@@ -74,7 +74,13 @@ it (`task setup`, `task serve`).
 ## 3. Write the site folder
 
 Write `site/site.json` from the answers. Every setting is explained in the core's
-[`site/README.md`](../site/README.md). Delete `site/theme.css` unless the owner wants to change a design token
+[`site/README.md`](../site/README.md).
+
+Write the three features in `features` with the owner's answers, `true` or `false`, so the choice can be read in
+the file: `"features": { "mainEventPot": true, "timeChip": false, "seasonPlanner": true }`. The same README lists
+what each one turns off.
+
+Delete `site/theme.css` unless the owner wants to change a design token
 other than the main color.
 
 Then draw the app icons on the site's color:
