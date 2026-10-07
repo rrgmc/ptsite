@@ -4,6 +4,7 @@ import { ApiError, type Player } from '@/api/client'
 import { useRemovePlayerPhoto, useSavePlayerPhoto } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { t } from '@/i18n'
 import { playerImageUrl } from '@/lib/playerImages'
 import { shrinkPicture } from '@/lib/resizeImage'
 
@@ -34,7 +35,7 @@ export function PlayerImagesEditor({ player }: { player: Player }) {
 
   const failure = save.error ?? remove.error
   const message = unreadable
-    ? 'Não foi possível ler este arquivo. Escolha uma imagem JPEG, PNG ou WebP.'
+    ? t.players.photo.unreadable
     : failure instanceof ApiError
       ? (failure.fieldError('image') ?? failure.message)
       : failure?.message
@@ -42,25 +43,25 @@ export function PlayerImagesEditor({ player }: { player: Player }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       {url ? (
-        <img src={url} alt={`Foto de ${player.nickname}`} className="h-32 w-24 shrink-0 rounded-md bg-surface-sunken object-cover" />
+        <img src={url} alt={t.players.photoAlt({ nickname: player.nickname })} className="h-32 w-24 shrink-0 rounded-md bg-surface-sunken object-cover" />
       ) : (
-        <span className="flex h-32 w-24 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-center text-xs text-muted">Sem foto</span>
+        <span className="flex h-32 w-24 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-center text-xs text-muted">{t.players.photo.none}</span>
       )}
-      <p className="min-w-0 flex-1 basis-40 text-sm text-muted">Aparece ao lado do apelido nas listas e abre ao tocar nela. O site usa o meio da imagem.</p>
+      <p className="min-w-0 flex-1 basis-40 text-sm text-muted">{t.players.photo.help}</p>
       <div className="flex flex-wrap gap-2">
         <FileTrigger acceptedFileTypes={['image/jpeg', 'image/png', 'image/webp']} onSelect={(files) => void send(files?.[0])}>
-          <Button variant="secondary" isPending={save.isPending} aria-label={url ? 'Trocar foto' : 'Enviar foto'}>{url ? 'Trocar' : 'Enviar'}</Button>
+          <Button variant="secondary" isPending={save.isPending} aria-label={url ? t.players.photo.replaceLabel : t.players.photo.sendLabel}>{url ? t.players.photo.replace : t.players.photo.send}</Button>
         </FileTrigger>
         {url && (
-          <Button variant="ghost" isPending={remove.isPending} onPress={() => setConfirming(true)} aria-label="Remover foto">Remover</Button>
+          <Button variant="ghost" isPending={remove.isPending} onPress={() => setConfirming(true)} aria-label={t.players.photo.removeLabel}>{t.common.remove}</Button>
         )}
       </div>
       {message && <p role="alert" className="w-full rounded-md bg-danger-soft p-3 text-danger">{message}</p>}
       <ConfirmDialog
         isOpen={confirming}
         onOpenChange={setConfirming}
-        title="Remover a foto?"
-        confirmLabel="Remover"
+        title={t.players.photo.removeConfirmTitle}
+        confirmLabel={t.common.remove}
         confirmVariant="danger"
         isPending={remove.isPending}
         onConfirm={() => {
@@ -69,7 +70,7 @@ export function PlayerImagesEditor({ player }: { player: Player }) {
           remove.mutate({ playerId: player.id }, { onSettled: () => setConfirming(false) })
         }}
       >
-        A foto de {player.nickname} deixa de aparecer no site.
+        {t.players.photo.removeConfirmText({ nickname: player.nickname })}
       </ConfirmDialog>
     </div>
   )

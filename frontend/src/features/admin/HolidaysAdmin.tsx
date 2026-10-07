@@ -15,15 +15,16 @@ import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { Badge, ErrorBox, Loading } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { formatLongDate } from '@/lib/format'
 import { holidayRule } from './holidayRule'
 
 const SCOPES = [
-  { id: 'national', label: 'Nacional' },
-  { id: 'state', label: 'Estadual (SP)' },
-  { id: 'city', label: 'Municipal (São Paulo)' },
+  { id: 'national', label: t.admin.holidays.scopeNational },
+  { id: 'state', label: t.admin.holidays.scopeState },
+  { id: 'city', label: t.admin.holidays.scopeCity },
 ]
-const scopeLabel = (scope: string | null) => SCOPES.find((s) => s.id === scope)?.label ?? 'Só neste ano'
+const scopeLabel = (scope: string | null) => SCOPES.find((s) => s.id === scope)?.label ?? t.admin.holidays.scopeOneYear
 
 /** "Feriados": the holiday table used by the season planner, and its changes for a single year. */
 export function HolidaysAdmin({ initialYear = new Date().getFullYear() + 1 }: { initialYear?: number }) {
@@ -31,10 +32,7 @@ export function HolidaysAdmin({ initialYear = new Date().getFullYear() + 1 }: { 
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-muted">
-        Usados em “Planejar datas” de cada temporada. Evento em feriado, na véspera de feriado (emenda) ou no fim de
-        semana de Carnaval fica de fora do plano.
-      </p>
+      <p className="text-muted">{t.admin.holidays.intro}</p>
       <YearCalendar year={year} setYear={setYear} />
       <ExtraHolidayForm year={year} />
       <HolidayTable />
@@ -50,11 +48,11 @@ function YearCalendar({ year, setYear }: { year: number; setYear: (y: number) =>
 
   return (
     <Card
-      title={`Feriados de ${year}`}
+      title={t.admin.holidays.yearTitle({ year })}
       action={
         <span className="flex">
-          <Button variant="ghost" aria-label="Ano anterior" onPress={() => setYear(year - 1)}>‹</Button>
-          <Button variant="ghost" aria-label="Próximo ano" onPress={() => setYear(year + 1)}>›</Button>
+          <Button variant="ghost" aria-label={t.admin.holidays.previousYear} onPress={() => setYear(year - 1)}>‹</Button>
+          <Button variant="ghost" aria-label={t.admin.holidays.nextYear}onPress={() => setYear(year + 1)}>›</Button>
         </span>
       }
     >
@@ -68,12 +66,12 @@ function YearCalendar({ year, setYear }: { year: number; setYear: (y: number) =>
                 <span className="block text-sm text-muted">{formatLongDate(h.date)} · {scopeLabel(h.scope)}</span>
               </span>
               <span className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
-                {h.cancelled && <Badge tone="warning">Não haverá em {year}</Badge>}
-                {h.holiday_id === null && <Badge tone="primary">Só em {year}</Badge>}
+                {h.cancelled && <Badge tone="warning">{t.admin.holidays.notThisYear({ year })}</Badge>}
+                {h.holiday_id === null && <Badge tone="primary">{t.admin.holidays.onlyThisYear({ year })}</Badge>}
                 {h.exception_id !== null ? (
-                  <Button variant="ghost" className="px-2" onPress={() => undo.mutate(h.exception_id!)}>{h.cancelled ? 'Desfazer' : 'Remover'}</Button>
+                  <Button variant="ghost" className="px-2" onPress={() => undo.mutate(h.exception_id!)}>{h.cancelled ? t.admin.holidays.undo : t.common.remove}</Button>
                 ) : (
-                  <Button variant="ghost" className="px-2" onPress={() => cancel.mutate({ year, holiday_id: h.holiday_id! })}>Não haverá</Button>
+                  <Button variant="ghost" className="px-2" onPress={() => cancel.mutate({ year, holiday_id: h.holiday_id! })}>{t.admin.holidays.wontHappen}</Button>
                 )}
               </span>
             </li>
@@ -91,7 +89,7 @@ function ExtraHolidayForm({ year }: { year: number }) {
   const error = save.error instanceof ApiError ? save.error : null
 
   return (
-    <Card title={`Feriado só em ${year}`}>
+    <Card title={t.admin.holidays.extraTitle({ year })}>
       <Form
         className="grid grid-cols-1 gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end"
         onSubmit={(e) => {
@@ -99,9 +97,9 @@ function ExtraHolidayForm({ year }: { year: number }) {
           save.mutate({ year, date, name }, { onSuccess: () => { setDate(''); setName('') } })
         }}
       >
-        <TextField label="Data" type="date" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('date')} />
-        <TextField label="Nome" value={name} onChange={setName} isRequired errorMessage={error?.fieldError('name')} />
-        <Button type="submit" variant="secondary" isPending={save.isPending}>Adicionar</Button>
+        <TextField label={t.common.date} type="date" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('date')} />
+        <TextField label={t.common.name} value={name} onChange={setName} isRequired errorMessage={error?.fieldError('name')} />
+        <Button type="submit" variant="secondary" isPending={save.isPending}>{t.admin.holidays.add}</Button>
       </Form>
     </Card>
   )
@@ -115,7 +113,7 @@ function HolidayTable() {
   const isSaving = (id: number) => save.isPending && save.variables?.id === id
 
   return (
-    <Card title="Tabela de feriados" action={!adding && <Button variant="ghost" onPress={() => setAdding(true)}>+ Novo feriado</Button>}>
+    <Card title={t.admin.holidays.tableTitle} action={!adding && <Button variant="ghost" onPress={() => setAdding(true)}>{t.admin.holidays.newHoliday}</Button>}>
       {adding && <HolidayForm onDone={() => setAdding(false)} />}
       {save.error && <ErrorBox error={save.error} />}
       {holidays.isPending ? <Loading /> : holidays.error ? <ErrorBox error={holidays.error} /> : (
@@ -125,7 +123,7 @@ function HolidayTable() {
               <span className="min-w-0 wrap-break-word hyphens-auto">
                 <span className="flex flex-wrap items-center gap-x-2">
                   <span className={`font-semibold ${h.archived ? 'text-muted line-through' : ''}`}>{h.name}</span>
-                  {h.archived && <Badge tone="danger">arquivado</Badge>}
+                  {h.archived && <Badge tone="danger">{t.common.archived}</Badge>}
                 </span>
                 <span className="block text-sm text-muted">{holidayRule(h)} · {scopeLabel(h.scope)}</span>
               </span>
@@ -134,9 +132,9 @@ function HolidayTable() {
                 variant="ghost"
                 isPending={isSaving(h.id)}
                 onPress={() => (h.archived ? save.mutate({ id: h.id, archived: false }) : setArchiving(h))}
-                aria-label={`${h.archived ? 'Restaurar' : 'Arquivar'} ${h.name}`}
+                aria-label={h.archived ? t.admin.restoreItem({ name: h.name }) : t.admin.archiveItem({ name: h.name })}
               >
-                {h.archived ? 'Restaurar' : 'Arquivar'}
+                {h.archived ? t.common.restore : t.common.archive}
               </Button>
             </li>
           ))}
@@ -146,13 +144,13 @@ function HolidayTable() {
         <ConfirmDialog
           isOpen
           onOpenChange={() => setArchiving(null)}
-          title={`Arquivar ${archiving.name}?`}
-          confirmLabel="Arquivar"
+          title={t.admin.archiveConfirmTitle({ name: archiving.name })}
+          confirmLabel={t.common.archive}
           confirmVariant="danger"
           isPending={save.isPending}
           onConfirm={() => save.mutate({ id: archiving.id, archived: true }, { onSettled: () => setArchiving(null) })}
         >
-          O feriado deixa de contar em “Planejar datas” e sai dos calendários. Dá para restaurar depois, nesta tabela.
+          {t.admin.holidays.archiveConfirmBody}
         </ConfirmDialog>
       )}
     </Card>
@@ -186,20 +184,20 @@ function HolidayForm({ onDone }: { onDone: () => void }) {
         )
       }}
     >
-      <TextField label="Nome" value={name} onChange={setName} isRequired errorMessage={error?.fieldError('name')} />
-      <Select label="Abrangência" options={SCOPES} selectedKey={scope ?? null} onSelectionChange={(k) => setScope(k as HolidayInput['scope'])} />
+      <TextField label={t.common.name} value={name} onChange={setName} isRequired errorMessage={error?.fieldError('name')} />
+      <Select label={t.admin.holidays.scope} options={SCOPES} selectedKey={scope ?? null} onSelectionChange={(k) => setScope(k as HolidayInput['scope'])} />
       <Select
-        label="Quando"
-        options={[{ id: 'fixed', label: 'Mesmo dia todo ano' }, { id: 'easter', label: 'Relativo à Páscoa' }]}
+        label={t.admin.holidays.when}
+        options={[{ id: 'fixed', label: t.admin.holidays.sameDayEveryYear }, { id: 'easter', label: t.admin.holidays.relativeToEaster }]}
         selectedKey={kind}
         onSelectionChange={(k) => setKind(k === 'easter' ? 'easter' : 'fixed')}
       />
       {kind === 'fixed' ? (
-        <TextField label="Dia e mês" placeholder="21/04" inputMode="numeric" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('day') ?? error?.fieldError('month')} />
+        <TextField label={t.admin.holidays.dayAndMonth} placeholder={t.admin.holidays.dayAndMonthExample} inputMode="numeric" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('day') ?? error?.fieldError('month')} />
       ) : (
         <TextField
-          label="Dias depois da Páscoa"
-          description="Negativo para antes: Sexta-feira Santa é −2, Corpus Christi é 60."
+          label={t.admin.holidays.daysAfterEaster}
+          description={t.admin.holidays.daysAfterEasterHelp}
           inputMode="numeric"
           value={offset}
           onChange={setOffset}
@@ -207,11 +205,11 @@ function HolidayForm({ onDone }: { onDone: () => void }) {
           errorMessage={error?.fieldError('easter_offset')}
         />
       )}
-      <TextField label="A partir do ano (opcional)" inputMode="numeric" value={firstYear} onChange={setFirstYear} errorMessage={error?.fieldError('first_year')} />
+      <TextField label={t.admin.holidays.firstYear} inputMode="numeric" value={firstYear} onChange={setFirstYear} errorMessage={error?.fieldError('first_year')} />
       {error && !error.body.errors?.name && <ErrorBox error={error} />}
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" isPending={save.isPending}>Salvar</Button>
-        <Button variant="ghost" onPress={onDone}>Cancelar</Button>
+        <Button type="submit" isPending={save.isPending}>{t.common.save}</Button>
+        <Button variant="ghost" onPress={onDone}>{t.common.cancel}</Button>
       </div>
     </Form>
   )

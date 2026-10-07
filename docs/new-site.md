@@ -37,7 +37,7 @@ Ask these before creating anything. Offer the default where there is one.
 | The folder and name of the new repository | | the name in lowercase, with `-site` |
 | The version of the core to pin | the submodule | the core's newest tag |
 
-The screens are in Brazilian Portuguese for now, so `locale` is `pt-BR`.
+Also ask the language: `locale` is `pt-BR` for Brazilian Portuguese, or `en` (or `en-US`, `en-GB`) for English.
 
 ## 2. Make the repository
 
@@ -116,6 +116,8 @@ core's version.
 - **A new version of the core.** `git -C core fetch --tags && git -C core checkout <new tag>`, then
   `composer update rrgmc/ptsite --with-dependencies` in `backend/`, `task frontend:install`, `task db:up` and
   `task build`. Read the core's release notes first. Commit the submodule and `composer.lock` together.
+- **Rewording a text of a screen.** Add `site/messages.json` with only the texts to change, in the shape of
+  `core/frontend/src/i18n/pt-BR` (the core's `site/README.md`). Then `task build`.
 - **Rewording a message of the API.** Add `backend/lang/pt_BR/rules.php` (or `auth.php`, `validation.php`)
   with only the lines to change. The site's own `lang` folder comes before the core's.
 - **Site-only backend code.** Add a service provider under `backend/app/`, name it in

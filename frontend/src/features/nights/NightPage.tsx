@@ -8,6 +8,7 @@ import { Card, PageHeader } from '@/components/Card'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { Badge, ErrorBox, Loading } from '@/components/Feedback'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { dayOf } from '@/lib/dates'
 import { formatTime, formatWeekday, nightTitle } from '@/lib/format'
 import { plainText } from '@/lib/plainText'
@@ -16,7 +17,7 @@ import { NightAttendance } from '../attendance/NightAttendance'
 import { NightResultCard } from '../results/NightResultCard'
 import { NightPartialResult } from './PartialResultCard'
 
-const statusLabel = { scheduled: 'Agendado', open: 'Aberto', finished: 'Finalizado' } as const
+const statusLabel = t.nights.status
 const secondaryLink = 'inline-flex min-h-touch items-center justify-center rounded-md border border-border bg-surface px-4 font-semibold hover:bg-surface-sunken'
 
 export function NightPage() {
@@ -41,26 +42,26 @@ export function NightPage() {
     <>
       <PageHeader
         title={nightTitle(n.starts_at)}
-        subtitle={<span>{formatWeekday(n.starts_at)} · {formatTime(n.starts_at)} · {n.place?.name ?? 'Local a definir'}</span>}
+        subtitle={<span>{formatWeekday(n.starts_at)} · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>}
         action={<Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{statusLabel[n.status]}</Badge>}
       />
 
       {description && <p className="mb-4 max-w-xl whitespace-pre-line">{description}</p>}
 
       {canRun && (
-        <Card className="mb-4" title="Ações">
+        <Card className="mb-4" title={t.nights.page.actions}>
           <div className="flex flex-col gap-2 sm:flex-row">
             {n.status === 'scheduled' && !n.archived && (
               <>
-                <Button onPress={() => setConfirming(true)}>Abrir evento</Button>
-                {!rescheduling && <Button variant="secondary" onPress={() => setRescheduling(true)}>Remarcar</Button>}
-                <Button variant="ghost" onPress={() => setCancelling(true)}>Cancelar evento</Button>
+                <Button onPress={() => setConfirming(true)}>{t.nights.page.openNight}</Button>
+                {!rescheduling && <Button variant="secondary" onPress={() => setRescheduling(true)}>{t.nights.page.reschedule}</Button>}
+                <Button variant="ghost" onPress={() => setCancelling(true)}>{t.nights.page.cancelNight}</Button>
               </>
             )}
-            {n.archived && <p className="text-muted">Este evento foi cancelado.</p>}
-            {n.status === 'open' && <Link to={`/nights/${n.id}/result`} className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover">Finalizar: lançar resultado</Link>}
-            {n.status === 'finished' && <Link to={`/nights/${n.id}/result`} className={secondaryLink}>Editar resultado</Link>}
-            {canEdit && <Link to={`/nights/${n.id}/edit`} className={secondaryLink}>Editar evento</Link>}
+            {n.archived && <p className="text-muted">{t.nights.nightCancelled}</p>}
+            {n.status === 'open' && <Link to={`/nights/${n.id}/result`} className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover">{t.nights.page.finishEnterResult}</Link>}
+            {n.status === 'finished' && <Link to={`/nights/${n.id}/result`} className={secondaryLink}>{t.nights.page.editResult}</Link>}
+            {canEdit && <Link to={`/nights/${n.id}/edit`} className={secondaryLink}>{t.nights.editNight}</Link>}
           </div>
           {open.error && <div className="mt-3"><ErrorBox error={open.error} /></div>}
           {rescheduling && <RescheduleForm night={n} onDone={() => setRescheduling(false)} />}
@@ -76,32 +77,32 @@ export function NightPage() {
       ) : n.status === 'open' && !n.archived ? (
         <NightPartialResult night={n} />
       ) : (
-        <Card><p className="text-muted">O resultado aparece aqui quando o evento for finalizado.</p></Card>
+        <Card><p className="text-muted">{t.nights.page.resultPlaceholder}</p></Card>
       )}
 
       <ConfirmDialog
         isOpen={cancelling}
         onOpenChange={setCancelling}
-        title="Cancelar este evento?"
-        confirmLabel="Cancelar evento"
-        cancelLabel="Voltar"
+        title={t.nights.page.cancelConfirmTitle}
+        confirmLabel={t.nights.page.cancelNight}
+        cancelLabel={t.common.back}
         confirmVariant="danger"
         isPending={cancel.isPending}
         onConfirm={() => cancel.mutate(undefined, { onSuccess: () => navigate('/results'), onSettled: () => setCancelling(false) })}
       >
-        O evento sai do calendário e a data fica livre. As respostas de presença ficam guardadas no histórico.
+        {t.nights.page.cancelConfirmBody}
         {cancel.error instanceof ApiError ? ` ${cancel.error.body.message}` : ''}
       </ConfirmDialog>
 
       <ConfirmDialog
         isOpen={confirming}
         onOpenChange={setConfirming}
-        title="Abrir este evento?"
-        confirmLabel="Abrir evento"
+        title={t.nights.page.openConfirmTitle}
+        confirmLabel={t.nights.page.openNight}
         isPending={open.isPending}
         onConfirm={() => open.mutate(n.id, { onSettled: () => setConfirming(false) })}
       >
-        Só um evento por temporada pode ficar aberto. {open.error instanceof ApiError ? open.error.body.message : ''}
+        {t.nights.page.openConfirmBody} {open.error instanceof ApiError ? open.error.body.message : ''}
       </ConfirmDialog>
     </>
   )
@@ -116,19 +117,19 @@ export function RescheduleForm({ night, onDone }: { night: Night; onDone: () => 
 
   return (
     <Form
-      aria-label="Remarcar evento"
+      aria-label={t.nights.reschedule.formLabel}
       className="mt-4 grid grid-cols-1 gap-3 rounded-md bg-surface-sunken p-3 sm:grid-cols-2"
       onSubmit={(e) => {
         e.preventDefault()
         reschedule.mutate({ starts_at: `${date} ${time}:00` }, { onSuccess: onDone })
       }}
     >
-      <TextField label="Nova data" type="date" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('starts_at')} />
-      <TextField label="Novo horário" type="time" value={time} onChange={setTime} isRequired />
+      <TextField label={t.nights.reschedule.newDate} type="date" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('starts_at')} />
+      <TextField label={t.nights.reschedule.newTime} type="time" value={time} onChange={setTime} isRequired />
       {error && !error.fieldError('starts_at') && <p role="alert" className="text-danger sm:col-span-2">{error.body.message}</p>}
       <div className="flex gap-2 sm:col-span-2">
-        <Button type="submit" isPending={reschedule.isPending}>Salvar nova data</Button>
-        <Button variant="ghost" onPress={onDone}>Voltar</Button>
+        <Button type="submit" isPending={reschedule.isPending}>{t.nights.reschedule.save}</Button>
+        <Button variant="ghost" onPress={onDone}>{t.common.back}</Button>
       </div>
     </Form>
   )

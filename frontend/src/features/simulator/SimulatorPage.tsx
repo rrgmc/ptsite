@@ -7,6 +7,7 @@ import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { PlayerLink } from '@/components/PlayerLink'
 import { formatPoints, ordinal, parseMoneyInput } from '@/lib/format'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
@@ -23,7 +24,7 @@ export function SimulatorPage() {
 
   if (isPending || players.isPending) return <Loading />
   if (error) return <ErrorBox error={error} />
-  if (!season) return <Empty>Nenhuma temporada cadastrada.</Empty>
+  if (!season) return <Empty>{t.simulator.noSeason}</Empty>
 
   const pot = parseMoneyInput(potText)
   const chosen = Object.values(order).filter((p): p is Player => p !== null).map((p) => p.id)
@@ -31,7 +32,7 @@ export function SimulatorPage() {
 
   return (
     <>
-      <PageHeader title="Simulação" subtitle={`E se o próximo evento terminar assim? · ${season.name}`} />
+      <PageHeader title={t.simulator.title} subtitle={t.simulator.subtitle({ season: season.name })} />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[22rem_1fr]">
         <Form
           className="flex flex-col gap-3"
@@ -43,35 +44,35 @@ export function SimulatorPage() {
         >
           <Card>
             <div className="flex flex-col gap-3">
-              <TextField label={`Pote imaginado (${currencySymbol})`} inputMode="decimal" value={potText} onChange={setPotText} placeholder="840,00" isRequired />
+              <TextField label={t.simulator.potLabel({ currency: currencySymbol })} inputMode="decimal" value={potText} onChange={setPotText} placeholder={t.simulator.potExample} isRequired />
               {percentages.map((p) => (
                 <PlayerPicker
                   key={p.position}
-                  label={`${ordinal(p.position)} lugar · ${p.percent}%`}
+                  label={t.simulator.positionLabel({ position: ordinal(p.position), percent: p.percent })}
                   players={players.data ?? []}
                   value={order[p.position] ?? null}
                   onChange={(player) => setOrder((o) => ({ ...o, [p.position]: player }))}
                   excludeIds={chosen.filter((id) => id !== order[p.position]?.id)}
                 />
               ))}
-              <Button type="submit" isDisabled={!complete} isPending={simulate.isPending}>Simular</Button>
-              <p className="text-sm text-muted">Nada é salvo.</p>
+              <Button type="submit" isDisabled={!complete} isPending={simulate.isPending}>{t.simulator.simulate}</Button>
+              <p className="text-sm text-muted">{t.simulator.nothingSaved}</p>
             </div>
           </Card>
         </Form>
 
-        <Card title="Classificação simulada">
+        <Card title={t.simulator.resultTitle}>
           {simulate.error && <ErrorBox error={simulate.error} />}
           {!simulate.data ? (
-            <Empty>Escolha o pote e a ordem de chegada para ver como ficaria a classificação.</Empty>
+            <Empty>{t.simulator.resultEmpty}</Empty>
           ) : (
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-border text-left text-xs uppercase text-muted">
                   <th scope="col" className="px-2 py-2">#</th>
-                  <th scope="col" className="py-2">Jogador</th>
-                  <th scope="col" className="py-2 text-right">Hoje</th>
-                  <th scope="col" className="py-2 pr-2 text-right">Simulado</th>
+                  <th scope="col" className="py-2">{t.common.player}</th>
+                  <th scope="col" className="py-2 text-right">{t.common.today}</th>
+                  <th scope="col" className="py-2 pr-2 text-right">{t.simulator.simulated}</th>
                 </tr>
               </thead>
               <tbody>
@@ -99,13 +100,13 @@ export function SimulatorPage() {
 }
 
 function Movement({ value }: { value: number | null }) {
-  if (value === null) return <span className="ml-1 text-xs text-primary" title="Entraria na classificação">novo</span>
+  if (value === null) return <span className="ml-1 text-xs text-primary" title={t.simulator.newEntryTitle}>{t.simulator.newEntry}</span>
   if (value === 0) return null
   const up = value > 0
   return (
     <span className={`ml-1 text-xs ${up ? 'text-success' : 'text-danger'}`}>
       <span aria-hidden>{up ? '▲' : '▼'}</span>
-      <span className="sr-only">{up ? 'sobe' : 'desce'}</span>
+      <span className="sr-only">{up ? t.simulator.movesUp : t.simulator.movesDown}</span>
       {Math.abs(value)}
     </span>
   )

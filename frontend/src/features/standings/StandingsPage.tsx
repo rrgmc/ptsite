@@ -3,6 +3,7 @@ import { useAttendance, useMe, useSeasonNights, useStandings } from '@/api/queri
 import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { formatDate, formatMoney, formatWeekday } from '@/lib/format'
+import { t } from '@/i18n'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { StandingsTable } from './StandingsTable'
@@ -14,7 +15,7 @@ export function StandingsPage() {
 
   if (isPending) return <Loading />
   if (error) return <ErrorBox error={error} />
-  if (!season) return <Empty>Nenhuma temporada cadastrada.</Empty>
+  if (!season) return <Empty>{t.standings.noSeason}</Empty>
 
   const finished = (nights.data ?? []).filter((n) => n.status === 'finished')
   const next = (nights.data ?? []).find((n) => n.status === 'open') ?? (nights.data ?? []).find((n) => n.status === 'scheduled')
@@ -24,8 +25,8 @@ export function StandingsPage() {
     <>
       <OpenNightAttendance />
       <PageHeader
-        title="Classificação"
-        subtitle={`${season.name} · ${finished.length} ${finished.length === 1 ? 'evento' : 'eventos'}`}
+        title={t.standings.title}
+        subtitle={t.standings.subtitle({ season: season.name, count: finished.length })}
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_20rem]">
@@ -36,32 +37,32 @@ export function StandingsPage() {
           ) : standings.error ? (
             <ErrorBox error={standings.error} />
           ) : standings.data!.length === 0 ? (
-            <Empty>Ninguém pontuou ainda nesta temporada.</Empty>
+            <Empty>{t.standings.nobodyScored}</Empty>
           ) : (
-            <StandingsTable rows={standings.data!} caption={`Classificação da temporada ${season.name}`} />
+            <StandingsTable rows={standings.data!} caption={t.standings.tableCaption({ season: season.name })} />
           )}
         </Card>
 
         <div className="flex flex-col gap-4">
           {next && (
-            <Card title={next.status === 'open' ? 'Evento aberto' : 'Próximo evento'}>
+            <Card title={next.status === 'open' ? t.standings.openNight : t.standings.nextNight}>
               <Link to={`/nights/${next.id}`} className="block rounded-md p-2 hover:bg-surface-sunken">
                 <span className="block font-semibold">{formatWeekday(next.starts_at)}</span>
-                <span className="text-muted">{next.place?.name ?? 'Local a definir'}</span>
+                <span className="text-muted">{next.place?.name ?? t.standings.placeToBeDefined}</span>
                 <NextNightAttendance nightId={next.id} isOpen={next.status === 'open'} />
               </Link>
             </Card>
           )}
           {last && (
-            <Card title="Último resultado" action={<Link to="/results" className="text-sm font-semibold text-primary">Ver todos</Link>}>
+            <Card title={t.standings.lastResult} action={<Link to="/results" className="text-sm font-semibold text-primary">{t.standings.seeAll}</Link>}>
               <Link to={`/nights/${last.id}`} className="block rounded-md p-2 hover:bg-surface-sunken">
-                <span className="block font-semibold">{formatDate(last.starts_at)} · Pote {formatMoney(last.pot)}</span>
+                <span className="block font-semibold">{t.standings.lastResultLine({ date: formatDate(last.starts_at), pot: formatMoney(last.pot) })}</span>
                 <span className="text-muted">🥇 {last.results?.[0]?.player.nickname}</span>
               </Link>
             </Card>
           )}
           <Link to="/simulator" className="rounded-lg border-2 border-dashed border-border p-4 text-center font-semibold text-primary hover:bg-primary-soft">
-            🔮 E se…? Simular o próximo evento
+            {t.standings.simulate}
           </Link>
         </div>
       </div>
@@ -78,9 +79,9 @@ function NextNightAttendance({ nightId, isOpen }: { nightId: number; isOpen: boo
   const mine = attendance.data.find((a) => a.player.id === me.data?.player?.id)?.answer
   return (
     <span className="mt-1 block text-sm">
-      {coming} {coming === 1 ? 'vai jogar' : 'vão jogar'} ·{' '}
+      {t.standings.coming({ count: coming })}{' '}
       {me.data?.player ? (
-        mine ? <span className="font-semibold">Você: {mine === 'all_in' ? 'ALL IN' : 'FOLD'}</span> : isOpen ? <span className="font-semibold text-primary">Confirme sua presença</span> : null
+        mine ? <span className="font-semibold">{t.standings.myAnswer({ answer: mine === 'all_in' ? t.attendance.allIn : t.attendance.fold })}</span> : isOpen ? <span className="font-semibold text-primary">{t.standings.confirmPresence}</span> : null
       ) : null}
     </span>
   )

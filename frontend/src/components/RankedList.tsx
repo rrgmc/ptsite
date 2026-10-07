@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { t } from '@/i18n'
 
 const medal = ['text-gold', 'text-silver', 'text-bronze']
 
@@ -7,7 +8,7 @@ export function RankCell({ rank, tied }: { rank: number; tied: boolean }) {
   return (
     <td className={`py-3 px-1 sm:px-2 font-display text-lg font-extrabold tabular ${medal[rank - 1] ?? 'text-muted'}`}>
       {rank}
-      {tied && <span className="sr-only"> (empatado)</span>}
+      {tied && <span className="sr-only"> {t.components.rankedList.tied}</span>}
     </td>
   )
 }
@@ -51,7 +52,7 @@ export function RankedList({ caption, labelHeader, valueHeader, rows, tiedNotSho
         </tbody>
       </table>
       {tiedNotShown > 0 && (
-        <p className="mt-2 text-sm text-muted">e mais {tiedNotShown} {tiedNotShown === 1 ? 'empatado' : 'empatados'}</p>
+        <p className="mt-2 text-sm text-muted">{t.components.rankedList.moreTied({ count: tiedNotShown })}</p>
       )}
     </div>
   )

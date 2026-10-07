@@ -9,6 +9,7 @@ demo site. A league's own repository has its own folder like this one, and point
 | `site.json` | The settings below. Required. |
 | `theme.css` | Optional. CSS that changes any design token of `frontend/src/tokens/tokens.css`, such as `:root { --color-accent: #1d4ed8; }`. |
 | `public/` | Optional. Files copied over the frontend's `public/` folder, such as the site's own `icons/`. |
+| `messages.json` | Optional. The site's own wording for single texts of `frontend/src/i18n`, such as `{"nights": {"mainEventPot": "Pote ME"}}`. |
 
 ## `site.json`
 
@@ -19,7 +20,7 @@ demo site. A league's own repository has its own folder like this one, and point
 | `tagline` | `Liga de pôquer entre amigos` | A line below the name on the login screen and in the signature of emails. Optional. |
 | `nightTitlePrefix` | `Liga` | The first word of a night's title: "Liga - 14/03/2026". Default: `shortName`. |
 | `logo` | `♠` | One character shown next to the name. Default: `♠`. |
-| `locale` | `pt-BR` | The language and the formats of dates and numbers. The screens are in Brazilian Portuguese for now. |
+| `locale` | `pt-BR` | The language and the formats of dates and numbers. The texts exist in Brazilian Portuguese (`pt-…`) and English (anything else). |
 | `currency` | `BRL` | The ISO 4217 code of the money. It must have two decimal places. |
 | `timeZone` | `America/Sao_Paulo` | The time zone of the league. Dates and times are shown in it, whatever the visitor's own. |
 | `brandColor` | `#14532d` | The main color, as `#rrggbb`. The hover and soft shades, the browser's theme color and the icon's background are made from it. It must be dark enough for light text on it: the build stops if it is not. |

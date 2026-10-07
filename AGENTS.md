@@ -127,10 +127,14 @@ Details and examples are in `docs/architecture/backend-layers.md` (including the
 - **Task.** `Taskfile.yml` gives the common commands short names ([go-task](https://taskfile.dev)): `task check`
   runs the "before pushing" list, `task api` the two API commands above, and `task --list` shows the rest. When
   a command here changes, change its task too.
-- **Language.** Screens and API error messages are in **Brazilian Portuguese (pt-BR)**, not European
-  Portuguese: use Brazilian vocabulary, spelling and formats (`celular`, not `telemóvel`; `R$ 1.234,56`;
-  `dd/mm/aaaa`). All code is in English: class, method, variable, table, column, endpoint and JSON field names,
-  website URL paths (`/nights/42`, not `/eventos/42`), plus comments and docs.
+- **Texts.** No screen writes a text of its own: every text is in `frontend/src/i18n`, in **Brazilian
+  Portuguese and English**, and the API's messages are in `backend/lang/pt_BR` and `backend/lang/en`. Add a
+  text to both languages in the same change (`docs/architecture/frontend.md`, "Texts"). `npm run lint` fails on
+  a text written in a component. The Portuguese is Brazilian, not European: Brazilian vocabulary and spelling
+  (`celular`, not `telemóvel`). Dates, numbers and money are never written by hand: they come from
+  `frontend/src/lib/format.ts`, in the site's language, money and time zone.
+- **Code is in English:** class, method, variable, table, column, endpoint and JSON field names, website URL
+  paths (`/nights/42`, not `/eventos/42`), plus comments and docs.
 - **Name.** Write `PTSite` in code namespaces (`PTSite\Domain`) and in prose. Write `ptsite` in lowercase where
   the name must be lowercase: package names, artisan commands and file names (`ptsite-frontend`,
   `ptsite:verify`).
@@ -138,8 +142,8 @@ Details and examples are in `docs/architecture/backend-layers.md` (including the
 
 ## Glossary
 
-Screens use Brazilian Portuguese for now. A translation layer with English is planned. Code uses English. Use
-this table to map one to the other.
+The demo site's screens are in Brazilian Portuguese, and the specs quote them. Code uses English. Use this table
+to map one to the other. The English texts of the screens are in `frontend/src/i18n/en`.
 
 | Brazilian Portuguese (screens) | English (code and docs) | Meaning |
 |---|---|---|

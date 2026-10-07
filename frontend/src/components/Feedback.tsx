@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { ApiError } from '@/api/client'
+import { t } from '@/i18n'
 
-export function Loading({ label = 'Carregando…' }: { label?: string }) {
+export function Loading({ label = t.common.loading }: { label?: string }) {
   return (
     <div role="status" className="flex items-center gap-3 p-6 text-muted">
       <span aria-hidden className="size-5 animate-spin rounded-full border-2 border-border border-t-primary" />
@@ -12,7 +13,7 @@ export function Loading({ label = 'Carregando…' }: { label?: string }) {
 
 export function ErrorBox({ error }: { error: unknown }) {
   const message =
-    error instanceof ApiError ? error.body.message : 'Algo deu errado. Verifique sua conexão e tente de novo.'
+    error instanceof ApiError ? error.body.message : t.components.connectionError
   return (
     <div role="alert" className="rounded-md border border-danger bg-danger-soft p-4 text-danger">
       {message}

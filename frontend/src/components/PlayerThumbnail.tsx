@@ -1,5 +1,6 @@
 import { Button as AriaButton, Dialog, DialogTrigger, Heading, Modal, ModalOverlay } from 'react-aria-components'
 import type { Player } from '@/api/client'
+import { t } from '@/i18n'
 import { playerImageUrl } from '@/lib/playerImages'
 import { Button } from './Button'
 
@@ -38,7 +39,7 @@ export function PlayerPhotoButton({ player }: { player: PlayerImages }) {
   return (
     <DialogTrigger>
       <AriaButton
-        aria-label={`Ver foto de ${player.nickname}`}
+        aria-label={t.components.playerPhoto.view({ nickname: player.nickname })}
         className="shrink-0 rounded-sm hover:opacity-90 focus-visible:outline-3 focus-visible:outline-focus focus-visible:outline-offset-2"
       >
         <PlayerThumbnail player={player} />
@@ -49,8 +50,8 @@ export function PlayerPhotoButton({ player }: { player: PlayerImages }) {
             {({ close }) => (
               <>
                 <Heading slot="title" className="text-lg font-bold">{player.nickname}</Heading>
-                <img src={photo} alt={`Foto de ${player.nickname}`} className="w-52 max-w-full rounded-md bg-surface-sunken" />
-                <Button variant="secondary" onPress={close}>Fechar</Button>
+                <img src={photo} alt={t.components.playerPhoto.alt({ nickname: player.nickname })} className="w-52 max-w-full rounded-md bg-surface-sunken" />
+                <Button variant="secondary" onPress={close}>{t.common.close}</Button>
               </>
             )}
           </Dialog>

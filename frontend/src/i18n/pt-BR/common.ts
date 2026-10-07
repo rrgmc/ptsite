@@ -39,6 +39,9 @@ export const common = {
   nickname: 'Apelido',
   password: 'Senha',
 
+  /** A place in an order: 1 is "1º". */
+  ordinal: ({ position }: { position: number }) => `${position}º`,
+
   /** The roles as the screens name them (docs/specs/accounts-and-roles.md). */
   roles: {
     player: 'Jogador',

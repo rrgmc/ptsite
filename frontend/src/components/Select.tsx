@@ -9,6 +9,7 @@ import {
   SelectValue,
   type Key,
 } from 'react-aria-components'
+import { t } from '@/i18n'
 
 export interface SelectOption {
   id: Key
@@ -20,7 +21,7 @@ export function Select({
   options,
   selectedKey,
   onSelectionChange,
-  placeholder = 'Selecione',
+  placeholder = t.common.select,
   errorMessage,
 }: {
   label: string

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { TextField } from './TextField'
 
 interface NewPasswordFieldsProps {
@@ -15,8 +16,8 @@ interface NewPasswordFieldsProps {
 export function NewPasswordFields({ password, repeated, onPasswordChange, onRepeatedChange, mismatch, errorMessage }: NewPasswordFieldsProps) {
   return (
     <>
-      <TextField label="Nova senha" type="password" autoComplete="new-password" description="Pelo menos 8 caracteres." value={password} onChange={onPasswordChange} isRequired errorMessage={errorMessage} />
-      <TextField label="Repetir a nova senha" type="password" autoComplete="new-password" value={repeated} onChange={onRepeatedChange} isRequired errorMessage={mismatch ? 'As duas senhas não são iguais.' : undefined} />
+      <TextField label={t.components.newPassword.label} type="password" autoComplete="new-password" description={t.components.newPassword.hint} value={password} onChange={onPasswordChange} isRequired errorMessage={errorMessage} />
+      <TextField label={t.components.newPassword.repeatLabel} type="password" autoComplete="new-password" value={repeated} onChange={onRepeatedChange} isRequired errorMessage={mismatch ? t.components.newPassword.mismatch : undefined} />
     </>
   )
 }

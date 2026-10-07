@@ -1,12 +1,9 @@
-import { site } from '@/lib/site'
-
-const rules = new Intl.PluralRules(site.locale)
-
 /**
- * Picks the form for a number, by the site's language: plural(2, { one: 'evento', other: 'eventos' }) is
- * "eventos". `other` is the form for every case a language has and the texts do not name.
+ * Picks the form for a number: plural(2, { one: 'evento', other: 'eventos' }) is "eventos".
+ *
+ * Only exactly 1 takes `one`. The site writes "0 eventos", in Portuguese too, where the language's own rule
+ * (Intl.PluralRules) would say "0 evento". Both languages of the catalogue have these two forms and no more.
  */
-export function plural(count: number, forms: { one: string; other: string; zero?: string }): string {
-  const rule = rules.select(count)
-  return (rule === 'zero' ? forms.zero : rule === 'one' ? forms.one : undefined) ?? forms.other
+export function plural(count: number, forms: { one: string; other: string }): string {
+  return count === 1 ? forms.one : forms.other
 }

@@ -6,6 +6,8 @@ import { useRequestPasswordReset } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { ErrorBox } from '@/components/Feedback'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
+import { rich } from '@/i18n/rich'
 import { AuthShell, authLinkClass } from './AuthShell'
 
 /**
@@ -18,12 +20,12 @@ export function ForgotPasswordPage() {
   const error = request.error instanceof ApiError ? request.error : null
 
   return (
-    <AuthShell title="Esqueci minha senha">
+    <AuthShell title={t.auth.forgotPassword}>
       <div className="flex flex-col gap-4 rounded-lg bg-surface p-5 shadow-card">
-        <h2 className="font-display text-xl font-bold">Esqueci minha senha</h2>
+        <h2 className="font-display text-xl font-bold">{t.auth.forgotPassword}</h2>
         {request.isSuccess ? (
           <p role="status">
-            Enviamos um link para <strong>{request.data.email}</strong>. Ele vale por 60 minutos. Confira também a caixa de spam.
+            {rich(t.auth.forgot.sent, { email: <strong>{request.data.email}</strong> })}
           </p>
         ) : (
           <Form
@@ -33,14 +35,14 @@ export function ForgotPasswordPage() {
               request.mutate({ login })
             }}
           >
-            <p className="text-muted">Informe o seu usuário ou o seu e-mail. Enviamos um link para você escolher uma nova senha.</p>
-            <TextField label="Usuário ou e-mail" name="login" autoComplete="username" value={login} onChange={setLogin} isRequired autoFocus errorMessage={error?.fieldError('login')} />
+            <p className="text-muted">{t.auth.forgot.intro}</p>
+            <TextField label={t.auth.forgot.loginLabel} name="login" autoComplete="username" value={login} onChange={setLogin} isRequired autoFocus errorMessage={error?.fieldError('login')} />
             {request.error && !error?.fieldError('login') && <ErrorBox error={request.error} />}
-            <Button type="submit" isPending={request.isPending} fullWidth>Enviar link</Button>
+            <Button type="submit" isPending={request.isPending} fullWidth>{t.auth.forgot.sendLink}</Button>
           </Form>
         )}
       </div>
-      <Link to="/login" className={`mt-2 ${authLinkClass}`}>Voltar para o login</Link>
+      <Link to="/login" className={`mt-2 ${authLinkClass}`}>{t.auth.forgot.backToLogin}</Link>
     </AuthShell>
   )
 }

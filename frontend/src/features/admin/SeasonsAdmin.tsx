@@ -9,7 +9,8 @@ import { Checkbox } from '@/components/Checkbox'
 import { Badge, ErrorBox, Loading } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
-import { formatDate } from '@/lib/format'
+import { t } from '@/i18n'
+import { formatDate, ordinal } from '@/lib/format'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 
 const STANDARD = [38, 23, 15, 11, 8, 5]
@@ -23,23 +24,32 @@ export function SeasonsAdmin() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Button className="self-start" onPress={() => navigate('/admin/seasons/new')}>+ Nova temporada</Button>
+      <Button className="self-start" onPress={() => navigate('/admin/seasons/new')}>{t.admin.seasons.newSeason}</Button>
       <Card>
         <ul className="divide-y divide-border/60">
           {seasons.data!.map((s) => (
             <li key={s.id} className="flex min-h-touch flex-wrap items-center justify-between gap-2 px-2 py-2 even:bg-surface-stripe">
               <span>
                 <span className="font-semibold">{s.name}</span>
-                <span className="block text-sm text-muted">Início {formatDate(s.starts_on)} · {s.nights_planned ?? 0} de {s.rounds} rodadas ({s.nights_count} finalizadas) · {s.percentages?.map((p) => p.percent).join('/')}% · {WEEKDAYS[s.schedule.weekday - 1]?.label} {s.schedule.time}, {EVERY_WEEKS[s.schedule.every_weeks - 1]?.label.toLowerCase()}</span>
+                <span className="block text-sm text-muted">{t.admin.seasons.summary({
+                  start: formatDate(s.starts_on),
+                  planned: s.nights_planned ?? 0,
+                  rounds: s.rounds,
+                  finished: s.nights_count ?? 0,
+                  percents: s.percentages?.map((p) => p.percent).join('/') ?? '',
+                  weekday: WEEKDAYS[s.schedule.weekday - 1]?.label ?? '',
+                  time: s.schedule.time,
+                  every: EVERY_WEEKS[s.schedule.every_weeks - 1]?.label.toLowerCase() ?? '',
+                })}</span>
               </span>
               <span className="flex flex-wrap items-center gap-2">
-                {s.is_finished ? <Badge>Finalizada</Badge> : s.is_open ? <Badge tone="primary">Aberta</Badge> : <Badge tone="warning">Fechada</Badge>}
+                {s.is_finished ? <Badge>{t.admin.seasons.finished}</Badge> : s.is_open ? <Badge tone="primary">{t.admin.seasons.open}</Badge> : <Badge tone="warning">{t.admin.seasons.closed}</Badge>}
                 {!s.is_finished && (
                   <Link to={`/admin/seasons/${s.id}/plan`} className="inline-flex min-h-touch items-center rounded-md px-4 font-semibold text-primary hover:bg-primary-soft">
-                    Planejar datas
+                    {t.admin.seasons.planDates}
                   </Link>
                 )}
-                <Button variant="ghost" onPress={() => navigate(`/admin/seasons/${s.id}`)} aria-label={`Editar ${s.name}`}>Editar</Button>
+                <Button variant="ghost" onPress={() => navigate(`/admin/seasons/${s.id}`)} aria-label={t.admin.editItem({ name: s.name })}>{t.common.edit}</Button>
               </span>
             </li>
           ))}
@@ -63,7 +73,7 @@ export function SeasonEditPage() {
 
   return (
     <div className="flex flex-col gap-3">
-      <Link to="/admin" className="inline-flex min-h-touch items-center self-start font-semibold text-primary">‹ Temporadas</Link>
+      <Link to="/admin" className="inline-flex min-h-touch items-center self-start font-semibold text-primary">{t.admin.seasons.back}</Link>
       {id === undefined ? (
         <SeasonForm season={null} onDone={back} />
       ) : seasons.isPending ? (
@@ -73,7 +83,7 @@ export function SeasonEditPage() {
       ) : season ? (
         <SeasonForm key={season.id} season={season} onDone={back} />
       ) : (
-        <ErrorBox error={new Error('Temporada não encontrada.')} />
+        <ErrorBox error={new Error(t.admin.seasons.notFound)} />
       )}
     </div>
   )
@@ -95,7 +105,7 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
   const error = save.error instanceof ApiError ? save.error : null
 
   return (
-    <Card title={season ? `Editar ${season.name}` : 'Nova temporada'}>
+    <Card title={season ? t.admin.editItem({ name: season.name }) : t.admin.seasons.newTitle}>
       <Form
         className="flex flex-col gap-3"
         onSubmit={(e) => {
@@ -119,46 +129,46 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
           )
         }}
       >
-        <TextField label="Nome" value={name} onChange={setName} isRequired errorMessage={error?.fieldError('name')} />
-        <TextField label="Início" type="date" value={startsOn} onChange={setStartsOn} isRequired errorMessage={error?.fieldError('starts_on')} />
+        <TextField label={t.common.name} value={name} onChange={setName} isRequired errorMessage={error?.fieldError('name')} />
+        <TextField label={t.admin.seasons.start} type="date" value={startsOn} onChange={setStartsOn} isRequired errorMessage={error?.fieldError('starts_on')} />
         <TextField
-          label="Rodadas"
-          description="Quantos eventos a temporada tem (normalmente 26). Vazio na nova temporada: igual à anterior."
+          label={t.admin.seasons.rounds}
+          description={t.admin.seasons.roundsHelp}
           inputMode="numeric"
           value={rounds}
           onChange={setRounds}
           errorMessage={error?.fieldError('rounds')}
         />
-        <Select label="Local padrão" options={(places.data ?? []).map((p) => ({ id: p.id, label: p.name }))} selectedKey={placeId} onSelectionChange={(k) => setPlaceId(k === null ? null : Number(k))} />
+        <Select label={t.admin.seasons.defaultPlace} options={(places.data ?? []).map((p) => ({ id: p.id, label: p.name }))} selectedKey={placeId} onSelectionChange={(k) => setPlaceId(k === null ? null : Number(k))} />
         <fieldset className="min-w-0 rounded-md border border-border p-3">
-          <legend className="px-1 text-sm font-semibold">Evento habitual (usado para sugerir e planejar datas)</legend>
+          <legend className="px-1 text-sm font-semibold">{t.admin.seasons.regularNight}</legend>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Select label="Dia da semana" options={WEEKDAYS} selectedKey={weekday} onSelectionChange={(k) => setWeekday(k === null ? null : Number(k))} placeholder={season ? 'Selecione' : 'Igual à temporada anterior'} />
-            <TextField label="Horário" type="time" value={nightTime} onChange={setNightTime} errorMessage={error?.fieldError('schedule_time')} />
-            <Select label="Frequência" options={EVERY_WEEKS} selectedKey={everyWeeks} onSelectionChange={(k) => setEveryWeeks(k === null ? null : Number(k))} placeholder={season ? 'Selecione' : 'Igual à temporada anterior'} />
+            <Select label={t.admin.seasons.weekday} options={WEEKDAYS} selectedKey={weekday} onSelectionChange={(k) => setWeekday(k === null ? null : Number(k))} placeholder={season ? t.common.select : t.admin.seasons.sameAsPrevious} />
+            <TextField label={t.admin.seasons.time} type="time" value={nightTime} onChange={setNightTime} errorMessage={error?.fieldError('schedule_time')} />
+            <Select label={t.admin.seasons.frequency} options={EVERY_WEEKS} selectedKey={everyWeeks} onSelectionChange={(k) => setEveryWeeks(k === null ? null : Number(k))} placeholder={season ? t.common.select : t.admin.seasons.sameAsPrevious} />
           </div>
         </fieldset>
         <fieldset className="min-w-0 rounded-md border border-border p-3">
-          <legend className="px-1 text-sm font-semibold">Pontuação (% do pote por posição)</legend>
+          <legend className="px-1 text-sm font-semibold">{t.admin.seasons.percentages}</legend>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {percents.map((p, i) => (
-              <TextField key={i} label={`${i + 1}º`} inputMode="numeric" value={p} onChange={(v) => setPercents((all) => all.map((x, j) => (j === i ? v : x)))} />
+              <TextField key={i} label={ordinal(i + 1)} inputMode="numeric" value={p} onChange={(v) => setPercents((all) => all.map((x, j) => (j === i ? v : x)))} />
             ))}
           </div>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm">
-            <span className={total === 100 ? 'text-success' : 'font-semibold text-danger'}>Total: {total}%</span>
+            <span className={total === 100 ? 'text-success' : 'font-semibold text-danger'}>{t.admin.seasons.total({ total })}</span>
             <span className="flex flex-wrap gap-1">
-              <Button variant="ghost" onPress={() => setPercents((all) => [...all, '0'])}>+ posição</Button>
-              {percents.length > 1 && <Button variant="ghost" onPress={() => setPercents((all) => all.slice(0, -1))}>− posição</Button>}
+              <Button variant="ghost" onPress={() => setPercents((all) => [...all, '0'])}>{t.admin.seasons.addPosition}</Button>
+              {percents.length > 1 && <Button variant="ghost" onPress={() => setPercents((all) => all.slice(0, -1))}>{t.admin.seasons.removePosition}</Button>}
             </span>
           </div>
           {error?.fieldError('percentages') && <p role="alert" className="mt-1 text-sm text-danger">{error.fieldError('percentages')}</p>}
         </fieldset>
-        <Checkbox isSelected={isFinished} onChange={setIsFinished}>Temporada finalizada</Checkbox>
+        <Checkbox isSelected={isFinished} onChange={setIsFinished}>{t.admin.seasons.isFinished}</Checkbox>
         {error && !error.body.errors && <ErrorBox error={error} />}
         <div className="flex flex-wrap gap-2">
-          <Button type="submit" isPending={save.isPending}>Salvar</Button>
-          <Button variant="ghost" onPress={onDone}>Cancelar</Button>
+          <Button type="submit" isPending={save.isPending}>{t.common.save}</Button>
+          <Button variant="ghost" onPress={onDone}>{t.common.cancel}</Button>
         </div>
       </Form>
     </Card>

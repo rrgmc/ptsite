@@ -18,6 +18,7 @@ import {
 } from 'react-aria-components'
 import type { Player } from '@/api/client'
 import { useQuickAddPlayer } from '@/api/queries'
+import { t } from '@/i18n'
 
 const NEW = 'new:'
 const NONE = 'none'
@@ -100,7 +101,7 @@ export function PlayerPicker({
     p.id === value?.id ? (
       <span className="font-bold text-primary">
         <span aria-hidden>✓</span>
-        <span className="sr-only">(escolhido)</span>
+        <span className="sr-only">{t.components.playerPicker.chosen}</span>
       </span>
     ) : null
 
@@ -116,7 +117,7 @@ export function PlayerPicker({
           aria-describedby={error ? errorId : undefined}
           className={`flex min-h-touch items-center justify-between rounded-md border bg-surface px-3 text-left ${error ? 'border-danger' : 'border-border'}`}
         >
-          <span id={`${labelId}-value`} className={value ? 'font-semibold' : 'text-muted'}>{value?.nickname ?? 'Escolher jogador'}</span>
+          <span id={`${labelId}-value`} className={value ? 'font-semibold' : 'text-muted'}>{value?.nickname ?? t.components.playerPicker.choose}</span>
           <span aria-hidden className="text-muted">▾</span>
         </Button>
         <ModalOverlay isDismissable className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
@@ -124,24 +125,24 @@ export function PlayerPicker({
             <Dialog aria-labelledby={labelId} className="flex min-h-0 flex-1 flex-col outline-none">
               <div className="flex items-center justify-between gap-2 border-b border-border p-3">
                 <Heading slot="title" className="font-bold">{label}</Heading>
-                <Button slot="close" className="min-h-touch rounded-md px-3 font-semibold text-primary">Fechar</Button>
+                <Button slot="close" className="min-h-touch rounded-md px-3 font-semibold text-primary">{t.common.close}</Button>
               </div>
               {/* Autocomplete keeps focus in the search box while typing; the list uses virtual focus. */}
               <Autocomplete inputValue={search} onInputChange={setSearch}>
-              <SearchField aria-label="Buscar jogador" autoFocus className="p-3">
-                <Input placeholder="Buscar pelo apelido" className="min-h-touch w-full rounded-md border border-border bg-surface px-3 text-base" />
+              <SearchField aria-label={t.components.playerPicker.searchLabel} autoFocus className="p-3">
+                <Input placeholder={t.components.playerPicker.searchPlaceholder} className="min-h-touch w-full rounded-md border border-border bg-surface px-3 text-base" />
               </SearchField>
               {/* Action-only list: with a selection mode, React Aria would toggle selection instead of choosing once a
                   player is picked, so changing the pick would not work. The current player is marked instead. */}
               <ListBox
-                aria-label="Jogadores"
+                aria-label={t.common.players}
                 onAction={choose}
                 className="min-h-0 flex-1 overflow-auto px-2 pb-3 outline-none"
-                renderEmptyState={() => <p className="p-3 text-muted">Nenhum jogador encontrado.</p>}
+                renderEmptyState={() => <p className="p-3 text-muted">{t.components.playerPicker.noneFound}</p>}
               >
                 {clearable && value && search.trim() === '' && (
-                  <ListBoxItem id={NONE} textValue="Deixar em branco" className={`${itemClass} text-muted`}>
-                    Deixar em branco
+                  <ListBoxItem id={NONE} textValue={t.components.playerPicker.leaveBlank} className={`${itemClass} text-muted`}>
+                    {t.components.playerPicker.leaveBlank}
                   </ListBoxItem>
                 )}
                 {first.length > 0 && (
@@ -157,7 +158,7 @@ export function PlayerPicker({
                 )}
                 {active.length > 0 && (
                   <ListBoxSection>
-                    <Header className="px-3 pt-2 text-xs font-bold uppercase text-muted">Ativos</Header>
+                    <Header className="px-3 pt-2 text-xs font-bold uppercase text-muted">{t.components.playerPicker.activeGroup}</Header>
                     {active.map((p) => (
                       <ListBoxItem key={p.id} id={String(p.id)} textValue={p.nickname} className={itemClass}>
                         {p.nickname}
@@ -168,18 +169,18 @@ export function PlayerPicker({
                 )}
                 {inactive.length > 0 && (
                   <ListBoxSection>
-                    <Header className="px-3 pt-2 text-xs font-bold uppercase text-muted">Inativos</Header>
+                    <Header className="px-3 pt-2 text-xs font-bold uppercase text-muted">{t.components.playerPicker.inactiveGroup}</Header>
                     {inactive.map((p) => (
                       <ListBoxItem key={p.id} id={String(p.id)} textValue={p.nickname} className={`${itemClass} text-muted`}>
                         {p.nickname}
-                        <span className="text-xs">inativo {current(p)}</span>
+                        <span className="text-xs">{t.common.inactive} {current(p)}</span>
                       </ListBoxItem>
                     ))}
                   </ListBoxSection>
                 )}
                 {canAdd && (
                   <ListBoxItem key={`${NEW}${search.trim()}`} id={`${NEW}${search.trim()}`} textValue={search} className={`${itemClass} mt-2 border-t border-dashed border-border pt-2 font-semibold text-primary`}>
-                    {quickAdd.isPending ? 'Adicionando…' : `+ Adicionar “${search.trim()}” como novo jogador`}
+                    {quickAdd.isPending ? t.components.playerPicker.adding : t.components.playerPicker.addNew({ nickname: search.trim() })}
                   </ListBoxItem>
                 )}
               </ListBox>

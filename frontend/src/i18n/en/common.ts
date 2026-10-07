@@ -37,6 +37,12 @@ export const common: Messages['common'] = {
   nickname: 'Nickname',
   password: 'Password',
 
+  ordinal: ({ position }: { position: number }) => {
+    const tens = position % 100
+    const suffix = tens >= 11 && tens <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][position % 10] ?? 'th')
+    return `${position}${suffix}`
+  },
+
   roles: {
     player: 'Player',
     results_keeper: 'Results keeper',

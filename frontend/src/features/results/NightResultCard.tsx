@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import type { Night } from '@/api/client'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { PlayerLink } from '@/components/PlayerLink'
+import { t } from '@/i18n'
 import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
 
 /**
@@ -10,9 +11,9 @@ import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
  */
 export function NightResultCard({ night, number }: { night: Night; number?: number }) {
   const amounts = [
-    ['Pote Total', night.pot],
-    ['Pote ME', night.main_event_pot],
-    ['Time chip', night.time_chip],
+    [t.nights.amounts.potTotal, night.pot],
+    [t.nights.amounts.mainEventPot, night.main_event_pot],
+    [t.nights.amounts.timeChip, night.time_chip],
   ] as const
 
   return (

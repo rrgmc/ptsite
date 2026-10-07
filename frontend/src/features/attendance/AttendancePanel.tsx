@@ -3,15 +3,16 @@ import { Label, Radio, RadioGroup } from 'react-aria-components'
 import type { Attendance, Player } from '@/api/client'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
+import { t } from '@/i18n'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { PlayerLink } from '@/components/PlayerLink'
 
 export type Answer = 'all_in' | 'fold'
 
 const choices: { id: Answer | 'none'; label: string }[] = [
-  { id: 'all_in', label: 'ALL IN' },
-  { id: 'fold', label: 'FOLD' },
-  { id: 'none', label: 'Não confirmado' },
+  { id: 'all_in', label: t.attendance.allIn },
+  { id: 'fold', label: t.attendance.fold },
+  { id: 'none', label: t.attendance.notConfirmed },
 ]
 
 /**
@@ -50,7 +51,7 @@ export function AttendancePanel({
   const [other, setOther] = useState<Player | null>(null)
 
   return (
-    <Card title={isOpen && myPlayerId !== null ? 'Confirme sua presença' : 'Presença'}>
+    <Card title={isOpen && myPlayerId !== null ? t.attendance.panel.titleOpen : t.attendance.panel.title}>
       {isOpen && myPlayerId !== null && (
         <RadioGroup
           value={mine}
@@ -61,7 +62,7 @@ export function AttendancePanel({
           orientation="horizontal"
           className="mb-4 flex flex-col gap-2"
         >
-          <Label className="text-sm font-semibold">Sua resposta</Label>
+          <Label className="text-sm font-semibold">{t.attendance.panel.yourAnswer}</Label>
           <div className="grid grid-cols-3 gap-2">
             {choices.map((c) => (
               <Radio
@@ -76,36 +77,36 @@ export function AttendancePanel({
         </RadioGroup>
       )}
 
-      {notOpenYet && <p className="mb-3 text-muted">As confirmações começam quando o evento for aberto.</p>}
+      {notOpenYet && <p className="mb-3 text-muted">{t.attendance.panel.notOpenYet}</p>}
 
       {error && <p role="alert" className="mb-3 rounded-md bg-danger-soft p-3 text-danger">{error}</p>}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <section aria-labelledby="attendance-coming">
-          <h3 id="attendance-coming" className="mb-1 font-bold">Vão jogar ({coming.length})</h3>
+          <h3 id="attendance-coming" className="mb-1 font-bold">{t.attendance.panel.comingHeading({ count: coming.length })}</h3>
           {coming.length === 0 ? (
-            <p className="text-muted">Ninguém confirmou ainda.</p>
+            <p className="text-muted">{t.attendance.panel.nobodyConfirmed}</p>
           ) : (
             <ol className="list-inside list-decimal">
               {coming.map((a) => (
                 <li key={a.player.id} className="py-0.5">
                   <PlayerLink player={a.player} className="underline" />
-                  {a.answered_by && <span className="text-sm text-muted"> · por {a.answered_by.name}</span>}
+                  {a.answered_by && <span className="text-sm text-muted">{t.attendance.panel.answeredBy({ name: a.answered_by.name })}</span>}
                 </li>
               ))}
             </ol>
           )}
         </section>
         <section aria-labelledby="attendance-fold">
-          <h3 id="attendance-fold" className="mb-1 font-bold">Fold ({folded.length})</h3>
+          <h3 id="attendance-fold" className="mb-1 font-bold">{t.attendance.panel.foldedHeading({ count: folded.length })}</h3>
           {folded.length === 0 ? (
-            <p className="text-muted">Ninguém.</p>
+            <p className="text-muted">{t.attendance.panel.nobody}</p>
           ) : (
             <ul>
               {folded.map((a) => (
                 <li key={a.player.id} className="py-0.5">
                   <PlayerLink player={a.player} className="underline" />
-                  {a.answered_by && <span className="text-sm text-muted"> · por {a.answered_by.name}</span>}
+                  {a.answered_by && <span className="text-sm text-muted">{t.attendance.panel.answeredBy({ name: a.answered_by.name })}</span>}
                 </li>
               ))}
             </ul>
@@ -115,7 +116,7 @@ export function AttendancePanel({
 
       {isOpen && canAnswerForOthers && (
         <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-          <PlayerPicker label="Responder por outro jogador" players={players} value={other} onChange={setOther} />
+          <PlayerPicker label={t.attendance.panel.answerForOther} players={players} value={other} onChange={setOther} />
           <div className="grid grid-cols-3 gap-2">
             {choices.map((c) => (
               <Button

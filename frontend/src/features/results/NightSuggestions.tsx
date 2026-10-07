@@ -1,5 +1,6 @@
 import { Label, Radio, RadioGroup } from 'react-aria-components'
 import type { SuggestedNight } from '@/api/client'
+import { t } from '@/i18n'
 import { formatWeekday } from '@/lib/format'
 import { suggestionValue } from './suggestionValue'
 
@@ -12,8 +13,8 @@ function weekLabel(startsAt: string, today = new Date()): string {
   }
   const [y, m, d] = suggestionValue({ starts_at: startsAt }).date.split('-').map(Number)
   const weeks = Math.round((monday(new Date(y, m - 1, d)).getTime() - monday(today).getTime()) / (7 * 24 * 3600 * 1000))
-  if (weeks <= 0) return 'esta semana'
-  return weeks === 1 ? 'próxima semana' : `em ${weeks} semanas`
+  if (weeks <= 0) return t.results.suggestions.thisWeek
+  return weeks === 1 ? t.results.suggestions.nextWeek : t.results.suggestions.inWeeks({ weeks })
 }
 
 /**
@@ -41,7 +42,7 @@ export function NightSuggestions({
       }}
       className="flex flex-col gap-2"
     >
-      <Label className="text-sm font-semibold">Sugestões</Label>
+      <Label className="text-sm font-semibold">{t.results.suggestions.title}</Label>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         {suggestions.map((s) => (
           <Radio
