@@ -12,6 +12,8 @@ use PTSite\Domain\Shared\Money;
  */
 final class Standings
 {
+    public const int TOP = 10;
+
     /**
      * @param  iterable<ScoreLine>  $lines  result lines of the season's finished nights
      * @return list<StandingRow>
@@ -47,5 +49,18 @@ final class Standings
         }
 
         return $rows;
+    }
+
+    /**
+     * The first rows of the standings. When the cut falls inside a tie, it says how many tied rows it left out.
+     *
+     * @param  list<StandingRow>  $rows  the result of rank()
+     */
+    public function top(array $rows, int $limit = self::TOP): TopStandings
+    {
+        $shown = array_slice($rows, 0, $limit);
+        $last = $shown === [] ? null : $shown[count($shown) - 1]->rank;
+
+        return new TopStandings($shown, count(array_filter(array_slice($rows, $limit), fn (StandingRow $row) => $row->rank === $last)));
     }
 }

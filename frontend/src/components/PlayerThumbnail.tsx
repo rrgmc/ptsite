@@ -9,6 +9,7 @@ type PlayerImages = Pick<Player, 'id' | 'nickname' | 'thumbnail_version' | 'phot
 const frames = {
   md: 'h-12 w-9 shrink-0 rounded-sm',
   sm: 'h-8 w-6 shrink-0 rounded-sm text-sm sm:h-12 sm:w-9 sm:text-base',
+  xs: 'h-8 w-6 shrink-0 rounded-sm text-sm',
   lg: 'h-32 w-24 shrink-0 rounded-md text-3xl',
 }
 
@@ -17,6 +18,7 @@ const frames = {
  * player with no image shows the first letter of the nickname, so that rows line up.
  * The nickname is always next to it, so screen readers skip it.
  * The `sm` size is smaller on a phone only, for lists where the rows must be short.
+ * The `xs` size is that small on every screen, for condensed lists.
  * The `lg` size is the size of the photo on the player's page and in the detailed players view.
  */
 export function PlayerThumbnail({ player, size = 'md' }: { player: PlayerImages; size?: keyof typeof frames }) {

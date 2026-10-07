@@ -79,6 +79,37 @@ it('gives tied players the same rank, with no tie-breaker', function () {
     expect(array_map(fn ($r) => $r->rank, $rows))->toBe([1, 2, 2, 4]);
 });
 
+it('keeps the first ten of the standings', function () {
+    $standings = new Standings;
+    $rows = $standings->rank(array_map(fn (int $player) => line($player, (string) (200 - $player).'.00', 1), range(1, 12)));
+
+    $top = $standings->top($rows);
+
+    expect(array_map(fn ($r) => $r->playerId, $top->rows))->toBe(range(1, 10))
+        ->and($top->tiedNotShown)->toBe(0);
+});
+
+it('says how many players tied with the tenth were left out', function () {
+    $standings = new Standings;
+    // Nine players ahead, then three with the same total: one of them is tenth, two do not fit.
+    $lines = array_map(fn (int $player) => line($player, (string) (200 - $player).'.00', 1), range(1, 9));
+    $rows = $standings->rank([...$lines, line(10, '50.00', 2), line(11, '50.00', 2), line(12, '50.00', 2), line(13, '10.00', 6)]);
+
+    $top = $standings->top($rows);
+
+    expect(count($top->rows))->toBe(10)
+        ->and($top->rows[9]->rank)->toBe(10)
+        ->and($top->tiedNotShown)->toBe(2);
+});
+
+it('keeps every row when fewer than ten players scored', function () {
+    $standings = new Standings;
+    $top = $standings->top($standings->rank([line(ANA, '114.00', 1), line(BRENO, '69.00', 2)]));
+
+    expect(count($top->rows))->toBe(2)->and($top->tiedNotShown)->toBe(0)
+        ->and($standings->top([])->rows)->toBe([]);
+});
+
 it('simulates a night without saving and shows who moves up', function () {
     $current = [
         line(ANA, '114.00', 1), line(BRENO, '69.00', 2),

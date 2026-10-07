@@ -18,7 +18,7 @@ export async function logout(page: Page) {
   await expect(page.getByLabel('Usuário')).toBeVisible()
 }
 
-/** The season name in the header, which leads to "Temporadas". */
+/** The season name in the header, which leads to "Escolher temporada". */
 export function seasonLink(page: Page) {
   return page.getByRole('link', { name: /^Temporada:/ })
 }
@@ -28,7 +28,7 @@ export function seasonNotice(page: Page) {
   return page.getByRole('complementary', { name: 'Temporada selecionada' })
 }
 
-/** Picks a season in "Temporadas", opened from the header. The site returns to the season screen it was on. */
+/** Picks a season in "Escolher temporada", opened from the header. The site returns to the season screen it was on. */
 export async function pickSeason(page: Page, name: string) {
   await seasonLink(page).click()
   await page.getByRole('listitem').filter({ has: page.getByText(name, { exact: true }) }).getByRole('button').click()

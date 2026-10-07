@@ -7,7 +7,8 @@ import { login, pickSeason, seasonLink } from './helpers'
 test.use({ viewport: { width: 360, height: 780 } })
 
 const screens = [
-  '', 'results', 'calendar', 'simulator', 'statistics', 'players', 'players/1', 'players/1/all', 'seasons', 'profile',
+  '', 'results', 'calendar', 'simulator', 'statistics', 'players', 'players/1', 'players/1/all', 'seasons', 'seasons/select',
+  'profile',
   'admin', 'admin/seasons/new', 'admin/players', 'admin/players/1', 'admin/players/new', 'admin/places', 'admin/places/new',
   'admin/holidays', 'admin/audit-log',
 ]

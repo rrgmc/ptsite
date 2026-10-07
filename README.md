@@ -33,8 +33,8 @@ the screenshot browser shows them in US format.
 | Simulator | Admin: seasons | Admin: changes |
 | <img src="docs/screens/mobile/13-admin-season-planner.png" width="240" alt="Planning a season's dates"> | <img src="docs/screens/mobile/14-admin-holidays.png" width="240" alt="Admin: holidays"> | <img src="docs/screens/mobile/15-calendar.png" width="240" alt="Season calendar"> |
 | Planning a season's dates | Admin: holidays | Season calendar |
-| <img src="docs/screens/mobile/16-seasons.png" width="240" alt="Seasons"> | <img src="docs/screens/mobile/17-menu.png" width="240" alt="Menu"> |  |
-| Seasons | Menu |  |
+| <img src="docs/screens/mobile/16-seasons.png" width="240" alt="Seasons, with the first ten of each"> | <img src="docs/screens/mobile/17-menu.png" width="240" alt="Menu"> | <img src="docs/screens/mobile/18-season-picker.png" width="240" alt="Choosing the season on screen"> |
+| Seasons, with the first ten of each | Menu | Choosing the season on screen |
 
 ### Desktop
 
@@ -54,10 +54,10 @@ the screenshot browser shows them in US format.
 | Admin: seasons | Admin: changes |
 | <img src="docs/screens/desktop/13-admin-season-planner.png" width="400" alt="Planning a season's dates"> | <img src="docs/screens/desktop/14-admin-holidays.png" width="400" alt="Admin: holidays"> |
 | Planning a season's dates | Admin: holidays |
-| <img src="docs/screens/desktop/15-calendar.png" width="400" alt="Season calendar"> | <img src="docs/screens/desktop/16-seasons.png" width="400" alt="Seasons"> |
-| Season calendar | Seasons |
-| <img src="docs/screens/desktop/17-menu.png" width="400" alt="Menu"> |  |
-| Menu |  |
+| <img src="docs/screens/desktop/15-calendar.png" width="400" alt="Season calendar"> | <img src="docs/screens/desktop/16-seasons.png" width="400" alt="Seasons, with the first ten of each"> |
+| Season calendar | Seasons, with the first ten of each |
+| <img src="docs/screens/desktop/17-menu.png" width="400" alt="Menu"> | <img src="docs/screens/desktop/18-season-picker.png" width="400" alt="Choosing the season on screen"> |
+| Menu | Choosing the season on screen |
 
 ## What is here
 
