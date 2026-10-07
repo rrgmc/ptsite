@@ -6,7 +6,7 @@
 
 arch('the domain is plain PHP, free of Laravel and the app')
     ->expect('PTSite\Domain')
-    ->not->toUse(['Illuminate', 'App', 'Laravel']);
+    ->not->toUse(['Illuminate', 'PTSite\App', 'Laravel']);
 
 arch('models hold no business rules and call no actions')
     ->expect('PTSite\App\Models')
