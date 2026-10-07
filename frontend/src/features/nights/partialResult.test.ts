@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import type { PartialResult } from '@/api/client'
+import { overrideFeatures } from '@/lib/features'
 import { players } from '@/mocks/data'
 import { isEmptyPartial, seedFromPartial } from './partialResult'
 
@@ -33,5 +34,15 @@ describe('isEmptyPartial', () => {
     expect(isEmptyPartial(empty)).toBe(true)
     expect(isEmptyPartial({ ...empty, time_chip: '0.00' })).toBe(false)
     expect(isEmptyPartial({ ...empty, positions: [{ position: 1, player: players[0] }] })).toBe(false)
+  })
+
+  let restore = () => {}
+  afterEach(() => restore())
+
+  it('does not look at an amount the site does not have', () => {
+    restore = overrideFeatures({ timeChip: false })
+
+    expect(isEmptyPartial({ ...empty, time_chip: '0.00' })).toBe(true)
+    expect(isEmptyPartial({ ...empty, main_event_pot: '0.00' })).toBe(false)
   })
 })

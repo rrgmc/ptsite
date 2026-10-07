@@ -76,7 +76,7 @@ export const admin: Messages['admin'] = {
   holidays: {
     tab: 'Holidays',
     intro:
-      'Used by "Plan dates" of each season. A night on a holiday, on the day before a holiday (bridge day) or on the Carnival weekend is left out of the plan.',
+      'Days with no night. A night on a holiday, on the day before a holiday (bridge day) or on the Carnival weekend is left out of each season\'s dates.',
     scopeNational: 'National',
     scopeState: 'State (SP)',
     scopeCity: 'City (São Paulo)',
@@ -92,7 +92,7 @@ export const admin: Messages['admin'] = {
     add: 'Add',
     tableTitle: 'Holiday table',
     newHoliday: '+ New holiday',
-    archiveConfirmBody: 'The holiday stops counting in "Plan dates" and leaves the calendars. You can restore it later, in this table.',
+    archiveConfirmBody: 'The holiday stops counting in the seasons\' dates and leaves the calendars. You can restore it later, in this table.',
     scope: 'Scope',
     when: 'When',
     sameDayEveryYear: 'Same day every year',
@@ -174,7 +174,7 @@ export const admin: Messages['admin'] = {
     rounds: 'Rounds',
     roundsHelp: 'How many nights the season has (usually 26). Empty on a new season: same as the previous one.',
     defaultPlace: 'Default place',
-    regularNight: 'Regular night (used to suggest and plan dates)',
+    regularNight: 'Regular night (used to suggest dates)',
     weekday: 'Weekday',
     time: 'Time',
     frequency: 'Frequency',

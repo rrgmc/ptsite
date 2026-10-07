@@ -11,6 +11,7 @@ import { t } from '@/i18n'
 import { formatTime, nightTitle, parseMoneyInput } from '@/lib/format'
 import { FinishingOrderFields } from './FinishingOrderFields'
 import { seedFromPartial } from './partialResult'
+import { hasFeature } from '@/lib/features'
 import { currencySymbol } from '@/lib/site'
 
 const invalidMoney = t.nights.invalidMoney
@@ -84,7 +85,10 @@ function PartialResultForm({ night: n, season, players, initial, onReload }: { n
   const invalid = (text: string) => text.trim() !== '' && parseMoneyInput(text) === null
   const pot = amount(potText)
   const apiError = save.error instanceof ApiError ? save.error : null
-  const canSubmit = !invalid(potText) && !invalid(mainEventPotText) && !invalid(timeChipText)
+  // A site with no Main Event pot or no time chip has no field for it, and sends none.
+  const mainEventPotInvalid = hasFeature('mainEventPot') && invalid(mainEventPotText)
+  const timeChipInvalid = hasFeature('timeChip') && invalid(timeChipText)
+  const canSubmit = !invalid(potText) && !mainEventPotInvalid && !timeChipInvalid
   const savedByOther = latest.data?.saved_at && latest.data.saved_at !== knownSavedAt ? latest.data : null
 
   function submit() {
@@ -92,8 +96,8 @@ function PartialResultForm({ night: n, season, players, initial, onReload }: { n
     save.mutate(
       {
         pot,
-        main_event_pot: amount(mainEventPotText),
-        time_chip: amount(timeChipText),
+        main_event_pot: hasFeature('mainEventPot') ? amount(mainEventPotText) : null,
+        time_chip: hasFeature('timeChip') ? amount(timeChipText) : null,
         positions: order.flatMap((p, i) => (p ? [{ position: percentages[i].position, player_id: p.id }] : [])),
       },
       { onSuccess: (saved) => setKnownSavedAt(saved.saved_at) },
@@ -127,24 +131,28 @@ function PartialResultForm({ night: n, season, players, initial, onReload }: { n
             placeholder={t.nights.moneyFields.potPlaceholder}
             errorMessage={apiError?.fieldError('pot') ?? (invalid(potText) ? invalidMoney : undefined)}
           />
-          <TextField
-            label={t.nights.moneyFields.mainEventPot({ currency: currencySymbol })}
-            description={t.nights.partialForm.mainEventPotHelp}
-            inputMode="decimal"
-            value={mainEventPotText}
-            onChange={setMainEventPotText}
-            placeholder={t.nights.moneyFields.mainEventPotPlaceholder}
-            errorMessage={apiError?.fieldError('main_event_pot') ?? (invalid(mainEventPotText) ? invalidMoney : undefined)}
-          />
-          <TextField
-            label={t.nights.moneyFields.timeChip({ currency: currencySymbol })}
-            description={t.nights.partialForm.timeChipHelp}
-            inputMode="decimal"
-            value={timeChipText}
-            onChange={setTimeChipText}
-            placeholder={t.nights.moneyFields.timeChipPlaceholder}
-            errorMessage={apiError?.fieldError('time_chip') ?? (invalid(timeChipText) ? invalidMoney : undefined)}
-          />
+          {hasFeature('mainEventPot') && (
+            <TextField
+              label={t.nights.moneyFields.mainEventPot({ currency: currencySymbol })}
+              description={t.nights.partialForm.mainEventPotHelp}
+              inputMode="decimal"
+              value={mainEventPotText}
+              onChange={setMainEventPotText}
+              placeholder={t.nights.moneyFields.mainEventPotPlaceholder}
+              errorMessage={apiError?.fieldError('main_event_pot') ?? (invalid(mainEventPotText) ? invalidMoney : undefined)}
+            />
+          )}
+          {hasFeature('timeChip') && (
+            <TextField
+              label={t.nights.moneyFields.timeChip({ currency: currencySymbol })}
+              description={t.nights.partialForm.timeChipHelp}
+              inputMode="decimal"
+              value={timeChipText}
+              onChange={setTimeChipText}
+              placeholder={t.nights.moneyFields.timeChipPlaceholder}
+              errorMessage={apiError?.fieldError('time_chip') ?? (invalid(timeChipText) ? invalidMoney : undefined)}
+            />
+          )}
         </div>
       </Card>
 

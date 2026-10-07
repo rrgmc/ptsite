@@ -322,8 +322,10 @@ export function usePlaces({ archived = false }: { archived?: boolean } = {}) {
 
 export interface ResultInput {
   pot: string
-  main_event_pot: string
-  time_chip: string
+  /** Null on a site with no Main Event pot. */
+  main_event_pot: string | null
+  /** Null on a site with no time chip. */
+  time_chip: string | null
   positions: { position: number; player_id: number }[]
 }
 

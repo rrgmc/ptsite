@@ -80,7 +80,7 @@ export const admin = {
     /** The tab of the admin menu. */
     tab: 'Feriados',
     intro:
-      'Usados em “Planejar datas” de cada temporada. Evento em feriado, na véspera de feriado (emenda) ou no fim de semana de Carnaval fica de fora do plano.',
+      'Dias sem evento. Evento em feriado, na véspera de feriado (emenda) ou no fim de semana de Carnaval fica de fora das datas de cada temporada.',
     scopeNational: 'Nacional',
     scopeState: 'Estadual (SP)',
     scopeCity: 'Municipal (São Paulo)',
@@ -96,7 +96,7 @@ export const admin = {
     add: 'Adicionar',
     tableTitle: 'Tabela de feriados',
     newHoliday: '+ Novo feriado',
-    archiveConfirmBody: 'O feriado deixa de contar em “Planejar datas” e sai dos calendários. Dá para restaurar depois, nesta tabela.',
+    archiveConfirmBody: 'O feriado deixa de contar nas datas das temporadas e sai dos calendários. Dá para restaurar depois, nesta tabela.',
     scope: 'Abrangência',
     when: 'Quando',
     sameDayEveryYear: 'Mesmo dia todo ano',
@@ -189,7 +189,7 @@ export const admin = {
     rounds: 'Rodadas',
     roundsHelp: 'Quantos eventos a temporada tem (normalmente 26). Vazio na nova temporada: igual à anterior.',
     defaultPlace: 'Local padrão',
-    regularNight: 'Evento habitual (usado para sugerir e planejar datas)',
+    regularNight: 'Evento habitual (usado para sugerir datas)',
     weekday: 'Dia da semana',
     time: 'Horário',
     frequency: 'Frequência',

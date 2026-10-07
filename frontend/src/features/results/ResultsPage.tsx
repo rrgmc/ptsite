@@ -11,6 +11,7 @@ import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { formatMoney, formatWeekday, formatTime } from '@/lib/format'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
+import { amountRows } from '../nights/amounts'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { NightResultCard } from './NightResultCard'
 import { NightSuggestions } from './NightSuggestions'
@@ -77,11 +78,11 @@ export function ResultsPage() {
           </div>
           <Card title={t.results.seasonTotals}>
             <dl>
-              {([
-                [t.nights.amounts.potTotal, statistics.data.pot_total],
-                [t.nights.amounts.mainEventPot, statistics.data.main_event_pot_total],
-                [t.nights.amounts.timeChip, statistics.data.time_chip_total],
-              ] as const).map(([label, amount]) => (
+              {amountRows({
+                pot: statistics.data.pot_total,
+                mainEventPot: statistics.data.main_event_pot_total,
+                timeChip: statistics.data.time_chip_total,
+              }).map(([label, amount]) => (
                 <div key={label} className="flex items-center justify-between py-0.5">
                   <dt className="font-semibold">{label}</dt>
                   <dd className="tabular">{formatMoney(amount)}</dd>
