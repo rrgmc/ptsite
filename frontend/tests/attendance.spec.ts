@@ -26,11 +26,11 @@ test('answers start when the night is open: players answer ALL IN or FOLD, keepe
   await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
   await expect(page.getByText('Aberto', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: /^Responder por outro jogador/ }).click()
-  await page.getByRole('dialog').getByRole('searchbox').fill('Onyx')
-  await page.getByRole('dialog').getByRole('option', { name: 'Onyx', exact: true }).click()
+  await page.getByRole('dialog').getByRole('searchbox').fill('Jacobson')
+  await page.getByRole('dialog').getByRole('option', { name: 'Jacobson', exact: true }).click()
   await page.getByRole('button', { name: 'ALL IN', exact: true }).click()
   const coming = page.getByRole('region', { name: /^Vão jogar/ })
-  await expect(coming.getByRole('listitem')).toHaveText(['Onyx · por Responsável (dev)'])
+  await expect(coming.getByRole('listitem')).toHaveText(['Jacobson · por Responsável (dev)'])
 
   // A player answers for themself, then changes their mind
   await logout(page)

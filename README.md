@@ -15,7 +15,49 @@ submodule, and that holds the league's name, settings, data and deploy target. S
 
 ## Screenshots
 
-Screenshots of the demo league will be added in `docs/screens/`.
+The demo site, with the invented demo league. Regenerate them with `npm run screenshots` in `frontend/` when a
+screen changes (it needs bash and PHP on the path). Native date and time fields follow each device's settings;
+the screenshot browser shows them in US format.
+
+### Mobile
+
+|  |  |  |
+|---|---|---|
+| <img src="docs/screens/mobile/01-login.png" width="240" alt="Login"> | <img src="docs/screens/mobile/02-standings-2022.png" width="240" alt="Standings of a finished season"> | <img src="docs/screens/mobile/03-results-2022.png" width="240" alt="Results"> |
+| Login | Standings of a finished season | Results |
+| <img src="docs/screens/mobile/04-schedule-night.png" width="240" alt="Scheduling a night, with suggestions"> | <img src="docs/screens/mobile/05-attendance.png" width="240" alt="Attendance: ALL IN / FOLD"> | <img src="docs/screens/mobile/06-open-confirm.png" width="240" alt="Opening a night"> |
+| Scheduling a night, with suggestions | Attendance: ALL IN / FOLD | Opening a night |
+| <img src="docs/screens/mobile/07-player-picker-quick-add.png" width="240" alt="Picking a player, and adding a new one"> | <img src="docs/screens/mobile/08-result-form.png" width="240" alt="Entering a result"> | <img src="docs/screens/mobile/09-night-finished.png" width="240" alt="A finished night"> |
+| Picking a player, and adding a new one | Entering a result | A finished night |
+| <img src="docs/screens/mobile/10-simulator.png" width="240" alt="Simulator"> | <img src="docs/screens/mobile/11-admin-seasons.png" width="240" alt="Admin: seasons"> | <img src="docs/screens/mobile/12-admin-audit-log.png" width="240" alt="Admin: changes"> |
+| Simulator | Admin: seasons | Admin: changes |
+| <img src="docs/screens/mobile/13-admin-season-planner.png" width="240" alt="Planning a season's dates"> | <img src="docs/screens/mobile/14-admin-holidays.png" width="240" alt="Admin: holidays"> | <img src="docs/screens/mobile/15-calendar.png" width="240" alt="Season calendar"> |
+| Planning a season's dates | Admin: holidays | Season calendar |
+| <img src="docs/screens/mobile/16-seasons.png" width="240" alt="Seasons"> | <img src="docs/screens/mobile/17-menu.png" width="240" alt="Menu"> |  |
+| Seasons | Menu |  |
+
+### Desktop
+
+|  |  |
+|---|---|
+| <img src="docs/screens/desktop/01-login.png" width="400" alt="Login"> | <img src="docs/screens/desktop/02-standings-2022.png" width="400" alt="Standings of a finished season"> |
+| Login | Standings of a finished season |
+| <img src="docs/screens/desktop/03-results-2022.png" width="400" alt="Results"> | <img src="docs/screens/desktop/04-schedule-night.png" width="400" alt="Scheduling a night, with suggestions"> |
+| Results | Scheduling a night, with suggestions |
+| <img src="docs/screens/desktop/05-attendance.png" width="400" alt="Attendance: ALL IN / FOLD"> | <img src="docs/screens/desktop/06-open-confirm.png" width="400" alt="Opening a night"> |
+| Attendance: ALL IN / FOLD | Opening a night |
+| <img src="docs/screens/desktop/07-player-picker-quick-add.png" width="400" alt="Picking a player, and adding a new one"> | <img src="docs/screens/desktop/08-result-form.png" width="400" alt="Entering a result"> |
+| Picking a player, and adding a new one | Entering a result |
+| <img src="docs/screens/desktop/09-night-finished.png" width="400" alt="A finished night"> | <img src="docs/screens/desktop/10-simulator.png" width="400" alt="Simulator"> |
+| A finished night | Simulator |
+| <img src="docs/screens/desktop/11-admin-seasons.png" width="400" alt="Admin: seasons"> | <img src="docs/screens/desktop/12-admin-audit-log.png" width="400" alt="Admin: changes"> |
+| Admin: seasons | Admin: changes |
+| <img src="docs/screens/desktop/13-admin-season-planner.png" width="400" alt="Planning a season's dates"> | <img src="docs/screens/desktop/14-admin-holidays.png" width="400" alt="Admin: holidays"> |
+| Planning a season's dates | Admin: holidays |
+| <img src="docs/screens/desktop/15-calendar.png" width="400" alt="Season calendar"> | <img src="docs/screens/desktop/16-seasons.png" width="400" alt="Seasons"> |
+| Season calendar | Seasons |
+| <img src="docs/screens/desktop/17-menu.png" width="400" alt="Menu"> |  |
+| Menu |  |
 
 ## What is here
 

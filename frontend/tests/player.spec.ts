@@ -83,22 +83,22 @@ test('the simulator shows who would move up, without saving', async ({ page }) =
 test('the players list shows thumbnails, and a thumbnail opens the larger photo', async ({ page }) => {
   await login(page, 'dev-player')
   await page.goto('players')
-  const quartz = page.getByRole('listitem').filter({ has: page.getByText('Quartz', { exact: true }) })
+  const moneymaker = page.getByRole('listitem').filter({ has: page.getByText('Moneymaker', { exact: true }) })
   // The images load when they come near the screen.
-  await quartz.scrollIntoViewIfNeeded()
+  await moneymaker.scrollIntoViewIfNeeded()
   // The sizes the server makes: thumbnails of 180 x 240 pixels, photos of 600 x 800.
-  await expect(quartz.locator('img')).toHaveJSProperty('naturalWidth', 180)
+  await expect(moneymaker.locator('img')).toHaveJSProperty('naturalWidth', 180)
   await expectAccessible(page)
 
-  await quartz.getByRole('button', { name: 'Ver foto de Quartz' }).click()
-  await expect(page.getByRole('dialog').getByRole('img', { name: 'Foto de Quartz' })).toHaveJSProperty('naturalWidth', 600)
+  await moneymaker.getByRole('button', { name: 'Ver foto de Moneymaker' }).click()
+  await expect(page.getByRole('dialog').getByRole('img', { name: 'Foto de Moneymaker' })).toHaveJSProperty('naturalWidth', 600)
   await expectAccessible(page)
   await page.getByRole('button', { name: 'Fechar' }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)
 
   // A player with no image shows the first letter of the nickname, and nothing to open.
-  const mica = page.getByRole('listitem').filter({ has: page.getByText('Mica', { exact: true }) })
-  await expect(mica).toContainText(/^M/)
-  await expect(mica.locator('img')).toHaveCount(0)
-  await expect(mica.getByRole('button')).toHaveCount(0)
+  const heinz = page.getByRole('listitem').filter({ has: page.getByText('Heinz', { exact: true }) })
+  await expect(heinz).toContainText(/^H/)
+  await expect(heinz.locator('img')).toHaveCount(0)
+  await expect(heinz.getByRole('button')).toHaveCount(0)
 })

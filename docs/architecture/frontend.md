@@ -64,7 +64,7 @@ frontend/
 | `/admin`, `/admin/players`, `/admin/places`, `/admin/audit-log` | Seasons, players, places, audit log | admins |
 | `/admin/seasons/new`, `/admin/seasons/:id`, `/admin/players/new`, `/admin/players/:id`, `/admin/places/new`, `/admin/places/:id` | The form of one season, player or place, on a page of its own | admins |
 
-Screenshots of the demo league will be added in `docs/screens/`.
+Screenshots of the demo site are in `docs/screens/`, and `README.md` shows them.
 
 The browser title names the screen: "Resultados · Liga Demo" (the site's name, from its settings). `PageHeader` sets it from its `title`, through
 `usePageTitle` (`src/lib`). A screen with no `PageHeader` calls `usePageTitle` itself: the screens before login

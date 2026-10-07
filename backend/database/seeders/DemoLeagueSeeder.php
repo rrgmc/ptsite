@@ -25,31 +25,35 @@ use Random\Randomizer;
  */
 class DemoLeagueSeeder extends Seeder
 {
-    /** Players named after minerals, so that no name can be taken for a real person. */
+    /**
+     * The players are named after champions of the World Series of Poker Main Event: names anyone who plays
+     * knows, and that cannot be taken for a member of a real league. Only their names are real. The results,
+     * the dates and the drawn pictures here are invented.
+     */
     private const PLAYERS = [
-        // nickname, name, email, has a photo
-        ['Agate', 'Agate Demo', 'agate@example.org', true],
-        ['Âmbar', 'Âmbar Demo', null, false],
-        ['Basalt', 'Basalt Demo', 'basalt@example.org', true],
-        ['Cobalt', 'Cobalt', null, true],
-        ['Feldspar', 'Feldspar Demo', null, false],
-        ['Flint', 'Flint Demo', 'flint@example.org', true],
-        ['Granite', null, null, false],
-        ['Gypsum', 'Gypsum Demo', null, true],
-        ['Marble', 'Marble Demo', 'marble@example.org', false],
-        ['Mica', 'Mica Demo', null, false],
-        ['Obsidian', 'Obsidian Demo', null, true],
-        ['Onyx', 'Onyx Demo', 'onyx@example.org', false],
-        ['Pyrite', 'pyrite', null, false],
-        ['Quartz', 'Quartz Demo', 'quartz@example.org', true],
-        ['Slate', 'Slate Demo', null, false],
-        ['Topaz', 'Topaz Demo', null, true],
-        ['Zircon', 'Zircon Demo', null, false],
-        ['Índigo', 'Índigo Demo', null, false],
+        // nickname, name, email, has a picture
+        ['Aldemir', 'Koray Aldemir', 'aldemir@example.org', true],
+        ['Blumstein', 'Scott Blumstein', null, false],
+        ['Brunson', 'Doyle Brunson', 'brunson@example.org', true],
+        ['Cada', 'Cada', null, true],
+        ['Chan', 'Johnny Chan', null, false],
+        ['Duhamel', 'Jonathan Duhamel', 'duhamel@example.org', true],
+        ['Eastgate', null, null, false],
+        ['Ensan', 'Hossein Ensan', null, true],
+        ['Hachem', 'Joe Hachem', 'hachem@example.org', false],
+        ['Heinz', 'Pius Heinz', null, false],
+        ['Hellmuth', 'Phil Hellmuth', null, true],
+        ['Jacobson', 'Martin Jacobson', 'jacobson@example.org', false],
+        ['Merson', 'merson', null, false],
+        ['Moneymaker', 'Chris Moneymaker', 'moneymaker@example.org', true],
+        ['Nguyen', 'Qui Nguyen', null, false],
+        ['Raymer', 'Greg Raymer', null, true],
+        ['Ungar', 'Stu Ungar', null, false],
+        ['Yang', 'Jerry Yang', null, false],
     ];
 
     /** Players who only played the first season and are on a break. */
-    private const INACTIVE = ['Zircon', 'Índigo'];
+    private const INACTIVE = ['Ungar', 'Yang'];
 
     /** Fridays of 2022 with no night: Carnival, Good Friday and the days after Tiradentes and Corpus Christi. */
     private const NO_NIGHT = ['2022-02-25', '2022-04-15', '2022-04-22', '2022-06-17'];
@@ -83,7 +87,7 @@ class DemoLeagueSeeder extends Seeder
 
             // The first player of the list has a login of their own, as most players of a real league do.
             User::query()->create([
-                'username' => 'agate', 'name' => 'Agate', 'password' => 'password', 'role' => Role::Player,
+                'username' => 'aldemir', 'name' => 'Aldemir', 'password' => 'password', 'role' => Role::Player,
                 'is_enabled' => true, 'player_id' => $players[0],
             ]);
 
@@ -102,7 +106,7 @@ class DemoLeagueSeeder extends Seeder
                 'name' => $name,
                 'email' => $email,
                 'birth_date' => sprintf('%d-%02d-%02d', 1970 + $index, 1 + $index % 12, 1 + ($index * 7) % 28),
-                'memo' => $nickname === 'Quartz' ? 'Fundador da liga. Nunca chega atrasado.' : null,
+                'memo' => $nickname === 'Moneymaker' ? 'Campeão do Main Event da WSOP de 2003.' : null,
                 'status' => 'active',
             ]);
             if ($hasPhoto) {

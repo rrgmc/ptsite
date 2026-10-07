@@ -108,7 +108,7 @@ if (await alreadyOpen.count()) {
   await page.getByLabel('Pote (R$)').fill('800')
   await page.getByLabel('Pote ME (R$)').fill('160')
   await page.getByLabel('Time chip (R$)').fill('0')
-  for (const [position, search] of [[1, 'quartz'], [2, 'basalt'], [3, 'onyx'], [4, 'flint'], [5, 'cobalt'], [6, 'topaz']]) {
+  for (const [position, search] of [[1, 'moneymaker'], [2, 'brunson'], [3, 'jacobson'], [4, 'duhamel'], [5, 'cada'], [6, 'raymer']]) {
     await pick(new RegExp(`^${position}º lugar`), search)
   }
   await page.getByRole('button', { name: 'Finalizar evento' }).click()
@@ -126,7 +126,7 @@ await shot('06-open-confirm')
 await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
 await page.getByText('Aberto', { exact: true }).waitFor()
 // Attendance, once the night is open: the keeper answers for three players who told them in person
-for (const [nickname, answer] of [['Onyx', 'ALL IN'], ['Flint', 'ALL IN'], ['Quartz', 'FOLD']]) {
+for (const [nickname, answer] of [['Jacobson', 'ALL IN'], ['Duhamel', 'ALL IN'], ['Moneymaker', 'FOLD']]) {
   await page.getByRole('button', { name: /^Responder por outro jogador/ }).click()
   await page.getByRole('dialog').getByRole('searchbox').fill(nickname)
   await page.getByRole('dialog').getByRole('option', { name: nickname, exact: true }).click()
@@ -140,16 +140,16 @@ await page.getByRole('link', { name: /Finalizar/ }).click()
 await page.getByLabel('Pote (R$)').fill('845')
 await page.getByLabel('Pote ME (R$)').fill('170')
 await page.getByLabel('Time chip (R$)').fill('40')
-await pick(/^1º lugar/, 'onyx')
-await pick(/^2º lugar/, 'flint')
-await pick(/^3º lugar/, 'cobalt')
+await pick(/^1º lugar/, 'jacobson')
+await pick(/^2º lugar/, 'duhamel')
+await pick(/^3º lugar/, 'cada')
 await page.getByRole('button', { name: /^4º lugar/ }).click()
 await page.getByRole('dialog').getByRole('searchbox').fill('Estreante')
 await shot('07-player-picker-quick-add')
 await page.getByRole('option', { name: /Adicionar/ }).click()
 await page.getByRole('dialog').waitFor({ state: 'detached' })
-await pick(/^5º lugar/, 'quartz')
-await pick(/^6º lugar/, 'basalt')
+await pick(/^5º lugar/, 'moneymaker')
+await pick(/^6º lugar/, 'brunson')
 await shot('08-result-form', true)
 await page.getByRole('button', { name: 'Finalizar evento' }).click()
 await page.getByText('Finalizado', { exact: true }).waitFor()
@@ -157,7 +157,7 @@ await shot('09-night-finished')
 
 await page.goto('seasons/10/simulator')
 await page.getByLabel('Pote imaginado (R$)').fill('840')
-for (const [position, search] of [[1, 'quartz'], [2, 'basalt'], [3, 'onyx'], [4, 'flint'], [5, 'cobalt'], [6, 'topaz']]) {
+for (const [position, search] of [[1, 'moneymaker'], [2, 'brunson'], [3, 'jacobson'], [4, 'duhamel'], [5, 'cada'], [6, 'raymer']]) {
   await pick(new RegExp(`^${position}º lugar`), search)
 }
 await page.getByRole('button', { name: 'Simular' }).click()
@@ -189,7 +189,8 @@ await page.getByText('Sexta-feira Santa').first().waitFor()
 await shot('14-admin-holidays')
 
 // The season calendar of 2022: winners, and the Friday after Tiradentes left out
-await page.goto('seasons/10/calendar')
+// Liga 2022 is the second season the demo league seeds.
+await page.goto('seasons/2/calendar')
 await page.getByRole('region', { name: 'Abril de 2022' }).waitFor()
 await shot('15-calendar', true)
 await browser.close()
