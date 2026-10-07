@@ -1,0 +1,300 @@
+# Common commands, run with go-task (https://taskfile.dev): `task --list` shows them.
+#
+# The tasks run from PowerShell, Git Bash and Linux alike. So they call only php, composer, npm, npx, git, gh
+# and docker (which also runs the MySQL server), never Unix tools such as cp, rm or zip. File work is done in the PHP scripts in deploy/.
+# Exceptions are marked "needs Git Bash on Windows".
+version: '3'
+
+# A git worktree gets its own port offset in this file from `task worktree:init`, so two checkouts can run at
+# the same time. Without the file, PORT_OFFSET in the environment is used. frontend/ports.ts does the same.
+#
+# The deploy tasks read the site's host from local/deploy.env, which git ignores: DEPLOY_CPANEL_USER,
+# DEPLOY_CPANEL_URL, DEPLOY_FTP_HOST, APP_DIR, TARGET_VHOST and TARGET_URL (docs/architecture/deployment.md).
+dotenv: ['local/ports.env', 'local/deploy.env']
+
+vars:
+  BACKEND_PORT: '{{add 8000 (.PORT_OFFSET | default 0)}}'
+  VITE_PORT: '{{add 5173 (.PORT_OFFSET | default 0)}}'
+  STORYBOOK_PORT: '{{add 6006 (.PORT_OFFSET | default 0)}}'
+
+tasks:
+  default:
+    silent: true
+    cmds:
+      - task --list
+
+  # --- Setup ---
+
+  setup:
+    desc: First-time setup of the backend (with the demo league and dev logins) and the frontend
+    cmds:
+      - task: hooks:install
+      - task: backend:setup
+      - task: frontend:setup
+
+  hooks:install:
+    desc: Turn on the git hooks in .githooks (pre-push refuses pushes to master)
+    cmds:
+      # The setting is shared by every worktree of this clone.
+      - git config core.hooksPath .githooks
+
+  backend:setup:
+    desc: Install PHP packages, create .env, start MySQL and seed the demo league
+    dir: backend
+    cmds:
+      - composer install
+      - task: backend:env
+      - task: db:reset
+
+  backend:env:
+    internal: true
+    dir: backend
+    status:
+      - test -f .env
+    cmds:
+      - php -r "copy('.env.example', '.env');"
+      - php artisan key:generate
+
+  frontend:setup:
+    desc: Install the frontend packages
+    dir: frontend
+    cmds:
+      - npm ci
+
+  worktree:init:
+    desc: 'Prepare a new git worktree: copy the ignored files, pick its ports, then run setup'
+    cmds:
+      - php deploy/worktree-init.php
+      - task: setup
+
+  # --- Database (MySQL in Docker, see compose.yaml) ---
+
+  db:start:
+    desc: Start the MySQL server and Mailpit, and wait until they answer (Docker must be running)
+    cmds:
+      - docker compose up --detach --wait
+
+  db:up:
+    desc: Start MySQL and make sure the development database is there, seeding it when it is empty
+    dir: backend
+    deps: [db:start]
+    cmds:
+      # The server keeps its data in memory, so the database is gone after the container stops.
+      - php artisan ptsite:prepare-database --seed
+
+  db:reset:
+    desc: Recreate the development database with the demo league and the dev logins
+    dir: backend
+    deps: [db:start]
+    cmds:
+      - php artisan ptsite:prepare-database
+      - php artisan migrate:fresh --seed
+
+  db:stop:
+    desc: Stop the MySQL server and Mailpit; every database and message in them is lost
+    cmds:
+      - docker compose down
+
+  # --- Run ---
+
+  dev:
+    desc: Run the backend (:{{.BACKEND_PORT}}) and the frontend dev server (:{{.VITE_PORT}}/app/) together
+    deps: [backend:serve, frontend:dev]
+
+  backend:serve:
+    desc: Run Laravel on http://127.0.0.1:{{.BACKEND_PORT}}
+    dir: backend
+    deps: [db:up]
+    cmds:
+      - php artisan serve --port={{.BACKEND_PORT}}
+
+  frontend:dev:
+    desc: Run the Vite dev server on http://localhost:{{.VITE_PORT}}/app/
+    dir: frontend
+    cmds:
+      - npm run dev
+
+  storybook:
+    desc: Browse components and screens on http://localhost:{{.STORYBOOK_PORT}}
+    dir: frontend
+    cmds:
+      - npx storybook dev -p {{.STORYBOOK_PORT}}
+
+  build:
+    desc: Build the frontend into backend/public/app, served by Laravel on :{{.BACKEND_PORT}}
+    dir: frontend
+    cmds:
+      - npm run build
+
+  # --- Checks ---
+
+  fmt:
+    desc: Fix the PHP code style (Pint)
+    dir: backend
+    cmds:
+      - php vendor/bin/pint
+
+  lint:
+    desc: Check the code style and types (Pint, oxlint, tsc)
+    cmds:
+      - task: lint:backend
+      - task: lint:frontend
+
+  lint:backend:
+    internal: true
+    dir: backend
+    cmds:
+      - php vendor/bin/pint --test
+
+  lint:frontend:
+    internal: true
+    dir: frontend
+    cmds:
+      - npm run lint
+      - npx tsc -b
+
+  test:
+    desc: Run the backend and frontend unit tests
+    cmds:
+      - task: test:backend
+      - task: test:frontend
+
+  test:backend:
+    desc: 'Run Pest. Arguments go after --, for example: task test:backend -- --filter=Standings'
+    dir: backend
+    deps: [db:start]
+    cmds:
+      # The extra memory is for the output of a failed test with a large response.
+      - php -d memory_limit=1G vendor/bin/pest {{.CLI_ARGS}}
+
+  test:frontend:
+    desc: Run the frontend unit tests (Vitest)
+    dir: frontend
+    cmds:
+      - npm test -- {{.CLI_ARGS}}
+
+  test:e2e:
+    desc: 'Build, then run the end-to-end tests. One file: task test:e2e -- tests/admin.spec.ts'
+    dir: frontend
+    deps: [db:start]
+    cmds:
+      - npm run build
+      - npm run test:e2e -- {{.CLI_ARGS}}
+
+  test:storybook:
+    desc: Build Storybook, then check that every story renders and passes axe
+    dir: frontend
+    cmds:
+      - npm run build-storybook
+      - npm run test:storybook
+
+  api:
+    desc: Regenerate frontend/openapi.json and the API types after changing the API
+    cmds:
+      - task: api:export
+      - task: api:types
+
+  api:export:
+    internal: true
+    dir: backend
+    deps: [db:up]
+    # The spec names the server. A worktree has its own port in APP_URL, which must not reach the committed file.
+    env:
+      APP_URL: http://localhost:8000
+    cmds:
+      - php artisan scramble:export --path=../frontend/openapi.json
+
+  api:types:
+    internal: true
+    dir: frontend
+    cmds:
+      - npm run api:types
+
+  check:
+    desc: Everything to run before pushing (style, types, unit tests, build)
+    cmds:
+      - task: lint
+      - task: test
+      - task: build
+
+  screenshots:
+    desc: Regenerate the screenshots in docs/screens (needs Git Bash on Windows)
+    dir: frontend
+    deps: [db:start]
+    cmds:
+      - npm run screenshots
+
+  icons:
+    desc: Make the app icons in frontend/public/icons again from favicon.svg
+    dir: frontend
+    cmds:
+      - npm run icons
+
+  # --- Releases (RELEASE.md) ---
+
+  release:
+    desc: Release a version by tagging master and pushing the tag (task release -- 2.1.0; add --dry-run to only check)
+    cmds:
+      - php deploy/release.php {{.CLI_ARGS}}
+
+  # --- Deploy to a shared host (docs/architecture/deployment.md) ---
+
+  package:
+    desc: Build the deploy package local/build/ptsite.zip
+    cmds:
+      - php deploy/build-package.php
+
+  deploy:
+    desc: Build the package, upload it to the site and run the migrations there, keeping its data
+    cmds:
+      - task: package
+      - php deploy/upload.php local/build/ptsite.zip --migrate
+
+  deploy:ci:
+    desc: Upload the package CI built for the current commit (run "gh workflow run ci.yml" first) and run the migrations, keeping the data there
+    vars:
+      SHA:
+        sh: git rev-parse HEAD
+    cmds:
+      - task: deploy:ci:download
+        vars: { SHA: '{{.SHA}}' }
+      - php deploy/upload.php local/build/ci-{{.SHA}}/ptsite-{{.SHA}}.zip --migrate
+
+  deploy:release:
+    desc: Upload the package of a release and run the migrations, keeping the data there (task deploy:release -- v2.1.0)
+    vars:
+      TAG: '{{.CLI_ARGS}}'
+    preconditions:
+      - sh: '{{if .TAG}}true{{else}}false{{end}}'
+        msg: 'Name the release: task deploy:release -- v2.1.0'
+    cmds:
+      - gh release download {{.TAG}} --pattern ptsite-{{.TAG}}.zip --dir local/build/release --clobber
+      - php deploy/upload.php local/build/release/ptsite-{{.TAG}}.zip --migrate
+
+  deploy:release:ftp:
+    desc: The same as deploy:release, over FTP with the account of local/keys.md instead of the cPanel API token
+    vars:
+      TAG: '{{.CLI_ARGS}}'
+    preconditions:
+      - sh: '{{if .TAG}}true{{else}}false{{end}}'
+        msg: 'Name the release: task deploy:release:ftp -- v2.1.0'
+    cmds:
+      - gh release download {{.TAG}} --pattern ptsite-{{.TAG}}.zip --dir local/build/release --clobber
+      - php deploy/upload.php local/build/release/ptsite-{{.TAG}}.zip --migrate --ftp
+
+  deploy:ftp:check:
+    desc: Log in with the FTP account and check the site is ready for an FTP upload, changing nothing
+    cmds:
+      - php deploy/ftp-check.php
+
+  deploy:mail:
+    desc: Put the mailbox of local/keys.md into the .env on the site, so the site can send email
+    cmds:
+      - php deploy/set-mail-env.php
+
+  deploy:ci:download:
+    internal: true
+    status:
+      - test -f local/build/ci-{{.SHA}}/ptsite-{{.SHA}}.zip
+    cmds:
+      - gh run download --name ptsite-deploy-{{.SHA}} --dir local/build/ci-{{.SHA}}

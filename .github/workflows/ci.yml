@@ -1,0 +1,175 @@
+name: CI
+
+# The repository is private and on GitHub's free plan: 2,000 minutes of jobs and 500 MB of stored artifacts a
+# month, for the whole account. So CI runs as little as it can (docs/architecture/deployment.md, "Build (CI)"):
+#
+# - A pull request runs the tests. `master` only changes through pull requests, so nothing runs again there.
+# - A change that touches only docs runs nothing.
+# - The deploy package is built only when someone starts this workflow by hand (the "Run workflow" button, or
+#   `gh workflow run ci.yml`). Nobody uses CI's package for now: `task deploy` builds its own.
+on:
+  pull_request:
+    paths-ignore: ['docs/**', '**/*.md']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (Pint, Pest, API spec)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    # The same MySQL as compose.yaml: the shared host's version, with its data in memory.
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: >-
+          --tmpfs /var/lib/mysql:rw
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval 2s --health-timeout 5s --health-retries 60
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, mbstring, intl, gd, exif
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: cp .env.example .env && php artisan key:generate
+      - name: No site, host or person is named (deploy/check-forbidden.php)
+        run: php deploy/check-forbidden.php
+        working-directory: .
+      - name: Code style
+        run: vendor/bin/pint --test
+      - name: Tests (domain, architecture, API)
+        run: vendor/bin/pest
+      - name: OpenAPI spec is up to date
+        run: |
+          php artisan ptsite:prepare-database && php artisan migrate --force -q
+          php artisan scramble:export --path=../frontend/openapi.json
+          git diff --exit-code -- ../frontend/openapi.json || (echo "::error::frontend/openapi.json is out of date. Run: php artisan scramble:export --path=../frontend/openapi.json, then npm run api:types in frontend." && exit 1)
+
+  frontend:
+    name: Frontend (lint, types, unit, build, Storybook a11y)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: API types match the spec
+        run: |
+          npm run api:types
+          git diff --exit-code -- src/api/schema.d.ts || (echo "::error::Run npm run api:types and commit src/api/schema.d.ts." && exit 1)
+      - run: npm run lint
+      - run: npx tsc -b
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build-storybook
+      - name: Every story renders and passes axe
+        run: npm run test:storybook
+
+  e2e:
+    name: End-to-end (phone and desktop, axe)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: >-
+          --tmpfs /var/lib/mysql:rw
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval 2s --health-timeout 5s --health-retries 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, mbstring, intl, gd, exif
+          coverage: none
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: composer install --no-interaction --prefer-dist --no-progress
+        working-directory: backend
+      - run: cp .env.example .env && php artisan key:generate
+        working-directory: backend
+      - run: npm ci && npm run build && npx playwright install --with-deps chromium
+        working-directory: frontend
+      # The test servers run under gdb, so a crash of PHP itself prints a backtrace (see tests/php-server.ts).
+      - run: sudo apt-get install -y -q gdb
+      - name: PHP opcache settings (the test servers turn the JIT off)
+        run: php -i | grep -E '^opcache\.(enable|enable_cli|jit|jit_buffer_size) '
+      # One job runs both sizes at once: a job is billed by how long it runs, so this costs fewer minutes.
+      - name: End-to-end tests, phone and desktop side by side
+        run: npm run test:e2e:parallel
+        working-directory: frontend
+        env:
+          E2E_GDB: '1'
+      - name: Show the end of the test servers' logs
+        if: failure()
+        run: for f in storage/logs/*.log; do echo "=== $f"; tail -n 80 "$f"; done
+        working-directory: backend
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-traces
+          path: |
+            frontend/test-results
+            backend/storage/logs/*.log
+
+  package:
+    name: Build the deploy package (not uploaded)
+    # Off unless the workflow is started by hand. It only stores the zip as an artifact: uploading it to the
+    # site is `task deploy:ci`, from a developer's machine.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+        working-directory: backend
+      - run: npm ci
+        working-directory: frontend
+      - name: Build the upload package (see docs/architecture/deployment.md)
+        run: |
+          name=ptsite-${{ github.sha }}.zip
+          (cd frontend && npm run build)
+          (cd backend && zip -qr "../$name" . -x '.env' 'database/*.sqlite*' 'storage/logs/*' 'tests/*' 'node_modules/*')
+          ls -la *.zip
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ptsite-deploy-${{ github.sha }}
+          path: ptsite-${{ github.sha }}.zip
+          # Stored artifacts count against the plan for as long as they are kept. `task deploy` builds the
+          # package of an older commit again.
+          retention-days: 3

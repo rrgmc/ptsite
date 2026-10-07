@@ -1,0 +1,53 @@
+name: Release
+
+# A release is a tag on master, pushed by `task release` (see RELEASE.md). This builds the deploy package with
+# the tag as its version and publishes the GitHub release with the package attached.
+#
+# A release costs about 3 minutes of the plan's 2,000 a month. The package is a release asset, which does not
+# count against the 500 MB of stored artifacts.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build the package and publish the release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The whole history, to check the tag against master and to write the release notes.
+          fetch-depth: 0
+      - name: Refuse a tag that is not on master
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/master
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build the package (see docs/architecture/deployment.md)
+        run: |
+          php deploy/build-package.php
+          mv local/build/ptsite.zip "ptsite-$GITHUB_REF_NAME.zip"
+        env:
+          APP_VERSION: ${{ github.ref_name }}
+      - name: Publish the GitHub release
+        # GitHub writes the notes with bare URLs. The sed turns each one into a short link: "#6" for a pull
+        # request, "v2.0.0...v2.1.0" for the full changelog.
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="$GITHUB_REF_NAME" --jq .body \
+            | sed -E \
+                -e 's,https://github\.com/[^/ ]+/[^/ ]+/pull/([0-9]+),[#\1](&),g' \
+                -e 's,https://github\.com/[^/ ]+/[^/ ]+/(compare|commits)/([^ ]+),[\2](&),g' \
+            > release-notes.md
+          gh release create "$GITHUB_REF_NAME" --verify-tag --notes-file release-notes.md "ptsite-$GITHUB_REF_NAME.zip"
+        env:
+          GH_TOKEN: ${{ github.token }}
+

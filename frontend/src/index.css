@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+/* React Aria state variants: selected:, pressed:, pending:, invalid:, … */
+@plugin 'tailwindcss-react-aria-components';
+@import './tokens/tokens.css';
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas text-text font-sans antialiased;
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* Numbers in tables line up. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

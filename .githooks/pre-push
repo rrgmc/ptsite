@@ -1,0 +1,13 @@
+#!/bin/sh
+# Refuses every push to master: a normal push, a force push and a deletion. master only changes through a
+# pull request (AGENTS.md, "Branches"). `task hooks:install` turns this hook on.
+#
+# Git gives one line per pushed ref on standard input: <local ref> <local sha> <remote ref> <remote sha>.
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+  if [ "$remote_ref" = "refs/heads/master" ]; then
+    echo "Push to master refused: master only changes through a pull request." >&2
+    echo "Push your branch and open one: git push -u origin <branch>, then gh pr create." >&2
+    exit 1
+  fi
+done
+exit 0

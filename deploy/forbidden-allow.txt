@@ -1,0 +1,12 @@
+# Exceptions for deploy/check-forbidden.php. One per line:
+#   <path>: <word>     the word is allowed in that file
+#   <word>             the word is allowed in every file
+#   <path to an image> the image is allowed
+#
+# Every image here is drawn, not a photo: the site's icon in several sizes and the picture the tests upload.
+backend/public/favicon.ico
+frontend/public/icons/apple-touch-icon.png
+frontend/public/icons/icon-192.png
+frontend/public/icons/icon-512.png
+frontend/public/icons/icon-maskable-512.png
+frontend/tests/fixtures/photo.png

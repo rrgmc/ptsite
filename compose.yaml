@@ -1,0 +1,42 @@
+# The development services. Start them with `task db:up`.
+#
+# MySQL 5.7 is the development and test database, the version on the shared host. Mailpit catches outgoing mail.
+#
+# The project name is fixed, so every checkout and git worktree uses this one server. Each of them has its own
+# databases in it (see DB_DATABASE in backend/.env.example).
+#
+# The data is kept in memory (tmpfs), not on disk: seeding and the tests are many times faster, most of all on a
+# slow disk under Docker Desktop. It is lost when the container stops. `task db:up` creates and seeds the
+# development database again, and the tests create their own.
+name: ptsite
+
+services:
+  mysql:
+    image: mysql:5.7
+    platform: linux/amd64 # there is no arm64 image of 5.7
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-name-resolve
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '127.0.0.1:${PTSITE_DB_PORT:-3306}:3306'
+    tmpfs:
+      - /var/lib/mysql:rw,size=2g
+    healthcheck:
+      # Over TCP: the socket also answers while the image is still setting up, before the real server starts.
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-uroot', '-proot', '--silent']
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    restart: unless-stopped
+
+  # Catches the mail the site sends in development (the password link), so that nothing reaches a real mailbox.
+  # Read it at http://127.0.0.1:8025. The tests do not use it. Like MySQL, it is shared by every checkout.
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - '127.0.0.1:${PTSITE_MAIL_PORT:-1025}:1025'
+      - '127.0.0.1:${PTSITE_MAIL_UI_PORT:-8025}:8025'
+    restart: unless-stopped
