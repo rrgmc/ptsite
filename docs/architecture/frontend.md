@@ -51,7 +51,8 @@ frontend/
 | `/` | Standings, next night, last result; the attendance banner while a night of the current season is open | players |
 | `/results` | Finished nights, numbered in the season's order; the "Pontos acumulados" chart; the season's three amounts added up; upcoming nights and "+ Agendar" with the next three regular weekdays suggested; the attendance banner | players; scheduling for results keepers |
 | `/calendar` | Season calendar | players |
-| `/seasons` | "Temporadas": the season list, where the user picks the selected season | players |
+| `/seasons` | "Temporadas": every season with the first ten of its standings, and "Ver esta temporada" to make it the selected season | players |
+| `/seasons/select` | "Escolher temporada": the season list, where the user picks the selected season | players |
 | `/seasons/:id`, `/seasons/:id/results`, `/seasons/:id/calendar`, `/seasons/:id/simulator`, `/seasons/:id/statistics` | Links to one season: pick it, then redirect to `/`, `/results`, `/calendar`, `/simulator` or `/statistics` | players |
 | `/nights/:id` | Night: details, attendance ("ALL IN" / "FOLD"), the partial result while open, result, "Abrir", "Remarcar", "Cancelar evento", "Finalizar", "Editar resultado", "Editar evento" | players; actions for results keepers |
 | `/nights/:id/edit` | Edit a night ("Editar evento"): place and description | results keepers and admins while scheduled; admins once open or finished |
@@ -127,7 +128,7 @@ The API's messages are translated in the backend the same way: `backend/lang/pt_
 
 The standings, results, calendar, simulator, statistics (`/statistics`) and a player's page (`/players/:id`) show
 one season, the **selected season**
-([seasons-and-nights.md](../specs/seasons-and-nights.md) rules 3a to 3e).
+([seasons-and-nights.md](../specs/seasons-and-nights.md) rules 3a to 3f).
 
 - `src/lib/selectedSeason.ts` keeps the picked season's id in the browser's `sessionStorage`, so it lasts until
   the browser tab closes. No pick means the current season; the current season's id is never stored, so the site
@@ -135,8 +136,10 @@ one season, the **selected season**
 - `useSelectedSeason()` (`features/layout`) returns the season to show. Screens never read a season id from the
   URL. A pick that answers 404 or is archived is cleared.
 - `useLogout` clears the pick. The `/seasons/:id…` routes are loaders that set it and redirect.
-- The header shows the selected season's name as a link to `/seasons`. `SeasonNotice` appears on the season
-  screens while the pick is not the current season.
+- The header shows the selected season's name as a link to `/seasons/select`. `SeasonNotice` appears on the
+  season screens while the pick is not the current season.
+- `usePickSeason()` (`features/seasons`) makes a season the selected one. "Escolher temporada" and "Temporadas"
+  both use it.
 
 ## Navigation
 

@@ -26,6 +26,7 @@
 | `POST /password-resets/{token}/complete` | anyone | Sets the new password: `password` (8 characters or more). Answers 204. The link stops working, and every session and API token of the account ends |
 | `GET /seasons` | logged in | Seasons, newest first. `updated_since` |
 | `GET /seasons/current` | logged in | Newest open, unfinished season (404 if none) |
+| `GET /seasons/top-standings` | logged in | Every season that is not archived, newest first, each with the first ten of its standings: `season`, `rows` (as in the standings; empty before the first finished night) and `tied_not_shown` (players left out who have the same total as the last one shown) |
 | `GET /seasons/{id}` | logged in | One season with its percentage table |
 | `GET /seasons/{id}/standings` | logged in | Standings: `rank` (shared on ties), `player`, `points`, `nights_scored`, `wins` |
 | `GET /seasons/{id}/nights` | logged in | Nights oldest first, with results. `status`, `updated_since` |
