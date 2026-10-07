@@ -27,9 +27,13 @@ never depend on that: a setting a site needs goes in `site.json` or `backend/con
 ([`docs/architecture/backend-layers.md`](docs/architecture/backend-layers.md), "A package and an app in one
 folder").
 
-Nothing site-specific may be committed here: no real league, host or deploy target, and no real person (not even
-in an example). `php deploy/check-forbidden.php` enforces it, and CI runs it. Worked examples use invented names
-and the invented domains `ligademo.example`, `inventado.example`, `semdominio.example` and `example.com`.
+Nothing site-specific may be committed here: no real league, host or deploy target, and no member of a real
+league (not even in an example). `php deploy/check-forbidden.php` enforces it, and CI runs it. Worked examples
+use invented names and the invented domains `ligademo.example`, `inventado.example`, `semdominio.example` and
+`example.com`.
+
+The demo league's players are named after champions of the World Series of Poker Main Event. The names are
+public; the results are invented. Write nothing about them but public facts.
 
 ## Status
 

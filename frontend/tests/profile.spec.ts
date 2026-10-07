@@ -12,7 +12,7 @@ test('a player edits their own details and photos in "Meu perfil"', async ({ pag
   const nickname = await page.getByLabel('Apelido').inputValue()
 
   // A nickname in use is refused; typing another one and saving again works.
-  await page.getByLabel('Apelido').fill('Mica')
+  await page.getByLabel('Apelido').fill('Heinz')
   await page.getByRole('button', { name: 'Salvar' }).click()
   await expect(page.getByText('Já existe um jogador com este apelido.')).toBeVisible()
   await page.getByLabel('Apelido').fill(nickname)
@@ -57,11 +57,11 @@ test('a player edits their own details and photos in "Meu perfil"', async ({ pag
 test('an admin sends and removes a player\'s photo in "Administração"', async ({ page }) => {
   await login(page, 'dev-admin')
   await page.goto('admin/players')
-  await page.getByRole('button', { name: 'Editar Mica' }).click()
+  await page.getByRole('button', { name: 'Editar Heinz' }).click()
   await expect(page.getByRole('heading', { name: 'Foto', exact: true })).toBeVisible()
 
   await page.locator('input[type=file]').setInputFiles(picture)
-  await expect(page.getByRole('img', { name: 'Foto de Mica', exact: true })).toHaveJSProperty('naturalWidth', 600)
+  await expect(page.getByRole('img', { name: 'Foto de Heinz', exact: true })).toHaveJSProperty('naturalWidth', 600)
   await expectAccessible(page)
 
   await page.getByRole('button', { name: 'Remover foto', exact: true }).click()
