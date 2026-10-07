@@ -31,12 +31,12 @@ export function SeasonsPage() {
               key={season.id}
               title={season.name}
               action={
-                <span className="flex flex-wrap items-center gap-2">
+                <span className="flex max-w-full min-w-0 flex-wrap items-center gap-2">
                   <SeasonBadge season={season} isCurrent={season.id === defaultSeason?.id} />
                   {season.id === selected?.id ? (
                     <span className="flex min-h-touch items-center text-sm font-semibold text-primary">{t.seasons.selected}</span>
                   ) : (
-                    <Button variant="secondary" onPress={() => pick(season)} aria-label={t.seasons.viewSeason({ season: season.name })}>
+                    <Button variant="secondary" className="max-w-full min-w-0 wrap-anywhere" onPress={() => pick(season)} aria-label={t.seasons.viewSeason({ season: season.name })}>
                       {t.seasons.view}
                     </Button>
                   )}

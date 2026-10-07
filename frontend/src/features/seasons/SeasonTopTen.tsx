@@ -21,14 +21,15 @@ export function SeasonTopTen({ caption, rows, tiedNotShown = 0 }: {
         {rows.map((row, i) => {
           const tied = rows[i - 1]?.rank === row.rank || rows[i + 1]?.rank === row.rank || (i === rows.length - 1 && tiedNotShown > 0)
           return (
-            <li key={row.player.id} className="flex break-inside-avoid items-center gap-2 border-b border-border/60 py-1">
+            // With large text on a phone the nickname and the points do not fit beside the photo: they move down.
+            <li key={row.player.id} className="flex break-inside-avoid flex-wrap items-center gap-x-2 border-b border-border/60 py-1">
               <span className={`w-7 shrink-0 text-center font-display text-lg font-extrabold tabular ${rankColor(row.rank)}`}>
                 {row.rank}
                 {tied && <span className="sr-only"> {t.components.rankedList.tied}</span>}
               </span>
               <PlayerThumbnail player={row.player} size="xs" />
-              <PlayerLink player={row.player} className="min-w-0 flex-1 font-semibold" />
-              <span className="shrink-0 font-bold tabular">{formatPoints(row.points)}</span>
+              <PlayerLink player={row.player} className="min-w-20 flex-1 font-semibold" />
+              <span className="ml-auto shrink-0 font-bold tabular">{formatPoints(row.points)}</span>
             </li>
           )
         })}
