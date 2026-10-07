@@ -7,8 +7,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 FRONTEND=$PWD
 BACKEND=$FRONTEND/../backend
-# The same port offset as ports.ts: the one in local/ports.env, or else PORT_OFFSET.
-OFFSET=$(sed -n 's/^PORT_OFFSET=//p' ../local/ports.env 2>/dev/null | tr -d '\r')
+# The same port offset as ports.ts: the one in local/ports.env, or else PORT_OFFSET. Only a git worktree has
+# that file.
+OFFSET=$({ sed -n 's/^PORT_OFFSET=//p' ../local/ports.env 2>/dev/null || true; } | tr -d '\r')
 PORT=${PORT:-$((8130 + ${OFFSET:-${PORT_OFFSET:-0}}))}
 # Its own database: the development one's name plus this suffix (backend/config/database.php).
 export DB_DATABASE_SUFFIX=_screenshots

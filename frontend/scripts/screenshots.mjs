@@ -189,7 +189,8 @@ await page.getByText('Sexta-feira Santa').first().waitFor()
 await shot('14-admin-holidays')
 
 // The season calendar of 2022: winners, and the Friday after Tiradentes left out
-await page.goto('seasons/10/calendar')
+// Liga 2022 is the second season the demo league seeds.
+await page.goto('seasons/2/calendar')
 await page.getByRole('region', { name: 'Abril de 2022' }).waitFor()
 await shot('15-calendar', true)
 await browser.close()
