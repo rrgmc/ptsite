@@ -7,7 +7,7 @@ import { Card } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { type GridDay, GridLegend, MonthGrid, type MonthNote, MonthNotes } from '@/components/MonthGrid'
 import { TextField } from '@/components/TextField'
-import { addDays, dayOf, monthsBetween, today, yearsBetween } from '@/lib/dates'
+import { addDays, dayOf, monthsBetween, today, yearsBetween, zonedDateTime } from '@/lib/dates'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 
 /**
@@ -146,7 +146,7 @@ export function PlanCalendar({ season, from, to, dates, holidays, onScheduled, t
     for (let n = 1; n <= 31; n++) {
       const day = `${month}-${String(n).padStart(2, '0')}`
       if (day < from || day > to || planDays.has(day)) continue
-      const startsAt = `${day}T${time}:00-03:00`
+      const startsAt = zonedDateTime(day, time)
       const on = added.includes(startsAt)
       const holiday = days[day]
       days[day] = {

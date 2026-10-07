@@ -30,8 +30,10 @@ frontend/
                       MonthGrid, RankedList, StatTiles, PeriodSwitch, …)
   src/features/       one folder per area: auth, layout, standings, results, calendar, seasons, nights,
                       simulator, statistics, players, admin
-  src/lib/            pt-BR formatting (money, dates, points), the selected season, site.ts (the site's name,
-                      tagline, night title prefix and logo)
+  src/lib/            formatting in the site's language, money and time zone (money, dates, points), the selected
+                      season, site.ts (the site's settings, as the app reads them)
+  src/site/           the settings' types, and the shades made from the main color
+  site-settings.ts    reads the site folder for the build (see "Site settings")
   src/mocks/          invented data and MSW handlers for Storybook
   .storybook/         Storybook config
   tests/              Playwright end-to-end tests
@@ -64,10 +66,32 @@ frontend/
 
 Screenshots of the demo league will be added in `docs/screens/`.
 
-The browser title names the screen: "Resultados · Liga Demo" (the site name, from `src/lib/site.ts`). `PageHeader` sets it from its `title`, through
+The browser title names the screen: "Resultados · Liga Demo" (the site's name, from its settings). `PageHeader` sets it from its `title`, through
 `usePageTitle` (`src/lib`). A screen with no `PageHeader` calls `usePageTitle` itself: the screens before login
 do it through the `title` of `AuthShell`, and the error page directly. A screen that is still loading shows
 the site name alone. Every tab of the admin section shows "Administração · <site name>".
+
+## Site settings
+
+A site's name, logo, language, money, time zone and main color are in its site folder's `site.json`
+([`site/README.md`](../../site/README.md)). The folder is `../site`, the demo site, unless `PTSITE_SITE_DIR`
+names another one. The frontend reads it **when it is built**, so the page, the installed app and the login
+screen have the right name and colors before the first request to the API.
+
+- **`site-settings.ts`** reads and checks the file. A wrong setting stops the build with a plain message.
+  `vite.config.ts` puts the result in the constant `__SITE__`; code reads it through `src/lib/site.ts`, never
+  directly.
+- **Its Vite plugin** writes the page's title, language and theme color into `index.html`, makes
+  `manifest.webmanifest` and `favicon.svg`, adds the site's `theme.css`, and puts the files of the site's
+  `public/` folder over the frontend's own. `PTSITE_OUT_DIR` sends the build to a site's own backend.
+- **The main color** is one value, `brandColor`. `src/site/brand.ts` makes the hover, soft and current-month
+  shades from it, and the plugin writes them after `tokens.css`. The build stops when text on the color, or
+  the color as text, has a contrast below 4.5:1. A site changes any other token in its `theme.css`.
+- **Formats.** `src/lib/format.ts` and `src/lib/dates.ts` build every `Intl` formatter from `site.locale`,
+  `site.currency` and `site.timeZone`. No component names a language, a currency or a time zone.
+- **The icons** are drawn on the main color by `npm run icons`, into the site folder's `public/icons` when
+  `PTSITE_SITE_DIR` is set.
+- The unit tests, Storybook and the end-to-end tests run on the demo site.
 
 ## Selected season
 

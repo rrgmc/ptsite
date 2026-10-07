@@ -1,0 +1,5 @@
+/* This site's changes to the design tokens of frontend/src/tokens/tokens.css. The main color is in site.json. */
+:root {
+  --color-accent: #b45309;
+  --color-accent-soft: #fef3c7;
+}

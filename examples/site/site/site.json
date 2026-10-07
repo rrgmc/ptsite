@@ -1,0 +1,12 @@
+{
+  "name": "Clube Exemplo",
+  "shortName": "Clube",
+  "tagline": "O menor site feito com o PTSite",
+  "nightTitlePrefix": "Rodada",
+  "logo": "♣",
+  "locale": "pt-BR",
+  "currency": "BRL",
+  "timeZone": "America/Sao_Paulo",
+  "brandColor": "#1e3a8a",
+  "siteDomain": "clube.example"
+}

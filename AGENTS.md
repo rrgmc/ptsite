@@ -12,9 +12,20 @@ assistants that read `AGENTS.md` pick it up directly. Change the rules here, nev
 This repository is the shared core. A league uses it by making its own **site repository**. That repository:
 
 - pins this one as a git submodule;
-- sets the league's name and settings (`APP_NAME`, `frontend/src/lib/site.ts`, `backend/config/ptsite.php`);
+- sets the league's name, logo, language, money, time zone and main color in one file, `site/site.json`
+  (settings: [`site/README.md`](site/README.md)), which both the backend and the frontend read;
+- has a thin Laravel app that requires `backend/` here as the Composer package `rrgmc/ptsite`;
 - holds the league's data, its deploy target and its history;
 - holds any importer for data from an older site.
+
+[`examples/site`](examples/site/) is the smallest site, and CI builds it. **To create a new site, follow
+[`docs/new-site.md`](docs/new-site.md).** Claude Code has it as the skill `new-site` and Gemini CLI as the
+command `/new-site`; both only point to that file.
+
+`backend/` and `frontend/` here also run alone, as the demo site of the `site/` folder at the top. Code must
+never depend on that: a setting a site needs goes in `site.json` or `backend/config/ptsite.php`
+([`docs/architecture/backend-layers.md`](docs/architecture/backend-layers.md), "A package and an app in one
+folder").
 
 Nothing site-specific may be committed here: no real league, host or deploy target, and no real person (not even
 in an example). `php deploy/check-forbidden.php` enforces it, and CI runs it. Worked examples use invented names

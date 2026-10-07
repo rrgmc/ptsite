@@ -10,6 +10,7 @@ import { TextField } from '@/components/TextField'
 import { formatTime, nightTitle, parseMoneyInput } from '@/lib/format'
 import { FinishingOrderFields } from './FinishingOrderFields'
 import { isEmptyPartial, moneyText, type ResultSeed, seedFromPartial } from './partialResult'
+import { currencySymbol } from '@/lib/site'
 
 const invalidMoney = 'Valor inválido. Use por exemplo 840 ou 840,50.'
 
@@ -105,7 +106,7 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
         <Card>
           <div className="flex flex-col gap-3">
             <TextField
-              label="Pote (R$)"
+              label={`Pote (${currencySymbol})`}
               inputMode="decimal"
               value={potText}
               onChange={setPotText}
@@ -114,7 +115,7 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
               errorMessage={apiError?.fieldError('pot') ?? (potText && pot === null ? invalidMoney : undefined)}
             />
             <TextField
-              label="Pote ME (R$)"
+              label={`Pote ME (${currencySymbol})`}
               description="A parte guardada para o Main Event. Use 0 se não houve."
               inputMode="decimal"
               value={mainEventPotText}
@@ -124,7 +125,7 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
               errorMessage={apiError?.fieldError('main_event_pot') ?? (mainEventPotText && mainEventPot === null ? invalidMoney : undefined)}
             />
             <TextField
-              label="Time chip (R$)"
+              label={`Time chip (${currencySymbol})`}
               description="Rebuys e atrasos, guardado para a festa de fim de ano. Use 0 se não houve."
               inputMode="decimal"
               value={timeChipText}

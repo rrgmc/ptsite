@@ -5,10 +5,24 @@
  *
  * The package merges this file into the host app's configuration, so a site only names what it changes.
  */
+
+use PTSite\App\Support\SiteFile;
+
+// The site folder's site.json (site/README.md), which the frontend is built from too. Without the file, the
+// name, language and time zone are Laravel's own settings: APP_NAME, APP_LOCALE and APP_TIMEZONE.
+$site = SiteFile::read(base_path(), env('PTSITE_SITE_DIR'));
+
 return [
 
+    // From site.json. The package puts each one that is set into Laravel's own configuration.
+    'site' => [
+        'name' => $site['name'] ?? null,
+        'locale' => isset($site['locale']) ? SiteFile::laravelLocale($site['locale']) : null,
+        'time_zone' => $site['timeZone'] ?? null,
+    ],
+
     // A line below the site name, in the mail signature. Empty: the name alone.
-    'tagline' => env('PTSITE_TAGLINE', ''),
+    'tagline' => $site['tagline'] ?? env('PTSITE_TAGLINE', ''),
 
     'database' => [
         // The name of the MySQL database.
@@ -42,7 +56,8 @@ return [
         'attempts_per_minute' => (int) env('PASSWORD_RESET_THROTTLE', 5),
 
         // The site's own domain. An address on it, or on a subdomain, never gets a link. Empty: no such check.
-        'site_domain' => (string) env('PASSWORD_RESET_SITE_DOMAIN', ''),
+        // PASSWORD_RESET_SITE_DOMAIN, or else "siteDomain" of site.json.
+        'site_domain' => (string) env('PASSWORD_RESET_SITE_DOMAIN', $site['siteDomain'] ?? ''),
 
         /*
          * Domains that never get a link: placeholders people type for a player who gave no email. Some of them

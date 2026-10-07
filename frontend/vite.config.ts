@@ -4,6 +4,7 @@ import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 import { ports } from './ports.ts'
+import { loadSite, sitePlugin } from './site-settings.ts'
 
 const backend = process.env.BACKEND_URL ?? `http://127.0.0.1:${ports.backend}`
 
@@ -19,13 +20,16 @@ function appVersion(): string {
   }
 }
 
+// The site being built: its name, language, money, time zone and main color (site/README.md).
+const site = loadSite()
+
 // The built site is served by Laravel from backend/public/app on the same domain as the API,
 // so the login cookie just works. In development, Vite forwards API calls to Laravel.
 // The site is at the root of its domain: the app at /app/, the API at /api (see src/lib/paths.ts).
 export default defineConfig({
   base: '/app/',
-  define: { __APP_VERSION__: JSON.stringify(appVersion()) },
-  plugins: [react(), tailwindcss()],
+  define: { __APP_VERSION__: JSON.stringify(appVersion()), __SITE__: JSON.stringify(site) },
+  plugins: [react(), tailwindcss(), sitePlugin(site)],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
@@ -37,7 +41,8 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../backend/public/app',
+    // A site's own backend folder, when it builds from its own repository.
+    outDir: process.env.PTSITE_OUT_DIR ?? '../backend/public/app',
     emptyOutDir: true,
   },
   test: {

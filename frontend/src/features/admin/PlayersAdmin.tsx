@@ -14,6 +14,7 @@ import { PlayerImagesEditor } from '@/features/players/PlayerImagesEditor'
 import { fullNameIfDifferent } from '@/lib/format'
 import { roleLabels } from '@/lib/roles'
 import { PlayerLoginForm } from './PlayerLoginForm'
+import { site } from '@/lib/site'
 
 export function PlayersAdmin() {
   const [search, setSearch] = useState('')
@@ -43,7 +44,7 @@ export function PlayersAdmin() {
                   <span className="flex flex-wrap items-center gap-x-2">
                     <span className={`font-semibold ${p.archived ? 'text-muted line-through' : ''}`}>{p.nickname}</span>
                     {p.archived ? <Badge tone="danger">arquivado</Badge> : p.status === 'inactive' && <Badge>inativo</Badge>}
-                    {p.login && p.login.role !== 'player' && <Badge tone="primary">{roleLabels[p.login.role].toLocaleLowerCase('pt-BR')}</Badge>}
+                    {p.login && p.login.role !== 'player' && <Badge tone="primary">{roleLabels[p.login.role].toLocaleLowerCase(site.locale)}</Badge>}
                   </span>
                   {fullNameIfDifferent(p.nickname, p.name) && <span className="block text-sm text-muted">{p.name}</span>}
                 </span>

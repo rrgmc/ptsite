@@ -1,0 +1,96 @@
+# The commands of a site built on PTSite, run with go-task (https://taskfile.dev): `task --list` shows them.
+#
+# This file works here, where the core is two folders up, and in a site's own repository, where the core is a
+# git submodule: change CORE below to its folder there (docs/new-site.md in the core).
+version: '3'
+
+vars:
+  # The folder of the PTSite core, from this file.
+  CORE: '../..'
+  BACKEND_PORT: '{{.BACKEND_PORT | default 8000}}'
+
+env:
+  # The frontend is the core's, built for this site's folder into this site's backend.
+  PTSITE_SITE_DIR: '{{.ROOT_DIR}}/site'
+  PTSITE_OUT_DIR: '{{.ROOT_DIR}}/backend/public/app'
+  BACKEND_URL: 'http://127.0.0.1:{{.BACKEND_PORT}}'
+
+tasks:
+  default:
+    silent: true
+    cmds:
+      - task --list
+
+  setup:
+    desc: 'First-time setup: PHP packages, .env, frontend packages, database and a first build'
+    cmds:
+      - task: backend:install
+      - task: backend:env
+      - task: frontend:install
+      - task: db:up
+      - task: build
+
+  backend:install:
+    desc: Install the PHP packages, with the core as a package
+    dir: backend
+    cmds:
+      - composer install
+
+  backend:env:
+    internal: true
+    dir: backend
+    status:
+      - test -f .env
+    cmds:
+      - php -r "copy('.env.example', '.env');"
+      - php artisan key:generate
+
+  frontend:install:
+    desc: Install the frontend packages of the core
+    dir: '{{.CORE}}/frontend'
+    cmds:
+      - npm ci
+
+  db:up:
+    desc: Create the development database when it is missing, and bring its tables up to date
+    dir: backend
+    cmds:
+      - php artisan ptsite:prepare-database
+      - php artisan migrate
+
+  db:demo:
+    desc: Fill an empty development database with the demo league and the dev logins (never on the real site)
+    dir: backend
+    cmds:
+      - php artisan db:seed --class=PTSite\\Database\\Seeders\\DatabaseSeeder
+
+  build:
+    desc: Build the frontend for this site into backend/public/app
+    dir: '{{.CORE}}/frontend'
+    cmds:
+      - npx tsc -b
+      - npx vite build
+
+  serve:
+    desc: Run the site on http://127.0.0.1:{{.BACKEND_PORT}}/app/ (build first)
+    dir: backend
+    cmds:
+      - php artisan serve --port={{.BACKEND_PORT}}
+
+  frontend:dev:
+    desc: Run the Vite dev server for this site, next to `task serve`
+    dir: '{{.CORE}}/frontend'
+    cmds:
+      - npm run dev
+
+  icons:
+    desc: Draw this site's app icons into site/public/icons, after changing its main color
+    dir: '{{.CORE}}/frontend'
+    cmds:
+      - npm run icons
+
+  verify:
+    desc: Check that every finished night's points match its pot and percentage table
+    dir: backend
+    cmds:
+      - php artisan ptsite:verify

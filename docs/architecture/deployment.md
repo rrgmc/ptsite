@@ -99,7 +99,7 @@ Production values to set:
 
 | Setting | Value |
 |---|---|
-| `APP_NAME` | The site's name |
+| `APP_NAME` | The site's name. The package's `site.json` gives the name shown; this one names the session cookie |
 | `APP_ENV`, `APP_DEBUG` | `production`, `false` |
 | `APP_KEY` | A new key (`php artisan key:generate --show`) |
 | `APP_URL` | The site's address, such as `https://example.com`. The password link is built from it |

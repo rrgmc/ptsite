@@ -1,16 +1,14 @@
+import type { SiteSettings } from '@/site/types'
+
 /**
- * This site's name and wording. Everything that names the site reads it from here, so a league changes it in
- * one place.
+ * This site's settings: its name, language, money, time zone and main color. They come from the site folder's
+ * site.json when the app is built (site-settings.ts, site/README.md). Everything that names the site or formats
+ * a value reads them from here.
  */
-export const site = {
-  /** The name in the browser title, the menu, the login screen and the footer. */
-  name: 'Liga Demo',
-  /** A short form of the name for the header, where a phone has room for a few letters only. */
-  shortName: 'Liga',
-  /** A line below the name on the login screen. Empty: no line. */
-  tagline: 'Liga de pôquer entre amigos',
-  /** What a night is called in its title: "Liga - 14/03/2026". */
-  nightTitlePrefix: 'Liga',
-  /** A character shown next to the name. */
-  logo: '♠',
-} as const
+export const site: SiteSettings = __SITE__
+
+/** The sign of the site's money, for a field label: "R$". */
+export const currencySymbol =
+  new Intl.NumberFormat(site.locale, { style: 'currency', currency: site.currency })
+    .formatToParts(0)
+    .find((part) => part.type === 'currency')?.value ?? site.currency

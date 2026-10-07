@@ -50,7 +50,7 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 
 6. A night has a date and time, a place (the season's default place unless changed) and a description.
 6a. A night's title is a word set by the site and the night's date: "Liga - 14/03/2026". The first word is the
-   site's setting (`nightTitlePrefix` in `frontend/src/lib/site.ts`); the demo league uses "Liga", and so do the
+   site's setting (`nightTitlePrefix` in its `site.json`); the demo league uses "Liga", and so do the
    examples in these specs. On "Resultados" the title also has the night's number in the season, counting the
    finished nights from the oldest: "Liga 3 - 14/03/2026".
 7. A night goes through these states: **scheduled** → **open** → **finished**.
