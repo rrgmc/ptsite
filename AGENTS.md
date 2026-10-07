@@ -69,7 +69,8 @@ Do not re-argue a Proposed decision without a new reason. To change one, write a
   `gh pr merge --merge --delete-branch --subject "Merge <what changed> into master"`.
 - The `pre-push` hook in `.githooks/` refuses a push to `master`. `task setup` turns it on, and
   `task hooks:install` does only that. Never skip it with `git push --no-verify`. GitHub itself does not block
-  the push: branch protection is not available for a private repository on a free account.
+  the push: branch protection is not available for a private repository on a free account. The workflow
+  `master-guard.yml` reports one instead: it fails on a commit that reached `master` without a pull request.
 - **CI tests a change once, on its pull request.** Wait for the checks to pass before merging: `master` does not
   run them again. If `master` moved after the checks ran, bring the branch
   up to date first. A change that touches only `docs/` or `.md` files runs no checks. CI minutes are limited
