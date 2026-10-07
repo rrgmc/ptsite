@@ -13,6 +13,7 @@ import { AllTimePlayerPage, PlayerPage } from './features/players/PlayerPage'
 import { PlayersPage } from './features/players/PlayersPage'
 import { ProfilePage } from './features/profile/ProfilePage'
 import { ResultsPage } from './features/results/ResultsPage'
+import { SeasonPickerPage } from './features/seasons/SeasonPickerPage'
 import { SeasonsPage } from './features/seasons/SeasonsPage'
 import { SimulatorPage } from './features/simulator/SimulatorPage'
 import { StandingsPage } from './features/standings/StandingsPage'
@@ -47,6 +48,7 @@ export const router = createBrowserRouter(
         { path: 'statistics', lazy: statistics('StatisticsPage') },
         { path: 'statistics/all', lazy: statistics('AllTimeStatisticsPage') },
         { path: 'seasons', element: <SeasonsPage /> },
+        { path: 'seasons/select', element: <SeasonPickerPage /> },
         { path: 'seasons/:seasonId', loader: pickSeason('/') },
         { path: 'seasons/:seasonId/results', loader: pickSeason('/results') },
         { path: 'seasons/:seasonId/calendar', loader: pickSeason('/calendar') },

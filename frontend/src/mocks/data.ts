@@ -1,4 +1,4 @@
-import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, PartialResult, Player, PlayerStatistics, PlannedDate, RankedList, Season, Standing, Statistics, User } from '@/api/client'
+import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, PartialResult, Player, PlayerStatistics, PlannedDate, RankedList, Season, SeasonTopStandings, Standing, Statistics, User } from '@/api/client'
 
 // Invented data for Storybook and component tests. The development database has the demo league (backend/database/seeders/DemoLeagueSeeder.php).
 
@@ -315,6 +315,23 @@ const playerResult = (nightId: number, day: string, seasonId: number, seasonName
 })
 
 /** Ana in one season: first in the standings, and no points on the second night. */
+/** The first ten of a finished season, with a shared 4th place. */
+export const topTen: Standing[] = ['1420.50', '1310.00', '1188.25', '960.00', '960.00', '845.75', '702.00', '655.50', '590.00', '412.25'].map((points, i) => ({
+  rank: i === 4 ? 4 : i + 1,
+  player: players[i],
+  points,
+  nights_scored: 20 - i,
+  wins: Math.max(0, 5 - i),
+}))
+
+/** "Temporadas": the current season so far, two finished seasons (one with a cut tie) and one with no result. */
+export const seasonsTopStandings: SeasonTopStandings[] = [
+  { season: seasons[0], rows: standings, tied_not_shown: 0 },
+  { season: seasons[1], rows: topTen, tied_not_shown: 2 },
+  { season: seasons[2], rows: [...topTen.slice(5), ...topTen.slice(0, 5)].map((row, i) => ({ ...row, rank: i + 1, points: topTen[i].points })), tied_not_shown: 0 },
+  { season: { ...seasons[3], nights_count: 0 }, rows: [], tied_not_shown: 0 },
+]
+
 export const playerStatistics: PlayerStatistics = {
   season_id: 1,
   rank: 1,

@@ -11,6 +11,8 @@ export const keys = {
   currentSeason: ['seasons', 'current'] as const,
   season: (id: number) => ['seasons', id] as const,
   standings: (id: number) => ['seasons', id, 'standings'] as const,
+  /** Starts with "seasons", so a changed result refreshes it with the standings. */
+  seasonsTopStandings: ['seasons', 'top-standings'] as const,
   /** `null` is every season. */
   statistics: (seasonId: number | null) => ['statistics', seasonId] as const,
   /** Starts with "statistics", so a changed result refreshes it with the league's. */
@@ -138,6 +140,14 @@ export function useStandings(seasonId: number | undefined) {
     enabled: seasonId !== undefined,
     queryFn: async () =>
       (await unwrap(api.GET('/v1/seasons/{season}/standings', { params: { path: { season: seasonId! } } }))).data,
+  })
+}
+
+/** Every season, newest first, each with the first ten of its standings. */
+export function useSeasonsTopStandings() {
+  return useQuery({
+    queryKey: keys.seasonsTopStandings,
+    queryFn: async () => (await unwrap(api.GET('/v1/seasons/top-standings'))).data,
   })
 }
 

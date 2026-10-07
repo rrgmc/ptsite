@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, memo, memos, nightPlan, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, standings, statistics, statisticsAllTime } from './data'
+import { attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, memo, memos, nightPlan, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
 
 const withArchived = (request: Request) => new URL(request.url).searchParams.get('archived') === '1'
 
@@ -13,6 +13,7 @@ export const handlers = [
   http.post('/api/v1/password-resets/:token/complete', () => new HttpResponse(null, { status: 204 })),
   http.get('/api/v1/seasons', () => HttpResponse.json({ data: seasons })),
   http.get('/api/v1/seasons/current', () => HttpResponse.json({ data: season })),
+  http.get('/api/v1/seasons/top-standings', () => HttpResponse.json({ data: seasonsTopStandings })),
   http.get('/api/v1/seasons/:id', ({ params }) => {
     const found = seasons.find((s) => s.id === Number(params.id))
     return found ? HttpResponse.json({ data: found }) : HttpResponse.json({ message: 'Temporada não encontrada.' }, { status: 404 })

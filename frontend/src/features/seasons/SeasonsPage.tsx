@@ -1,71 +1,59 @@
-import { Button as AriaButton } from 'react-aria-components'
-import { useLocation, useNavigate } from 'react-router'
-import type { Season } from '@/api/client'
-import { useSeasons } from '@/api/queries'
+import { useSeasonsTopStandings } from '@/api/queries'
+import { Button } from '@/components/Button'
 import { Card, PageHeader } from '@/components/Card'
-import { Badge, Empty, ErrorBox, Loading } from '@/components/Feedback'
+import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { t } from '@/i18n'
 import { formatDate } from '@/lib/format'
-import { setSelectedSeasonId } from '@/lib/selectedSeason'
-import { isSeasonScreen } from '../layout/navigation'
-import { useSelectedSeason } from '../layout/useSelectedSeason'
+import { SeasonBadge } from './SeasonBadge'
+import { SeasonTopTen } from './SeasonTopTen'
+import { usePickSeason } from './usePickSeason'
 
-/** "Temporadas": every season, newest first. Picking one makes it the season that every screen shows. */
+/**
+ * "Temporadas", from the menu: every season, newest first, each with the first ten of its standings. A season can
+ * be made the one that every screen shows.
+ */
 export function SeasonsPage() {
-  const seasons = useSeasons()
-  const { season: selected, defaultSeason } = useSelectedSeason()
-  const navigate = useNavigate()
-  const from = (useLocation().state as { from?: string } | null)?.from
+  const seasons = useSeasonsTopStandings()
+  const { pick, selected, defaultSeason } = usePickSeason()
 
   if (seasons.isPending) return <Loading />
   if (seasons.error) return <ErrorBox error={seasons.error} />
 
-  const list = seasons.data!.filter((s) => !s.archived)
-
-  function pick(season: Season) {
-    // The current season is "no pick", so the site follows the next season when it opens.
-    setSelectedSeasonId(season.id === defaultSeason?.id ? null : season.id)
-    navigate(isSeasonScreen(from) ? from : '/')
-  }
-
   return (
     <>
-      <PageHeader title={t.common.seasons} subtitle={t.seasons.subtitle} />
-      {list.length === 0 ? (
+      <PageHeader title={t.common.seasons} subtitle={t.seasons.overviewSubtitle} />
+      {seasons.data.length === 0 ? (
         <Empty>{t.seasons.noSeason}</Empty>
       ) : (
-        <Card>
-          <ul className="divide-y divide-border/60">
-            {list.map((s) => (
-              <li key={s.id} className="even:bg-surface-stripe">
-                <AriaButton
-                  onPress={() => pick(s)}
-                  aria-current={s.id === selected?.id ? 'true' : undefined}
-                  className="flex min-h-touch w-full flex-wrap items-center justify-between gap-2 rounded-md px-2 py-2 text-left hover:bg-surface-sunken focus-visible:outline-3 focus-visible:outline-focus"
-                >
-                  <span className="min-w-0 wrap-anywhere">
-                    <span className="font-semibold">{s.name}</span>
-                    <span className="block text-sm text-muted">
-                      {t.seasons.started({ date: formatDate(s.starts_on), count: s.nights_count ?? 0 })}
-                    </span>
-                  </span>
-                  <span className="flex flex-wrap items-center gap-2">
-                    {s.id === selected?.id && <span className="text-sm font-semibold text-primary">{t.seasons.selected}</span>}
-                    {s.id === defaultSeason?.id ? (
-                      <Badge tone="primary">{t.seasons.current}</Badge>
-                    ) : s.is_finished ? (
-                      <Badge>{t.seasons.finished}</Badge>
-                    ) : s.is_open ? (
-                      <Badge tone="primary">{t.seasons.open}</Badge>
-                    ) : (
-                      <Badge tone="warning">{t.seasons.closed}</Badge>
-                    )}
-                  </span>
-                </AriaButton>
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <div className="grid grid-cols-1 gap-4">
+          {seasons.data.map(({ season, rows, tied_not_shown }) => (
+            <Card
+              key={season.id}
+              title={season.name}
+              action={
+                <span className="flex flex-wrap items-center gap-2">
+                  <SeasonBadge season={season} isCurrent={season.id === defaultSeason?.id} />
+                  {season.id === selected?.id ? (
+                    <span className="flex min-h-touch items-center text-sm font-semibold text-primary">{t.seasons.selected}</span>
+                  ) : (
+                    <Button variant="secondary" onPress={() => pick(season)} aria-label={t.seasons.viewSeason({ season: season.name })}>
+                      {t.seasons.view}
+                    </Button>
+                  )}
+                </span>
+              }
+            >
+              <p className="-mt-2 mb-2 text-sm text-muted">
+                {t.seasons.started({ date: formatDate(season.starts_on), count: season.nights_count ?? 0 })}
+              </p>
+              {rows.length === 0 ? (
+                <p className="text-muted">{t.seasons.noResults}</p>
+              ) : (
+                <SeasonTopTen caption={t.seasons.topTenCaption({ season: season.name })} rows={rows} tiedNotShown={tied_not_shown} />
+              )}
+            </Card>
+          ))}
+        </div>
       )}
     </>
   )

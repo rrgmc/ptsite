@@ -79,14 +79,14 @@ export function AppLayout() {
   )
 }
 
-/** The season on screen, as the way to "Temporadas". Picking a season there returns to the screen it was opened from. */
+/** The season on screen, as the way to "Escolher temporada". Picking a season there returns to the screen it was opened from. */
 function SelectedSeasonLink() {
   const { season } = useSelectedSeason()
   const { pathname } = useLocation()
   if (!season) return null
   return (
     <Link
-      to="/seasons"
+      to="/seasons/select"
       state={isSeasonScreen(pathname) ? { from: pathname } : undefined}
       className="flex min-h-touch min-w-0 items-center gap-1 rounded-md px-1 font-semibold text-primary hover:bg-primary-soft sm:px-2"
     >
