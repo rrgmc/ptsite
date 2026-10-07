@@ -32,6 +32,7 @@ docs/screens/desktop/14-admin-holidays.png
 docs/screens/desktop/15-calendar.png
 docs/screens/desktop/16-seasons.png
 docs/screens/desktop/17-menu.png
+docs/screens/desktop/18-season-picker.png
 docs/screens/mobile/01-login.png
 docs/screens/mobile/02-standings-2022.png
 docs/screens/mobile/03-results-2022.png
@@ -49,3 +50,4 @@ docs/screens/mobile/14-admin-holidays.png
 docs/screens/mobile/15-calendar.png
 docs/screens/mobile/16-seasons.png
 docs/screens/mobile/17-menu.png
+docs/screens/mobile/18-season-picker.png
