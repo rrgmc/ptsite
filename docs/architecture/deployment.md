@@ -179,6 +179,28 @@ Two catches with the cPanel API:
 - cPanel keeps the PHP version as a handler block in the document root's `.htaccess`, and each deploy replaces
   that file. The script copies the block into the new file.
 
+## Moving to a fresh app folder
+
+An upload never deletes a file on the server. That is safe, but files a new version no longer has stay in the
+app folder, and some would still be read: an old `lang/` or `config/` file comes before the package's own. So a
+large change of the code goes to a **fresh app folder**, and the old one stays as the way back.
+
+1. Pick a new folder name, such as `liga-app-2`, and set `APP_DIR` to it.
+2. `php deploy/copy-env.php <old app folder>` gives the new folder the server's `.env`
+   ([`deploy/cpanel-copy-env.sh`](../../deploy/cpanel-copy-env.sh)). The file is read and written on the
+   server's side: it never reaches the developer's disk, and no value is printed. `NAME=value` after the folder
+   changes a setting in the copy, such as `APP_URL` for a test address.
+3. Upload as usual. The upload writes the document root's `index.php` with the new folder's path, so the site
+   runs from it from that moment.
+4. To go back, upload the old version with `APP_DIR` set to the old folder: its `index.php` points there again.
+
+**A test address first.** Give a subdomain its own document root and upload there with `WEB_DIR`, `TARGET_VHOST`
+and `TARGET_URL` set to the subdomain, and `APP_DIR` set to the new folder. The new code then runs next to the
+live site. When both run on the same database, check first that the new version has no migration to run
+(`php artisan migrate --pretend` on a copy of the data), and upload without `--migrate`. For the cutover, upload
+again with the live site's `WEB_DIR`, `TARGET_VHOST` and `TARGET_URL`, and set `APP_URL` back with
+`copy-env.php` and `DEPLOY_REPLACE_ENV=1`.
+
 ## Upload over FTP
 
 The cPanel API token can change the whole hosting account: files, databases, mailboxes and DNS. A CI job or a
