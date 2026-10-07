@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 import { t } from '@/i18n'
+import { rankColor } from './rankColor'
 
-const medal = ['text-gold', 'text-silver', 'text-bronze']
 
 /** The position in a ranked table, with medal colors for the first three. Tied lines say so to screen readers. */
 export function RankCell({ rank, tied }: { rank: number; tied: boolean }) {
   return (
-    <td className={`py-3 px-1 sm:px-2 font-display text-lg font-extrabold tabular ${medal[rank - 1] ?? 'text-muted'}`}>
+    <td className={`py-3 px-1 sm:px-2 font-display text-lg font-extrabold tabular ${rankColor(rank)}`}>
       {rank}
       {tied && <span className="sr-only"> {t.components.rankedList.tied}</span>}
     </td>

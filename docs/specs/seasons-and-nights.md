@@ -26,9 +26,9 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 3a. **One season on every screen.** The standings, the results, the calendar and the simulator all show the same
    season: the **selected season**. It is the current season unless the user picks another. If no season is
    open, it is the newest season.
-3b. **"Temporadas"** lists every season, newest first, with its start date, how many nights were played, and
-   whether it is the current one ("Atual"), finished, open or closed. It marks the selected season. Everyone
-   logged in can open it, from the season name at the top of every screen or from the menu.
+3b. **"Escolher temporada"** lists every season, newest first, with its start date, how many nights were played,
+   and whether it is the current one ("Atual"), finished, open or closed. It marks the selected season. Everyone
+   logged in can open it, from the season name at the top of every screen.
 3c. **Picking a season** in that list makes it the selected season on every screen. The pick lasts until the user
    picks another season, closes the browser tab or logs out ("Sair"). It belongs to that browser tab only: it
    changes nothing for other people.
@@ -36,6 +36,12 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    não é a temporada atual.") and offer **"Voltar para a atual"**.
 3e. A link to one season (`/seasons/7/results`) picks that season, then opens the screen. If the picked season no
    longer exists or was archived, the site goes back to the current season.
+3f. **"Temporadas"**, in the menu, shows every season, newest first, each with the **first ten of its standings**:
+   position, photo, nickname and points. On a wide screen the ten take two columns, 1 to 5 and 6 to 10. A
+   finished season shows its final standings and the current season its standings so far. When the tenth place
+   is shared, ten players are shown and the list says how many tied players did not fit ("e mais 2 empatados").
+   A season with no finished night says so. **"Ver esta temporada"** makes a season the selected one and opens
+   its standings; the selected season shows "✓ Selecionada" instead. Everyone logged in can open it.
 4. A night belongs to a season explicitly. A night's season cannot be worked out from its date, because
    seasons no longer follow the calendar year.
 5. A season has a **regular night**: a weekday, a start time and a frequency (for example Friday at 21:30, every
@@ -130,14 +136,19 @@ Names are invented.
 
 The selected season, in the demo league (the current season, and Liga 2022, which is finished):
 
-- **At first.** A player logs in. Every screen shows the current season, and "Temporadas" marks it "✓ Selecionada"
-  and "Atual".
-- **Picking another.** The player opens "Temporadas" from the results and picks Liga 2022. The site returns to the
+- **At first.** A player logs in. Every screen shows the current season, and "Escolher temporada" marks it
+  "✓ Selecionada" and "Atual".
+- **Picking another.** The player opens "Escolher temporada" from the results and picks Liga 2022. The site returns to the
   results, now of 2022. The calendar and the simulator also show 2022, and so does the site after a reload. Each
   of those screens shows the notice; "Jogadores" does not.
 - **A finished season.** A results keeper with Liga 2022 selected sees no "+ Agendar". After "Voltar para a
   atual" the notice is gone and "+ Agendar" is back.
 - **Logging out.** The player picks Liga 2022, logs out and logs in again: the current season is shown.
+- **The first ten.** The player opens "Temporadas" from the menu. Liga 2022 is "Finalizada" and lists ten players,
+  its champion first. The current season shows "✓ Selecionada" and no button. "Ver esta temporada" on Liga 2022
+  opens the standings of 2022, with the notice.
+- **A shared tenth place.** Eleven players scored, and the tenth and the eleventh both have 15,00. The list shows
+  ten players and "e mais 1 empatado".
 - **A link.** Opening `/seasons/10/results` shows the results of Liga 2022 at `/results`.
 - **A season that is gone.** Opening `/seasons/999999/results` shows the results of the current season, without
   the notice.

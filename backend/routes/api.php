@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('seasons', [SeasonController::class, 'index']);
         Route::get('seasons/current', [SeasonController::class, 'current']);
+        Route::get('seasons/top-standings', [SeasonController::class, 'topStandings']);
         Route::post('seasons', [SeasonController::class, 'store']);
         Route::get('seasons/{season}', [SeasonController::class, 'show']);
         Route::patch('seasons/{season}', [SeasonController::class, 'update']);

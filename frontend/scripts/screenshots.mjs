@@ -82,10 +82,14 @@ async function pick(label, search) {
 await page.goto('login')
 await shot('01-login')
 await login('dev-keeper')
-// "Temporadas": picking 2022 makes it the season on every screen, with a notice that it is not the current one
-await page.getByRole('link', { name: /^Temporada:/ }).click()
+// "Temporadas": every season with the first ten of its standings
+await page.goto('seasons')
 await page.getByRole('heading', { name: 'Temporadas' }).waitFor()
 await shot('16-seasons')
+// "Escolher temporada": picking 2022 makes it the season on every screen, with a notice that it is not the current one
+await page.getByRole('link', { name: /^Temporada:/ }).click()
+await page.getByRole('heading', { name: 'Escolher temporada' }).waitFor()
+await shot('18-season-picker')
 await page.getByRole('listitem').filter({ has: page.getByText('Liga 2022', { exact: true }) }).getByRole('button').click()
 await page.getByRole('table').waitFor()
 await shot('02-standings-2022')
