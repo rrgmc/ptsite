@@ -14,7 +14,8 @@ export default defineConfig({
     launchOptions: executablePath ? { executablePath } : {},
   },
   webServer: {
-    command: `python3 -m http.server ${port} --bind 127.0.0.1 --directory storybook-static`,
+    // PHP serves the files: the project needs it anyway, and Windows has no python3.
+    command: `php -S 127.0.0.1:${port} -t storybook-static`,
     url: `http://127.0.0.1:${port}/index.json`,
     reuseExistingServer: false,
   },
