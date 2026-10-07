@@ -259,7 +259,7 @@ after changing the mailbox's password.
 original" must show SPF, DKIM and DMARC as PASS. If the host refuses SMTP from PHP, set `MAIL_MAILER=sendmail`
 in the server's `.env` instead.
 
-The addresses that never get a link are set in `backend/config/password_reset.php`: the site's own domain
+The addresses that never get a link are set in `backend/config/ptsite.php` (`password_reset`): the site's own domain
 (`PASSWORD_RESET_SITE_DOMAIN`, empty by default) and a list of placeholder domains. The built-in list holds only
 `email.com` and `email.com.br`. `PASSWORD_RESET_BLOCKED_DOMAINS` in the `.env` adds domains without a deploy.
 

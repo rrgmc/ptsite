@@ -39,12 +39,46 @@ backend/
   app/Http/Resources/     JSON shape
   app/Models/             Eloquent: columns, relationships, casts, scopes only
   app/Policies/           who may do what (player, results keeper, admin)
-  app/Support/            AuditLogger, HolidayTable (holiday rows → domain calendar), PlayerPhotoMaker, DatabaseCreator
+  app/Support/            AuditLogger, HolidayTable (holiday rows → domain calendar), PlayerPhotoMaker, DatabaseCreator,
+                            TablePrefix
+  app/Providers/          PTSiteServiceProvider: loads everything on this list into the host app
+  app/Bootstrap.php       the middleware and error rendering a host app's bootstrap/app.php asks for
+  app/Console/Commands/   ptsite:prepare-database, ptsite:verify
+  config/ptsite.php       the site's settings
   lang/pt_BR/             validation, auth and rule messages
   tests/Unit/Domain/      domain tests, no database; mirror the examples in docs/specs
   tests/Feature/          API tests through HTTP
   tests/Arch/             architecture tests
 ```
+
+## A package and an app in one folder
+
+`backend/` is two things at once.
+
+- **A Composer package, `rrgmc/ptsite`.** A site's own Laravel app requires it. Composer then registers
+  `PTSite\App\Providers\PTSiteServiceProvider`, which brings the settings (`config/ptsite.php`), the API and
+  single-page app routes, the migrations, the messages, the mail views and the commands. The site's
+  `bootstrap/app.php` calls `PTSite\App\Bootstrap::middleware()` and `::exceptions()`, the two things a package
+  cannot set by itself.
+- **The package's own app.** The usual Laravel files next to it (`artisan`, `bootstrap/`, `public/`, the other
+  files in `config/`) make the package run alone, for development, the tests and the demo.
+
+What follows from that:
+
+- **Nothing in the code may depend on those app files.** A setting the site needs goes in `config/ptsite.php`,
+  and the provider puts it where Laravel expects it: the database name, its suffix and the table prefix, the
+  users' model, how long "Lembrar de mim" lasts. A value added only to `config/auth.php` or `bootstrap/app.php`
+  here would be missing in a site.
+- **Views are named `ptsite::…`** and routes are loaded by the provider, not by `bootstrap/app.php`.
+- **A login token stores `user`** as its owner's kind, not the model's class name, so tokens do not depend on a
+  namespace. The provider also accepts `App\Models\User`, the name a database has when an app with the model
+  in Laravel's usual place made its tokens.
+- **`db:seed` looks for `Database\Seeders\DatabaseSeeder`.** The real seeders are in
+  `PTSite\Database\Seeders`; `database/skeleton/` holds two small classes with the names Laravel looks for, for
+  this app only. A site seeds with `--class='PTSite\Database\Seeders\DemoLeagueSeeder'`, or has its own.
+- [`examples/site`](../../examples/site/) is the smallest site: a Laravel skeleton of a few files that
+  requires the package through a path repository. CI installs it, migrates it with a table prefix, seeds the
+  demo league and calls its API, so the package is proven to work outside its own app.
 
 ## Dependency rules
 
@@ -66,7 +100,7 @@ with `NightStatus::from()`.
 ## Business rule errors
 
 Domain classes throw `PTSite\Domain\Shared\RuleViolation` with a rule code (such as `night.open.another_open`),
-the input field it concerns, and context values. `bootstrap/app.php` renders it as JSON, taking the message
+the input field it concerns, and context values. `PTSite\App\Bootstrap` renders it as JSON, taking the message
 from `lang/pt_BR/rules.php`. The domain has no user-facing text.
 
 ## Stored versus calculated

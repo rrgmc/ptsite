@@ -1,7 +1,7 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "rrgmc/ptsite",
-    "type": "project",
+    "type": "library",
     "description": "API of a poker home-game league site",
     "keywords": [
         "laravel",
@@ -76,7 +76,10 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [],
+            "providers": [
+                "PTSite\\App\\Providers\\PTSiteServiceProvider"
+            ]
         }
     },
     "config": {

@@ -42,7 +42,7 @@ final class RequestPasswordReset
         $this->rules->assertUsableAddress($address);
 
         $resets = PasswordReset::query()->whereIn('user_id', $users->modelKeys());
-        if ((clone $resets)->where('created_at', '>', now()->subSeconds(config('password_reset.resend_seconds')))->exists()) {
+        if ((clone $resets)->where('created_at', '>', now()->subSeconds(config('ptsite.password_reset.resend_seconds')))->exists()) {
             throw new RuleViolation('password_reset.too_soon', 'login');
         }
 
@@ -52,7 +52,7 @@ final class RequestPasswordReset
         try {
             return DB::transaction(function () use ($users, $address) {
                 $masked = $this->rules->mask($address);
-                $minutes = (int) config('password_reset.expire_minutes');
+                $minutes = (int) config('ptsite.password_reset.expire_minutes');
                 $links = [];
                 foreach ($users as $user) {
                     $token = Str::random(64);

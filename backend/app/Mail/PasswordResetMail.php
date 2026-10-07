@@ -25,7 +25,7 @@ final class PasswordResetMail extends Mailable
         $site = config('app.name');
         $tagline = trim((string) config('ptsite.tagline'));
 
-        return new Content(view: 'mail.password-reset', text: 'mail.password-reset-text', with: [
+        return new Content(view: 'ptsite::mail.password-reset', text: 'ptsite::mail.password-reset-text', with: [
             'site' => $site,
             'signature' => $tagline === '' ? $site : "{$site} - {$tagline}",
         ]);

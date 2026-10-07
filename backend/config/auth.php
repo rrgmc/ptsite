@@ -41,7 +41,6 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-            'remember' => 60 * 24 * 30, // "remember me" keeps a login for 30 days
         ],
     ],
 
@@ -114,8 +113,5 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
-
-    // Login and token requests allowed per minute per client (raised for end-to-end tests).
-    'login_attempts_per_minute' => (int) env('LOGIN_THROTTLE', 10),
 
 ];

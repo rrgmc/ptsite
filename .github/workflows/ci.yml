@@ -57,6 +57,46 @@ jobs:
           php artisan scramble:export --path=../frontend/openapi.json
           git diff --exit-code -- ../frontend/openapi.json || (echo "::error::frontend/openapi.json is out of date. Run: php artisan scramble:export --path=../frontend/openapi.json, then npm run api:types in frontend." && exit 1)
 
+  example-site:
+    name: Example site (the backend as a Composer package)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: >-
+          --tmpfs /var/lib/mysql:rw
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval 2s --health-timeout 5s --health-retries 60
+    defaults:
+      run:
+        working-directory: examples/site/backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, mbstring, intl, gd, exif
+          coverage: none
+      # The package comes from ../../../backend through a path repository, without its development packages.
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: cp .env.example .env && php artisan key:generate
+      - name: Migrate and seed the demo league, with this site's table prefix
+        run: |
+          php artisan ptsite:prepare-database
+          php artisan migrate --force
+          php artisan db:seed --class='PTSite\Database\Seeders\DemoLeagueSeeder' --force
+          php artisan ptsite:verify
+      - name: The API answers, in the site's language
+        run: |
+          php artisan serve --port=8000 > storage/logs/serve.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/up > /dev/null && break; sleep 1; done
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Accept: application/json' http://127.0.0.1:8000/api/v1/seasons)" = 401
+          curl -s -H 'Accept: application/json' -H 'Content-Type: application/json' -d '{"username":"agate","password":"errada"}'             http://127.0.0.1:8000/api/v1/login | grep -q 'senha incorretos'
+
   frontend:
     name: Frontend (lint, types, unit, build, Storybook a11y)
     if: github.event_name == 'pull_request'
