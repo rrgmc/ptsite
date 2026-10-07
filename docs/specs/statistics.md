@@ -32,7 +32,8 @@ Everyone logged in: players, results keepers and admins.
 6. **"Vitórias"** is a bar chart of the "Posição: 1º" list, with the first places of everyone else added up as
    "Outros".
 7. The view also shows how many nights it counts and their total pot. The Main Event pots and the time chips of
-   those nights are added up too; "Resultados" shows the three totals of the season.
+   those nights are added up too; "Resultados" shows the three totals of the season. A site with no Main Event
+   pot or no time chip does not show that total.
 8. **A player's statistics** are on the player's page ([players.md](players.md), rule 11). They have the same two
    views, "Temporada" and "Geral", and count the same nights (rule 2).
 9. The player's **numbers**:

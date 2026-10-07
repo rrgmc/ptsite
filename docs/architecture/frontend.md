@@ -93,6 +93,19 @@ screen have the right name and colors before the first request to the API.
   `PTSITE_SITE_DIR` is set.
 - The unit tests, Storybook and the end-to-end tests run on the demo site.
 
+### Feature flags
+
+A site turns a part of the product off in `features` of its `site.json`
+([0021](../decisions/0021-feature-flags.md); the list is in [`site/README.md`](../../site/README.md)).
+
+- **`src/site/features.ts`** has every flag with its default. `site-settings.ts` checks the site's `features`
+  against it and stops the build on a name it does not know.
+- **A screen asks `hasFeature('timeChip')`** of `src/lib/features.ts`, and leaves out the field, the row or the
+  link when the answer is no. Hiding is cosmetic: the API refuses the feature too.
+- **The demo site has every feature**, so a test or a story shows the other way with `overrideFeatures` (a test)
+  or the decorator `withFeatures` of `src/mocks/withFeatures.tsx` (a story).
+- To add a flag, follow "Adding a feature flag" in [backend-layers.md](backend-layers.md).
+
 ## Texts
 
 Every text a visitor reads or hears is in `src/i18n`, never in a component. This is what lets the site run in

@@ -66,6 +66,9 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    anywhere yet.
 9b. Wherever a finished night's result is shown (the results list and the night's page), the three amounts come
    below the positions: "Pote Total", "Pote ME" and "Time chip". An amount that was never recorded shows "—".
+9c. A site can do without the Main Event pot, the time chip or both (`features` in
+   [`site/README.md`](../../site/README.md)). Finishing a night then does not ask for that amount and does not
+   record it, the partial result has no field for it, and it is not shown with the night's result.
 10. **The same player cannot appear twice** in the scoring positions.
 11. When a night is finished, the points are calculated (see
     [points-and-standings.md](points-and-standings.md)).

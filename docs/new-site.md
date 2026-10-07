@@ -33,6 +33,9 @@ Ask these before creating anything. Offer the default where there is one.
 | The money, as an ISO 4217 code | `currency` | `BRL` |
 | The time zone of the league | `timeZone` | `America/Sao_Paulo` |
 | The site's own domain, if it has one | `siteDomain` | none |
+| Does a night set money aside for a Main Event ("Pote ME")? | `features`: `mainEventPot` | yes |
+| Does a night set money aside for a year party ("Time chip")? | `features`: `timeChip` | yes |
+| Should admins plan a season's dates at once, leaving out holidays ("Planejar datas")? | `features`: `seasonPlanner` | yes |
 | The holidays a new database starts with | `PTSITE_HOLIDAY_PRESET` in `.env` | `sao-paulo`; empty for none |
 | A table prefix, when the database is shared with another site | `DB_TABLE_PREFIX` in `.env` | none |
 | A short name for the deploy package, in lowercase | `packageName` | `ptsite` |

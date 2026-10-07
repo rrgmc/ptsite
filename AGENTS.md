@@ -124,6 +124,9 @@ Details and examples are in `docs/architecture/backend-layers.md` (including the
   resource. No save hooks with side effects.
 - **The API is complete.** Every feature the website offers has an endpoint under `/api/v1`. Permissions are
   enforced by policies in the API, never only in the website.
+- **A part of the product that a league may do without** gets a feature flag, which the site turns off in its
+  `site.json`. The API refuses a feature that is off; the screens hide it. Steps:
+  `docs/architecture/backend-layers.md`, "Adding a feature flag".
 - **Business rule errors** are `RuleViolation` codes in the domain; their Brazilian Portuguese messages live in
   `backend/lang/pt_BR/rules.php`.
 - **The website** uses only the API, through the client generated from the OpenAPI spec. After changing the
