@@ -1,4 +1,5 @@
 import type { PartialResult, Player } from '@/api/client'
+import { hasFeature } from '@/lib/features'
 
 /** What a result form starts from: the amounts as typed text, and the players in the order of the percentage table. */
 export interface ResultSeed {
@@ -23,7 +24,12 @@ export function seedFromPartial(percentages: { position: number }[], partial: Pa
   }
 }
 
-/** Nothing recorded: no amount and no position. */
+/** Nothing recorded: no amount and no position. An amount this site does not have is not looked at. */
 export function isEmptyPartial(partial: PartialResult): boolean {
-  return partial.pot === null && partial.main_event_pot === null && partial.time_chip === null && partial.positions.length === 0
+  return (
+    partial.pot === null &&
+    (partial.main_event_pot === null || !hasFeature('mainEventPot')) &&
+    (partial.time_chip === null || !hasFeature('timeChip')) &&
+    partial.positions.length === 0
+  )
 }

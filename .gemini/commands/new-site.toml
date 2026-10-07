@@ -8,10 +8,11 @@ order. Do not work from memory of it: it changes with the core.
 
 In short:
 
-1. Ask the owner the questions of its first table before creating anything. Use one message.
+1. Ask the owner the questions of its first table before creating anything, including which features the
+   league uses (the Main Event pot, the time chip, the season planner). Use one message.
 2. Make the site's repository next to this one, never inside it, with this repository as the `core` submodule.
 3. Copy examples/site into it, and change only files outside core/.
-4. Write site/site.json, draw the icons, run `task setup`, then do the checks of step 5.
+4. Write site/site.json with its `features`, draw the icons, run `task setup`, then do the checks of step 5.
 
 Ask before creating a repository on GitHub, pushing or deploying. Never write a league's name, people or host
 into this repository.

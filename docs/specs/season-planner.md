@@ -12,6 +12,10 @@ schedules the chosen dates at once.
 Scheduling one night at a time, with the next three regular weekdays as suggestions, stays as it is (rules 14
 and 15 of [seasons-and-nights.md](seasons-and-nights.md)).
 
+A site can do without the planner (`features` in [`site/README.md`](../../site/README.md)). It then has no
+"Planejar datas", and its nights are scheduled one at a time. The holiday table stays: the season calendar uses
+it.
+
 ## Who
 
 - **Admins** plan the season and edit the holidays.

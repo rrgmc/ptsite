@@ -14,6 +14,7 @@ use PTSite\App\Console\Commands\VerifyLeague;
 use PTSite\App\Models\User;
 use PTSite\App\Support\TablePrefix;
 use PTSite\Domain\Accounts\PasswordResetRules;
+use PTSite\Domain\Features\Features;
 
 /**
  * The whole site as one Laravel package: its settings, API, single-page app routes, migrations, messages, mail
@@ -34,6 +35,7 @@ class PTSiteServiceProvider extends ServiceProvider
             config('ptsite.password_reset.site_domain'),
             config('ptsite.password_reset.blocked_domains'),
         ));
+        $this->app->bind(Features::class, fn () => new Features((array) config('ptsite.features')));
     }
 
     public function boot(): void

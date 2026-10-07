@@ -2,19 +2,15 @@ import { Link } from 'react-router'
 import type { Night } from '@/api/client'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { PlayerLink } from '@/components/PlayerLink'
-import { t } from '@/i18n'
 import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
+import { amountRows } from '../nights/amounts'
 
 /**
- * A finished night: who finished in each scoring position, then the night's three amounts.
+ * A finished night: who finished in each scoring position, then the night's amounts.
  * `number` is the night's place in its season, counting from 1.
  */
 export function NightResultCard({ night, number }: { night: Night; number?: number }) {
-  const amounts = [
-    [t.nights.amounts.potTotal, night.pot],
-    [t.nights.amounts.mainEventPot, night.main_event_pot],
-    [t.nights.amounts.timeChip, night.time_chip],
-  ] as const
+  const amounts = amountRows({ pot: night.pot, mainEventPot: night.main_event_pot, timeChip: night.time_chip })
 
   return (
     // On a phone the rows are shorter and the card has less padding, so that a night takes less of the screen.

@@ -21,6 +21,10 @@ return [
         'time_zone' => $site['timeZone'] ?? null,
     ],
 
+    // The features this site turns on or off, from "features" of site.json: PTSite\Domain\Features\Feature has
+    // the names. One that is left out keeps its default.
+    'features' => $site['features'] ?? [],
+
     // A line below the site name, in the mail signature. Empty: the name alone.
     'tagline' => $site['tagline'] ?? env('PTSITE_TAGLINE', ''),
 

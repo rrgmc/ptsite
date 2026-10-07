@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router'
 import { emptyPartialResult, partialResult, players, season } from '@/mocks/data'
+import { withFeatures } from '@/mocks/withFeatures'
 import { PartialResultCard } from './PartialResultCard'
 
 const percentages = season.percentages ?? []
@@ -29,3 +30,5 @@ export const LongNickname: Story = {
     partial: { ...partialResult, positions: [{ position: 6, player: { ...players[4], nickname: 'Estela Maria dos Santos Albuquerque de Oliveira' } }] },
   },
 }
+/** A site with no Main Event pot and no time chip shows the pot alone. */
+export const PotOnly: Story = { decorators: [withFeatures({ mainEventPot: false, timeChip: false })] }

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Gate;
 use PTSite\App\Models\Night;
 use PTSite\App\Models\NightPartialResult;
 use PTSite\App\Models\User;
+use PTSite\Domain\Features\Feature;
+use PTSite\Domain\Features\Features;
 use PTSite\Domain\Nights\NightRules;
 use PTSite\Domain\Nights\NightStatus;
 use PTSite\Domain\Scoring\PercentageTable;
@@ -23,6 +25,7 @@ final class SavePartialResult
     public function __construct(
         private readonly NightRules $rules,
         private readonly KnownPlayers $players,
+        private readonly Features $features,
     ) {}
 
     /** @param array<int, int> $playerByPosition position => player id; a missing position is empty */
@@ -40,8 +43,9 @@ final class SavePartialResult
 
             $partial = NightPartialResult::query()->updateOrCreate(['night_id' => $night->id], [
                 'pot' => $pot,
-                'main_event_pot' => $mainEventPot,
-                'time_chip' => $timeChip,
+                // An amount of a feature this site has turned off is not kept, whatever was sent.
+                'main_event_pot' => $this->features->enabled(Feature::MainEventPot) ? $mainEventPot : null,
+                'time_chip' => $this->features->enabled(Feature::TimeChip) ? $timeChip : null,
                 'saved_by_user_id' => $user->id,
                 'saved_at' => now(),
             ]);

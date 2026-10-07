@@ -26,9 +26,30 @@ demo site. A league's own repository has its own folder like this one, and point
 | `brandColor` | `#14532d` | The main color, as `#rrggbb`. The hover and soft shades, the browser's theme color and the icon's background are made from it. It must be dark enough for light text on it: the build stops if it is not. |
 | `siteDomain` | `example.com` | The site's own domain. An email address on it never gets a password link. Optional. |
 | `packageName` | `liga` | The name of the deploy package, `liga.zip`: lowercase letters, digits and hyphens. Default: `ptsite`. |
+| `features` | `{ "timeChip": false }` | The features the site turns on or off: see "Features" below. Optional. |
 
-The backend reads the same file (`name`, `tagline`, `locale`, `timeZone`, `siteDomain`), so the two ends cannot
-disagree. The frontend reads it when it is built, so a change needs a new build.
+The backend reads the same file (`name`, `tagline`, `locale`, `timeZone`, `siteDomain`, `features`), so the two
+ends cannot disagree. The frontend reads it when it is built, so a change needs a new build.
 
 After changing `brandColor` or `logo`, run `npm run icons` in `frontend/`. It draws the app icons again into
 `public/icons` of this folder.
+
+## Features
+
+A league that does not use a part of the site turns it off in `features`. Every feature is on unless the site
+sets it to `false`, so a site that names none has them all:
+
+```json
+"features": { "mainEventPot": false, "timeChip": false }
+```
+
+| Feature | What it is | With `false` |
+|---|---|---|
+| `mainEventPot` | "Pote ME": the money a night sets aside for the Main Event. | The result forms, the night's result and the season totals have no "Pote ME". Finishing a night does not ask for it. |
+| `timeChip` | "Time chip": the money a night sets aside for the year party. | The same, for "Time chip". |
+| `seasonPlanner` | "Planejar datas": the calendar that schedules a season's regular nights at once. | "Administração" has no "Planejar datas". Nights are scheduled one at a time with "+ Agendar". The holiday table and the season calendar stay. |
+
+The build stops on a name that is not in this table, or on a value that is not `true` or `false`.
+
+Turning a feature off hides it and stops recording it. It deletes nothing: the amounts already recorded stay in
+the database, and are shown again when the feature is turned back on.

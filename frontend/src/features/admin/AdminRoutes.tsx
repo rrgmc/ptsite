@@ -7,6 +7,7 @@ import { AuditLogPage } from './AuditLogPage'
 import { HolidaysAdmin } from './HolidaysAdmin'
 import { PlaceEditPage, PlacesAdmin } from './PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './PlayersAdmin'
+import { hasFeature } from '@/lib/features'
 import { SeasonPlanner } from './SeasonPlanner'
 import { SeasonEditPage, SeasonsAdmin } from './SeasonsAdmin'
 
@@ -33,7 +34,7 @@ export function AdminRoutes() {
       <Routes>
         <Route index element={<SeasonsAdmin />} />
         <Route path="seasons/:seasonId" element={<SeasonEditPage />} />
-        <Route path="seasons/:seasonId/plan"element={<SeasonPlanner />} />
+        {hasFeature('seasonPlanner') && <Route path="seasons/:seasonId/plan" element={<SeasonPlanner />} />}
         <Route path="holidays" element={<HolidaysPage />} />
         <Route path="players" element={<PlayersAdmin />} />
         <Route path="players/:playerId" element={<PlayerEditPage />} />

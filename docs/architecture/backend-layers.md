@@ -174,6 +174,24 @@ it('pays each scoring position its share of a R$ 845 pot, adding up to the pot',
 6. Add a feature test in `tests/Feature`.
 7. Regenerate the API spec and types (see [api.md](api.md)), then build the screen.
 
+## Adding a feature flag
+
+A feature flag lets a site do without a part of the product ([0021](../decisions/0021-feature-flags.md)). The
+flags are listed in [`site/README.md`](../../site/README.md), "Features".
+
+1. Add a case to `PTSite\Domain\Features\Feature`. Its value is the name written in `site.json`. Give it a
+   default in `default()`: `true` for a part that exists already, so no site changes.
+2. Add the same name and default to `frontend/src/site/features.ts`. A frontend test fails while the two lists
+   differ.
+3. Ask `Features::enabled()` where the rule is: inject `Features` into the action or pass it to the domain class.
+   A Form Request asks through the trait `HasFeatures`. A route of the feature's own takes
+   `->middleware(RequireFeature::for(Feature::X))`, which answers 404.
+4. In the screens, ask `hasFeature('x')` of `src/lib/features.ts`.
+5. Test both ways. A backend test turns a flag off with `config(['ptsite.features' => ['x' => false]])`. A
+   frontend test or story uses `overrideFeatures` or the decorator `withFeatures`.
+6. Add the flag to the table in `site/README.md` and to the questions of [`new-site.md`](../new-site.md), and
+   say in the spec what the rule becomes without it.
+
 ## When to go stricter
 
 If an area grows complex, its actions can switch from Eloquent to repository interfaces and plain domain
