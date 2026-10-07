@@ -14,6 +14,8 @@ env:
   PTSITE_SITE_DIR: '{{.ROOT_DIR}}/site'
   PTSITE_OUT_DIR: '{{.ROOT_DIR}}/backend/public/app'
   BACKEND_URL: 'http://127.0.0.1:{{.BACKEND_PORT}}'
+  # The core's deploy scripts work on this repository: its local/ folder and its git tags.
+  PTSITE_PROJECT_ROOT: '{{.ROOT_DIR}}'
 
 tasks:
   default:
@@ -88,6 +90,11 @@ tasks:
     dir: '{{.CORE}}/frontend'
     cmds:
       - npm run icons
+
+  package:
+    desc: 'Build the deploy package into local/build (in a site''s own repository: see docs/new-site.md in the core)'
+    cmds:
+      - php {{.CORE}}/deploy/build-package.php
 
   verify:
     desc: Check that every finished night's points match its pot and percentage table

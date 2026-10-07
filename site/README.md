@@ -24,6 +24,7 @@ demo site. A league's own repository has its own folder like this one, and point
 | `timeZone` | `America/Sao_Paulo` | The time zone of the league. Dates and times are shown in it, whatever the visitor's own. |
 | `brandColor` | `#14532d` | The main color, as `#rrggbb`. The hover and soft shades, the browser's theme color and the icon's background are made from it. It must be dark enough for light text on it: the build stops if it is not. |
 | `siteDomain` | `example.com` | The site's own domain. An email address on it never gets a password link. Optional. |
+| `packageName` | `liga` | The name of the deploy package, `liga.zip`: lowercase letters, digits and hyphens. Default: `ptsite`. |
 
 The backend reads the same file (`name`, `tagline`, `locale`, `timeZone`, `siteDomain`), so the two ends cannot
 disagree. The frontend reads it when it is built, so a change needs a new build.

@@ -10,6 +10,8 @@ export interface SiteFile {
   timeZone: string
   brandColor: string
   siteDomain?: string
+  /** Read by the deploy scripts only. */
+  packageName?: string
 }
 
 /** The settings the app runs with: the file's, with every default filled in. */
