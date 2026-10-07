@@ -26,7 +26,7 @@ the site to send email, which it never did. Four facts limit the choice:
   random 64-character token, never the token. A link works for 60 minutes and once. The stock
   `password_reset_tokens` table is dropped.
 - **Refuse some addresses**: the site's own domain (`PASSWORD_RESET_SITE_DOMAIN`), its subdomains, and a list of
-  placeholder domains in `config/password_reset.php`. The built-in list holds only `email.com` and
+  placeholder domains in `config/ptsite.php`. The built-in list holds only `email.com` and
   `email.com.br`. A site adds more with `PASSWORD_RESET_BLOCKED_DOMAINS`. The rule is in
   `PTSite\Domain\Accounts\PasswordResetRules`.
 - **Say what went wrong.** The site tells the user that no account was found or that the account has no valid

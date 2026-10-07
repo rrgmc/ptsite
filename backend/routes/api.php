@@ -16,11 +16,11 @@ use PTSite\App\Http\Controllers\Api\SeasonController;
 use PTSite\App\Http\Controllers\Api\StatisticsController;
 
 Route::prefix('v1')->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:'.config('auth.login_attempts_per_minute').',1');
-    Route::post('tokens', [AuthController::class, 'createToken'])->middleware('throttle:'.config('auth.login_attempts_per_minute').',1');
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:'.config('ptsite.auth.login_attempts_per_minute').',1');
+    Route::post('tokens', [AuthController::class, 'createToken'])->middleware('throttle:'.config('ptsite.auth.login_attempts_per_minute').',1');
     // A forgotten password. Each limit has a name, so that it does not share the login's count.
-    Route::post('password-resets', [PasswordResetController::class, 'store'])->middleware('throttle:'.config('password_reset.attempts_per_minute').',1,password-reset-request');
-    Route::middleware('throttle:'.config('auth.login_attempts_per_minute').',1,password-reset-use')->group(function () {
+    Route::post('password-resets', [PasswordResetController::class, 'store'])->middleware('throttle:'.config('ptsite.password_reset.attempts_per_minute').',1,password-reset-request');
+    Route::middleware('throttle:'.config('ptsite.auth.login_attempts_per_minute').',1,password-reset-use')->group(function () {
         Route::get('password-resets/{token}', [PasswordResetController::class, 'show']);
         Route::post('password-resets/{token}/complete', [PasswordResetController::class, 'complete']);
     });
@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
         // Limited like the login: each try checks a password.
-        Route::put('me/password', [AuthController::class, 'changePassword'])->middleware('throttle:'.config('auth.login_attempts_per_minute').',1');
+        Route::put('me/password', [AuthController::class, 'changePassword'])->middleware('throttle:'.config('ptsite.auth.login_attempts_per_minute').',1');
 
         Route::get('seasons', [SeasonController::class, 'index']);
         Route::get('seasons/current', [SeasonController::class, 'current']);

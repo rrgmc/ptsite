@@ -20,7 +20,7 @@ const BUILT_IN = ['tlpt', 'little poker table', 'hostgator', 'aptclub', 'rangel'
 const IMAGES = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'bmp', 'ico'];
 const SELF = ['deploy/check-forbidden.php'];
 // Lock files name the authors of other people's packages. Only the words above are searched in them.
-const LOCK_FILES = ['backend/composer.lock', 'frontend/package-lock.json'];
+const LOCK_FILES = ['composer.lock', 'package-lock.json'];
 
 $root = dirname(__DIR__);
 chdir($root);
@@ -103,7 +103,7 @@ foreach ($files as $path) {
         }
     }
 
-    $isLockFile = in_array($path, LOCK_FILES, true);
+    $isLockFile = in_array(basename($path), LOCK_FILES, true);
     foreach ($patterns as $entry => $pattern) {
         if ($isLockFile && ! in_array($entry, BUILT_IN, true)) {
             continue;

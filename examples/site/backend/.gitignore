@@ -1,0 +1,9 @@
+/vendor
+/public/app
+# Not committed: it would have to follow every change of the package next door.
+composer.lock
+.env
+.env.*
+!.env.example
+*.log
+.phpunit.result.cache

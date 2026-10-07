@@ -22,8 +22,8 @@ beforeEach(function () {
     Mail::fake();
     config([
         'app.name' => 'Liga Demo',
-        'password_reset.site_domain' => 'ligademo.example',
-        'password_reset.blocked_domains' => ['inventado.example', 'semdominio.example'],
+        'ptsite.password_reset.site_domain' => 'ligademo.example',
+        'ptsite.password_reset.blocked_domains' => ['inventado.example', 'semdominio.example'],
     ]);
 });
 
