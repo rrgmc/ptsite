@@ -33,6 +33,7 @@ Ask these before creating anything. Offer the default where there is one.
 | The site's own domain, if it has one | `siteDomain` | none |
 | The holidays a new database starts with | `PTSITE_HOLIDAY_PRESET` in `.env` | `sao-paulo`; empty for none |
 | A table prefix, when the database is shared with another site | `DB_TABLE_PREFIX` in `.env` | none |
+| A short name for the deploy package, in lowercase | `packageName` | `ptsite` |
 | The folder and name of the new repository | | the name in lowercase, with `-site` |
 | The version of the core to pin | the submodule | the core's newest tag |
 
@@ -122,5 +123,7 @@ core's version.
   `backend/composer.json`. Keep it small: what every league needs belongs in the core.
 - **Deploying.** The core's scripts in `core/deploy/` upload a package to a cPanel shared host
   ([architecture/deployment.md](architecture/deployment.md)). They read the host's settings from
-  `local/deploy.env` and secrets from `local/keys.md`, both ignored by git. Building the package from a site's
-  own repository is not scripted yet: until it is, ask the owner how they deploy.
+  `local/deploy.env` and secrets from `local/keys.md`, both ignored by git. `task package` builds the package
+  from the site's repository into `local/build/<packageName>.zip`: the site's `backend/`, with the core copied
+  into its `vendor/` folder and the frontend built for the site. `php core/deploy/upload.php
+  local/build/<packageName>.zip --migrate` uploads it. Ask the owner before the first upload.

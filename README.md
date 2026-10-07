@@ -1,7 +1,7 @@
 # PTSite
 
-PTSite is the core of a poker home-game league website: a Laravel API (`backend/`) and a React single-page app
-(`frontend/`). It keeps seasons, game nights, results, standings and statistics.
+PTSite (Poker Tournament Site) is the core of a poker home-game league website: a Laravel API (`backend/`) and
+a React single-page app (`frontend/`). It keeps seasons, game nights, results, standings and statistics.
 
 A league does not fork this repository. It makes its own small **site repository** that pins this one as a git
 submodule, and that holds the league's name, settings, data and deploy target. See "Core and sites" in

@@ -1,7 +1,7 @@
 # PTSite
 
-PTSite is the core of a poker home-game league website: a Laravel API and a React single-page app. Several
-leagues can use it, each through its own site repository.
+PTSite stands for Poker Tournament Site. It is the core of a poker home-game league website: a Laravel API and
+a React single-page app. Several leagues can use it, each through its own site repository.
 
 These are the rules for anyone working in this repository, people and coding assistants alike. Claude Code
 reads them through `CLAUDE.md` and Gemini CLI through `GEMINI.md`; both files only import this one. Other

@@ -9,4 +9,4 @@
 
 require __DIR__.'/lib.php';
 
-run_cpanel_script('ftp-upload.sh', ['--check'], root('deploy'), ftp_env());
+run_cpanel_script('ftp-upload.sh', ['--check'], core_root('deploy'), ftp_env());

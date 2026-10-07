@@ -3,11 +3,33 @@
 // Helpers shared by the deploy scripts. They run from PowerShell, Git Bash and Linux alike, so they use no
 // Unix tools: see Taskfile.yml.
 
-const ROOT = __DIR__.'/..';
+const CORE_ROOT = __DIR__.'/..';
 
+/** A path inside this repository, the core: its scripts, its backend package and its frontend. */
+function core_root(string $path = ''): string
+{
+    return str_replace('\\', '/', realpath(CORE_ROOT)).($path === '' ? '' : '/'.$path);
+}
+
+/**
+ * A path inside the project being built or deployed: its `local/` folder, its git checkout. It is the core
+ * itself, unless PTSITE_PROJECT_ROOT names a site's own repository, which has the core as a submodule.
+ */
 function root(string $path = ''): string
 {
-    return str_replace('\\', '/', realpath(ROOT)).($path === '' ? '' : '/'.$path);
+    $project = getenv('PTSITE_PROJECT_ROOT');
+    if ($project === false || $project === '') {
+        return core_root($path);
+    }
+    $real = realpath($project) ?: fail("PTSITE_PROJECT_ROOT is not a folder: $project");
+
+    return str_replace('\\', '/', $real).($path === '' ? '' : '/'.$path);
+}
+
+/** Whether the project is a site's own repository, not the core. */
+function is_site(): bool
+{
+    return root() !== core_root();
 }
 
 function fail(string $message): never
@@ -101,11 +123,11 @@ function run_cpanel_script(string $script, array $args, string $files, array $en
                 array_push($command, '-e', $name);
             }
         }
-        array_push($command, '-v', root('deploy').':/deploy:ro', '-v', $files.':/pkg:ro', 'alpine:3', 'sh', '-c',
+        array_push($command, '-v', core_root('deploy').':/deploy:ro', '-v', $files.':/pkg:ro', 'alpine:3', 'sh', '-c',
             'apk add -q --no-cache bash curl jq unzip coreutils >/dev/null && bash /deploy/'.$script.' "$@"', 'sh', ...$args);
         $cwd = root();
     } else {
-        $command = ['bash', root('deploy/'.$script), ...$args];
+        $command = ['bash', core_root('deploy/'.$script), ...$args];
         $cwd = $files;
     }
 
