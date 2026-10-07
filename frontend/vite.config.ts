@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 import { ports } from './ports.ts'
-import { loadSite, sitePlugin } from './site-settings.ts'
+import { loadMessages, loadSite, sitePlugin } from './site-settings.ts'
 
 const backend = process.env.BACKEND_URL ?? `http://127.0.0.1:${ports.backend}`
 
@@ -28,7 +28,7 @@ const site = loadSite()
 // The site is at the root of its domain: the app at /app/, the API at /api (see src/lib/paths.ts).
 export default defineConfig({
   base: '/app/',
-  define: { __APP_VERSION__: JSON.stringify(appVersion()), __SITE__: JSON.stringify(site) },
+  define: { __APP_VERSION__: JSON.stringify(appVersion()), __SITE__: JSON.stringify(site), __SITE_MESSAGES__: JSON.stringify(loadMessages()) },
   plugins: [react(), tailwindcss(), sitePlugin(site)],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },

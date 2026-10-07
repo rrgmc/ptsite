@@ -6,6 +6,7 @@ import { useLogin, useMe } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Checkbox } from '@/components/Checkbox'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { AuthShell, authLinkClass } from './AuthShell'
 
 export function LoginPage() {
@@ -22,7 +23,7 @@ export function LoginPage() {
   const error = login.error instanceof ApiError ? login.error.fieldError('username') ?? login.error.body.message : undefined
 
   return (
-    <AuthShell title="Entrar">
+    <AuthShell title={t.auth.logIn}>
       <Form
         className="flex flex-col gap-4 rounded-lg bg-surface p-5 shadow-card"
         onSubmit={(e) => {
@@ -30,13 +31,13 @@ export function LoginPage() {
           login.mutate({ username, password, remember }, { onSuccess: () => navigate('/', { replace: true }) })
         }}
       >
-        <TextField label="Usuário" name="username" autoComplete="username" value={username} onChange={setUsername} isRequired autoFocus />
-        <TextField label="Senha" name="password" type="password" autoComplete="current-password" value={password} onChange={setPassword} isRequired />
-        <Checkbox isSelected={remember} onChange={setRemember}>Manter conectado por 30 dias</Checkbox>
+        <TextField label={t.auth.username} name="username" autoComplete="username" value={username} onChange={setUsername} isRequired autoFocus />
+        <TextField label={t.auth.password} name="password" type="password" autoComplete="current-password" value={password} onChange={setPassword} isRequired />
+        <Checkbox isSelected={remember} onChange={setRemember}>{t.auth.stayLoggedIn}</Checkbox>
         {error && <p role="alert" className="rounded-md bg-danger-soft p-3 text-danger">{error}</p>}
-        <Button type="submit" isPending={login.isPending} fullWidth>Entrar</Button>
+        <Button type="submit" isPending={login.isPending} fullWidth>{t.auth.logIn}</Button>
       </Form>
-      <Link to="/forgot-password" className={`mt-2 ${authLinkClass}`}>Esqueci minha senha</Link>
+      <Link to="/forgot-password" className={`mt-2 ${authLinkClass}`}>{t.auth.forgotPassword}</Link>
     </AuthShell>
   )
 }
