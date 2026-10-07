@@ -3,6 +3,7 @@ import { useAuditLog } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
+import { site } from '@/lib/site'
 
 const actions: Record<string, string> = {
   'night.scheduled': 'agendou o evento',
@@ -36,7 +37,7 @@ const actions: Record<string, string> = {
   'v1.player_images_imported': 'importou as fotos dos jogadores do site anterior',
 }
 
-const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' })
+const dateTime = new Intl.DateTimeFormat(site.locale, { dateStyle: 'short', timeStyle: 'short', timeZone: site.timeZone })
 
 /** Who changed what, and the values before and after (docs/decisions/0009-audit-log.md). */
 export function AuditLogPage() {

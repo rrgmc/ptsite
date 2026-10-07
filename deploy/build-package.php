@@ -29,6 +29,10 @@ foreach (array_filter(explode("\0", (string) $files)) as $file) {
 }
 is_file("$stage/artisan") || fail('No backend files found. Is this a git checkout?');
 
+// The site's settings go with the app: the backend reads them from its own folder on the server.
+$siteFile = (getenv('PTSITE_SITE_DIR') ?: root('site')).'/site.json';
+copy($siteFile, "$stage/site.json") || fail("Could not copy $siteFile");
+
 echo "Installing PHP packages without the dev ones...\n";
 run('composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress', $stage);
 

@@ -10,3 +10,7 @@ frontend/public/icons/icon-192.png
 frontend/public/icons/icon-512.png
 frontend/public/icons/icon-maskable-512.png
 frontend/tests/fixtures/photo.png
+examples/site/site/public/icons/apple-touch-icon.png
+examples/site/site/public/icons/icon-192.png
+examples/site/site/public/icons/icon-512.png
+examples/site/site/public/icons/icon-maskable-512.png

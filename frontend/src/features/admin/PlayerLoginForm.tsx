@@ -7,6 +7,7 @@ import { ErrorBox } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
 import { type Role, roleLabels } from '@/lib/roles'
+import { site } from '@/lib/site'
 
 const roleOptions = (Object.keys(roleLabels) as Role[]).map((id) => ({ id, label: roleLabels[id] }))
 
@@ -16,7 +17,7 @@ export function PlayerLoginForm({ player }: { player: Player }) {
   const save = useSavePlayerLogin()
   const login = save.data?.login ?? player.login ?? null
   const own = me.data?.player?.id === player.id
-  const [username, setUsername] = useState(player.nickname.toLocaleLowerCase('pt-BR').replace(/\s+/g, ''))
+  const [username, setUsername] = useState(player.nickname.toLocaleLowerCase(site.locale).replace(/\s+/g, ''))
   const [role, setRole] = useState<Role>(login?.role ?? 'player')
   const [password, setPassword] = useState('')
   const error = save.error instanceof ApiError ? save.error : null

@@ -58,7 +58,7 @@ jobs:
           git diff --exit-code -- ../frontend/openapi.json || (echo "::error::frontend/openapi.json is out of date. Run: php artisan scramble:export --path=../frontend/openapi.json, then npm run api:types in frontend." && exit 1)
 
   example-site:
-    name: Example site (the backend as a Composer package)
+    name: Example site (the package and the frontend, built for another site)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     services:
@@ -81,8 +81,19 @@ jobs:
           php-version: '8.3'
           extensions: pdo_mysql, mbstring, intl, gd, exif
           coverage: none
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
       # The package comes from ../../../backend through a path repository, without its development packages.
       - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Build the frontend for this site, from its own site folder
+        run: npm ci && npx vite build
+        working-directory: frontend
+        env:
+          PTSITE_SITE_DIR: ../examples/site/site
+          PTSITE_OUT_DIR: ../examples/site/backend/public/app
       - run: cp .env.example .env && php artisan key:generate
       - name: Migrate and seed the demo league, with this site's table prefix
         run: |
@@ -96,6 +107,10 @@ jobs:
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/up > /dev/null && break; sleep 1; done
           test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Accept: application/json' http://127.0.0.1:8000/api/v1/seasons)" = 401
           curl -s -H 'Accept: application/json' -H 'Content-Type: application/json' -d '{"username":"agate","password":"errada"}'             http://127.0.0.1:8000/api/v1/login | grep -q 'senha incorretos'
+      - name: The page and the installed app carry the site's name and main color
+        run: |
+          curl -s http://127.0.0.1:8000/app/ | grep -q '<title>Clube Exemplo</title>'
+          curl -s http://127.0.0.1:8000/app/manifest.webmanifest | grep -q '"theme_color": "#1e3a8a"'
 
   frontend:
     name: Frontend (lint, types, unit, build, Storybook a11y)

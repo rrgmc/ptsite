@@ -1,0 +1,12 @@
+{
+  "name": "Liga Demo",
+  "shortName": "Liga",
+  "tagline": "Liga de pôquer entre amigos",
+  "nightTitlePrefix": "Liga",
+  "logo": "♠",
+  "locale": "pt-BR",
+  "currency": "BRL",
+  "timeZone": "America/Sao_Paulo",
+  "brandColor": "#14532d",
+  "siteDomain": ""
+}

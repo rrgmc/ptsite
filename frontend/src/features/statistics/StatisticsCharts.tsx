@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { Statistics } from '@/api/client'
-import { formatPoints } from '@/lib/format'
+import { formatPoints, formatWhole } from '@/lib/format'
 import { progressData, SERIES_COLORS, winsData } from './chartData'
 import { cell, head, highestFirst, tick, tooltip } from './chartStyle'
 
@@ -67,7 +67,7 @@ export function PointsProgressChart({ progress, perSeason }: { progress: Statist
           <LineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
             <CartesianGrid stroke="var(--color-border)" vertical={false} />
             <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />
-            <YAxis tick={tick} tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => v.toLocaleString('pt-BR')} />
+            <YAxis tick={tick} tickLine={false} axisLine={false} width={48} tickFormatter={formatWhole} />
             <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} itemSorter={highestFirst} formatter={(value) => formatPoints(Number(value))} />
             {series.map((s) => (
               <Line

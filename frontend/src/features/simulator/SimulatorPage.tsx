@@ -10,6 +10,7 @@ import { TextField } from '@/components/TextField'
 import { PlayerLink } from '@/components/PlayerLink'
 import { formatPoints, ordinal, parseMoneyInput } from '@/lib/format'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
+import { currencySymbol } from '@/lib/site'
 
 /** "Simulação": what the standings would look like after an imagined next night. Nothing is saved. */
 export function SimulatorPage() {
@@ -42,7 +43,7 @@ export function SimulatorPage() {
         >
           <Card>
             <div className="flex flex-col gap-3">
-              <TextField label="Pote imaginado (R$)" inputMode="decimal" value={potText} onChange={setPotText} placeholder="840,00" isRequired />
+              <TextField label={`Pote imaginado (${currencySymbol})`} inputMode="decimal" value={potText} onChange={setPotText} placeholder="840,00" isRequired />
               {percentages.map((p) => (
                 <PlayerPicker
                   key={p.position}

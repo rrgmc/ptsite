@@ -84,6 +84,19 @@ class PTSiteServiceProvider extends ServiceProvider
             'auth.providers.users.model' => User::class,
             'auth.guards.web.remember' => config('ptsite.auth.remember_minutes'),
         ]);
+
+        // The site's name, language and time zone, when site.json gives them.
+        if ($name = config('ptsite.site.name')) {
+            config(['app.name' => $name, 'mail.from.name' => $name]);
+        }
+        if ($locale = config('ptsite.site.locale')) {
+            config(['app.locale' => $locale]);
+        }
+        if ($timeZone = config('ptsite.site.time_zone')) {
+            config(['app.timezone' => $timeZone]);
+            // Laravel set PHP's time zone from its own setting before this provider ran.
+            date_default_timezone_set($timeZone);
+        }
     }
 
     /** The migrations, unless the host app is this package itself and already has them in its own folder. */

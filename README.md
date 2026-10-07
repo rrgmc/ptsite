@@ -23,8 +23,16 @@ Screenshots of the demo league will be added in `docs/screens/`.
 |---|---|
 | `backend/` | Laravel 13 API at `/api/v1`, the league rules in `src/Domain`, the demo league seeder |
 | `frontend/` | React + TypeScript single-page app, served by Laravel at `/app`, plus Storybook |
+| `site/` | The demo site's folder: its name, logo, language, money, time zone and main color (`site.json`) |
+| `examples/site/` | The smallest site built on this repository |
 | `deploy/` | Scripts that build the deploy package and upload it to a cPanel shared host |
 | `docs/` | Decisions, architecture and specs |
+
+## Making your own site
+
+A league does not fork this repository. It makes a small repository of its own, which pins this one as a git
+submodule and holds the league's settings. The steps are in [`docs/new-site.md`](docs/new-site.md). A coding
+assistant can do them: ask it to "create a new site".
 
 ## Installing on a phone
 

@@ -1,19 +1,32 @@
-import { site } from './site'
+import { currencySymbol, site } from './site'
 
-// Brazilian Portuguese formatting for money, dates and ordinals.
+// Money, dates and ordinals in the site's language, money and time zone (site.locale, site.currency,
+// site.timeZone). The examples below are the demo site's: Brazilian Portuguese, reais, São Paulo.
 
-const money = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-const points = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const weekdayDate = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' })
-const shortDate = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Sao_Paulo' })
-const time = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
+const { locale, timeZone } = site
+const money = new Intl.NumberFormat(locale, { style: 'currency', currency: site.currency })
+const points = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const weekdayDate = new Intl.DateTimeFormat(locale, { weekday: 'long', day: '2-digit', month: '2-digit', timeZone })
+const longDate = new Intl.DateTimeFormat(locale, { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', timeZone })
+const shortDate = new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone })
+const time = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone })
+const whole = new Intl.NumberFormat(locale)
+
+// The characters the site's language puts between thousands and before the cents: "." and "," in pt-BR.
+const numberParts = new Intl.NumberFormat(locale).formatToParts(1234567.8)
+const groupSeparator = numberParts.find((part) => part.type === 'group')?.value ?? ''
+const decimalSeparator = numberParts.find((part) => part.type === 'decimal')?.value ?? '.'
 
 /**
- * A date and time from the API. A date alone ("2026-04-01") is read as midday in São Paulo: as UTC midnight it
- * would show the day before.
+ * A date and time from the API. A date alone ("2026-04-01") is read as midday UTC: as midnight it would show
+ * the day before in a time zone west of Greenwich.
  */
 function toDate(iso: string): Date {
-  return new Date(/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T12:00:00-03:00` : iso)
+  return new Date(/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T12:00:00Z` : iso)
+}
+
+function capitalized(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
 /** "840.00" → "R$ 840,00" */
@@ -26,6 +39,11 @@ export function formatPoints(amount: string | number): string {
   return points.format(Number(amount))
 }
 
+/** 1500 → "1.500", for the scale of a chart */
+export function formatWhole(amount: number): string {
+  return whole.format(amount)
+}
+
 /** ISO date → "14/03/2026" */
 export function formatDate(iso: string): string {
   return shortDate.format(toDate(iso))
@@ -33,13 +51,12 @@ export function formatDate(iso: string): string {
 
 /** ISO date → "Sábado, 14/03" (only the first letter capitalized: "Sexta-feira", not "Sexta-Feira") */
 export function formatWeekday(iso: string): string {
-  const text = weekdayDate.format(toDate(iso))
-  return text.charAt(0).toUpperCase() + text.slice(1)
+  return capitalized(weekdayDate.format(toDate(iso)))
 }
 
 /** ISO date → "Sexta-feira, 26/03/2027" */
 export function formatLongDate(iso: string): string {
-  return `${formatWeekday(iso)}/${toDate(iso).toLocaleString('pt-BR', { year: 'numeric', timeZone: 'America/Sao_Paulo' })}`
+  return capitalized(longDate.format(toDate(iso)))
 }
 
 export function formatTime(iso: string): string {
@@ -59,9 +76,16 @@ export function ordinal(position: number): string {
   return `${position}º`
 }
 
-/** Brazilian decimal input ("1.234,50" or "840") → API decimal string ("1234.50"), or null if invalid. */
+/**
+ * An amount as typed, in the site's language ("1.234,50" or "840" in pt-BR, with or without the money sign) →
+ * API decimal string ("1234.50"), or null if invalid.
+ */
 export function parseMoneyInput(text: string): string | null {
-  const cleaned = text.replace(/\s|R\$/g, '').replace(/\./g, '').replace(',', '.')
+  const cleaned = text
+    .replace(/\s/g, '')
+    .split(currencySymbol).join('')
+    .split(groupSeparator || '\u0000').join('')
+    .replace(decimalSeparator, '.')
   if (!/^\d{1,10}(\.\d{1,2})?$/.test(cleaned)) return null
   return Number(cleaned).toFixed(2)
 }
@@ -75,5 +99,5 @@ export function shareOf(pot: string, percent: number): string {
 /** A player's full name, unless it only repeats the nickname ("breno" / "Breno"), so lists don't show it twice. */
 export function fullNameIfDifferent(nickname: string, name: string | null | undefined): string | null {
   if (!name) return null
-  return name.localeCompare(nickname, 'pt-BR', { sensitivity: 'base' }) === 0 ? null : name
+  return name.localeCompare(nickname, locale, { sensitivity: 'base' }) === 0 ? null : name
 }
