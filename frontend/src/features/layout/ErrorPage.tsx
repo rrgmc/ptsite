@@ -1,4 +1,5 @@
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router'
+import { t } from '@/i18n'
 import { usePageTitle } from '@/lib/usePageTitle'
 import { SiteFooter } from './SiteFooter'
 
@@ -7,7 +8,7 @@ export function ErrorPage() {
   const error = useRouteError()
   const notFound = isRouteErrorResponse(error) && error.status === 404
   if (!notFound) console.error(error)
-  const title = notFound ? 'Página não encontrada' : 'Algo deu errado'
+  const title = notFound ? t.layout.errorPage.notFoundTitle : t.layout.errorPage.errorTitle
   usePageTitle(title)
 
   return (
@@ -15,13 +16,13 @@ export function ErrorPage() {
       <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-4 px-4 text-center">
         <h1 className="font-display text-2xl font-extrabold">{title}</h1>
         <p className="text-muted">
-          {notFound ? 'O endereço não existe.' : 'Tente de novo. Se o problema continuar, avise quem cuida do site.'}
+          {notFound ? t.layout.errorPage.notFoundText : t.layout.errorPage.errorText}
         </p>
         <div className="flex flex-col gap-2">
           <button type="button" onClick={() => window.location.reload()} className="min-h-touch rounded-md bg-primary px-4 font-semibold text-on-primary">
-            Recarregar
+            {t.common.reload}
           </button>
-          <Link to="/" className="inline-flex min-h-touch items-center justify-center font-semibold text-primary">Ir para a classificação</Link>
+          <Link to="/" className="inline-flex min-h-touch items-center justify-center font-semibold text-primary">{t.layout.errorPage.toStandings}</Link>
         </div>
       </main>
       <SiteFooter />

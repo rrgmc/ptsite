@@ -17,7 +17,7 @@ return [
     // From site.json. The package puts each one that is set into Laravel's own configuration.
     'site' => [
         'name' => $site['name'] ?? null,
-        'locale' => isset($site['locale']) ? SiteFile::laravelLocale($site['locale']) : null,
+        'locale' => isset($site['locale']) ? SiteFile::laravelLocale($site['locale'], dirname(__DIR__).'/lang') : null,
         'time_zone' => $site['timeZone'] ?? null,
     ],
 

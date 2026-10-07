@@ -7,6 +7,7 @@ import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox } from '@/components/Feedback'
 import { NewPasswordFields } from '@/components/NewPasswordFields'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { PlayerImagesEditor } from '@/features/players/PlayerImagesEditor'
 
 /**
@@ -19,22 +20,22 @@ export function ProfilePage() {
 
   return (
     <>
-      <PageHeader title="Meu perfil" subtitle={me.data ? `Usuário: ${me.data.username}` : undefined} />
+      <PageHeader title={t.profile.title} subtitle={me.data ? t.profile.username({ username: me.data.username }) : undefined} />
       <div className="flex max-w-xl flex-col gap-4">
         {player ? (
           <>
-            <Card title="Meus dados">
+            <Card title={t.profile.myData}>
               <ProfileForm player={player} />
             </Card>
-            <Card title="Minha foto">
+            <Card title={t.profile.myPhoto}>
               <PlayerImagesEditor player={player} />
             </Card>
           </>
         ) : (
           // An account with no player, such as an admin who does not play.
-          <Empty>Este acesso não está ligado a um jogador, então só tem a senha.</Empty>
+          <Empty>{t.profile.noPlayer}</Empty>
         )}
-        <Card title="Minha senha">
+        <Card title={t.profile.myPassword}>
           <PasswordForm />
         </Card>
       </div>
@@ -69,12 +70,12 @@ function PasswordForm() {
         })
       }}
     >
-      <TextField label="Senha atual" type="password" autoComplete="current-password" value={current} onChange={typing(setCurrent)} isRequired errorMessage={error?.fieldError('current_password')} />
+      <TextField label={t.profile.currentPassword} type="password" autoComplete="current-password" value={current} onChange={typing(setCurrent)} isRequired errorMessage={error?.fieldError('current_password')} />
       <NewPasswordFields password={password} repeated={repeated} onPasswordChange={typing(setPassword)} onRepeatedChange={typing(setRepeated)} mismatch={mismatch} errorMessage={error?.fieldError('password')} />
       {change.error && !(error?.body.errors && Object.keys(error.body.errors).length > 0) && <ErrorBox error={change.error} />}
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" isPending={change.isPending}>Alterar senha</Button>
-        {change.isSuccess && <span role="status" className="font-semibold text-success">Senha alterada.</span>}
+        <Button type="submit" isPending={change.isPending}>{t.profile.changePassword}</Button>
+        {change.isSuccess && <span role="status" className="font-semibold text-success">{t.profile.passwordChanged}</span>}
       </div>
     </Form>
   )
@@ -96,14 +97,14 @@ function ProfileForm({ player }: { player: Player }) {
         save.mutate({ id: player.id, nickname, name: name || null, email: email || null, birth_date: birthDate || null })
       }}
     >
-      <TextField label="Apelido" description="O nome que aparece na classificação e nos resultados." value={nickname} onChange={setNickname} isRequired errorMessage={error?.fieldError('nickname')} />
-      <TextField label="Nome completo" value={name} onChange={setName} errorMessage={error?.fieldError('name')} />
-      <TextField label="E-mail" type="email" description="Só você e os administradores veem." value={email} onChange={setEmail} errorMessage={error?.fieldError('email')} />
-      <TextField label="Data de nascimento" type="date" description="Só você e os administradores veem." value={birthDate} onChange={setBirthDate} errorMessage={error?.fieldError('birth_date')} />
+      <TextField label={t.common.nickname} description={t.profile.nicknameHelp} value={nickname} onChange={setNickname} isRequired errorMessage={error?.fieldError('nickname')} />
+      <TextField label={t.profile.fullName} value={name} onChange={setName} errorMessage={error?.fieldError('name')} />
+      <TextField label={t.profile.email} type="email" description={t.profile.emailHelp} value={email} onChange={setEmail} errorMessage={error?.fieldError('email')} />
+      <TextField label={t.profile.birthDate} type="date" description={t.profile.birthDateHelp} value={birthDate} onChange={setBirthDate} errorMessage={error?.fieldError('birth_date')} />
       {save.error && !(error?.body.errors && Object.keys(error.body.errors).length > 0) && <ErrorBox error={save.error} />}
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" isPending={save.isPending}>Salvar</Button>
-        {save.isSuccess && <span role="status" className="font-semibold text-success">Dados salvos.</span>}
+        <Button type="submit" isPending={save.isPending}>{t.common.save}</Button>
+        {save.isSuccess && <span role="status" className="font-semibold text-success">{t.profile.saved}</span>}
       </div>
     </Form>
   )

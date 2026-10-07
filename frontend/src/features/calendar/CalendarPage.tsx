@@ -6,6 +6,7 @@ import { useHolidayCalendars, useSeasonCalendar } from '@/api/queries'
 import { PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { type GridDay, GridLegend, MonthGrid, type MonthNote, MonthNotes } from '@/components/MonthGrid'
+import { t } from '@/i18n'
 import { dayOf, monthsBetween, today, yearsBetween } from '@/lib/dates'
 import { formatMoney, formatTime, formatWeekday } from '@/lib/format'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
@@ -19,11 +20,11 @@ export function CalendarPage() {
 
   if (isPending) return <Loading />
   if (error) return <ErrorBox error={error} />
-  if (!season) return <Empty>Nenhuma temporada cadastrada.</Empty>
+  if (!season) return <Empty>{t.calendar.noSeason}</Empty>
 
   return (
     <>
-      <PageHeader title="Calendário" subtitle={season.name} />
+      <PageHeader title={t.calendar.title} subtitle={season.name} />
       {calendar.isPending || holidays.isPending ? <Loading /> : calendar.error ? <ErrorBox error={calendar.error} /> : (
         <SeasonCalendar season={season} entries={calendar.data!} holidays={holidays.data} />
       )}
@@ -31,21 +32,27 @@ export function CalendarPage() {
   )
 }
 
-const answers = { all_in: 'ALL IN', fold: 'FOLD' } as const
+const answers = { all_in: t.attendance.allIn, fold: t.attendance.fold } as const
 
 function describe(entry: CalendarEntry): string {
   const n = entry.night
   if (!n) {
     const reason = entry.skip_reason!
-    return `Sem evento · ${reason.kind === 'carnival' ? 'Carnaval' : `${reason.kind === 'bridge' ? 'Emenda' : 'Feriado'}: ${reason.holiday}`}`
+    return t.calendar.noNight({
+      reason: reason.kind === 'carnival'
+        ? t.calendar.carnival
+        : reason.kind === 'bridge'
+          ? t.calendar.bridgeNamed({ name: reason.holiday ?? '' })
+          : t.calendar.holidayNamed({ name: reason.holiday ?? '' }),
+    })
   }
   if (n.status === 'finished') return `🏆 ${n.winner ?? '—'} · ${formatMoney(n.pot)}`
   return [
     formatTime(entry.starts_at),
-    n.status === 'open' ? 'Aberto' : null,
-    n.place ?? 'Local a definir',
-    n.status === 'open' || n.all_in_count > 0 ? `${n.all_in_count} ALL IN` : null,
-    n.my_answer ? `Você: ${answers[n.my_answer]}` : null,
+    n.status === 'open' ? t.calendar.open : null,
+    n.place ?? t.calendar.placeToBeSet,
+    n.status === 'open' || n.all_in_count > 0 ? t.calendar.allInCount({ count: n.all_in_count }) : null,
+    n.my_answer ? t.calendar.yourAnswer({ answer: answers[n.my_answer] }) : null,
   ].filter(Boolean).join(' · ')
 }
 
@@ -58,11 +65,11 @@ export function SeasonCalendar({ season, entries, holidays = [], today: now = to
 }) {
   const next = entries.find((e) => e.night && e.night.status !== 'finished' && dayOf(e.starts_at) >= now)
 
-  if (entries.length === 0) return <Empty>Nenhum evento nesta temporada ainda.</Empty>
+  if (entries.length === 0) return <Empty>{t.calendar.noNights}</Empty>
 
   const days: Record<string, GridDay> = {}
   for (const h of holidays) {
-    if (!h.cancelled) days[h.date] = { tone: 'holiday', label: `Feriado: ${h.name}` }
+    if (!h.cancelled) days[h.date] = { tone: 'holiday', label: t.calendar.holidayNamed({ name: h.name }) }
   }
   for (const e of entries) {
     const day = dayOf(e.starts_at)
@@ -88,19 +95,19 @@ export function SeasonCalendar({ season, entries, holidays = [], today: now = to
       {next && (
         <div className="flex flex-col items-start gap-1 rounded-lg bg-primary-soft p-3">
           <p>
-            <span className="font-semibold">Próximo evento: </span>
+            <span className="font-semibold">{t.calendar.nextNight} </span>
             <Link to={`/nights/${next.night!.id}`} className="text-primary underline">{formatWeekday(next.starts_at)}</Link>
             {' · '}{describe(next)}
           </p>
-          {canJump && <JumpButton month={jumpTo}>Ver no calendário</JumpButton>}
+          {canJump && <JumpButton month={jumpTo}>{t.calendar.viewInCalendar}</JumpButton>}
         </div>
       )}
-      {!next && canJump && <JumpButton month={jumpTo}>Ir para hoje</JumpButton>}
+      {!next && canJump && <JumpButton month={jumpTo}>{t.calendar.goToToday}</JumpButton>}
       <GridLegend today={months.includes(now.slice(0, 7))} items={[
-        { tone: 'night', label: 'Evento' },
-        { tone: 'finished', label: 'Finalizado' },
-        { tone: 'skipped', label: 'Sem evento (feriado)' },
-        { tone: 'holiday', label: 'Feriado' },
+        { tone: 'night', label: t.calendar.legend.night },
+        { tone: 'finished', label: t.calendar.legend.finished },
+        { tone: 'skipped', label: t.calendar.legend.skipped },
+        { tone: 'holiday', label: t.calendar.legend.holiday },
       ]} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {months.map((month) => (
@@ -137,7 +144,7 @@ function calendarNotes(month: string, entries: CalendarEntry[], holidays: Calend
   const notes = new Map<string, MonthNote>()
   for (const h of holidays) {
     if (!h.cancelled && h.date.startsWith(month)) {
-      notes.set(h.date, { date: h.date, tone: 'holiday', text: `Feriado: ${h.name}` })
+      notes.set(h.date, { date: h.date, tone: 'holiday', text: t.calendar.holidayNamed({ name: h.name }) })
     }
   }
   for (const e of entries) {

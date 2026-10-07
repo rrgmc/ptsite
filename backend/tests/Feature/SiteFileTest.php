@@ -54,7 +54,12 @@ it('reads the file from the app\'s own folder first, then from the site folder n
     array_map('rmdir', ["{$root}/site", "{$root}/backend", "{$root}/other", $root]);
 });
 
-it('writes a language as Laravel names its folders', function () {
-    expect(SiteFile::laravelLocale('pt-BR'))->toBe('pt_BR')
-        ->and(SiteFile::laravelLocale('en'))->toBe('en');
-});
+it('finds the folder of messages for a language', function (string $locale, string $folder) {
+    expect(SiteFile::laravelLocale($locale, lang_path()))->toBe($folder);
+})->with([
+    'its own folder' => ['pt-BR', 'pt_BR'],
+    'English' => ['en', 'en'],
+    'another country, same language' => ['pt-PT', 'pt_BR'],
+    'English of a country' => ['en-US', 'en'],
+    'a language with no messages' => ['fr-FR', 'en'],
+]);

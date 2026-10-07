@@ -15,6 +15,7 @@ backend/
   .env.example            the holiday preset, the database and the table prefix
 site/
   site.json               the site's name, logo, language, money, time zone and main color
+  messages.json           its own wording for two texts
   theme.css               its changes to the design tokens
   public/icons/           its app icons, drawn by `npm run icons`
 ```
@@ -44,8 +45,9 @@ php artisan serve
 
 ## The frontend
 
-`site/` is this site's folder: its name, logo, language, money, time zone and main color in `site.json`, a
-change to two design tokens in `theme.css`, and its own app icons in `public/icons` (see
+`site/` is this site's folder: its name, logo, language (English), money, time zone and main color in
+`site.json`, its own wording for two texts in `messages.json`, a change to two design tokens in `theme.css`, and
+its own app icons in `public/icons` (see
 [`site/README.md`](../../site/README.md) at the top of this repository). The frontend is built for it from the
 core's `frontend/` folder:
 
@@ -55,4 +57,4 @@ PTSITE_SITE_DIR=../examples/site/site PTSITE_OUT_DIR=../examples/site/backend/pu
 ```
 
 In PowerShell, set the two variables with `$env:PTSITE_SITE_DIR = '..\examples\site\site'` first. After the
-build, `php artisan serve` in `backend/` shows "Clube Exemplo" in blue at `/app/`.
+build, `php artisan serve` in `backend/` shows "Example Club" in blue and in English at `/app/`.

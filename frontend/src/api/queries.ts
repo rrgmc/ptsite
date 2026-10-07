@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { t } from '@/i18n'
 import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { ApiError, api, type Attendance, fetchCsrfCookie, type PartialResult, type Player, unwrap } from './client'
 
@@ -34,7 +35,7 @@ export function useMe() {
     queryFn: async () => {
       const { data, response } = await api.GET('/v1/me')
       if (response.status === 401) return null
-      if (!response.ok) throw new Error('Falha ao carregar o usuário')
+      if (!response.ok) throw new Error(t.api.loadUserFailed)
       return data!.data
     },
     staleTime: 5 * 60_000,
@@ -115,7 +116,7 @@ export function useCurrentSeason() {
     queryFn: async () => {
       const { data, response } = await api.GET('/v1/seasons/current')
       if (response.status === 404) return null
-      if (!response.ok) throw new Error('Falha ao carregar a temporada')
+      if (!response.ok) throw new Error(t.api.loadSeasonFailed)
       return data!.data
     },
   })

@@ -93,6 +93,36 @@ screen have the right name and colors before the first request to the API.
   `PTSITE_SITE_DIR` is set.
 - The unit tests, Storybook and the end-to-end tests run on the demo site.
 
+## Texts
+
+Every text a visitor reads or hears is in `src/i18n`, never in a component. This is what lets the site run in
+another language and lets a site reword a text.
+
+- **One file per area and per language:** `src/i18n/pt-BR/nights.ts`, `src/i18n/en/nights.ts`. `common.ts` has
+  the words used in more than one area.
+- **Brazilian Portuguese is the reference.** The shape of its objects is the type `Messages`. Each English file
+  has that type, so a missing or misspelled key fails `npx tsc -b`.
+- **A text is a string, or a function of one object of named values** when it has a value in it:
+  `t.nights.title({ date })`. A text with a plural uses `plural()` (`src/i18n/plural.ts`), which follows the
+  site's language.
+- **A sentence with an element in it stays one text**, with the element's place in braces, and is drawn with
+  `rich()`: `rich(t.auth.forgot.sent, { email: <strong>{email}</strong> })`. A translator can then move the
+  name to where the language wants it.
+- **The site's language picks the catalogue** when the app starts (`site.locale`): Portuguese for `pt…`,
+  English for anything else. Dates, numbers and money follow `site.locale` itself (see "Site settings").
+- **A site rewords single texts** in `messages.json` of its site folder: the same shape as the catalogue, with
+  only the texts it changes, as strings. A text with values names them in braces: `"Pote ME ({currency})"`. A
+  name that is not in the catalogue stops the app when it starts, with the name in the message.
+- **Code reads a text as `t.<area>.<name>`** (`import { t } from '@/i18n'`). Formats stay in `src/lib/format.ts`.
+- **`scripts/check-i18n.mjs`, part of `npm run lint`,** fails when a file outside `src/i18n` writes a text of
+  its own. Tests, stories and `src/mocks` are not checked: they name the texts they expect, in the demo site's
+  language.
+
+To add a text: add the key to the area's file in `pt-BR/`, add it to the same file in `en/`, and use it.
+
+The API's messages are translated in the backend the same way: `backend/lang/pt_BR` and `backend/lang/en`
+(`rules.php`, `mail.php`, `auth.php`, `validation.php`). A site rewords one in its own `backend/lang` folder.
+
 ## Selected season
 
 The standings, results, calendar, simulator, statistics (`/statistics`) and a player's page (`/players/:id`) show

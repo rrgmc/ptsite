@@ -1,4 +1,5 @@
 import { Dialog, Heading, Modal, ModalOverlay } from 'react-aria-components'
+import { t } from '@/i18n'
 import { Button } from './Button'
 
 export function ConfirmDialog({
@@ -7,7 +8,7 @@ export function ConfirmDialog({
   title,
   children,
   confirmLabel,
-  cancelLabel = 'Cancelar',
+  cancelLabel = t.common.cancel,
   confirmVariant = 'primary',
   onConfirm,
   isPending,

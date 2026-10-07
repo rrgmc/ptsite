@@ -7,6 +7,7 @@ import { Card } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { type GridDay, GridLegend, MonthGrid, type MonthNote, MonthNotes } from '@/components/MonthGrid'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { addDays, dayOf, monthsBetween, today, yearsBetween, zonedDateTime } from '@/lib/dates'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 
@@ -42,31 +43,34 @@ export function SeasonPlanner({ today: now = today() }: { today?: string }) {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Link to="/admin" className="text-primary underline">‹ Temporadas</Link>
-        <h2 className="mt-2 font-display text-xl font-bold">Planejar datas · {s.name}</h2>
+        <Link to="/admin" className="text-primary underline">{t.admin.seasons.back}</Link>
+        <h2 className="mt-2 font-display text-xl font-bold">{t.admin.planner.title({ name: s.name })}</h2>
         <p className="text-muted">
-          {WEEKDAYS[s.schedule.weekday - 1]?.label} às {s.schedule.time}, {EVERY_WEEKS[s.schedule.every_weeks - 1]?.label.toLowerCase()}.
-          Feriados, emendas e o Carnaval ficam de fora. Toque num dia para marcar ou desmarcar.
+          {t.admin.planner.intro({
+            weekday: WEEKDAYS[s.schedule.weekday - 1]?.label ?? '',
+            time: s.schedule.time,
+            every: EVERY_WEEKS[s.schedule.every_weeks - 1]?.label.toLowerCase() ?? '',
+          })}
         </p>
       </div>
       <Card>
         <div className="grid grid-cols-2 gap-3">
-          <TextField label="De" type="date" value={fromValue} onChange={(v) => { setFrom(v); setScheduled(null) }} />
+          <TextField label={t.admin.planner.from} type="date" value={fromValue} onChange={(v) => { setFrom(v); setScheduled(null) }} />
           <TextField
-            label="Até"
+            label={t.admin.planner.to}
             type="date"
             value={toValue}
             onChange={(v) => { setTo(v); setScheduled(null) }}
-            description={to !== null ? undefined : byRounds ? `Até a última rodada (${s.rounds}ª)` : 'Fim do ano'}
+            description={to !== null ? undefined : byRounds ? t.admin.planner.toLastRound({ round: s.rounds }) : t.admin.planner.endOfYear}
           />
         </div>
       </Card>
       {scheduled !== null ? (
         <Card>
-          <p role="status" className="font-semibold text-success">{scheduled === 1 ? '1 evento agendado.' : `${scheduled} eventos agendados.`}</p>
-          <Link to="/calendar" className="mt-2 inline-block text-primary underline">Ver o calendário</Link>
+          <p role="status" className="font-semibold text-success">{t.admin.planner.scheduledCount({ count: scheduled })}</p>
+          <Link to="/calendar" className="mt-2 inline-block text-primary underline">{t.admin.planner.viewCalendar}</Link>
         </Card>
-      ) : plan.isPending || holidays.isPending ? <Loading label="Calculando datas…" /> : plan.error ? <ErrorBox error={plan.error} /> : (
+      ) : plan.isPending || holidays.isPending ? <Loading label={t.admin.planner.calculating} /> : plan.error ? <ErrorBox error={plan.error} /> : (
         // A new plan starts again from its own ticks.
         <PlanCalendar
           key={`${fromValue}|${toValue}|${plan.dataUpdatedAt}`}
@@ -86,13 +90,13 @@ export function SeasonPlanner({ today: now = today() }: { today?: string }) {
 function reason(date: PlannedDate): string {
   switch (date.skip_reason?.kind) {
     case 'holiday':
-      return `Feriado: ${date.skip_reason.holiday}`
+      return t.admin.planner.reasonHoliday({ holiday: date.skip_reason.holiday ?? '' })
     case 'bridge':
-      return `Emenda: ${date.skip_reason.holiday}`
+      return t.admin.planner.reasonBridge({ holiday: date.skip_reason.holiday ?? '' })
     case 'carnival':
-      return 'Carnaval'
+      return t.admin.planner.reasonCarnival
     default:
-      return 'Evento habitual'
+      return t.admin.planner.reasonRegular
   }
 }
 
@@ -126,18 +130,18 @@ export function PlanCalendar({ season, from, to, dates, holidays, onScheduled, t
   // Build each day: holidays first, then the plan, then days added by hand.
   const days: Record<string, GridDay> = {}
   for (const h of holidays) {
-    if (!h.cancelled) days[h.date] = { tone: 'holiday', label: `Feriado: ${h.name}` }
+    if (!h.cancelled) days[h.date] = { tone: 'holiday', label: t.admin.planner.reasonHoliday({ holiday: h.name }) }
   }
   const planDays = new Set(dates.map((d) => dayOf(d.starts_at)))
   for (const d of dates) {
     const day = dayOf(d.starts_at)
     if (d.taken) {
-      days[day] = { tone: 'night', label: 'Já agendado', href: d.night_id ? `/nights/${d.night_id}` : undefined }
+      days[day] = { tone: 'night', label: t.admin.planner.alreadyScheduled, href: d.night_id ? `/nights/${d.night_id}` : undefined }
     } else {
       const on = ticked.has(d.starts_at)
       days[day] = {
         tone: on ? 'planned' : d.skip_reason ? 'skipped' : 'candidate',
-        label: on ? `${reason(d)}, marcado` : reason(d),
+        label: on ? t.admin.planner.ticked({ label: reason(d) }) : reason(d),
         onToggle: (selected) => toggle(d.starts_at, selected),
       }
     }
@@ -151,7 +155,7 @@ export function PlanCalendar({ season, from, to, dates, holidays, onScheduled, t
       const holiday = days[day]
       days[day] = {
         tone: on ? 'planned' : holiday?.tone ?? 'plain',
-        label: on ? `${holiday?.label ? `${holiday.label}, ` : ''}evento extra, marcado` : holiday?.label,
+        label: on ? (holiday?.label ? t.admin.planner.extraTickedAfter({ label: holiday.label }) : t.admin.planner.extraTicked) : holiday?.label,
         onToggle: (selected) => setAdded((all) => (selected ? [...all, startsAt] : all.filter((a) => a !== startsAt))),
       }
     }
@@ -161,21 +165,21 @@ export function PlanCalendar({ season, from, to, dates, holidays, onScheduled, t
     <>
       <Card>
         <p className={`font-semibold ${planned > season.rounds ? 'text-warning' : ''}`}>
-          Rodadas: {planned} de {season.rounds}
+          {t.admin.planner.roundsOf({ planned, rounds: season.rounds })}
         </p>
-        <p className="text-sm text-muted">{season.nights_planned ?? 0} já agendadas + {chosen.length} marcadas neste plano.</p>
+        <p className="text-sm text-muted">{t.admin.planner.planned({ scheduled: season.nights_planned ?? 0, marked: chosen.length })}</p>
         {planned > season.rounds && (
           <p role="alert" className="mt-2 rounded-md bg-warning-soft p-2 text-sm text-warning">
-            A temporada tem {season.rounds} rodadas; este plano passa de {season.rounds}. Ainda é possível agendar.
+            {t.admin.planner.overPlan({ rounds: season.rounds })}
           </p>
         )}
         <div className="mt-3">
           <GridLegend today={months.includes(now.slice(0, 7))} items={[
-            { tone: 'planned', label: 'Marcado' },
-            { tone: 'candidate', label: 'Evento habitual, desmarcado' },
-            { tone: 'skipped', label: 'Fica de fora (feriado)' },
-            { tone: 'night', label: 'Já agendado' },
-            { tone: 'holiday', label: 'Feriado' },
+            { tone: 'planned', label: t.admin.planner.legendMarked },
+            { tone: 'candidate', label: t.admin.planner.legendCandidate },
+            { tone: 'skipped', label: t.admin.planner.legendSkipped },
+            { tone: 'night', label: t.admin.planner.legendScheduled },
+            { tone: 'holiday', label: t.admin.planner.legendHoliday },
           ]} />
         </div>
       </Card>
@@ -194,7 +198,7 @@ export function PlanCalendar({ season, from, to, dates, holidays, onScheduled, t
           isPending={schedule.isPending}
           onPress={() => schedule.mutate(chosen, { onSuccess: (nights) => onScheduled(nights.length) })}
         >
-          {chosen.length === 1 ? 'Agendar 1 evento' : `Agendar ${chosen.length} eventos`}
+          {t.admin.planner.schedule({ count: chosen.length })}
         </Button>
       </div>
     </>
@@ -205,16 +209,16 @@ export function PlanCalendar({ season, from, to, dates, holidays, onScheduled, t
 function planNotes(month: string, dates: PlannedDate[], holidays: CalendarHoliday[]): MonthNote[] {
   const notes = new Map<string, MonthNote>()
   for (const h of holidays) {
-    if (!h.cancelled && h.date.startsWith(month)) notes.set(h.date, { date: h.date, tone: 'holiday', text: `Feriado: ${h.name}` })
+    if (!h.cancelled && h.date.startsWith(month)) notes.set(h.date, { date: h.date, tone: 'holiday', text: t.admin.planner.reasonHoliday({ holiday: h.name }) })
   }
   for (const d of dates) {
     const day = dayOf(d.starts_at)
     if (!day.startsWith(month)) continue
     if (d.taken) {
-      notes.set(day, { date: day, tone: 'night', text: 'Já agendado', href: d.night_id ? `/nights/${d.night_id}` : undefined })
+      notes.set(day, { date: day, tone: 'night', text: t.admin.planner.alreadyScheduled, href: d.night_id ? `/nights/${d.night_id}` : undefined })
     } else if (d.skip_reason) {
       // A Friday that is itself the holiday gets one line.
-      notes.set(day, { date: day, tone: 'skipped', text: `${reason(d)} · fica de fora` })
+      notes.set(day, { date: day, tone: 'skipped', text: t.admin.planner.skippedNote({ reason: reason(d) }) })
     }
   }
   return [...notes.values()]

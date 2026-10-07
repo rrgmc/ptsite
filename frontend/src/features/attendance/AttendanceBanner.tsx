@@ -1,10 +1,12 @@
 import { Link } from 'react-router'
 import type { Night } from '@/api/client'
 import { Button } from '@/components/Button'
+import { t } from '@/i18n'
+import { rich } from '@/i18n/rich'
 import { formatWeekday } from '@/lib/format'
 import type { Answer } from './AttendancePanel'
 
-const labels: Record<Answer, string> = { all_in: 'ALL IN', fold: 'FOLD' }
+const labels: Record<Answer, string> = { all_in: t.attendance.allIn, fold: t.attendance.fold }
 
 /**
  * The open night, above a season screen: a player who has not answered taps ALL IN or FOLD; one who has sees the
@@ -24,16 +26,16 @@ export function AttendanceBanner({
 }) {
   const nightPath = `/nights/${night.id}`
   return (
-    <aside aria-label="Evento aberto" className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-md bg-primary-soft p-3">
+    <aside aria-label={t.attendance.banner.label} className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-md bg-primary-soft p-3">
       <p className="min-w-0 wrap-anywhere">
-        <Link to={nightPath} className="font-semibold underline">Evento aberto: {formatWeekday(night.starts_at)}</Link>
-        <span className="text-muted"> · {night.place?.name ?? 'Local a definir'}</span>
+        <Link to={nightPath} className="font-semibold underline">{t.attendance.banner.title({ weekday: formatWeekday(night.starts_at) })}</Link>
+        <span className="text-muted"> · {night.place?.name ?? t.nights.noPlace}</span>
         <span className="block">
-          {answer ? <>Você: <strong>{labels[answer]}</strong></> : 'Confirme sua presença'}
+          {answer ? rich(t.attendance.banner.you, { answer: <strong>{labels[answer]}</strong> }) : t.attendance.banner.confirmPresence}
         </span>
       </p>
       {answer ? (
-        <Link to={nightPath} className="flex min-h-touch items-center rounded-md px-2 font-semibold text-primary underline">Alterar</Link>
+        <Link to={nightPath} className="flex min-h-touch items-center rounded-md px-2 font-semibold text-primary underline">{t.attendance.banner.change}</Link>
       ) : (
         <div className="flex gap-2">
           <Button onPress={() => onAnswer('all_in')}>{labels.all_in}</Button>

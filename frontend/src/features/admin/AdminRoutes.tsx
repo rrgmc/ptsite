@@ -2,6 +2,7 @@ import { NavLink, Route, Routes, useSearchParams } from 'react-router'
 import { useMe } from '@/api/queries'
 import { PageHeader } from '@/components/Card'
 import { ErrorBox } from '@/components/Feedback'
+import { t } from '@/i18n'
 import { AuditLogPage } from './AuditLogPage'
 import { HolidaysAdmin } from './HolidaysAdmin'
 import { PlaceEditPage, PlacesAdmin } from './PlacesAdmin'
@@ -13,7 +14,7 @@ import { SeasonEditPage, SeasonsAdmin } from './SeasonsAdmin'
 export function AdminRoutes() {
   const me = useMe()
   if (me.data?.role !== 'admin') {
-    return <ErrorBox error={new Error('Somente administradores.')} />
+    return <ErrorBox error={new Error(t.admin.adminOnly)} />
   }
 
   const tab = ({ isActive }: { isActive: boolean }) =>
@@ -21,13 +22,13 @@ export function AdminRoutes() {
 
   return (
     <>
-      <PageHeader title="Administração" />
-      <nav aria-label="Administração" className="-mx-4 mb-4 flex gap-1 overflow-x-auto px-4">
-        <NavLink to="/admin" end className={tab}>Temporadas</NavLink>
-        <NavLink to="/admin/players" className={tab}>Jogadores</NavLink>
-        <NavLink to="/admin/places" className={tab}>Locais</NavLink>
-        <NavLink to="/admin/holidays" className={tab}>Feriados</NavLink>
-        <NavLink to="/admin/audit-log" className={tab}>Alterações</NavLink>
+      <PageHeader title={t.admin.title} />
+      <nav aria-label={t.admin.title} className="-mx-4 mb-4 flex gap-1 overflow-x-auto px-4">
+        <NavLink to="/admin" end className={tab}>{t.common.seasons}</NavLink>
+        <NavLink to="/admin/players" className={tab}>{t.common.players}</NavLink>
+        <NavLink to="/admin/places" className={tab}>{t.common.places}</NavLink>
+        <NavLink to="/admin/holidays" className={tab}>{t.admin.holidays.tab}</NavLink>
+        <NavLink to="/admin/audit-log" className={tab}>{t.admin.auditLog.tab}</NavLink>
       </nav>
       <Routes>
         <Route index element={<SeasonsAdmin />} />

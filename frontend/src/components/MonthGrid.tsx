@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { ToggleButton } from 'react-aria-components'
 import { Link } from 'react-router'
+import { t } from '@/i18n'
 import { monthTitle, monthWeeks, today as currentDay } from '@/lib/dates'
 import { formatLongDate, formatWeekday } from '@/lib/format'
 
@@ -41,10 +42,6 @@ const tones: Record<DayTone, string> = {
 const todayRing = (tone: DayTone, disabled: boolean) =>
   `font-extrabold inset-ring-2 ${disabled ? 'inset-ring-muted' : tone === 'planned' || tone === 'finished' ? 'inset-ring-on-primary' : 'inset-ring-text'}`
 
-const WEEKDAYS = [
-  ['D', 'Domingo'], ['S', 'Segunda-feira'], ['T', 'Terça-feira'], ['Q', 'Quarta-feira'], ['Q', 'Quinta-feira'], ['S', 'Sexta-feira'], ['S', 'Sábado'],
-]
-
 /** One month as a grid of days, Sunday first. Days can link to a night or be ticked and unticked. Today is ringed, and its month has a tinted background. */
 export function MonthGrid({
   month,
@@ -76,7 +73,7 @@ export function MonthGrid({
       <table className="w-full table-fixed border-separate border-spacing-0.5 text-center">
         <thead>
           <tr>
-            {WEEKDAYS.map(([short, long], i) => (
+            {t.components.monthGrid.weekdays.map(({ short, long }, i) => (
               <th key={i} scope="col" abbr={long} className="text-xs font-semibold text-muted">{short}</th>
             ))}
           </tr>
@@ -101,7 +98,7 @@ export function MonthGrid({
 function Day({ date, day, disabled, isToday }: { date: string; day?: GridDay; disabled: boolean; isToday: boolean }) {
   const tone = day?.tone ?? 'plain'
   const number = Number(date.slice(8))
-  const description = `${formatLongDate(date)}${day?.label ? `: ${day.label}` : ''}${isToday ? ' (hoje)' : ''}`
+  const description = `${formatLongDate(date)}${day?.label ? `: ${day.label}` : ''}${isToday ? ` ${t.components.monthGrid.todayNote}` : ''}`
   const base = [
     // Cells shrink with the screen (7 per row even at 320 px) and stay round.
     'mx-auto flex aspect-square w-full max-w-11 items-center justify-center rounded-full text-sm',
@@ -140,7 +137,7 @@ function Day({ date, day, disabled, isToday }: { date: string; day?: GridDay; di
 /** The colors used in a grid, explained. `today` adds "Hoje": pass it when today is on one of the grids. */
 export function GridLegend({ items, today = false }: { items: { tone: DayTone; label: string }[]; today?: boolean }) {
   return (
-    <ul aria-label="Legenda" className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+    <ul aria-label={t.components.monthGrid.legend} className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
       {items.map((item) => (
         <li key={item.tone} className="flex items-center gap-2">
           <span aria-hidden className={`inline-flex size-6 items-center justify-center rounded-full text-xs ${tones[item.tone]}`}>9</span>
@@ -150,7 +147,7 @@ export function GridLegend({ items, today = false }: { items: { tone: DayTone; l
       {today && (
         <li className="flex items-center gap-2">
           <span aria-hidden className={`inline-flex size-6 items-center justify-center rounded-full text-xs ${tones.plain} ${todayRing('plain', false)}`}>9</span>
-          Hoje
+          {t.common.today}
         </li>
       )}
     </ul>

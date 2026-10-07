@@ -8,6 +8,7 @@ import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerPhotoButton, PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { TextField } from '@/components/TextField'
 import { ViewSwitch } from '@/components/ViewSwitch'
+import { t } from '@/i18n'
 import { fullNameIfDifferent } from '@/lib/format'
 import { playerImageUrl } from '@/lib/playerImages'
 
@@ -21,16 +22,16 @@ export function PlayersPage() {
 
   return (
     <>
-      <PageHeader title="Jogadores" subtitle="Ativos primeiro, depois inativos" />
+      <PageHeader title={t.common.players} subtitle={t.players.listSubtitle} />
       <ViewSwitch
-        label="Modo de exibição"
+        label={t.players.viewLabel}
         options={[
-          { label: 'Lista', to: '/players', current: !detailed },
-          { label: 'Detalhado', to: '/players?view=detailed', current: detailed },
+          { label: t.players.viewList, to: '/players', current: !detailed },
+          { label: t.players.viewDetailed, to: '/players?view=detailed', current: detailed },
         ]}
       />
       <div className="mb-4 max-w-sm">
-        <TextField label="Buscar" type="search" value={search} onChange={setSearch} placeholder="Apelido ou nome" />
+        <TextField label={t.common.search} type="search" value={search} onChange={setSearch} placeholder={t.players.searchPlaceholder} />
       </div>
       {players.isPending ? (
         <Loading />
@@ -38,7 +39,7 @@ export function PlayersPage() {
         <ErrorBox error={players.error} />
       ) : detailed ? (
         withMemo.length === 0 ? (
-          <Empty>Nenhum jogador com memo.</Empty>
+          <Empty>{t.players.noneWithMemo}</Empty>
         ) : (
           <ul className="flex flex-col gap-4">
             {withMemo.map((p) => (
@@ -49,7 +50,7 @@ export function PlayersPage() {
           </ul>
         )
       ) : players.data!.length === 0 ? (
-        <Empty>Nenhum jogador encontrado.</Empty>
+        <Empty>{t.players.noneFound}</Empty>
       ) : (
         <Card>
           <ul className="grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -60,7 +61,7 @@ export function PlayersPage() {
                   <PlayerLink player={p} />
                   {fullNameIfDifferent(p.nickname, p.name) && <span className="block text-sm text-muted">{p.name}</span>}
                 </span>
-                {p.status === 'inactive' && <Badge>inativo</Badge>}
+                {p.status === 'inactive' && <Badge>{t.common.inactive}</Badge>}
               </li>
             ))}
           </ul>
@@ -88,7 +89,7 @@ function PlayerMemoCard({ player }: { player: PlayerDetail }) {
         </div>
         <h2 className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-lg wrap-break-word">
           <PlayerLink player={player} />
-          {player.status === 'inactive' && <Badge>inativo</Badge>}
+          {player.status === 'inactive' && <Badge>{t.common.inactive}</Badge>}
         </h2>
         {/* Plain text, as typed: line breaks are kept and nothing in it becomes a link. */}
         <p className="col-span-2 min-w-0 whitespace-pre-line wrap-anywhere sm:col-span-1 sm:col-start-2">{player.memo}</p>

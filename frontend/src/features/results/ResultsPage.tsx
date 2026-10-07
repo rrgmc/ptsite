@@ -8,6 +8,7 @@ import { Card, PageHeader } from '@/components/Card'
 import { Badge, Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { formatMoney, formatWeekday, formatTime } from '@/lib/format'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
@@ -28,7 +29,7 @@ export function ResultsPage() {
 
   if (isPending) return <Loading />
   if (error) return <ErrorBox error={error} />
-  if (!season) return <Empty>Nenhuma temporada cadastrada.</Empty>
+  if (!season) return <Empty>{t.results.noSeason}</Empty>
 
   const all = nights.data ?? []
   // Each finished night with its number in the season, newest first.
@@ -39,13 +40,13 @@ export function ResultsPage() {
   return (
     <>
       <OpenNightAttendance />
-      <PageHeader title="Resultados" subtitle={season.name} />
+      <PageHeader title={t.results.title} subtitle={season.name} />
 
       {(upcoming.length > 0 || canRun) && (
-        <Card title="Próximos eventos" className="mb-4" action={canRun && !scheduling && <Button variant="secondary" onPress={() => setScheduling(true)}>+ Agendar</Button>}>
+        <Card title={t.results.upcoming} className="mb-4" action={canRun && !scheduling && <Button variant="secondary" onPress={() => setScheduling(true)}>{t.results.schedule}</Button>}>
           {scheduling && (season.nights_planned ?? 0) >= season.rounds && (
             <p role="alert" className="mb-3 rounded-md bg-warning-soft p-2 text-sm text-warning">
-              A temporada já tem {season.nights_planned} eventos de {season.rounds} rodadas. Ainda é possível agendar outro.
+              {t.results.overPlanned({ planned: season.nights_planned ?? 0, rounds: season.rounds })}
             </p>
           )}
           {scheduling && <ScheduleForm seasonId={season.id} defaultPlaceId={season.default_place?.id} defaultTime={season.schedule.time} onDone={(id) => { setScheduling(false); if (id) navigate(`/nights/${id}`) }} />}
@@ -55,13 +56,13 @@ export function ResultsPage() {
                 <Link to={`/nights/${n.id}`} className="flex min-h-touch flex-wrap items-center justify-between gap-x-2 rounded-md px-2 py-1 hover:bg-surface-sunken">
                   <span>
                     <span className="font-semibold">{formatWeekday(n.starts_at)}</span>
-                    <span className="text-muted"> · {formatTime(n.starts_at)} · {n.place?.name ?? 'Local a definir'}</span>
+                    <span className="text-muted"> · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>
                   </span>
-                  <Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{n.status === 'open' ? 'Aberto' : 'Agendado'}</Badge>
+                  <Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{n.status === 'open' ? t.nights.status.open : t.nights.status.scheduled}</Badge>
                 </Link>
               </li>
             ))}
-            {upcoming.length === 0 && !scheduling && <li className="text-muted">Nenhum evento agendado.</li>}
+            {upcoming.length === 0 && !scheduling && <li className="text-muted">{t.results.noUpcoming}</li>}
           </ul>
         </Card>
       )}
@@ -70,16 +71,16 @@ export function ResultsPage() {
         <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-[3fr_1fr] lg:items-start">
           {/* min-w-0 lets the chart shrink with its column. */}
           <div className="min-w-0">
-            <Suspense fallback={<Loading label="Carregando gráfico…" />}>
+            <Suspense fallback={<Loading label={t.results.loadingChart} />}>
               <PointsProgressChart progress={statistics.data.points_progress} perSeason={false} />
             </Suspense>
           </div>
-          <Card title="Totais da temporada">
+          <Card title={t.results.seasonTotals}>
             <dl>
               {([
-                ['Pote Total', statistics.data.pot_total],
-                ['Pote ME', statistics.data.main_event_pot_total],
-                ['Time chip', statistics.data.time_chip_total],
+                [t.nights.amounts.potTotal, statistics.data.pot_total],
+                [t.nights.amounts.mainEventPot, statistics.data.main_event_pot_total],
+                [t.nights.amounts.timeChip, statistics.data.time_chip_total],
               ] as const).map(([label, amount]) => (
                 <div key={label} className="flex items-center justify-between py-0.5">
                   <dt className="font-semibold">{label}</dt>
@@ -94,7 +95,7 @@ export function ResultsPage() {
       {nights.isPending ? (
         <Loading />
       ) : finished.length === 0 ? (
-        <Empty>Nenhum evento finalizado nesta temporada.</Empty>
+        <Empty>{t.results.noFinished}</Empty>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {finished.map(({ night, number }) => <NightResultCard key={night.id} night={night} number={number} />)}
@@ -106,7 +107,7 @@ export function ResultsPage() {
 
 function ScheduleForm({ seasonId, defaultPlaceId, defaultTime, onDone }: { seasonId: number; defaultPlaceId?: number; defaultTime: string; onDone: (nightId?: number) => void }) {
   const suggestions = useNightSuggestions(seasonId)
-  if (suggestions.isPending) return <Loading label="Carregando sugestões…" />
+  if (suggestions.isPending) return <Loading label={t.results.scheduleForm.loadingSuggestions} />
 
   // Start from the first suggestion (usually this week's night); after that the date and time are ordinary fields.
   const regular = suggestions.data?.[0]
@@ -165,13 +166,13 @@ function ScheduleFields({
           />
         </div>
       )}
-      <TextField label="Data" type="date" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('starts_at')} />
-      <TextField label="Hora" type="time" value={time} onChange={setTime} isRequired />
-      <Select label="Local" options={(places.data ?? []).map((p) => ({ id: p.id, label: p.name }))} selectedKey={placeId} onSelectionChange={(k) => setPlaceId(k === null ? null : Number(k))} />
+      <TextField label={t.common.date} type="date" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('starts_at')} />
+      <TextField label={t.results.scheduleForm.time} type="time" value={time} onChange={setTime} isRequired />
+      <Select label={t.common.place} options={(places.data ?? []).map((p) => ({ id: p.id, label: p.name }))} selectedKey={placeId} onSelectionChange={(k) => setPlaceId(k === null ? null : Number(k))} />
       {error && !error.fieldError('starts_at') && <p role="alert" className="text-danger sm:col-span-3">{error.body.message}</p>}
       <div className="flex gap-2 sm:col-span-3">
-        <Button type="submit" isPending={schedule.isPending}>Agendar evento</Button>
-        <Button variant="ghost" onPress={() => onDone()}>Cancelar</Button>
+        <Button type="submit" isPending={schedule.isPending}>{t.results.scheduleForm.submit}</Button>
+        <Button variant="ghost" onPress={() => onDone()}>{t.common.cancel}</Button>
       </div>
     </Form>
   )

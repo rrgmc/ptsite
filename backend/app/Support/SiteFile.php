@@ -41,9 +41,24 @@ final class SiteFile
         return [];
     }
 
-    /** "pt-BR", as the file and browsers write a language, to "pt_BR", as Laravel names its lang folders. */
-    public static function laravelLocale(string $locale): string
+    /**
+     * The folder of messages for a language as the file and browsers write it: "pt-BR" is lang/pt_BR. A
+     * language with no folder of its own takes one of the same language ("pt-PT" takes pt_BR), or else English.
+     */
+    public static function laravelLocale(string $locale, string $langPath): string
     {
-        return str_replace('-', '_', $locale);
+        $wanted = str_replace('-', '_', $locale);
+        $folders = array_map('basename', glob($langPath.'/*', GLOB_ONLYDIR) ?: []);
+        if (in_array($wanted, $folders, true)) {
+            return $wanted;
+        }
+        $language = strtolower(explode('_', $wanted)[0]);
+        foreach ($folders as $folder) {
+            if (strtolower(explode('_', $folder)[0]) === $language) {
+                return $folder;
+            }
+        }
+
+        return 'en';
     }
 }

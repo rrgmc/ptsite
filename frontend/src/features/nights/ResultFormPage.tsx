@@ -7,12 +7,13 @@ import { Button } from '@/components/Button'
 import { Card, PageHeader } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { TextField } from '@/components/TextField'
+import { t } from '@/i18n'
 import { formatTime, nightTitle, parseMoneyInput } from '@/lib/format'
 import { FinishingOrderFields } from './FinishingOrderFields'
 import { isEmptyPartial, moneyText, type ResultSeed, seedFromPartial } from './partialResult'
 import { currencySymbol } from '@/lib/site'
 
-const invalidMoney = 'Valor inválido. Use por exemplo 840 ou 840,50.'
+const invalidMoney = t.nights.invalidMoney
 
 /**
  * "Finalizar": enter or correct a night's result, designed for a phone at the table.
@@ -47,7 +48,7 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
   const finish = useFinishNight(n.id)
   const attendance = useAttendance(n.id)
   // Players who answered ALL IN come first in every picker, in the order they answered.
-  const confirmed = { label: 'Confirmados', ids: (attendance.data ?? []).filter((a) => a.answer === 'all_in').map((a) => a.player.id) }
+  const confirmed = { label: t.nights.confirmed, ids: (attendance.data ?? []).filter((a) => a.answer === 'all_in').map((a) => a.player.id) }
   const navigate = useNavigate()
   const percentages = season.percentages ?? []
 
@@ -88,7 +89,7 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
 
   return (
     <>
-      <PageHeader title={n.status === 'finished' ? 'Editar resultado' : 'Finalizar evento'} subtitle={nightTitle(n.starts_at)} />
+      <PageHeader title={n.status === 'finished' ? t.nights.resultForm.titleEdit : t.nights.resultForm.titleFinish} subtitle={nightTitle(n.starts_at)} />
 
       <Form
         className="flex max-w-xl flex-col gap-4"
@@ -99,45 +100,45 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
       >
         {partial && (
           <p role="status" className="rounded-md bg-primary-soft p-3">
-            Preenchido com o resultado parcial salvo por {partial.saved_by?.name ?? 'alguém'} às {formatTime(partial.saved_at!)}. Confira antes de finalizar.
+            {t.nights.resultForm.filledFromPartial({ name: partial.saved_by?.name ?? t.nights.someone, time: formatTime(partial.saved_at!) })}
           </p>
         )}
 
         <Card>
           <div className="flex flex-col gap-3">
             <TextField
-              label={`Pote (${currencySymbol})`}
+              label={t.nights.moneyFields.pot({ currency: currencySymbol })}
               inputMode="decimal"
               value={potText}
               onChange={setPotText}
-              placeholder="840,00"
+              placeholder={t.nights.moneyFields.potPlaceholder}
               isRequired
               errorMessage={apiError?.fieldError('pot') ?? (potText && pot === null ? invalidMoney : undefined)}
             />
             <TextField
-              label={`Pote ME (${currencySymbol})`}
-              description="A parte guardada para o Main Event. Use 0 se não houve."
+              label={t.nights.moneyFields.mainEventPot({ currency: currencySymbol })}
+              description={t.nights.resultForm.mainEventPotHelp}
               inputMode="decimal"
               value={mainEventPotText}
               onChange={setMainEventPotText}
-              placeholder="170,00"
+              placeholder={t.nights.moneyFields.mainEventPotPlaceholder}
               isRequired
               errorMessage={apiError?.fieldError('main_event_pot') ?? (mainEventPotText && mainEventPot === null ? invalidMoney : undefined)}
             />
             <TextField
-              label={`Time chip (${currencySymbol})`}
-              description="Rebuys e atrasos, guardado para a festa de fim de ano. Use 0 se não houve."
+              label={t.nights.moneyFields.timeChip({ currency: currencySymbol })}
+              description={t.nights.resultForm.timeChipHelp}
               inputMode="decimal"
               value={timeChipText}
               onChange={setTimeChipText}
-              placeholder="40,00"
+              placeholder={t.nights.moneyFields.timeChipPlaceholder}
               isRequired
               errorMessage={apiError?.fieldError('time_chip') ?? (timeChipText && timeChip === null ? invalidMoney : undefined)}
             />
           </div>
         </Card>
 
-        <Card title="Classificação do evento">
+        <Card title={t.nights.nightOrder}>
           <FinishingOrderFields
             percentages={percentages}
             players={players}
@@ -155,9 +156,9 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
 
         <div className="sticky bottom-20 flex flex-col gap-2 rounded-lg bg-surface p-3 shadow-raised sm:static sm:flex-row sm:bg-transparent sm:p-0 sm:shadow-none">
           <Button type="submit" isDisabled={!complete} isPending={finish.isPending} fullWidth>
-            {n.status === 'finished' ? 'Salvar correção' : 'Finalizar evento'}
+            {n.status === 'finished' ? t.nights.resultForm.saveCorrection : t.nights.resultForm.finish}
           </Button>
-          <Link to={`/nights/${n.id}`} className="inline-flex min-h-touch items-center justify-center rounded-md px-4 font-semibold text-primary">Cancelar</Link>
+          <Link to={`/nights/${n.id}`} className="inline-flex min-h-touch items-center justify-center rounded-md px-4 font-semibold text-primary">{t.common.cancel}</Link>
         </div>
       </Form>
     </>

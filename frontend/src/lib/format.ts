@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { currencySymbol, site } from './site'
 
 // Money, dates and ordinals in the site's language, money and time zone (site.locale, site.currency,
@@ -71,9 +72,9 @@ export function nightTitle(iso: string, number?: number): string {
   return `${site.nightTitlePrefix}${number ? ` ${number}` : ''} - ${formatDate(iso)}`
 }
 
-/** 1 → "1º" */
+/** 1 → "1º", or "1st" in English */
 export function ordinal(position: number): string {
-  return `${position}º`
+  return t.common.ordinal({ position })
 }
 
 /**

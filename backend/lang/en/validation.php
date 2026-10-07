@@ -197,6 +197,16 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'buy_in' => 'buy-in',
+        'default_place_id' => 'default place',
+        'login' => 'username or email',
+        'percentages' => 'percentage table',
+        'place_id' => 'place',
+        'schedule_time' => 'time',
+        'schedule_weekday' => 'day of the week',
+        'starts_at' => 'date and time',
+        'starts_on' => 'start date',
+    ],
 
 ];

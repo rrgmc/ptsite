@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { useLogout, useMe } from '@/api/queries'
 import { Loading } from '@/components/Feedback'
+import { t } from '@/i18n'
 import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { NavDrawer } from './NavDrawer'
 import { isSeasonScreen, navItemsFor } from './navigation'
@@ -38,7 +39,7 @@ export function AppLayout() {
           <NavLink to="/" className="flex shrink-0 items-center gap-2 font-display text-xl font-extrabold text-primary">
             <span aria-hidden>{site.logo}</span> {site.shortName}
           </NavLink>
-          <nav aria-label="Principal" className="hidden flex-wrap gap-1 sm:flex">
+          <nav aria-label={t.layout.mainNav} className="hidden flex-wrap gap-1 sm:flex">
             {items.filter((item) => item.top).map((item) => (
               // Words only: with the menu button and the season name, the icons do not fit the top bar.
               <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
@@ -52,7 +53,7 @@ export function AppLayout() {
             <SelectedSeasonLink />
             {/* On a phone "Sair" is in the menu, so the season name has room. */}
             <button type="button" onClick={logOut} className="hidden min-h-touch rounded-md px-2 font-semibold text-primary hover:bg-primary-soft sm:block">
-              Sair
+              {t.common.logOut}
             </button>
           </div>
         </div>
@@ -66,7 +67,7 @@ export function AppLayout() {
       {/* A new page opens at the top; going back returns to where the previous page was scrolled. */}
       <ScrollRestoration />
 
-      <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden">
+      <nav aria-label={t.layout.mainNav} className="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden">
         {items.filter((item) => item.tab).map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
             <span aria-hidden className="text-lg">{item.icon}</span>
@@ -89,7 +90,7 @@ function SelectedSeasonLink() {
       state={isSeasonScreen(pathname) ? { from: pathname } : undefined}
       className="flex min-h-touch min-w-0 items-center gap-1 rounded-md px-1 font-semibold text-primary hover:bg-primary-soft sm:px-2"
     >
-      <span className="sr-only">Temporada: </span>
+      <span className="sr-only">{t.layout.seasonPrefix} </span>
       <span className="truncate">{season.name}</span>
       <span aria-hidden>›</span>
     </Link>

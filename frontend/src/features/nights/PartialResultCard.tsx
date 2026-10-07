@@ -3,6 +3,7 @@ import type { Night, PartialResult } from '@/api/client'
 import { useMe, usePartialResult, useSeason } from '@/api/queries'
 import { Card } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
+import { t } from '@/i18n'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { PlayerLink } from '@/components/PlayerLink'
 import { formatMoney, formatPoints, formatTime, ordinal, shareOf } from '@/lib/format'
@@ -46,15 +47,15 @@ export function PartialResultCard({
 }) {
   const empty = isEmptyPartial(partial)
   const amounts = [
-    ['Pote Total', partial.pot],
-    ['Pote ME', partial.main_event_pot],
-    ['Time chip', partial.time_chip],
+    [t.nights.amounts.potTotal, partial.pot],
+    [t.nights.amounts.mainEventPot, partial.main_event_pot],
+    [t.nights.amounts.timeChip, partial.time_chip],
   ] as const
 
   return (
-    <Card className="max-w-md" title="Resultado parcial">
+    <Card className="max-w-md" title={t.nights.partialResult}>
       {empty ? (
-        <p className="text-muted">Ninguém preencheu o resultado parcial ainda.</p>
+        <p className="text-muted">{t.nights.partialCard.empty}</p>
       ) : (
         <>
           <ol className="divide-y divide-border/60">
@@ -74,7 +75,7 @@ export function PartialResultCard({
                     )}
                   </span>
                   {partial.pot && (
-                    <span className="shrink-0 tabular" aria-label={`Pontos do ${ordinal(position)} lugar`}>
+                    <span className="shrink-0 tabular" aria-label={t.nights.finishingOrder.positionPoints({ position: ordinal(position) })}>
                       {formatPoints(shareOf(partial.pot, percent))}
                     </span>
                   )}
@@ -92,7 +93,7 @@ export function PartialResultCard({
           </dl>
           {partial.saved_at && (
             <p className="mt-2 text-sm text-muted">
-              Salvo por {partial.saved_by?.name ?? 'alguém'} às {formatTime(partial.saved_at)}. Ainda não vale pontos.
+              {t.nights.partialCard.savedBy({ name: partial.saved_by?.name ?? t.nights.someone, time: formatTime(partial.saved_at) })}
             </p>
           )}
         </>
@@ -102,7 +103,7 @@ export function PartialResultCard({
           to={`/nights/${nightId}/partial-result`}
           className="mt-3 inline-flex min-h-touch w-full items-center justify-center rounded-md border border-border bg-surface px-4 font-semibold hover:bg-surface-sunken sm:w-auto"
         >
-          {empty ? 'Preencher resultado parcial' : 'Editar resultado parcial'}
+          {empty ? t.nights.partialCard.fill : t.nights.partialCard.edit}
         </Link>
       )}
     </Card>

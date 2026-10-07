@@ -1,5 +1,6 @@
 import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { PlayerStatistics } from '@/api/client'
+import { t } from '@/i18n'
 import { formatPoints, formatWhole } from '@/lib/format'
 import { playerProgressData, positionsData, SERIES_COLORS } from './chartData'
 import { cell, head, tick, tooltip } from './chartStyle'
@@ -21,15 +22,15 @@ export function PlayerPointsChart({ progress, perSeason, nickname }: { progress:
   const last = points.at(-1)
   return (
     <Figure
-      title="Pontos acumulados"
-      description={`Gráfico de linha: pontos acumulados de ${nickname}, por ${perSeason ? 'temporada' : 'evento'}.${last ? ` Chega a ${formatPoints(last.points)}.` : ''} Os números estão na tabela abaixo.`}
+      title={t.statistics.pointsProgress}
+      description={t.statistics.playerPointsDescription({ nickname, perSeason, total: last ? formatPoints(last.points) : undefined })}
       table={
         <table className="w-full border-collapse">
-          <caption className="sr-only">Pontos acumulados de {nickname} por {perSeason ? 'temporada' : 'evento'}</caption>
+          <caption className="sr-only">{t.statistics.playerPointsCaption({ nickname, perSeason })}</caption>
           <thead>
             <tr>
-              <th scope="col" className={`${head} text-left`}>{perSeason ? 'Temporada' : 'Evento'}</th>
-              <th scope="col" className={head}>Pontos</th>
+              <th scope="col" className={`${head} text-left`}>{perSeason ? t.common.season : t.common.night}</th>
+              <th scope="col" className={head}>{t.common.points}</th>
             </tr>
           </thead>
           <tbody>
@@ -49,10 +50,10 @@ export function PlayerPointsChart({ progress, perSeason, nickname }: { progress:
             <CartesianGrid stroke="var(--color-border)" vertical={false} />
             <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />
             <YAxis tick={tick} tickLine={false} axisLine={false} width={48} tickFormatter={formatWhole} />
-            <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} formatter={(value) => [formatPoints(Number(value)), 'Pontos']} />
+            <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} formatter={(value) => [formatPoints(Number(value)), t.common.points]} />
             <Line
               dataKey="points"
-              name="Pontos"
+              name={t.common.points}
               type="linear"
               stroke={SERIES_COLORS[0]}
               strokeWidth={2}
@@ -73,15 +74,15 @@ export function PlayerPositionsChart({ positions, nickname }: { positions: Playe
   const best = bars.reduce<(typeof bars)[number] | undefined>((top, bar) => (bar.count > (top?.count ?? 0) ? bar : top), undefined)
   return (
     <Figure
-      title="Posições"
-      description={`Gráfico de barras: vezes em que ${nickname} terminou em cada posição.${best ? ` A mais frequente é ${best.label}: ${best.count}.` : ''} Os números estão na tabela abaixo.`}
+      title={t.statistics.positions}
+      description={t.statistics.playerPositionsDescription({ nickname, best })}
       table={
         <table className="w-full border-collapse">
-          <caption className="sr-only">Vezes em que {nickname} terminou em cada posição</caption>
+          <caption className="sr-only">{t.statistics.playerPositionsCaption({ nickname })}</caption>
           <thead>
             <tr>
-              <th scope="col" className={`${head} text-left`}>Posição</th>
-              <th scope="col" className={head}>Vezes</th>
+              <th scope="col" className={`${head} text-left`}>{t.common.position}</th>
+              <th scope="col" className={head}>{t.statistics.times}</th>
             </tr>
           </thead>
           <tbody>
@@ -101,8 +102,8 @@ export function PlayerPositionsChart({ positions, nickname }: { positions: Playe
           <BarChart data={bars} layout="vertical" accessibilityLayer={false} margin={{ top: 0, right: 32, bottom: 0, left: 0 }} barCategoryGap={6}>
             <XAxis type="number" hide allowDecimals={false} />
             <YAxis type="category" dataKey="label" tick={{ ...tick, fill: 'var(--color-text)' }} tickLine={false} axisLine={false} width={40} interval={0} />
-            <Tooltip {...tooltip} cursor={{ fill: 'var(--color-surface-sunken)' }} formatter={(value) => [value, 'Vezes']} />
-            <Bar dataKey="count" name="Vezes" fill={SERIES_COLORS[0]} radius={[0, 4, 4, 0]} isAnimationActive={false}>
+            <Tooltip {...tooltip} cursor={{ fill: 'var(--color-surface-sunken)' }} formatter={(value) => [value, t.statistics.times]} />
+            <Bar dataKey="count" name={t.statistics.times} fill={SERIES_COLORS[0]} radius={[0, 4, 4, 0]} isAnimationActive={false}>
               <LabelList dataKey="count" position="right" fill="var(--color-text)" fontSize={12} />
             </Bar>
           </BarChart>

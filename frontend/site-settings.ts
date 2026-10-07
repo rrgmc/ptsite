@@ -65,6 +65,18 @@ export function loadSite(dir = siteDir): SiteSettings {
   }
 }
 
+/**
+ * The site's own wording: the texts of src/i18n it changes, in its messages.json. No file: no change. A name
+ * that is not in the catalogue stops the app when it starts, with the name in the message.
+ */
+export function loadMessages(dir = siteDir): Record<string, unknown> {
+  const file = join(dir, 'messages.json')
+  if (!existsSync(file)) return {}
+  const messages = JSON.parse(readFileSync(file, 'utf8')) as unknown
+  if (typeof messages !== 'object' || messages === null || Array.isArray(messages)) throw new Error(`${file} is not a JSON object.`)
+  return messages as Record<string, unknown>
+}
+
 /** The web app manifest. `id`, `start_url` and `scope` never change, so an installed app stays the same app. */
 export function manifestFor(site: SiteSettings) {
   return {

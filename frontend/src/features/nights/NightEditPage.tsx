@@ -8,6 +8,7 @@ import { Card, PageHeader } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextArea } from '@/components/TextArea'
+import { t } from '@/i18n'
 import { nightTitle } from '@/lib/format'
 import { plainText } from '@/lib/plainText'
 import { canEditNight } from './canEditNight'
@@ -30,7 +31,7 @@ export function NightEditPage() {
   if (night.error || places.error) return <ErrorBox error={night.error ?? places.error} />
   const n = night.data!
 
-  const header = <PageHeader title="Editar evento" subtitle={nightTitle(n.starts_at)} />
+  const header = <PageHeader title={t.nights.editNight} subtitle={nightTitle(n.starts_at)} />
   if (!canEditNight(n, me.data)) {
     return (
       <>
@@ -38,12 +39,12 @@ export function NightEditPage() {
         <Card className="max-w-xl">
           <p className="text-muted">
             {n.archived
-              ? 'Este evento foi cancelado.'
+              ? t.nights.nightCancelled
               : n.status === 'scheduled'
-                ? 'Só responsáveis e administradores editam um evento.'
-                : 'Só administradores editam um evento aberto ou finalizado.'}
+                ? t.nights.edit.onlyKeepersEdit
+                : t.nights.edit.onlyAdminsEdit}
           </p>
-          <Link to={`/nights/${nightId}`} className={`${backLink} mt-2 px-0`}>Voltar ao evento</Link>
+          <Link to={`/nights/${nightId}`} className={`${backLink} mt-2 px-0`}>{t.nights.backToNight}</Link>
         </Card>
       </>
     )
@@ -51,7 +52,7 @@ export function NightEditPage() {
 
   // An archived place is not in the list. The night keeps it unless another is picked.
   const options = [
-    { id: noPlace, label: 'Local a definir' },
+    { id: noPlace, label: t.nights.noPlace },
     ...(n.place && !places.data!.some((p) => p.id === n.place!.id) ? [{ id: n.place.id, label: n.place.name }] : []),
     ...places.data!.map((p) => ({ id: p.id, label: p.name })),
   ]
@@ -91,15 +92,15 @@ function NightEditForm({ night: n, options }: { night: Night; options: { id: num
       <Card>
         <div className="flex flex-col gap-3">
           <Select
-            label="Local"
+            label={t.common.place}
             options={options}
             selectedKey={placeId}
             onSelectionChange={(k) => setPlaceId(k === null ? noPlace : Number(k))}
             errorMessage={error?.fieldError('place_id')}
           />
           <TextArea
-            label="Descrição"
-            description="Aparece na página do evento."
+            label={t.nights.edit.description}
+            description={t.nights.edit.descriptionHelp}
             value={description}
             onChange={setDescription}
             maxLength={2000}
@@ -111,8 +112,8 @@ function NightEditForm({ night: n, options }: { night: Night; options: { id: num
       {error && !Object.keys(error.body.errors ?? {}).length && <ErrorBox error={error} />}
 
       <div className="flex flex-col gap-2 sm:flex-row">
-        <Button type="submit" isPending={update.isPending} fullWidth>Salvar</Button>
-        <Link to={`/nights/${n.id}`} className={backLink}>Voltar ao evento</Link>
+        <Button type="submit" isPending={update.isPending} fullWidth>{t.common.save}</Button>
+        <Link to={`/nights/${n.id}`} className={backLink}>{t.nights.backToNight}</Link>
       </div>
     </Form>
   )

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { Statistics } from '@/api/client'
+import { t } from '@/i18n'
 import { formatPoints, formatWhole } from '@/lib/format'
 import { progressData, SERIES_COLORS, winsData } from './chartData'
 import { cell, head, highestFirst, tick, tooltip } from './chartStyle'
@@ -17,7 +18,7 @@ export function Figure({ title, description, legend, table, children }: { title:
       {legend}
       <div role="img" aria-label={description}>{children}</div>
       <details className="mt-3 text-sm">
-        <summary className="cursor-pointer font-semibold text-primary">Ver dados em tabela</summary>
+        <summary className="cursor-pointer font-semibold text-primary">{t.statistics.viewTable}</summary>
         <div className="mt-2 overflow-x-auto">{table}</div>
       </details>
     </figure>
@@ -30,10 +31,10 @@ export function PointsProgressChart({ progress, perSeason }: { progress: Statist
   const leader = series[0]?.nickname
   return (
     <Figure
-      title="Pontos acumulados"
-      description={`Gráfico de linhas: pontos acumulados dos ${series.length} jogadores com mais pontos, por ${perSeason ? 'temporada' : 'evento'}.${leader ? ` ${leader} lidera.` : ''} Os números estão na tabela abaixo.`}
+      title={t.statistics.pointsProgress}
+      description={t.statistics.pointsProgressDescription({ count: series.length, perSeason, leader })}
       legend={
-        <ul aria-label="Legenda" className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <ul aria-label={t.statistics.legend} className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
           {series.map((s) => (
             <li key={s.key} className="flex items-center gap-2">
               <span aria-hidden className="inline-block h-1 w-5 rounded-full" style={{ background: s.color }} />
@@ -44,10 +45,10 @@ export function PointsProgressChart({ progress, perSeason }: { progress: Statist
       }
       table={
         <table className="w-full border-collapse">
-          <caption className="sr-only">Pontos acumulados por {perSeason ? 'temporada' : 'evento'}</caption>
+          <caption className="sr-only">{t.statistics.pointsProgressCaption({ perSeason })}</caption>
           <thead>
             <tr>
-              <th scope="col" className={`${head} text-left`}>{perSeason ? 'Temporada' : 'Evento'}</th>
+              <th scope="col" className={`${head} text-left`}>{perSeason ? t.common.season : t.common.night}</th>
               {series.map((s) => <th key={s.key} scope="col" className={head}>{s.nickname}</th>)}
             </tr>
           </thead>
@@ -95,15 +96,15 @@ export function WinsChart({ statistics }: { statistics: Statistics }) {
   const others = statistics.wins_not_shown
   return (
     <Figure
-      title="Vitórias"
-      description={`Gráfico de barras: vitórias por jogador.${bars[0] ? ` ${bars[0].nickname} tem mais: ${bars[0].wins}.` : ''} Os números estão na tabela abaixo.`}
+      title={t.statistics.wins}
+      description={t.statistics.winsDescription({ top: bars[0] })}
       table={
         <table className="w-full border-collapse">
-          <caption className="sr-only">Vitórias por jogador</caption>
+          <caption className="sr-only">{t.statistics.winsByPlayer}</caption>
           <thead>
             <tr>
-              <th scope="col" className={`${head} text-left`}>Jogador</th>
-              <th scope="col" className={head}>Vitórias</th>
+              <th scope="col" className={`${head} text-left`}>{t.common.player}</th>
+              <th scope="col" className={head}>{t.statistics.wins}</th>
             </tr>
           </thead>
           <tbody>
@@ -115,7 +116,7 @@ export function WinsChart({ statistics }: { statistics: Statistics }) {
             ))}
             {others > 0 && (
               <tr className="even:bg-surface-stripe">
-                <th scope="row" className={`${cell} text-left font-semibold`}>Outros</th>
+                <th scope="row" className={`${cell} text-left font-semibold`}>{t.statistics.others}</th>
                 <td className={cell}>{others}</td>
               </tr>
             )}
@@ -129,14 +130,14 @@ export function WinsChart({ statistics }: { statistics: Statistics }) {
           <BarChart data={bars} layout="vertical" accessibilityLayer={false} margin={{ top: 0, right: 32, bottom: 0, left: 0 }} barCategoryGap={6}>
             <XAxis type="number" hide allowDecimals={false} />
             <YAxis type="category" dataKey="nickname" tick={{ ...tick, fill: 'var(--color-text)' }} tickLine={false} axisLine={false} width={96} interval={0} />
-            <Tooltip {...tooltip} cursor={{ fill: 'var(--color-surface-sunken)' }} formatter={(value) => [value, 'Vitórias']} />
-            <Bar dataKey="wins" name="Vitórias" fill={SERIES_COLORS[0]} radius={[0, 4, 4, 0]} isAnimationActive={false}>
+            <Tooltip {...tooltip} cursor={{ fill: 'var(--color-surface-sunken)' }} formatter={(value) => [value, t.statistics.wins]} />
+            <Bar dataKey="wins" name={t.statistics.wins} fill={SERIES_COLORS[0]} radius={[0, 4, 4, 0]} isAnimationActive={false}>
               <LabelList dataKey="wins" position="right" fill="var(--color-text)" fontSize={12} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
-      {others > 0 && <p className="mt-2 text-sm text-muted">Outros: {others}</p>}
+      {others > 0 && <p className="mt-2 text-sm text-muted">{t.statistics.othersCount({ count: others })}</p>}
     </Figure>
   )
 }

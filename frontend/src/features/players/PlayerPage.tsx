@@ -7,6 +7,7 @@ import { Badge, Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { PeriodSwitch } from '@/components/PeriodSwitch'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { StatTiles } from '@/components/StatTiles'
+import { t } from '@/i18n'
 import { formatDate, formatPoints, fullNameIfDifferent, nightTitle, ordinal } from '@/lib/format'
 import { playerImageUrl } from '@/lib/playerImages'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
@@ -25,7 +26,7 @@ export function PlayerPage() {
 
   return (
     <PlayerScreen playerId={playerId} allTime={false} period={season?.name}>
-      {isPending ? <Loading /> : error ? <ErrorBox error={error} /> : !season ? <Empty>Nenhuma temporada cadastrada.</Empty> : <StatisticsOf query={statistics} />}
+      {isPending ? <Loading /> : error ? <ErrorBox error={error} /> : !season ? <Empty>{t.players.noSeason}</Empty> : <StatisticsOf query={statistics} />}
     </PlayerScreen>
   )
 }
@@ -36,7 +37,7 @@ export function AllTimePlayerPage() {
   const statistics = usePlayerStatistics(playerId, null)
 
   return (
-    <PlayerScreen playerId={playerId} allTime period="Todas as temporadas">
+    <PlayerScreen playerId={playerId} allTime period={t.players.allSeasons}>
       <StatisticsOf query={statistics} />
     </PlayerScreen>
   )
@@ -55,7 +56,7 @@ function PlayerScreen({ playerId, allTime, period, children }: { playerId: numbe
 
   return (
     <>
-      <Link to="/players" className={`${action} no-underline`}>‹ Jogadores</Link>
+      <Link to="/players" className={`${action} no-underline`}>{t.players.backToList}</Link>
       {player.isPending ? (
         <Loading />
       ) : player.error ? (
@@ -65,7 +66,7 @@ function PlayerScreen({ playerId, allTime, period, children }: { playerId: numbe
           <PlayerProfile player={player.data!} canEdit={me.data?.abilities.manage_players === true} isSelf={me.data?.player?.id === playerId} />
           <section aria-labelledby="player-statistics">
             <div className="mb-3">
-              <h2 id="player-statistics" className="font-display text-xl font-bold">Estatísticas</h2>
+              <h2 id="player-statistics" className="font-display text-xl font-bold">{t.players.statistics}</h2>
               {period && <p className="text-muted wrap-anywhere">{period}</p>}
             </div>
             <PeriodSwitch seasonTo={`/players/${playerId}`} allTimeTo={`/players/${playerId}/all`} allTime={allTime} />
@@ -90,8 +91,8 @@ export function PlayerProfile({ player, canEdit, isSelf }: { player: PlayerDetai
         action={
           (canEdit || isSelf) && (
             <span className="flex flex-wrap gap-x-4">
-              {isSelf && <Link to="/profile" className={action}>Meu perfil</Link>}
-              {canEdit && <Link to={`/admin/players/${player.id}`} className={action}>Editar</Link>}
+              {isSelf && <Link to="/profile" className={action}>{t.players.myProfile}</Link>}
+              {canEdit && <Link to={`/admin/players/${player.id}`} className={action}>{t.common.edit}</Link>}
             </span>
           )
         }
@@ -105,7 +106,7 @@ export function PlayerProfile({ player, canEdit, isSelf }: { player: PlayerDetai
         <div className="grid grid-cols-[auto_1fr] items-start gap-x-4 gap-y-3 sm:grid-rows-[auto_1fr] sm:gap-y-2">
           <div className="sm:row-span-2">
             {photo ? (
-              <img src={photo} alt={`Foto de ${player.nickname}`} className="w-24 max-w-[30vw] rounded-md bg-surface-sunken" />
+              <img src={photo} alt={t.players.photoAlt({ nickname: player.nickname })} className="w-24 max-w-[30vw] rounded-md bg-surface-sunken" />
             ) : (
               <PlayerThumbnail player={player} size="lg" />
             )}
@@ -113,19 +114,19 @@ export function PlayerProfile({ player, canEdit, isSelf }: { player: PlayerDetai
           {(player.archived || player.status === 'inactive' || player.email || player.birth_date) && (
             <div className="flex min-w-0 flex-col gap-2">
               {(player.archived || player.status === 'inactive') && (
-                <p>{player.archived ? <Badge tone="danger">arquivado</Badge> : <Badge>inativo</Badge>}</p>
+                <p>{player.archived ? <Badge tone="danger">{t.common.archived}</Badge> : <Badge>{t.common.inactive}</Badge>}</p>
               )}
               {(player.email || player.birth_date) && (
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm wrap-anywhere sm:grid-cols-[auto_1fr]">
                   {player.email && (
                     <>
-                      <dt className="text-muted">E-mail</dt>
+                      <dt className="text-muted">{t.players.email}</dt>
                       <dd className="wrap-anywhere"><a href={`mailto:${player.email}`} className={link}>{player.email}</a></dd>
                     </>
                   )}
                   {player.birth_date && (
                     <>
-                      <dt className="text-muted">Nascimento</dt>
+                      <dt className="text-muted">{t.players.birthDate}</dt>
                       <dd>{formatDate(player.birth_date)}</dd>
                     </>
                   )}
@@ -152,29 +153,29 @@ export function PlayerStatisticsView({ statistics, nickname }: { statistics: Pla
     <div className="flex flex-col gap-4">
       <StatTiles
         tiles={[
-          { label: allTime ? 'Posição geral' : 'Posição', value: statistics.rank === null ? '—' : ordinal(statistics.rank) },
-          { label: 'Pontos', value: formatPoints(statistics.points) },
-          { label: 'Eventos pontuando', value: statistics.nights_scored },
-          { label: 'Vitórias', value: statistics.wins },
+          { label: allTime ? t.players.overallPosition : t.common.position, value: statistics.rank === null ? '—' : ordinal(statistics.rank) },
+          { label: t.common.points, value: formatPoints(statistics.points) },
+          { label: t.players.nightsScored, value: statistics.nights_scored },
+          { label: t.players.wins, value: statistics.wins },
         ]}
       />
 
       {statistics.nights_scored === 0 ? (
-        <Empty>{allTime ? 'Ainda não pontuou.' : 'Ainda não pontuou nesta temporada.'}</Empty>
+        <Empty>{allTime ? t.players.notScoredYet : t.players.notScoredThisSeason}</Empty>
       ) : (
         <>
           {allTime && (
-            <Card title="Por temporada">
+            <Card title={t.players.bySeason}>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
-                  <caption className="sr-only">Classificação de {nickname} em cada temporada</caption>
+                  <caption className="sr-only">{t.players.bySeasonCaption({ nickname })}</caption>
                   <thead>
                     <tr className="border-b border-border text-left text-xs uppercase text-muted">
-                      <th scope="col" className="px-2 py-2">Temporada</th>
-                      <th scope="col" className={th}>Posição</th>
-                      <th scope="col" className={`${th} hidden sm:table-cell`}>Pontuou</th>
-                      <th scope="col" className={`${th} hidden sm:table-cell`}>Vitórias</th>
-                      <th scope="col" className={`${th} pr-2`}>Pontos</th>
+                      <th scope="col" className="px-2 py-2">{t.common.season}</th>
+                      <th scope="col" className={th}>{t.common.position}</th>
+                      <th scope="col" className={`${th} hidden sm:table-cell`}>{t.players.scored}</th>
+                      <th scope="col" className={`${th} hidden sm:table-cell`}>{t.players.wins}</th>
+                      <th scope="col" className={`${th} pr-2`}>{t.common.points}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -183,7 +184,7 @@ export function PlayerStatisticsView({ statistics, nickname }: { statistics: Pla
                         <th scope="row" className="px-2 py-2 text-left font-normal">
                           <Link to={`/seasons/${row.season_id}`} className={`${link} wrap-anywhere`}>{row.season_name}</Link>
                           <span className="block text-xs text-muted sm:hidden">
-                            {row.nights_scored} {row.nights_scored === 1 ? 'evento' : 'eventos'} · {row.wins} {row.wins === 1 ? 'vitória' : 'vitórias'}
+                            {t.players.nightsAndWins({ nights: row.nights_scored, wins: row.wins })}
                           </span>
                         </th>
                         <td className={td}>{ordinal(row.rank)}</td>
@@ -198,19 +199,19 @@ export function PlayerStatisticsView({ statistics, nickname }: { statistics: Pla
             </Card>
           )}
 
-          <Suspense fallback={<Loading label="Carregando gráficos…" />}>
+          <Suspense fallback={<Loading label={t.players.loadingCharts} />}>
             <PlayerCharts statistics={statistics} nickname={nickname} />
           </Suspense>
 
-          <Card title="Resultados">
+          <Card title={t.players.results}>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
-                <caption className="sr-only">Eventos em que {nickname} pontuou, do mais recente ao mais antigo</caption>
+                <caption className="sr-only">{t.players.resultsCaption({ nickname })}</caption>
                 <thead>
                   <tr className="border-b border-border text-left text-xs uppercase text-muted">
-                    <th scope="col" className="px-2 py-2">Evento</th>
-                    <th scope="col" className={th}>Posição</th>
-                    <th scope="col" className={`${th} pr-2`}>Pontos</th>
+                    <th scope="col" className="px-2 py-2">{t.common.night}</th>
+                    <th scope="col" className={th}>{t.common.position}</th>
+                    <th scope="col" className={`${th} pr-2`}>{t.common.points}</th>
                   </tr>
                 </thead>
                 <tbody>

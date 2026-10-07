@@ -58,7 +58,7 @@ jobs:
           git diff --exit-code -- ../frontend/openapi.json || (echo "::error::frontend/openapi.json is out of date. Run: php artisan scramble:export --path=../frontend/openapi.json, then npm run api:types in frontend." && exit 1)
 
   example-site:
-    name: Example site (the package and the frontend, built for another site)
+    name: Example site (the package and the frontend, built for another site in English)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     services:
@@ -106,10 +106,13 @@ jobs:
           php artisan serve --port=8000 > storage/logs/serve.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/up > /dev/null && break; sleep 1; done
           test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Accept: application/json' http://127.0.0.1:8000/api/v1/seasons)" = 401
-          curl -s -H 'Accept: application/json' -H 'Content-Type: application/json' -d '{"username":"agate","password":"errada"}'             http://127.0.0.1:8000/api/v1/login | grep -q 'senha incorretos'
+          curl -s -H 'Accept: application/json' -H 'Content-Type: application/json' -d '{"username":"agate","password":"errada"}'             http://127.0.0.1:8000/api/v1/login | grep -q 'Wrong username or password'
+      - name: The app is in English, with this site's own wording for two texts
+        run: grep -rqF 'Keep me signed in for 30 days' public/app/assets
       - name: The page and the installed app carry the site's name and main color
         run: |
-          curl -s http://127.0.0.1:8000/app/ | grep -q '<title>Clube Exemplo</title>'
+          curl -s http://127.0.0.1:8000/app/ | grep -q '<title>Example Club</title>'
+          curl -s http://127.0.0.1:8000/app/ | grep -q '<html lang="en-US">'
           curl -s http://127.0.0.1:8000/app/manifest.webmanifest | grep -q '"theme_color": "#1e3a8a"'
 
   frontend:

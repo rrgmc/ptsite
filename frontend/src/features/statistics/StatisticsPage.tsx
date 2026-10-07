@@ -7,6 +7,7 @@ import { PeriodSwitch } from '@/components/PeriodSwitch'
 import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { RankedList, type RankedRow } from '@/components/RankedList'
+import { t } from '@/i18n'
 import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { PointsProgressChart, WinsChart } from './StatisticsCharts'
@@ -18,20 +19,20 @@ export function StatisticsPage() {
 
   if (isPending) return <Loading />
   if (error) return <ErrorBox error={error} />
-  if (!season) return <Empty>Nenhuma temporada cadastrada.</Empty>
+  if (!season) return <Empty>{t.statistics.noSeason}</Empty>
 
   return <StatisticsScreen subtitle={season.name} allTime={false} query={statistics} />
 }
 
 /** "Estatísticas" of every season. */
 export function AllTimeStatisticsPage() {
-  return <StatisticsScreen subtitle="Todas as temporadas" allTime query={useStatistics(null)} />
+  return <StatisticsScreen subtitle={t.statistics.allSeasons} allTime query={useStatistics(null)} />
 }
 
 function StatisticsScreen({ subtitle, allTime, query }: { subtitle: string; allTime: boolean; query: ReturnType<typeof useStatistics> }) {
   return (
     <>
-      <PageHeader title="Estatísticas" subtitle={subtitle} />
+      <PageHeader title={t.statistics.title} subtitle={subtitle} />
       <PeriodSwitch seasonTo="/statistics" allTimeTo="/statistics/all" allTime={allTime} />
       {query.isPending ? <Loading /> : query.error ? <ErrorBox error={query.error} /> : <StatisticsView statistics={query.data!} />}
     </>
@@ -55,12 +56,12 @@ function playerRows(list: RankedListData, value: (row: RankedListData['rows'][nu
 /** The numbers of one view: the summary line, the two charts and the top ten lists. */
 export function StatisticsView({ statistics }: { statistics: Statistics }) {
   const allTime = statistics.season_id === null
-  if (statistics.nights_count === 0) return <Empty>Nenhum evento finalizado ainda.</Empty>
+  if (statistics.nights_count === 0) return <Empty>{t.statistics.noNights}</Empty>
 
   return (
     <div className="flex flex-col gap-4">
       <p className="text-muted">
-        {statistics.nights_count} {statistics.nights_count === 1 ? 'evento' : 'eventos'} · Pote total {formatMoney(statistics.pot_total)}
+        {t.statistics.summary({ count: statistics.nights_count, pot: formatMoney(statistics.pot_total) })}
       </p>
 
       {/* On a wide screen the line chart takes three quarters of the width. */}
@@ -72,29 +73,29 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <Card title="Pontuação Total">
+        <Card title={t.statistics.totalPoints}>
           <RankedList
-            caption="Jogadores por pontuação total"
-            labelHeader="Jogador"
-            valueHeader="Pontos"
+            caption={t.statistics.totalPointsCaption}
+            labelHeader={t.common.player}
+            valueHeader={t.common.points}
             rows={playerRows(statistics.total_points, (row) => formatPoints(row.amount ?? 0))}
             tiedNotShown={statistics.total_points.tied_not_shown}
           />
         </Card>
-        <Card title="Eventos Pontuando">
+        <Card title={t.statistics.nightsScored}>
           <RankedList
-            caption="Jogadores por eventos em que pontuaram"
-            labelHeader="Jogador"
-            valueHeader="Eventos"
+            caption={t.statistics.nightsScoredCaption}
+            labelHeader={t.common.player}
+            valueHeader={t.common.nights}
             rows={playerRows(statistics.nights_scored, (row) => row.count ?? 0)}
             tiedNotShown={statistics.nights_scored.tied_not_shown}
           />
         </Card>
-        <Card title="Maiores Potes">
+        <Card title={t.statistics.biggestPots}>
           <RankedList
-            caption="Eventos por pote"
-            labelHeader="Evento"
-            valueHeader="Pote"
+            caption={t.statistics.biggestPotsCaption}
+            labelHeader={t.common.night}
+            valueHeader={t.common.pot}
             rows={statistics.biggest_pots.rows.map((row) => ({
               key: row.night!.id,
               rank: row.rank,
@@ -109,23 +110,23 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
             tiedNotShown={statistics.biggest_pots.tied_not_shown}
           />
         </Card>
-        <Card title="Locais">
-          {statistics.places.rows.length === 0 ? <Empty>Nenhum evento com local.</Empty> : (
+        <Card title={t.statistics.places}>
+          {statistics.places.rows.length === 0 ? <Empty>{t.statistics.noPlaces}</Empty> : (
             <RankedList
-              caption="Locais por número de eventos"
-              labelHeader="Local"
-              valueHeader="Eventos"
+              caption={t.statistics.placesCaption}
+              labelHeader={t.common.place}
+              valueHeader={t.common.nights}
               rows={statistics.places.rows.map((row) => ({ key: row.place!.id, rank: row.rank, label: <span className="font-semibold wrap-anywhere">{row.place!.name}</span>, value: row.count ?? 0 }))}
               tiedNotShown={statistics.places.tied_not_shown}
             />
           )}
         </Card>
         {statistics.positions.map((list) => (
-          <Card key={list.position} title={`Posição: ${ordinal(list.position!)}`}>
+          <Card key={list.position} title={t.statistics.positionTitle({ position: ordinal(list.position!) })}>
             <RankedList
-              caption={`Jogadores por vezes em ${ordinal(list.position!)} lugar`}
-              labelHeader="Jogador"
-              valueHeader="Vezes"
+              caption={t.statistics.positionCaption({ position: ordinal(list.position!) })}
+              labelHeader={t.common.player}
+              valueHeader={t.statistics.times}
               rows={playerRows(list, (row) => row.count ?? 0)}
               tiedNotShown={list.tied_not_shown}
             />

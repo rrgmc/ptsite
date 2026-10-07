@@ -6,6 +6,8 @@ import { useCompletePasswordReset, usePasswordReset } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { NewPasswordFields } from '@/components/NewPasswordFields'
+import { t } from '@/i18n'
+import { rich } from '@/i18n/rich'
 import { AuthShell, authLinkClass } from './AuthShell'
 
 /**
@@ -28,24 +30,24 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <AuthShell title="Nova senha">
+    <AuthShell title={t.auth.reset.title}>
       <div className="flex flex-col gap-4 rounded-lg bg-surface p-5 shadow-card">
-        <h2 className="font-display text-xl font-bold">Nova senha</h2>
+        <h2 className="font-display text-xl font-bold">{t.auth.reset.title}</h2>
         {complete.isSuccess ? (
           <>
-            <p role="status">Senha alterada. Entre com a nova senha.</p>
-            <Link to="/login" className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary">Entrar</Link>
+            <p role="status">{t.auth.reset.done}</p>
+            <Link to="/login" className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary">{t.auth.logIn}</Link>
           </>
         ) : reset.isPending && token !== '' ? (
           <Loading />
         ) : !reset.data ? (
           <>
             {token === '' ? (
-              <p role="alert" className="rounded-md border border-danger bg-danger-soft p-4 text-danger">Este link não é válido. Peça um novo link.</p>
+              <p role="alert" className="rounded-md border border-danger bg-danger-soft p-4 text-danger">{t.auth.reset.invalidLink}</p>
             ) : (
               <ErrorBox error={reset.error} />
             )}
-            <Link to="/forgot-password" className={authLinkClass}>Pedir um novo link</Link>
+            <Link to="/forgot-password" className={authLinkClass}>{t.auth.reset.requestNewLink}</Link>
           </>
         ) : (
           <Form
@@ -57,19 +59,19 @@ export function ResetPasswordPage() {
               complete.mutate({ password })
             }}
           >
-            <p>Escolha uma nova senha para o usuário <strong>{reset.data.username}</strong>.</p>
+            <p>{rich(t.auth.reset.choose, { username: <strong>{reset.data.username}</strong> })}</p>
             <NewPasswordFields password={password} repeated={repeated} onPasswordChange={typing(setPassword)} onRepeatedChange={typing(setRepeated)} mismatch={mismatch} errorMessage={error?.fieldError('password')} />
             {complete.error && !error?.fieldError('password') && (
               <>
                 <ErrorBox error={complete.error} />
-                <Link to="/forgot-password" className={authLinkClass}>Pedir um novo link</Link>
+                <Link to="/forgot-password" className={authLinkClass}>{t.auth.reset.requestNewLink}</Link>
               </>
             )}
-            <Button type="submit" isPending={complete.isPending} fullWidth>Salvar nova senha</Button>
+            <Button type="submit" isPending={complete.isPending} fullWidth>{t.auth.reset.save}</Button>
           </Form>
         )}
       </div>
-      {!complete.isSuccess && <Link to="/login" className={`mt-2 ${authLinkClass}`}>Voltar para o login</Link>}
+      {!complete.isSuccess && <Link to="/login" className={`mt-2 ${authLinkClass}`}>{t.auth.forgot.backToLogin}</Link>}
     </AuthShell>
   )
 }

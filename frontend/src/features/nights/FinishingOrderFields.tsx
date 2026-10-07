@@ -1,5 +1,6 @@
 import type { Player } from '@/api/client'
 import { PlayerPicker } from '@/components/PlayerPicker'
+import { t } from '@/i18n'
 import { formatPoints, ordinal, shareOf } from '@/lib/format'
 
 /**
@@ -35,7 +36,7 @@ export function FinishingOrderFields({
       {percentages.map((p, i) => (
         <li key={p.position} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
           <PlayerPicker
-            label={`${ordinal(p.position)} lugar · ${p.percent}%`}
+            label={t.nights.finishingOrder.positionLabel({ position: ordinal(p.position), percent: p.percent })}
             players={players}
             value={order[i] ?? null}
             onChange={(player) => onChange(order.map((x, j) => (j === i ? player : x)))}
@@ -45,7 +46,7 @@ export function FinishingOrderFields({
             errorMessage={fieldError?.(`positions.${p.position}`)}
             firstGroup={firstGroup}
           />
-          <output className="min-h-touch min-w-20 content-center text-right font-bold tabular" aria-label={`Pontos do ${ordinal(p.position)} lugar`}>
+          <output className="min-h-touch min-w-20 content-center text-right font-bold tabular" aria-label={t.nights.finishingOrder.positionPoints({ position: ordinal(p.position) })}>
             {pot ? formatPoints(shareOf(pot, p.percent)) : '—'}
           </output>
         </li>

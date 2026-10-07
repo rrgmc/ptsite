@@ -36,7 +36,7 @@ final class RescheduleNight
                 ->whereDate('starts_at', $day)
                 ->exists();
             if ($taken) {
-                throw new RuleViolation('night.date_taken', 'starts_at', ['date' => CarbonImmutable::parse($day)->format('d/m/Y')]);
+                throw new RuleViolation('night.date_taken', 'starts_at', ['date' => CarbonImmutable::parse($day)->isoFormat('L')]);
             }
 
             $before = NightSnapshot::of($night);

@@ -1,3 +1,5 @@
+import { t } from '@/i18n'
+
 /** The longest side of a picture the site sends, in pixels. The server makes the photo with 600 x 800. */
 export const maxPictureSide = 1600
 
@@ -26,7 +28,7 @@ export async function shrinkPicture(file: Blob): Promise<Blob> {
     context.imageSmoothingQuality = 'high'
     context.drawImage(picture, 0, 0, width, height)
     return await new Promise<Blob>((resolve, reject) =>
-      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('The canvas gave no image'))), 'image/jpeg', 0.9),
+      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error(t.api.pictureFailed))), 'image/jpeg', 0.9),
     )
   } finally {
     picture.close()
