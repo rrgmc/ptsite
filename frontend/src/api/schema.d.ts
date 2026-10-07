@@ -663,6 +663,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/seasons/top-standings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every season that is not archived, newest first, each with the first ten of its standings.
+         *     When the tenth place is shared, tied_not_shown counts the players left out
+         */
+        get: operations["season.topStandings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/seasons/{season}": {
         parameters: {
             query?: never;
@@ -1306,6 +1326,14 @@ export interface components {
             }[];
             nights_count?: number;
             updated_at: string | null;
+        };
+        /** SeasonTopStandingsResource */
+        SeasonTopStandingsResource: {
+            season: components["schemas"]["SeasonResource"];
+            /** @description The first ten of the standings. Empty before the season's first finished night. */
+            rows: components["schemas"]["StandingResource"][];
+            /** @description Players left out who have the same total as the last one shown. */
+            tied_not_shown: number;
         };
         /** SimulateRequest */
         SimulateRequest: {
@@ -2890,6 +2918,29 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    "season.topStandings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `SeasonTopStandingsResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SeasonTopStandingsResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "season.show": {

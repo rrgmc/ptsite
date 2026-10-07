@@ -15,6 +15,7 @@ use PTSite\App\Http\Resources\CalendarEntryResource;
 use PTSite\App\Http\Resources\NightResource;
 use PTSite\App\Http\Resources\PlannedDateResource;
 use PTSite\App\Http\Resources\SeasonResource;
+use PTSite\App\Http\Resources\SeasonTopStandingsResource;
 use PTSite\App\Http\Resources\SimulatedStandingResource;
 use PTSite\App\Http\Resources\StandingResource;
 use PTSite\App\Http\Resources\SuggestedNightResource;
@@ -22,6 +23,7 @@ use PTSite\App\Models\Season;
 use PTSite\App\Queries\PlanSeasonNights;
 use PTSite\App\Queries\SeasonCalendar;
 use PTSite\App\Queries\SeasonStandings;
+use PTSite\App\Queries\SeasonsTopStandings;
 use PTSite\App\Queries\SimulateRanking;
 use PTSite\App\Queries\SuggestNightDates;
 
@@ -47,6 +49,23 @@ class SeasonController extends Controller
         $season = Season::query()->current()->with(['defaultPlace', 'percentages'])->withCount(self::counts())->first();
 
         return $season ? new SeasonResource($season) : response()->json(['message' => 'Nenhuma temporada aberta.'], 404);
+    }
+
+    /**
+     * Every season that is not archived, newest first, each with the first ten of its standings.
+     * When the tenth place is shared, tied_not_shown counts the players left out.
+     */
+    public function topStandings(Request $request, SeasonsTopStandings $top): AnonymousResourceCollection
+    {
+        $seasons = Season::query()
+            ->notArchived()
+            ->with(['defaultPlace', 'percentages'])
+            ->withCount(self::counts())
+            ->orderByDesc('starts_on')
+            ->orderByDesc('id')
+            ->get();
+
+        return SeasonTopStandingsResource::collection($top($seasons, $request->user()->isAdmin()));
     }
 
     public function show(Season $season): SeasonResource

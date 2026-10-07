@@ -2550,6 +2550,41 @@
                 }
             }
         },
+        "/v1/seasons/top-standings": {
+            "get": {
+                "operationId": "season.topStandings",
+                "summary": "Every season that is not archived, newest first, each with the first ten of its standings.\nWhen the tenth place is shared, tied_not_shown counts the players left out",
+                "tags": [
+                    "Season"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `SeasonTopStandingsResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/SeasonTopStandingsResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/seasons/{season}": {
             "get": {
                 "operationId": "season.show",
@@ -4955,6 +4990,31 @@
                     "updated_at"
                 ],
                 "title": "SeasonResource"
+            },
+            "SeasonTopStandingsResource": {
+                "type": "object",
+                "properties": {
+                    "season": {
+                        "$ref": "#/components/schemas/SeasonResource"
+                    },
+                    "rows": {
+                        "type": "array",
+                        "description": "The first ten of the standings. Empty before the season's first finished night.",
+                        "items": {
+                            "$ref": "#/components/schemas/StandingResource"
+                        }
+                    },
+                    "tied_not_shown": {
+                        "type": "integer",
+                        "description": "Players left out who have the same total as the last one shown."
+                    }
+                },
+                "required": [
+                    "season",
+                    "rows",
+                    "tied_not_shown"
+                ],
+                "title": "SeasonTopStandingsResource"
             },
             "SimulateRequest": {
                 "type": "object",
