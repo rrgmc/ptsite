@@ -25,7 +25,7 @@ final class VerifyLeagueData
         Night::query()->finished()->with(['results', 'season.percentages'])->orderBy('starts_at')
             ->each(function (Night $night) use (&$problems, &$checked) {
                 $checked++;
-                $label = "Night {$night->id} ({$night->starts_at->format('d/m/Y')}, {$night->season->name})";
+                $label = "Night {$night->id} ({$night->starts_at->toDateString()}, {$night->season->name})";
                 try {
                     $table = PercentageTable::of($night->season->percentByPosition());
                 } catch (RuleViolation $e) {

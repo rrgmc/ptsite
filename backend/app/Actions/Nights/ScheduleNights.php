@@ -31,7 +31,7 @@ final class ScheduleNights
         foreach ($startsAt as $i => $value) {
             $date = CarbonImmutable::parse($value);
             if ($taken->has($date->toDateString())) {
-                throw new RuleViolation('plan.date_taken', "starts_at.{$i}", ['date' => $date->format('d/m/Y')]);
+                throw new RuleViolation('plan.date_taken', "starts_at.{$i}", ['date' => $date->isoFormat('L')]);
             }
             $taken->put($date->toDateString(), true); // the same date twice in one request
         }

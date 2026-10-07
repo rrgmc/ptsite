@@ -1,13 +1,13 @@
 @if (count($links) === 1)
-Alguém pediu para redefinir a senha do usuário {!! $links[0]['username'] !!} no site {!! $site !!}.
+{!! __('mail.password_reset.one_account', ['username' => $links[0]['username'], 'site' => $site]) !!}
 
-Abra o link para escolher uma nova senha:
+{!! __('mail.password_reset.open_link') !!}
 
 {!! $links[0]['url'] !!}
 @else
-Alguém pediu para redefinir a senha no site {!! $site !!}.
+{!! __('mail.password_reset.many_accounts', ['site' => $site]) !!}
 
-Este e-mail está em mais de um acesso. Use o link do usuário que você quer alterar:
+{!! __('mail.password_reset.choose_account') !!}
 @foreach ($links as $link)
 
 {!! $link['username'] !!}:
@@ -15,8 +15,8 @@ Este e-mail está em mais de um acesso. Use o link do usuário que você quer al
 @endforeach
 @endif
 
-O link vale por {{ $expireMinutes }} minutos e só pode ser usado uma vez.
+{!! __('mail.password_reset.expires', ['minutes' => $expireMinutes]) !!}
 
-Se não foi você, ignore esta mensagem: a senha continua a mesma.
+{!! __('mail.password_reset.ignore') !!}
 
 {!! $signature !!}

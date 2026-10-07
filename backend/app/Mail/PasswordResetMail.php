@@ -17,7 +17,7 @@ final class PasswordResetMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: config('app.name').': redefinir a senha');
+        return new Envelope(subject: __('mail.password_reset.subject', ['site' => config('app.name')]));
     }
 
     public function content(): Content
