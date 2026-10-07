@@ -7,6 +7,7 @@ import { t } from '@/i18n'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { PlayerLink } from '@/components/PlayerLink'
 import { formatMoney, formatPoints, formatTime, ordinal, shareOf } from '@/lib/format'
+import { amountRows } from './amounts'
 import { isEmptyPartial } from './partialResult'
 
 /** The partial result of an open night, loaded from the API, with the way to fill it for those who may. */
@@ -46,11 +47,7 @@ export function PartialResultCard({
   canSave: boolean
 }) {
   const empty = isEmptyPartial(partial)
-  const amounts = [
-    [t.nights.amounts.potTotal, partial.pot],
-    [t.nights.amounts.mainEventPot, partial.main_event_pot],
-    [t.nights.amounts.timeChip, partial.time_chip],
-  ] as const
+  const amounts = amountRows({ pot: partial.pot, mainEventPot: partial.main_event_pot, timeChip: partial.time_chip })
 
   return (
     <Card className="max-w-md" title={t.nights.partialResult}>

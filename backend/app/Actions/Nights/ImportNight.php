@@ -21,7 +21,7 @@ final class ImportNight
     ) {}
 
     /** @param array<int, int> $playerByPosition position => player id */
-    public function __invoke(User $user, Season $season, string $startsAt, ?int $placeId, string $pot, string $mainEventPot, string $timeChip, array $playerByPosition): Night
+    public function __invoke(User $user, Season $season, string $startsAt, ?int $placeId, string $pot, ?string $mainEventPot, ?string $timeChip, array $playerByPosition): Night
     {
         Gate::forUser($user)->authorize('create', Night::class);
         if ($season->isArchived()) {

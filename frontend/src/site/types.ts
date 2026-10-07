@@ -1,3 +1,5 @@
+import type { Features } from './features.ts'
+
 /** A site's settings, as written in its site.json (see site/README.md). */
 export interface SiteFile {
   name: string
@@ -10,6 +12,8 @@ export interface SiteFile {
   timeZone: string
   brandColor: string
   siteDomain?: string
+  /** The features the site turns on or off. One that is left out keeps its default. */
+  features?: Partial<Features>
   /** Read by the deploy scripts only. */
   packageName?: string
 }
@@ -34,4 +38,6 @@ export interface SiteSettings {
   timeZone: string
   /** The main color, "#rrggbb". */
   brandColor: string
+  /** Which features the site has. Read them with `hasFeature` of src/lib/features.ts. */
+  features: Features
 }

@@ -11,6 +11,7 @@ import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { formatDate, ordinal } from '@/lib/format'
+import { hasFeature } from '@/lib/features'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 
 const STANDARD = [38, 23, 15, 11, 8, 5]
@@ -44,7 +45,7 @@ export function SeasonsAdmin() {
               </span>
               <span className="flex flex-wrap items-center gap-2">
                 {s.is_finished ? <Badge>{t.admin.seasons.finished}</Badge> : s.is_open ? <Badge tone="primary">{t.admin.seasons.open}</Badge> : <Badge tone="warning">{t.admin.seasons.closed}</Badge>}
-                {!s.is_finished && (
+                {!s.is_finished && hasFeature('seasonPlanner') && (
                   <Link to={`/admin/seasons/${s.id}/plan`} className="inline-flex min-h-touch items-center rounded-md px-4 font-semibold text-primary hover:bg-primary-soft">
                     {t.admin.seasons.planDates}
                   </Link>

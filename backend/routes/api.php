@@ -14,6 +14,8 @@ use PTSite\App\Http\Controllers\Api\PlayerLoginController;
 use PTSite\App\Http\Controllers\Api\PlayerStatisticsController;
 use PTSite\App\Http\Controllers\Api\SeasonController;
 use PTSite\App\Http\Controllers\Api\StatisticsController;
+use PTSite\App\Http\Middleware\RequireFeature;
+use PTSite\Domain\Features\Feature;
 
 Route::prefix('v1')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:'.config('ptsite.auth.login_attempts_per_minute').',1');
@@ -43,9 +45,9 @@ Route::prefix('v1')->group(function () {
         Route::post('seasons/{season}/simulate', [SeasonController::class, 'simulate']);
         Route::post('seasons/{season}/nights', [NightController::class, 'store']);
         Route::post('seasons/{season}/nights/import', [NightController::class, 'import']);
-        Route::get('seasons/{season}/night-plan', [SeasonController::class, 'nightPlan']);
+        Route::get('seasons/{season}/night-plan', [SeasonController::class, 'nightPlan'])->middleware(RequireFeature::for(Feature::SeasonPlanner));
         Route::get('seasons/{season}/calendar', [SeasonController::class, 'calendar']);
-        Route::post('seasons/{season}/nights/batch', [NightController::class, 'storeMany']);
+        Route::post('seasons/{season}/nights/batch', [NightController::class, 'storeMany'])->middleware(RequireFeature::for(Feature::SeasonPlanner));
 
         Route::get('nights/{night}', [NightController::class, 'show']);
         Route::patch('nights/{night}', [NightController::class, 'update']);

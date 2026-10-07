@@ -6,6 +6,7 @@ import { extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Plugin } from 'vite'
 import { brandCss, brandProblems } from './src/site/brand.ts'
+import { featureProblems, resolveFeatures } from './src/site/features.ts'
 import type { SiteFile, SiteSettings } from './src/site/types.ts'
 
 /** The colors of the icon and the installed app's splash screen that are not the brand's. */
@@ -48,6 +49,7 @@ export function loadSite(dir = siteDir): SiteSettings {
     }
     problems.push(...brandProblems(raw.brandColor!).map((problem) => `"brandColor" (${raw.brandColor}): ${problem}`))
   }
+  problems.push(...featureProblems(raw.features))
   if (problems.length > 0) throw new Error(`${file}:\n  ${problems.join('\n  ')}`)
 
   const name = raw.name!.trim()
@@ -62,6 +64,7 @@ export function loadSite(dir = siteDir): SiteSettings {
     currency: raw.currency!,
     timeZone: raw.timeZone!,
     brandColor: raw.brandColor!.toLowerCase(),
+    features: resolveFeatures(raw.features),
   }
 }
 

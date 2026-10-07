@@ -22,7 +22,7 @@ final class FinishNight
     ) {}
 
     /** @param array<int, int> $playerByPosition position => player id */
-    public function __invoke(User $user, Night $night, string $pot, string $mainEventPot, string $timeChip, array $playerByPosition): Night
+    public function __invoke(User $user, Night $night, string $pot, ?string $mainEventPot, ?string $timeChip, array $playerByPosition): Night
     {
         Gate::forUser($user)->authorize('finish', $night);
         $wasFinished = $night->status === NightStatus::Finished->value;

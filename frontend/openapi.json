@@ -3410,13 +3410,19 @@
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "main_event_pot": {
-                        "type": "string",
-                        "description": "The money set aside for the Main Event, as a decimal string. \"0\" when there is none.",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The money set aside for the Main Event, as a decimal string. \"0\" when there is none. Required,\nunless the site has no Main Event pot: then it is not kept.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "time_chip": {
-                        "type": "string",
-                        "description": "The money set aside for the year party (rebuys and late arrivals), as a decimal string. \"0\" when there is none.",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The money set aside for the year party (rebuys and late arrivals), as a decimal string. \"0\" when\nthere is none. Required, unless the site has no time chip: then it is not kept.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "positions": {
@@ -3445,8 +3451,6 @@
                 },
                 "required": [
                     "pot",
-                    "main_event_pot",
-                    "time_chip",
                     "positions"
                 ],
                 "title": "FinishNightRequest"
@@ -3581,11 +3585,19 @@
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "main_event_pot": {
-                        "type": "string",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Required, unless the site has no Main Event pot: then it is not kept.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "time_chip": {
-                        "type": "string",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Required, unless the site has no time chip: then it is not kept.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "positions": {
@@ -3615,8 +3627,6 @@
                 "required": [
                     "starts_at",
                     "pot",
-                    "main_event_pot",
-                    "time_chip",
                     "positions"
                 ],
                 "title": "ImportNightRequest"

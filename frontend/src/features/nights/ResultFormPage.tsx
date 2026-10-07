@@ -11,6 +11,7 @@ import { t } from '@/i18n'
 import { formatTime, nightTitle, parseMoneyInput } from '@/lib/format'
 import { FinishingOrderFields } from './FinishingOrderFields'
 import { isEmptyPartial, moneyText, type ResultSeed, seedFromPartial } from './partialResult'
+import { hasFeature } from '@/lib/features'
 import { currencySymbol } from '@/lib/site'
 
 const invalidMoney = t.nights.invalidMoney
@@ -18,6 +19,7 @@ const invalidMoney = t.nights.invalidMoney
 /**
  * "Finalizar": enter or correct a night's result, designed for a phone at the table.
  * Points are previewed as the pot and order are entered (the Main Event pot and the time chip do not count); the API calculates and checks them again.
+ * A site with no Main Event pot or no time chip has no field for it, and sends none.
  */
 export function ResultFormPage() {
   const nightId = Number(useParams().nightId)
@@ -72,15 +74,19 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
   const mainEventPot = parseMoneyInput(mainEventPotText)
   const timeChip = parseMoneyInput(timeChipText)
   const apiError = finish.error instanceof ApiError ? finish.error : null
-  const complete = pot !== null && mainEventPot !== null && timeChip !== null && order.every((p) => p !== null)
+  const complete =
+    pot !== null &&
+    (mainEventPot !== null || !hasFeature('mainEventPot')) &&
+    (timeChip !== null || !hasFeature('timeChip')) &&
+    order.every((p) => p !== null)
 
   function submit() {
     if (!complete) return
     finish.mutate(
       {
         pot: pot!,
-        main_event_pot: mainEventPot!,
-        time_chip: timeChip!,
+        main_event_pot: hasFeature('mainEventPot') ? mainEventPot : null,
+        time_chip: hasFeature('timeChip') ? timeChip : null,
         positions: order.map((p, i) => ({ position: percentages[i].position, player_id: p!.id })),
       },
       { onSuccess: () => navigate(`/nights/${n.id}`) },
@@ -115,26 +121,30 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
               isRequired
               errorMessage={apiError?.fieldError('pot') ?? (potText && pot === null ? invalidMoney : undefined)}
             />
-            <TextField
-              label={t.nights.moneyFields.mainEventPot({ currency: currencySymbol })}
-              description={t.nights.resultForm.mainEventPotHelp}
-              inputMode="decimal"
-              value={mainEventPotText}
-              onChange={setMainEventPotText}
-              placeholder={t.nights.moneyFields.mainEventPotPlaceholder}
-              isRequired
-              errorMessage={apiError?.fieldError('main_event_pot') ?? (mainEventPotText && mainEventPot === null ? invalidMoney : undefined)}
-            />
-            <TextField
-              label={t.nights.moneyFields.timeChip({ currency: currencySymbol })}
-              description={t.nights.resultForm.timeChipHelp}
-              inputMode="decimal"
-              value={timeChipText}
-              onChange={setTimeChipText}
-              placeholder={t.nights.moneyFields.timeChipPlaceholder}
-              isRequired
-              errorMessage={apiError?.fieldError('time_chip') ?? (timeChipText && timeChip === null ? invalidMoney : undefined)}
-            />
+            {hasFeature('mainEventPot') && (
+              <TextField
+                label={t.nights.moneyFields.mainEventPot({ currency: currencySymbol })}
+                description={t.nights.resultForm.mainEventPotHelp}
+                inputMode="decimal"
+                value={mainEventPotText}
+                onChange={setMainEventPotText}
+                placeholder={t.nights.moneyFields.mainEventPotPlaceholder}
+                isRequired
+                errorMessage={apiError?.fieldError('main_event_pot') ?? (mainEventPotText && mainEventPot === null ? invalidMoney : undefined)}
+              />
+            )}
+            {hasFeature('timeChip') && (
+              <TextField
+                label={t.nights.moneyFields.timeChip({ currency: currencySymbol })}
+                description={t.nights.resultForm.timeChipHelp}
+                inputMode="decimal"
+                value={timeChipText}
+                onChange={setTimeChipText}
+                placeholder={t.nights.moneyFields.timeChipPlaceholder}
+                isRequired
+                errorMessage={apiError?.fieldError('time_chip') ?? (timeChipText && timeChip === null ? invalidMoney : undefined)}
+              />
+            )}
           </div>
         </Card>
 

@@ -213,3 +213,16 @@ it('stops the plan at the rounds left when asked', function () {
         ->toBe(['08/01 ok', '22/01 ok', '05/02 carnival: Carnaval', '12/02 ok']);
     $this->getJson("{$this->planUrl}?from=2027-01-04&to=2027-12-31&count=0")->assertUnprocessable();
 });
+
+it('has no planner on a site that turned it off, but still schedules a night and shows the calendar', function () {
+    config(['ptsite.features' => ['seasonPlanner' => false]]);
+    Sanctum::actingAs(User::factory()->admin()->create());
+
+    $this->getJson("{$this->planUrl}?from=2027-01-01&to=2027-02-01")->assertNotFound();
+    $this->postJson("/api/v1/seasons/{$this->season->id}/nights/batch", ['starts_at' => ['2027-01-08 21:30']])->assertNotFound();
+    expect(Night::query()->count())->toBe(0);
+
+    $this->postJson("/api/v1/seasons/{$this->season->id}/nights", ['starts_at' => '2027-01-08 21:30'])->assertCreated();
+    $this->getJson("/api/v1/seasons/{$this->season->id}/calendar")->assertOk();
+    $this->getJson('/api/v1/holidays')->assertOk();
+});

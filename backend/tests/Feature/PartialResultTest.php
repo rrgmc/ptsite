@@ -164,3 +164,13 @@ it('tells the client who may save partial results', function (Closure $user, boo
     'account with no player' => [fn () => User::factory()->create(), false],
     'results keeper with no player' => [fn () => User::factory()->resultsKeeper()->create(), true],
 ]);
+
+it('keeps no Main Event pot and no time chip on a site that has neither', function () {
+    config(['ptsite.features' => ['mainEventPot' => false, 'timeChip' => false]]);
+
+    ($this->save)($this->anaUser, [], '840.00', '170.00', '25.00')
+        ->assertOk()
+        ->assertJsonPath('data.pot', '840.00')
+        ->assertJsonPath('data.main_event_pot', null)
+        ->assertJsonPath('data.time_chip', null);
+});

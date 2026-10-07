@@ -912,10 +912,16 @@ export interface components {
         FinishNightRequest: {
             /** @description The night's pot, as a decimal string such as "840.00". */
             pot: string;
-            /** @description The money set aside for the Main Event, as a decimal string. "0" when there is none. */
-            main_event_pot: string;
-            /** @description The money set aside for the year party (rebuys and late arrivals), as a decimal string. "0" when there is none. */
-            time_chip: string;
+            /**
+             * @description The money set aside for the Main Event, as a decimal string. "0" when there is none. Required,
+             *     unless the site has no Main Event pot: then it is not kept.
+             */
+            main_event_pot?: string | null;
+            /**
+             * @description The money set aside for the year party (rebuys and late arrivals), as a decimal string. "0" when
+             *     there is none. Required, unless the site has no time chip: then it is not kept.
+             */
+            time_chip?: string | null;
             positions: {
                 position: number;
                 player_id: number;
@@ -959,8 +965,10 @@ export interface components {
             starts_at: string;
             place_id?: number | null;
             pot: string;
-            main_event_pot: string;
-            time_chip: string;
+            /** @description Required, unless the site has no Main Event pot: then it is not kept. */
+            main_event_pot?: string | null;
+            /** @description Required, unless the site has no time chip: then it is not kept. */
+            time_chip?: string | null;
             positions: {
                 position: number;
                 player_id: number;
