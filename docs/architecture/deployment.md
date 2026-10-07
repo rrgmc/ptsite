@@ -21,8 +21,9 @@ The repository is private and on GitHub's free plan, which gives the whole accou
 | Started by hand (`gh workflow run ci.yml`, or "Run workflow" on GitHub) | The `package` job only |
 | A version tag (`vX.Y.Z`) is pushed | [`release.yml`](../../.github/workflows/release.yml), about 3 minutes. See "Releases" |
 
-The backend job also runs `php deploy/check-forbidden.php`, which fails when a file names a real site, host or
-person (see "Core and sites" in [AGENTS.md](../../AGENTS.md)).
+The backend job also runs `php deploy/check-forbidden.php`. It names no word itself: without a list it refuses
+only an image that `deploy/forbidden-allow.txt` does not name. A site runs the same script on the core with its
+own list of names (`--list`), in its own CI.
 
 The tests on a pull request run on its merge with `master` as it was then. If `master` moved since, bring the
 branch up to date before merging, so that the tests cover what `master` will hold.

@@ -2,24 +2,25 @@
 
 /*
  * Fails when a file of this repository names a real site, host or person. This repository is the shared core:
- * it must hold no site's name, no deployment target and no real player.
+ * it must hold no site's name, no deployment target and no member of a real league.
  *
  * Usage: php deploy/check-forbidden.php [--list <file>]
  *
  * It reads every file git knows or would add (tracked, plus untracked and not ignored).
  *
- * - The words below are searched in file names and contents, whatever their capitals, also inside longer words.
- * - --list (or PTSITE_FORBIDDEN_FILE) names a file with one more word or phrase per line, such as the names
- *   of a site's real players. That file belongs to a site and is never committed here. Its entries match
- *   whole words only. An entry shorter than five letters must also match the capitals.
+ * - **This script names no word itself.** The words come from the file given with --list (or
+ *   PTSITE_FORBIDDEN_FILE): one word or phrase per line. That file belongs to a site, which knows its own
+ *   names, and is never committed here. A site runs this check on the core with its list.
+ * - A plain entry matches whole words only, in file names and contents. An entry shorter than five letters
+ *   must also match the capitals.
+ * - An entry that starts with "*" matches anywhere, also inside a longer word, whatever the capitals: "*liga"
+ *   finds "ligademo". Use it for a site's name and its host.
  * - deploy/forbidden-allow.txt lists exceptions, one per line: "<path>: <word>", or "<word>" for every file.
- * - An image is refused unless deploy/forbidden-allow.txt lists its path.
+ * - An image is refused unless deploy/forbidden-allow.txt lists its path. This part needs no list.
+ * - Lock files name the authors of other people's packages. Only the "*" entries are searched in them.
  */
 
-const BUILT_IN = ['tlpt', 'little poker table', 'hostgator', 'aptclub', 'rangel', 'sibit', 'br578'];
 const IMAGES = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'bmp', 'ico'];
-const SELF = ['deploy/check-forbidden.php'];
-// Lock files name the authors of other people's packages. Only the words above are searched in them.
 const LOCK_FILES = ['composer.lock', 'package-lock.json'];
 
 $root = dirname(__DIR__);
@@ -36,13 +37,13 @@ function lines(string $file): array
     return array_values(array_filter($lines, fn (string $line) => $line !== '' && ! str_starts_with($line, '#')));
 }
 
-$extra = [];
+$entries = [];
 if ($listFile !== null) {
     if (! is_file($listFile)) {
         fwrite(STDERR, "check-forbidden: no such list: {$listFile}\n");
         exit(2);
     }
-    $extra = lines($listFile);
+    $entries = lines($listFile);
 }
 
 $allowEverywhere = [];
@@ -67,25 +68,26 @@ if ($status !== 0) {
 }
 $files = array_values(array_filter(explode("\0", implode("\n", $output))));
 
-/** A pattern that finds the entry as whole words. */
-function wholeWord(string $entry): string
-{
-    $flags = mb_strlen($entry) < 5 ? 'u' : 'iu';
-
-    return '/(?<![\p{L}\p{N}])'.preg_quote($entry, '/').'(?![\p{L}\p{N}])/'.$flags;
-}
-
-$patterns = [];
-foreach (BUILT_IN as $word) {
-    $patterns[$word] = '/'.preg_quote($word, '/').'/iu';
-}
-foreach ($extra as $entry) {
-    $patterns[$entry] ??= wholeWord($entry);
+/** @var array<string, array{pattern: string, anywhere: bool}> $words the entry as written, without its "*" */
+$words = [];
+foreach ($entries as $entry) {
+    $anywhere = str_starts_with($entry, '*');
+    $word = $anywhere ? ltrim(substr($entry, 1)) : $entry;
+    if ($word === '') {
+        continue;
+    }
+    $quoted = preg_quote($word, '/');
+    $words[$word] = [
+        'anywhere' => $anywhere,
+        'pattern' => $anywhere
+            ? "/{$quoted}/iu"
+            : '/(?<![\p{L}\p{N}])'.$quoted.'(?![\p{L}\p{N}])/'.(mb_strlen($word) < 5 ? 'u' : 'iu'),
+    ];
 }
 
 $problems = [];
 foreach ($files as $path) {
-    if (! is_file($path) || in_array($path, SELF, true)) {
+    if (! is_file($path)) {
         continue;
     }
     $allowed = [...$allowEverywhere, ...($allowByPath[$path] ?? [])];
@@ -104,24 +106,22 @@ foreach ($files as $path) {
     }
 
     $isLockFile = in_array(basename($path), LOCK_FILES, true);
-    foreach ($patterns as $entry => $pattern) {
-        if ($isLockFile && ! in_array($entry, BUILT_IN, true)) {
-            continue;
-        }
-        if (in_array(mb_strtolower((string) $entry), $allowed, true)) {
+    foreach ($words as $word => ['pattern' => $pattern, 'anywhere' => $anywhere]) {
+        if (($isLockFile && ! $anywhere) || in_array(mb_strtolower((string) $word), $allowed, true)) {
             continue;
         }
         foreach ($subjects as $where => $subject) {
             if (@preg_match($pattern, $subject, $m, PREG_OFFSET_CAPTURE) === 1) {
                 $line = $where === 'content' ? substr_count($subject, "\n", 0, $m[0][1]) + 1 : 0;
-                $problems[] = $where === 'content' ? "{$path}:{$line}: \"{$entry}\"" : "{$path}: \"{$entry}\" in the file name";
+                $problems[] = $where === 'content' ? "{$path}:{$line}: \"{$word}\"" : "{$path}: \"{$word}\" in the file name";
             }
         }
     }
 }
 
 if ($problems === []) {
-    echo 'check-forbidden: '.count($files).' files, '.count($patterns)." words, nothing found.\n";
+    $what = $words === [] ? 'no list of words given, images checked' : count($words).' words';
+    echo 'check-forbidden: '.count($files)." files, {$what}, nothing found.\n";
     exit(0);
 }
 

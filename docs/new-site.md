@@ -12,7 +12,9 @@ the smallest one, and the starting point below.
 - **Never change files inside the core from a site.** A change to the product is made in the core's own
   repository, through a pull request there. The site then moves its submodule to the new version.
 - **Never put a league's name, people or host into the core.** They belong to the site. The core's
-  `deploy/check-forbidden.php` fails on them.
+  `php core/deploy/check-forbidden.php --list <the site's list>` fails on them: keep that list in the site's
+  repository, one word per line, with `*` before a word that must match inside longer words too (the site's
+  name, its host).
 - **Ask before anything that leaves the machine:** creating a repository on GitHub, pushing, deploying.
 - **Never run `migrate:fresh`, `db:wipe` or a seeder on a real site's database.** They are for development.
 
