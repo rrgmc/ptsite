@@ -6,6 +6,7 @@ use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Support\ServiceProvider;
+use PTSite\App\Support\TablePrefix;
 use PTSite\Domain\Accounts\PasswordResetRules;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        TablePrefix::assertValid((string) config('database.connections.'.config('database.default').'.prefix'));
+
         Scramble::configure()->withDocumentTransformers(function (OpenApi $openApi) {
             $openApi->secure(SecurityScheme::http('bearer'));
             // A fixed title: the spec is committed, so it must not change with a site's name.

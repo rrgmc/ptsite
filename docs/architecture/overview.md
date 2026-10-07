@@ -71,6 +71,22 @@ The reasons are in [0013](../decisions/0013-mysql-everywhere.md).
 | `task db:reset` | Recreates the development database with the demo league and the dev logins |
 | `task db:stop` | Stops the server; every database in it is lost |
 
+## Table prefix
+
+`DB_TABLE_PREFIX` puts a prefix before every table name, such as `liga_players`. It lets two sites share one
+database, which some shared hosts require. It is empty by default.
+
+- The prefix is a lowercase letter, up to six more lowercase letters or digits, and an underscore: `liga_`. The
+  app refuses any other value when it starts (`PTSite\App\Support\TablePrefix`).
+- It applies to every table, also the framework's (`users`, `sessions`, `cache`, `migrations`).
+- The query builder adds the prefix. SQL written by hand would not get it, so the app writes no SQL that names
+  a table; `tests/Arch/TablePrefixTest.php` checks that.
+- The Pest tests run with the prefix `pt_` (`phpunit.xml`), so they prove the app works with one. The
+  end-to-end tests run without a prefix.
+- `migrate:fresh` and `db:wipe` drop every table of the database, whatever the prefix. Never run them on a
+  database that two sites share.
+- Set the prefix before the first `migrate`. Changing it later means renaming the tables by hand.
+
 ## Development mail
 
 `compose.yaml` also runs [Mailpit](https://mailpit.axllent.org), which catches the mail the site sends in
