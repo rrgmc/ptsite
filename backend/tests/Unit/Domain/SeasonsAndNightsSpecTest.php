@@ -4,6 +4,7 @@
  * Mirrors the examples in docs/specs/seasons-and-nights.md.
  */
 
+use PTSite\Domain\Features\Features;
 use PTSite\Domain\Nights\NightResult;
 use PTSite\Domain\Nights\NightRules;
 use PTSite\Domain\Nights\NightStatus;
@@ -11,9 +12,11 @@ use PTSite\Domain\Scoring\PercentageTable;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Shared\RuleViolation;
 
-function result(array $positions, string $pot = '840.00', string $mainEventPot = '170.00', string $timeChip = '0'): NightResult
+function result(array $positions, string $pot = '840.00', ?string $mainEventPot = '170.00', ?string $timeChip = '0'): NightResult
 {
-    return new NightResult(Money::fromDecimal($pot), Money::fromDecimal($mainEventPot), Money::fromDecimal($timeChip), $positions);
+    $amount = fn (?string $value) => $value === null ? null : Money::fromDecimal($value);
+
+    return new NightResult(Money::fromDecimal($pot), $amount($mainEventPot), $amount($timeChip), $positions);
 }
 
 function violation(callable $fn): ?RuleViolation
@@ -113,4 +116,28 @@ it('moves or cancels only a scheduled night', function (NightStatus $status, boo
     'scheduled' => [NightStatus::Scheduled, true],
     'open' => [NightStatus::Open, false],
     'finished' => [NightStatus::Finished, false],
+]);
+
+it('takes no Main Event pot and no time chip on a site that has neither', function (?string $mainEventPot, ?string $timeChip, ?string $rule) {
+    $features = new Features(['mainEventPot' => false, 'timeChip' => false]);
+
+    expect(violation(fn () => (new NightRules)->assertValidResult(
+        result([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6], '840.00', $mainEventPot, $timeChip),
+        PercentageTable::standard(),
+        $features,
+    ))?->rule)->toBe($rule);
+})->with([
+    'neither' => [null, null, null],
+    'a Main Event pot' => ['170.00', null, 'night.result.main_event_pot_disabled'],
+    'a time chip' => [null, '0', 'night.result.time_chip_disabled'],
+]);
+
+it('requires the Main Event pot and the time chip on a site that has them', function (?string $mainEventPot, ?string $timeChip, string $rule) {
+    expect(violation(fn () => (new NightRules)->assertValidResult(
+        result([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6], '840.00', $mainEventPot, $timeChip),
+        PercentageTable::standard(),
+    ))?->rule)->toBe($rule);
+})->with([
+    'no Main Event pot' => [null, '0', 'night.result.main_event_pot_required'],
+    'no time chip' => ['170.00', null, 'night.result.time_chip_required'],
 ]);

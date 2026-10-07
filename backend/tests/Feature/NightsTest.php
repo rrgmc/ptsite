@@ -256,3 +256,38 @@ it('refuses to edit a cancelled night', function () {
 
     $this->patchJson("/api/v1/nights/{$night->id}", ['description' => 'Noite de pizza'])->assertForbidden();
 });
+
+it('finishes a night with the pot alone on a site with no Main Event pot and no time chip', function () {
+    config(['ptsite.features' => ['mainEventPot' => false, 'timeChip' => false]]);
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $night = Night::factory()->for($this->season)->open()->create();
+    $positions = positions(array_slice($this->players, 0, 6));
+
+    $this->postJson("/api/v1/nights/{$night->id}/finish", ['pot' => '300.00', 'positions' => $positions])
+        ->assertOk()
+        ->assertJsonPath('data.status', 'finished')
+        ->assertJsonPath('data.main_event_pot', null)
+        ->assertJsonPath('data.time_chip', null);
+
+    // An amount that is sent anyway is not kept.
+    $this->postJson("/api/v1/nights/{$night->id}/finish", ['pot' => '300.00', 'main_event_pot' => '60.00', 'time_chip' => '20.00', 'positions' => $positions])
+        ->assertOk()
+        ->assertJsonPath('data.main_event_pot', null)
+        ->assertJsonPath('data.time_chip', null);
+});
+
+it('turns off the Main Event pot and the time chip one by one', function () {
+    config(['ptsite.features' => ['timeChip' => false]]);
+    Sanctum::actingAs(User::factory()->resultsKeeper()->create());
+    $body = ['starts_at' => '2026-03-14 21:00:00', 'pot' => '845.00', 'positions' => positions(array_slice($this->players, 0, 6))];
+
+    $this->postJson("/api/v1/seasons/{$this->season->id}/nights/import", $body)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['main_event_pot'])
+        ->assertJsonMissingValidationErrors(['time_chip']);
+
+    $this->postJson("/api/v1/seasons/{$this->season->id}/nights/import", [...$body, 'main_event_pot' => '170.00'])
+        ->assertCreated()
+        ->assertJsonPath('data.main_event_pot', '170.00')
+        ->assertJsonPath('data.time_chip', null);
+});

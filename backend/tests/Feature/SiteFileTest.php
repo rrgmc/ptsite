@@ -6,6 +6,8 @@
 
 use PTSite\App\Mail\PasswordResetMail;
 use PTSite\App\Support\SiteFile;
+use PTSite\Domain\Features\Feature;
+use PTSite\Domain\Features\Features;
 
 it('takes the site\'s name, language and time zone from site.json', function () {
     $site = json_decode(file_get_contents(base_path('../site/site.json')), true);
@@ -16,6 +18,15 @@ it('takes the site\'s name, language and time zone from site.json', function () 
         ->and(config('app.timezone'))->toBe($site['timeZone'])
         ->and(date_default_timezone_get())->toBe($site['timeZone'])
         ->and(config('ptsite.tagline'))->toBe($site['tagline']);
+});
+
+it('takes the site\'s features from site.json, and has the ones it does not name', function () {
+    $site = json_decode(file_get_contents(base_path('../site/site.json')), true);
+    expect(config('ptsite.features'))->toBe($site['features'] ?? []);
+
+    config(['ptsite.features' => ['seasonPlanner' => false]]);
+    expect(app(Features::class)->enabled(Feature::SeasonPlanner))->toBeFalse()
+        ->and(app(Features::class)->enabled(Feature::TimeChip))->toBeTrue();
 });
 
 it('signs its mail with the site\'s name and tagline', function () {

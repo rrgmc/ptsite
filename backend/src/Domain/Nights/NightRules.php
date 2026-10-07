@@ -2,6 +2,8 @@
 
 namespace PTSite\Domain\Nights;
 
+use PTSite\Domain\Features\Feature;
+use PTSite\Domain\Features\Features;
 use PTSite\Domain\Scoring\PercentageTable;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Shared\RuleViolation;
@@ -49,21 +51,29 @@ final class NightRules
     /**
      * Checks a night's result against the season's percentage table:
      * a positive pot, a Main Event pot and a time chip of zero or more, every scoring position filled, and
-     * nobody twice.
+     * nobody twice. A site that has the Main Event pot or the time chip must give it; one that does not, gives
+     * none.
      */
-    public function assertValidResult(NightResult $result, PercentageTable $table): void
+    public function assertValidResult(NightResult $result, PercentageTable $table, Features $features = new Features): void
     {
         if (! $result->pot->isPositive()) {
             throw new RuleViolation('night.result.pot_required', 'pot');
         }
-        if ($result->mainEventPot->compare(Money::zero()) < 0) {
-            throw new RuleViolation('night.result.main_event_pot_negative', 'main_event_pot');
-        }
-        if ($result->timeChip->compare(Money::zero()) < 0) {
-            throw new RuleViolation('night.result.time_chip_negative', 'time_chip');
-        }
+        $this->assertValidAmount($result->mainEventPot, $features->enabled(Feature::MainEventPot), 'main_event_pot');
+        $this->assertValidAmount($result->timeChip, $features->enabled(Feature::TimeChip), 'time_chip');
 
         $this->assertValidPositions($result->playerByPosition, $table);
+    }
+
+    /** An amount other than the pot: required and zero or more with its feature, absent without it. */
+    private function assertValidAmount(?Money $amount, bool $enabled, string $field): void
+    {
+        if (($amount !== null) !== $enabled) {
+            throw new RuleViolation("night.result.{$field}_".($enabled ? 'required' : 'disabled'), $field);
+        }
+        if ($amount !== null && $amount->compare(Money::zero()) < 0) {
+            throw new RuleViolation("night.result.{$field}_negative", $field);
+        }
     }
 
     /**
