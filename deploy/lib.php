@@ -116,7 +116,7 @@ function run_cpanel_script(string $script, array $args, string $files, array $en
         $names = [
             'DEPLOY_CPANEL_TOKEN', 'DEPLOY_CPANEL_USER', 'DEPLOY_CPANEL_URL',
             'DEPLOY_FTP_HOST', 'DEPLOY_FTP_USER', 'DEPLOY_FTP_PASSWORD', 'DEPLOY_FTP_INSECURE',
-            'APP_DIR', 'WEB_DIR', 'TARGET_VHOST', 'TARGET_PHP', 'TARGET_URL', 'DEPLOY_APP_DIR_PATTERN', 'DEPLOY_REFUSE_IF_PRESENT',
+            'APP_DIR', 'WEB_DIR', 'TARGET_VHOST', 'TARGET_PHP', 'TARGET_URL', 'DEPLOY_APP_DIR_PATTERN', 'DEPLOY_REFUSE_IF_PRESENT', 'DEPLOY_REPLACE_ENV',
         ];
         foreach ($names as $name) {
             if (isset($env[$name]) || getenv($name) !== false) {
