@@ -44,7 +44,8 @@ jobs:
           coverage: none
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: cp .env.example .env && php artisan key:generate
-      - name: No site, host or person is named (deploy/check-forbidden.php)
+      # Without a list of words this refuses only an image nobody listed. A site runs it with its own names.
+      - name: No unlisted image (deploy/check-forbidden.php)
         run: php deploy/check-forbidden.php
         working-directory: .
       - name: Code style

@@ -28,9 +28,13 @@ never depend on that: a setting a site needs goes in `site.json` or `backend/con
 folder").
 
 Nothing site-specific may be committed here: no real league, host or deploy target, and no member of a real
-league (not even in an example). `php deploy/check-forbidden.php` enforces it, and CI runs it. Worked examples
-use invented names and the invented domains `ligademo.example`, `inventado.example`, `semdominio.example` and
-`example.com`.
+league (not even in an example). Worked examples use invented names and the invented domains
+`ligademo.example`, `inventado.example`, `semdominio.example` and `example.com`.
+
+`php deploy/check-forbidden.php --list <file>` checks it. **The words to refuse are not in this repository**:
+writing them here would put them here. Each site keeps its own list, with its name, its host and its players,
+and runs the check on the core with it. Here, CI runs the check without a list, which only refuses an image
+that `deploy/forbidden-allow.txt` does not name.
 
 The demo league's players are named after champions of the World Series of Poker Main Event. The names are
 public; the results are invented. Write nothing about them but public facts.
