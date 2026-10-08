@@ -10,7 +10,7 @@ const screens = [
   '', 'results', 'calendar', 'simulator', 'statistics', 'players', 'players/1', 'players/1/all', 'seasons', 'seasons/select',
   'profile',
   'admin', 'admin/seasons/new', 'admin/players', 'admin/players/1', 'admin/players/new', 'admin/places', 'admin/places/new',
-  'admin/holidays', 'admin/audit-log',
+  'admin/holidays', 'admin/audit-log', 'admin/settings',
 ]
 
 // A second header line costs a small screen a lot of height, so at a moderately larger text size the season name
