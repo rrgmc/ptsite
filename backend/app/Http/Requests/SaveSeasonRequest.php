@@ -38,7 +38,7 @@ class SaveSeasonRequest extends FormRequest
             'rebuys_allowed' => ['sometimes', 'integer', 'min:0', 'max:'.SeasonMoney::MAX_REBUYS],
             /** Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
             'rebuy_charges_time_chip' => [$noTimeChip, 'sometimes', 'boolean'],
-            /** Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             'allows_extra_rebuys' => ['sometimes', 'boolean'],
             /** The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             'house_owner_buy_in' => [Rule::prohibitedIf(! $this->siteHas(Feature::HouseOwnerBuyIn)), 'sometimes', 'nullable', 'string', self::MONEY],

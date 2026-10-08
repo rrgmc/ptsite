@@ -1589,7 +1589,7 @@ export interface components {
             rebuys_allowed?: number;
             /** @description Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
             rebuy_charges_time_chip?: boolean;
-            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** @description Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             allows_extra_rebuys?: boolean;
             /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             house_owner_buy_in?: string | null;
@@ -1646,7 +1646,7 @@ export interface components {
             rebuys_allowed: number;
             /** @description Whether a rebuy also charges a time chip. */
             rebuy_charges_time_chip: boolean;
-            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** @description Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             allows_extra_rebuys: boolean;
             /** @description The smaller buy-in of the owner of the house where the night is played. */
             house_owner_buy_in: string | null;
@@ -1855,7 +1855,7 @@ export interface components {
             rebuys_allowed?: number;
             /** @description Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
             rebuy_charges_time_chip?: boolean;
-            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** @description Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             allows_extra_rebuys?: boolean;
             /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             house_owner_buy_in?: string | null;

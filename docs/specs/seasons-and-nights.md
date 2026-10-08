@@ -71,8 +71,9 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    - the **time chip value**: the price of one time chip, on a site with the time chip (rule 9c);
    - the **rebuys allowed** ("Rebuys permitidos"): how many rebuys a player can make on a night, from 0 to 20.
      A new season starts with 0;
-   - whether a player can make **rebuys past the limit** ("Permitir rebuys além do limite"). Those rebuys do not
-     count for the season's points;
+   - whether a player can make **rebuys past the limit** ("Permitir rebuys além do limite"). **A player who makes
+     one scores no points on that night**: they are not recorded in a scoring position. Nothing else changes: the
+     rebuy's money is part of the night's pot like any other, and the pot gives the same points to the others;
    - the **rebuy value**: the price of a rebuy, without the time chip it may also charge;
    - whether **a rebuy also pays the time chip** ("O rebuy também paga o time chip"), on a site with the time chip;
    - the **house owner's buy-in** ("Buy-in do dono da casa"): the smaller buy-in of the owner of the house where
@@ -237,8 +238,10 @@ Money settings:
   R$ 5,00 that every rebuy also pays, and rebuys past the limit. All of it is saved.
 - **No rebuys.** A new season has 0 rebuys allowed and none past the limit. It has no rebuys, and needs no rebuy
   value.
-- **Only past the limit.** A season allows 0 rebuys but allows rebuys past the limit. It has rebuys, none of which
-  counts for points, and needs a rebuy value.
+- **Only past the limit.** A season allows 0 rebuys but allows rebuys past the limit. It has rebuys, a player who
+  makes one scores no points on that night, and it needs a rebuy value.
+- **Past the limit, in the pot.** A season allows 2 rebuys at R$ 50,00 and more past the limit. Breno makes 3.
+  All R$ 150,00 are in the night's pot. Breno is not recorded in a scoring position of that night.
 - **No rebuy value.** A season with no rebuy value is changed to allow 2 rebuys: refused ("Informe o valor do
   rebuy, ou deixe a temporada sem rebuys.").
 - **Too many.** 21 rebuys allowed is refused; 20 is accepted.

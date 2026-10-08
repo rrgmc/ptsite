@@ -26,7 +26,7 @@ class SeasonResource extends JsonResource
             'rebuys_allowed' => $this->rebuys_allowed,
             /** Whether a rebuy also charges a time chip. */
             'rebuy_charges_time_chip' => $this->rebuy_charges_time_chip,
-            /** Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             'allows_extra_rebuys' => $this->allows_extra_rebuys,
             /** The smaller buy-in of the owner of the house where the night is played. */
             'house_owner_buy_in' => $this->house_owner_buy_in,

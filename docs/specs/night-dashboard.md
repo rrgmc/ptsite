@@ -41,7 +41,9 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
    participant. On a site with the house owner's buy-in, they owe the season's house owner's buy-in instead of
    the buy-in. Their rebuys cost the same as anyone's.
 10. **Rebuys follow the season.** A season with no rebuys takes none. At the season's limit a player takes
-    another only when the season allows rebuys past the limit. No player has more than 50.
+    another only when the season allows rebuys past the limit. No player has more than 50. A rebuy past the limit
+    costs the same and goes to the pot like any other; what it changes is that its player scores no points on
+    that night (rule 5b of [seasons-and-nights.md](seasons-and-nights.md)).
 11. **The amounts**, each shown as owed, paid and pending:
     - **"Pote"**: the buy-ins and every rebuy, also the ones past the limit;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
@@ -137,6 +139,5 @@ Finishing:
 ## Open questions
 
 - **Statistics.** Should the site show each player's rebuys and what each night collected?
-- **Rebuys past the limit.** They "do not count for the season's points" (rule 5b of
-  [seasons-and-nights.md](seasons-and-nights.md)), but the dashboard adds them to the pot. Should the suggested
-  pot at "Finalizar" leave them out?
+- **Players past the limit.** A player who rebought past the limit scores no points on that night. Should the
+  dashboard mark that player, and refuse them in a scoring position? Today nothing stops the keeper.

@@ -205,7 +205,7 @@ export const admin: Messages['admin'] = {
       timeChipValue: ({ currency }) => `Time chip value (${currency})`,
       rebuysAllowed: 'Rebuys allowed',
       rebuysAllowedHelp: 'How many rebuys each player can make on a night. 0: none.',
-      allowsExtraRebuys: 'Allow rebuys past the limit, which do not count for the season\'s points',
+      allowsExtraRebuys: 'Allow rebuys past the limit: a player who makes one scores no points on that night',
       rebuyValue: ({ currency }) => `Rebuy value (${currency})`,
       rebuyValueHelp: 'Without the time chip.',
       rebuyChargesTimeChip: 'A rebuy also pays the time chip',

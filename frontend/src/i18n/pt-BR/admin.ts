@@ -215,7 +215,7 @@ export const admin = {
       timeChipValue: ({ currency }: { currency: string }) => `Valor do time chip (${currency})`,
       rebuysAllowed: 'Rebuys permitidos',
       rebuysAllowedHelp: 'Quantos rebuys cada jogador pode fazer por evento. 0: nenhum.',
-      allowsExtraRebuys: 'Permitir rebuys além do limite, sem contar pontos na temporada',
+      allowsExtraRebuys: 'Permitir rebuys além do limite: quem fizer não pontua no evento',
       rebuyValue: ({ currency }: { currency: string }) => `Valor do rebuy (${currency})`,
       rebuyValueHelp: 'Sem o time chip.',
       rebuyChargesTimeChip: 'O rebuy também paga o time chip',

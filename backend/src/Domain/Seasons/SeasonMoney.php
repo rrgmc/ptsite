@@ -18,7 +18,8 @@ final readonly class SeasonMoney
     /**
      * @param  ?Money  $rebuyValue  a rebuy's price, without the time chip it may also charge
      * @param  int  $rebuysAllowed  how many rebuys a player can make on a night; 0 means none
-     * @param  bool  $allowsExtraRebuys  rebuys past the allowed number, which do not count for the season's points
+     * @param  bool  $allowsExtraRebuys  rebuys past the allowed number; a player who makes one is not recorded in a
+     *                                   scoring position of that night, and the money is part of the pot all the same
      * @param  ?int  $mainEventPotPercent  the share of a night's pot suggested as its Main Event pot, from 0 to 100
      */
     private function __construct(
@@ -62,7 +63,7 @@ final readonly class SeasonMoney
         return $money;
     }
 
-    /** Whether a player can rebuy at all: within the allowed number, or past it without points. */
+    /** Whether a player can rebuy at all: within the allowed number, or past it. */
     public function hasRebuys(): bool
     {
         return $this->rebuysAllowed > 0 || $this->allowsExtraRebuys;
