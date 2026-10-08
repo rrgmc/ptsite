@@ -28,8 +28,11 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    The address says which. With no season in it (`/results`) it is the current season; if no season is open, it
    is the newest season. With a season in it (`/seasons/7/results`) it is that season, on the same screen. So a
    link, a bookmark and the browser's "back" all lead to the season they were made for.
-3b. **"Escolher temporada"** lists every season, newest first, with its start date, how many nights were played,
-   and whether it is the current one ("Atual"), finished, open or closed. It marks the selected season. Everyone
+3b. **"Escolher temporada"** lists every season, newest first, in a table titled "Temporadas". Each season is a
+   row with one value per column: its name, its start date ("Início"), its number of rounds scheduled
+   ("Eventos"), how many were played ("Finalizados"), and whether it is the current one ("Atual"), finished,
+   open or closed ("Situação"). On a phone the two counts are hidden. It marks the selected season. "Administração" lists the seasons in the same
+   table, with each season's actions in a last column. Everyone
    logged in can open it, from the season name at the top of every screen.
 3c. **Picking a season** in that list opens the season screen the list was opened from, at that season's address;
    the standings when it was opened from another screen. Picking the current season opens the address with no
@@ -118,6 +121,10 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 17b. The night's page shows the description, when it has one. A description is plain text. The ones imported from
     an older site may be HTML from its text editor (`<p>&nbsp;Liga - 07/26</p>`): the site shows only their text,
     and the stored value keeps its markup until someone rewrites the description.
+
+17c. **"Próximos eventos"**, on "Resultados", lists the season's **next two** nights that are not finished,
+    the earliest first. When the season has more to come, the link "Ver todos no calendário" leads to the
+    calendar. **A finished season has no such box**, even with a night that was never finished.
 
 ### Extra nights ("Evento extra")
 

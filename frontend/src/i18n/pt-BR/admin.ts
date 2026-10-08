@@ -186,17 +186,9 @@ export const admin = {
   // Seasons
   seasons: {
     newSeason: '+ Nova temporada',
-    /** One line under a season's name in the list. */
-    summary: ({ start, planned, rounds, finished, percents, weekday, time, every }: {
-      start: string
-      planned: number
-      rounds: number
-      finished: number
-      percents: string
-      weekday: string
-      time: string
-      every: string
-    }) => `Início ${start} · ${planned} de ${rounds} rodadas (${finished} finalizadas) · ${percents}% · ${weekday} ${time}, ${every}`,
+    /** The title of the list and its columns. */
+    listTitle: 'Temporadas',
+    columns: { season: 'Temporada', start: 'Início', nights: 'Eventos', finished: 'Finalizados', status: 'Situação', actions: 'Ações' },
     finished: 'Finalizada',
     open: 'Aberta',
     closed: 'Fechada',

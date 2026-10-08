@@ -10,6 +10,7 @@ import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { formatMoney, formatWeekday, formatTime } from '@/lib/format'
+import { useSeasonPath } from '@/lib/seasonPath'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
 import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
 import { amountRows } from '../nights/amounts'
@@ -23,8 +24,12 @@ import { suggestionValue } from './suggestionValue'
 // The chart loads apart from the page, so the chart library stays out of the main bundle.
 const PointsProgressChart = lazy(() => import('../statistics/StatisticsCharts').then((m) => ({ default: m.PointsProgressChart })))
 
+/** How many nights "Próximos eventos" lists. */
+const UPCOMING = 2
+
 export function ResultsPage() {
   const { season, isPending, error } = useSelectedSeason()
+  const to = useSeasonPath()
   const nights = useSeasonNights(season?.id)
   const statistics = useStatistics(season?.id)
   const me = useMe()
@@ -38,7 +43,9 @@ export function ResultsPage() {
   const all = nights.data ?? []
   // Each finished night with its number in the season, newest first. Only a round has a number.
   const finished = numberRounds(all).reverse()
-  const upcoming = all.filter((n) => n.status !== 'finished')
+  // A finished season has nothing to come. An open one shows its next nights only; the calendar has them all.
+  const toCome = season.is_finished ? [] : all.filter((n) => n.status !== 'finished')
+  const upcoming = toCome.slice(0, UPCOMING)
   const canRun = me.data?.abilities.run_nights && !season.is_finished
 
   return (
@@ -71,6 +78,9 @@ export function ResultsPage() {
             ))}
             {upcoming.length === 0 && !scheduling && <li className="text-muted">{t.results.noUpcoming}</li>}
           </ul>
+          {toCome.length > upcoming.length && (
+            <Link to={to('/calendar')} className="mt-1 inline-flex min-h-touch items-center px-2 text-sm font-semibold text-primary">{t.results.seeCalendar}</Link>
+          )}
         </Card>
       )}
 

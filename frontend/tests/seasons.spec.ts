@@ -13,11 +13,11 @@ test('the season list marks the current season, which is the selected one at fir
   await expect(page.getByRole('heading', { name: 'Escolher temporada', level: 1 })).toBeVisible()
   await expect(page).toHaveTitle('Escolher temporada · Liga Demo')
 
-  const selected = page.locator('button[aria-current="true"]')
+  const selected = page.locator('tr[aria-current="true"]')
   await expect(selected).toHaveCount(1)
   await expect(selected).toContainText('✓ Selecionada')
   await expect(selected).toContainText('Atual')
-  await expect(page.getByRole('listitem').filter({ hasText: 'Liga 2022' })).toContainText('Finalizada')
+  await expect(page.getByRole('row').filter({ hasText: 'Liga 2022' })).toContainText('Finalizada')
   await expectAccessible(page)
 })
 
@@ -86,7 +86,7 @@ test('picking the current season again removes the notice', async ({ page }) => 
   await expect(seasonNotice(page)).toBeVisible()
 
   await seasonLink(page).click()
-  await page.getByRole('listitem').filter({ hasText: 'Atual' }).getByRole('button').click()
+  await page.getByRole('row').filter({ hasText: 'Atual' }).getByRole('button').click()
   await expect(page).toHaveURL(/\/app\/?$/)
   await expect(page.getByRole('heading', { name: 'Classificação', level: 1 })).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)

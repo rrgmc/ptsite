@@ -52,12 +52,15 @@ A site has the Main Event only if it turns it on (`mainEvent` in `features`, see
    the Main Event pots of the season's finished nights, added up. An admin also sees "Editar Main Event", which
    leads to the season's Main Event in "Administração".
 10. **"Temporadas"** shows the **Main Event champion** of each season that has a finished Main Event.
+10a. **"Classificação"** shows the **first three of the season's Main Event**, once it is finished, in a box
+    above the standings table, with the link "Ver Main Event" to the "Main Event" screen. The box shows fewer
+    players when fewer were recorded. A season with no finished Main Event has no box.
 11. On "Resultados", the calendar, the next night's card and the attendance banner, a Main Event night is marked
     **"Main Event"**. On "Resultados" its card lists the players in order, with no amounts and no number.
 12. **The points of the day are not the Main Event's.** When the players of a Main Event also score in a round,
     that round is another night, entered on its own. The two results are not compared.
-13. **On a site with no Main Event**, a night cannot be given this type, "Main Event" is not in the menu, and
-    "Temporadas" shows no Main Event champion. Main Event nights already recorded stay in the database.
+13. **On a site with no Main Event**, a night cannot be given this type, "Main Event" is not in the menu,
+    "Temporadas" shows no Main Event champion and "Classificação" shows no Main Event box. Main Event nights already recorded stay in the database.
 
 ## Examples
 

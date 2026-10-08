@@ -10,6 +10,8 @@ export const mainEvent: Messages['mainEvent'] = {
   notScheduled: 'The Main Event of this season is not scheduled yet.',
   notPlayed: 'The Main Event has not been played yet.',
   seeNight: 'See the night',
+  /** On the standings: the way from the first three to the whole Main Event. */
+  seeMainEvent: 'See the Main Event',
   manage: 'Edit the Main Event',
 
   // The result

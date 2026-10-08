@@ -8,6 +8,8 @@ export const results = {
   overPlanned: ({ planned, rounds }: { planned: number; rounds: number }) =>
     `A temporada já tem ${planned} eventos de ${rounds} rodadas. Ainda é possível agendar outro.`,
   noUpcoming: 'Nenhum evento agendado.',
+  /** Below the next nights, when the season has more to come. */
+  seeCalendar: 'Ver todos no calendário',
   loadingChart: 'Carregando gráfico…',
   seasonTotals: 'Totais da temporada',
   noFinished: 'Nenhum evento finalizado nesta temporada.',

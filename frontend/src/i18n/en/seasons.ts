@@ -14,6 +14,8 @@ export const seasons: Messages['seasons'] = {
   subtitle: 'Choose the season the site shows.',
   noSeason: 'No season yet.',
   started: ({ date, count }) => `Starts ${date} · ${count} ${plural(count, { one: 'night', other: 'nights' })}`,
+  listTitle: 'Seasons',
+  columns: { season: 'Season', start: 'Start', nights: 'Nights', finished: 'Finished', status: 'Status' },
   selected: '✓ Selected',
 
   // The badges

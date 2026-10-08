@@ -48,12 +48,12 @@ frontend/
 | `/login` | Login, with the link "Esqueci minha senha" | everyone |
 | `/forgot-password` | "Esqueci minha senha": asks for a password link by email, with the username or the email | everyone |
 | `/reset-password?token=…` | "Nova senha": the screen behind the link in the email, with the new password typed twice | whoever has the link |
-| `/` | Standings, next night, last result; the attendance banner while a night of the current season is open | players |
-| `/results` | Finished nights, the rounds numbered in the season's order, an extra night and the Main Event marked; the "Pontos acumulados" chart; the season's three amounts added up; upcoming nights and "+ Agendar" with the next three regular weekdays suggested and the type of the night (a round or an extra night); the attendance banner | players; scheduling for results keepers |
+| `/` | Standings, with the first three of the season's finished Main Event above them and the link to `/main-event`; next night, last result; the attendance banner while a night of the current season is open | players |
+| `/results` | Finished nights, the rounds numbered in the season's order, an extra night and the Main Event marked; the "Pontos acumulados" chart; the season's three amounts added up; the next two nights to come, in a season that is not finished, and "+ Agendar" with the next three regular weekdays suggested and the type of the night (a round or an extra night); the attendance banner | players; scheduling for results keepers |
 | `/main-event` | "Main Event", on a site that has it: the selected season's Main Event night, its players in order and the season's Main Event pot; "Editar Main Event" leads an admin to `/admin/seasons/:id/main-event` | players |
 | `/calendar` | Season calendar | players |
 | `/seasons` | "Temporadas": every season with the first ten of its standings and its Main Event champion, and "Ver esta temporada" to open that season's standings | players |
-| `/seasons/select` | "Escolher temporada": the season list, where the user picks the season to open | players |
+| `/seasons/select` | "Escolher temporada": the table of seasons (start, nights, finished nights, status), where the user picks the season to open | players |
 | `/seasons/:id`, `/seasons/:id/results`, `/seasons/:id/calendar`, `/seasons/:id/simulator`, `/seasons/:id/statistics`, `/seasons/:id/main-event`, `/seasons/:id/players/:id` | One season's own addresses: the same screens as `/`, `/results`, `/calendar`, `/simulator`, `/statistics`, `/main-event` and `/players/:id`, showing that season | players |
 | `/nights/:id` | Night: details, attendance ("ALL IN" / "FOLD"), the partial result while open, result, "Abrir", "Remarcar", "Cancelar evento", "Finalizar", "Editar resultado", "Editar evento" | players; actions for results keepers |
 | `/nights/:id/edit` | Edit a night ("Editar evento"): place, description and whether it is extra | results keepers and admins while scheduled; admins once open or finished |
