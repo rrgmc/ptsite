@@ -239,7 +239,9 @@ only on desktop also exists on another screen.
   `even:bg-surface-stripe`. The first and last cell have side padding, so the text does not touch the stripe's
   edge.
 - **One tap, one change, on the night dashboard.** A mark is a chip that one tap turns on or off (`ToggleChip`),
-  saved at once with no "Salvar" (only the amounts typed by hand have one). Its chips are 36px high, smaller
+  saved at once with no "Salvar" (only the amounts typed by hand have one). A buy-in and a rebuy have one state
+  more, for a payment that was not in cash: a second tap sets it, with the sign ⇄ in place of the check mark,
+  and a third unmarks the payment. Its chips are 36px high, smaller
   than the 44px of the rest of the site, so that a player's row fits a phone. The screen shows the change before the API answers
   (`features/dashboard/dashboardMoney.ts` has the API's rules for it) and puts it back if the API refuses. The
   changes of a night are sent one at a time, in order.

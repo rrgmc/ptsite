@@ -515,7 +515,7 @@ export interface paths {
         delete: operations["nightDashboard.removeRebuy"];
         options?: never;
         head?: never;
-        /** Mark a rebuy as paid or not paid */
+        /** Mark a rebuy as paid or not paid, and whether it was paid in cash */
         patch: operations["nightDashboard.markRebuy"];
         trace?: never;
     };
@@ -584,6 +584,26 @@ export interface paths {
          *     ones it works out
          */
         put: operations["nightDashboard.setAmounts"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/non-cash-adjustment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * "Ajuste fora do dinheiro": type an amount that is added to what was paid not in cash, for anything out of
+         *     the ordinary. It may be negative. Null takes it away
+         */
+        put: operations["nightDashboard.setNonCashAdjustment"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1238,6 +1258,8 @@ export interface components {
         MarkNightPlayerRequest: {
             /** @description Whether the player paid the buy-in. */
             buy_in_paid?: boolean;
+            /** @description Whether the buy-in was paid, but not in cash: a bank transfer, for instance. True also marks it as paid. A buy-in that is not paid is never "not in cash". */
+            buy_in_non_cash?: boolean;
             /** @description Whether the player arrived late and owes a time chip. False also unmarks it as paid. Refused on a site without the time chip. */
             time_chip?: boolean;
             /** @description Whether the player paid that time chip. True also marks it as owed. Refused on a site without the time chip. */
@@ -1247,6 +1269,8 @@ export interface components {
         MarkRebuyRequest: {
             /** @description Whether the rebuy was paid. */
             paid: boolean;
+            /** @description Whether the rebuy was paid, but not in cash. True also marks it as paid. Left out, a paid rebuy stays as it was. */
+            non_cash?: boolean;
         };
         /** NightDashboardResource */
         NightDashboardResource: {
@@ -1272,22 +1296,27 @@ export interface components {
             house_owner: components["schemas"]["PlayerResource"] | null;
             /**
              * @description The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and
-             *     `pending` add up the buy-in, the rebuys and the time chips of the player.
+             *     `pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a
+             *     rebuy's `non_cash` say that it was paid, but not in cash; the player's `non_cash` is how much of
+             *     `paid` that is.
              */
             players: {
                 player: components["schemas"]["PlayerResource"];
                 is_house_owner: boolean;
                 buy_in: string;
                 buy_in_paid: boolean;
+                buy_in_non_cash: boolean;
                 time_chip: boolean;
                 time_chip_paid: boolean;
                 rebuys: {
                     id: number;
                     paid: boolean;
+                    non_cash: boolean;
                 }[];
                 owed: string;
                 paid: string;
                 pending: string;
+                non_cash: string;
             }[];
             /** @description The positions of the open night's partial result filled so far. Empty once the night is finished. */
             positions: {
@@ -1315,6 +1344,17 @@ export interface components {
                     paid: string;
                     pending: string;
                 };
+            };
+            /**
+             * @description The total paid, split by how: `cash` is what should be in hand, `non_cash` what was paid another way
+             *     (a bank transfer, for instance). `non_cash` adds `non_cash_marked`, from the players' marks, and
+             *     `non_cash_adjustment`, typed by hand: it may be negative, and is null when there is none.
+             */
+            received: {
+                cash: string;
+                non_cash: string;
+                non_cash_marked: string;
+                non_cash_adjustment: string | null;
             };
             /**
              * @description The pot and the time chip set by hand on an open night ("Manual"), which stand in
@@ -1754,6 +1794,11 @@ export interface components {
         /** SetMainEventPotRequest */
         SetMainEventPotRequest: {
             /** @description The Main Event pot set by hand, as a decimal string such as "85.00", or null for the season's share of the pot. */
+            amount: string | null;
+        };
+        /** SetNonCashAdjustmentRequest */
+        SetNonCashAdjustmentRequest: {
+            /** @description The amount to add to what was paid not in cash, as a decimal string such as "20.00" or "-5.00", or null for none. */
             amount: string | null;
         };
         /** SetPartialAmountsRequest */
@@ -3162,6 +3207,38 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": components["schemas"]["SetPartialAmountsRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.setNonCashAdjustment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetNonCashAdjustmentRequest"];
             };
         };
         responses: {

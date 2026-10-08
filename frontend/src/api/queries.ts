@@ -345,7 +345,7 @@ async function sendDashboardChange(nightId: number, change: DashboardChange, lat
     case 'addRebuy':
       return (await unwrap(api.POST('/v1/nights/{night}/dashboard/players/{player}/rebuys', { params: { path: { ...night, player: change.player.id } }, body: { count: change.count } }))).data
     case 'markRebuy':
-      return (await unwrap(api.PATCH('/v1/nights/{night}/dashboard/rebuys/{rebuy}', { params: { path: { ...night, rebuy: rebuyId(change.player.id, change.index, change.id) } }, body: { paid: change.paid } }))).data
+      return (await unwrap(api.PATCH('/v1/nights/{night}/dashboard/rebuys/{rebuy}', { params: { path: { ...night, rebuy: rebuyId(change.player.id, change.index, change.id) } }, body: { paid: change.paid, ...(change.non_cash !== undefined && { non_cash: change.non_cash }) } }))).data
     case 'removeRebuy':
       return (await unwrap(api.DELETE('/v1/nights/{night}/dashboard/rebuys/{rebuy}', { params: { path: { ...night, rebuy: rebuyId(change.player.id, change.index, change.id) } } }))).data
     case 'removePlayer':
@@ -356,6 +356,8 @@ async function sendDashboardChange(nightId: number, change: DashboardChange, lat
       return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/positions/{position}', { params: { path: { ...night, position: change.position } }, body: { player_id: change.player?.id ?? null } }))).data
     case 'mainEventPot':
       return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/main-event-pot', { params: { path: night }, body: { amount: change.amount } }))).data
+    case 'nonCashAdjustment':
+      return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/non-cash-adjustment', { params: { path: night }, body: { amount: change.amount } }))).data
     case 'amounts':
       return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/amounts', { params: { path: night }, body: { ...(change.pot !== undefined && { pot: change.pot }), ...(change.time_chip !== undefined && { time_chip: change.time_chip }) } }))).data
   }

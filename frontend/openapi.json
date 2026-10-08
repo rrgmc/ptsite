@@ -1905,7 +1905,7 @@
         "/v1/nights/{night}/dashboard/rebuys/{rebuy}": {
             "patch": {
                 "operationId": "nightDashboard.markRebuy",
-                "summary": "Mark a rebuy as paid or not paid",
+                "summary": "Mark a rebuy as paid or not paid, and whether it was paid in cash",
                 "tags": [
                     "NightDashboard"
                 ],
@@ -2231,6 +2231,65 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/SetPartialAmountsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/dashboard/non-cash-adjustment": {
+            "put": {
+                "operationId": "nightDashboard.setNonCashAdjustment",
+                "summary": "\"Ajuste fora do dinheiro\": type an amount that is added to what was paid not in cash, for anything out of\nthe ordinary. It may be negative. Null takes it away",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SetNonCashAdjustmentRequest"
                             }
                         }
                     }
@@ -4580,6 +4639,10 @@
                         "type": "boolean",
                         "description": "Whether the player paid the buy-in."
                     },
+                    "buy_in_non_cash": {
+                        "type": "boolean",
+                        "description": "Whether the buy-in was paid, but not in cash: a bank transfer, for instance. True also marks it as paid. A buy-in that is not paid is never \"not in cash\"."
+                    },
                     "time_chip": {
                         "type": "boolean",
                         "description": "Whether the player arrived late and owes a time chip. False also unmarks it as paid. Refused on a site without the time chip."
@@ -4597,6 +4660,10 @@
                     "paid": {
                         "type": "boolean",
                         "description": "Whether the rebuy was paid."
+                    },
+                    "non_cash": {
+                        "type": "boolean",
+                        "description": "Whether the rebuy was paid, but not in cash. True also marks it as paid. Left out, a paid rebuy stays as it was."
                     }
                 },
                 "required": [
@@ -4674,7 +4741,7 @@
                     },
                     "players": {
                         "type": "array",
-                        "description": "The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and\n`pending` add up the buy-in, the rebuys and the time chips of the player.",
+                        "description": "The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and\n`pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a\nrebuy's `non_cash` say that it was paid, but not in cash; the player's `non_cash` is how much of\n`paid` that is.",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -4688,6 +4755,9 @@
                                     "type": "string"
                                 },
                                 "buy_in_paid": {
+                                    "type": "boolean"
+                                },
+                                "buy_in_non_cash": {
                                     "type": "boolean"
                                 },
                                 "time_chip": {
@@ -4706,11 +4776,15 @@
                                             },
                                             "paid": {
                                                 "type": "boolean"
+                                            },
+                                            "non_cash": {
+                                                "type": "boolean"
                                             }
                                         },
                                         "required": [
                                             "id",
-                                            "paid"
+                                            "paid",
+                                            "non_cash"
                                         ]
                                     }
                                 },
@@ -4722,6 +4796,9 @@
                                 },
                                 "pending": {
                                     "type": "string"
+                                },
+                                "non_cash": {
+                                    "type": "string"
                                 }
                             },
                             "required": [
@@ -4729,12 +4806,14 @@
                                 "is_house_owner",
                                 "buy_in",
                                 "buy_in_paid",
+                                "buy_in_non_cash",
                                 "time_chip",
                                 "time_chip_paid",
                                 "rebuys",
                                 "owed",
                                 "paid",
-                                "pending"
+                                "pending",
+                                "non_cash"
                             ]
                         }
                     },
@@ -4842,6 +4921,33 @@
                             "total"
                         ]
                     },
+                    "received": {
+                        "type": "object",
+                        "description": "The total paid, split by how: `cash` is what should be in hand, `non_cash` what was paid another way\n(a bank transfer, for instance). `non_cash` adds `non_cash_marked`, from the players' marks, and\n`non_cash_adjustment`, typed by hand: it may be negative, and is null when there is none.",
+                        "properties": {
+                            "cash": {
+                                "type": "string"
+                            },
+                            "non_cash": {
+                                "type": "string"
+                            },
+                            "non_cash_marked": {
+                                "type": "string"
+                            },
+                            "non_cash_adjustment": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "cash",
+                            "non_cash",
+                            "non_cash_marked",
+                            "non_cash_adjustment"
+                        ]
+                    },
                     "manual": {
                         "type": "object",
                         "description": "The pot and the time chip set by hand on an open night (\"Manual\"), which stand in\nfor the ones in `totals`. Null for an amount that was not typed.",
@@ -4912,6 +5018,7 @@
                     "main_event_pot",
                     "suggested_main_event_pot",
                     "totals",
+                    "received",
                     "manual",
                     "recorded",
                     "read_at"
@@ -6476,6 +6583,23 @@
                     "amount"
                 ],
                 "title": "SetMainEventPotRequest"
+            },
+            "SetNonCashAdjustmentRequest": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The amount to add to what was paid not in cash, as a decimal string such as \"20.00\" or \"-5.00\", or null for none.",
+                        "pattern": "^-?\\d{1,10}(\\.\\d{1,2})?$"
+                    }
+                },
+                "required": [
+                    "amount"
+                ],
+                "title": "SetNonCashAdjustmentRequest"
             },
             "SetPartialAmountsRequest": {
                 "type": "object",

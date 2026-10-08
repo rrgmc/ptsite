@@ -8,10 +8,11 @@ import { Checkbox } from '@/components/Checkbox'
 import { Badge, Empty } from '@/components/Feedback'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { TextField } from '@/components/TextField'
+import { ChipSign } from '@/components/ToggleChip'
 import { t } from '@/i18n'
 import { rich } from '@/i18n/rich'
 import { hasFeature } from '@/lib/features'
-import { formatMoney, formatTime, formatWeekday, moneyText, ordinal, parseMoneyInput, titleOfNight } from '@/lib/format'
+import { formatMoney, formatTime, formatWeekday, moneyText, ordinal, parseMoneyInput, parseSignedMoneyInput, titleOfNight } from '@/lib/format'
 import { searchKey } from '@/lib/search'
 import { currencySymbol } from '@/lib/site'
 import { usePageTitle } from '@/lib/usePageTitle'
@@ -106,6 +107,14 @@ export function NightDashboardView({
                 ))}
               </ul>
             )}
+            {dashboard.players.length > 0 && (
+              // What the signs on a buy-in and on a rebuy mean, and how to get to the second one.
+              <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+                <span className="inline-flex items-center gap-1"><ChipSign tone="done" swatch /> {t.dashboard.legend.cash}</span>
+                <span className="inline-flex items-center gap-1"><ChipSign tone="otherWay" swatch /> {t.dashboard.legend.nonCash}</span>
+                {canEdit && <span>{t.dashboard.legend.howTo}</span>}
+              </p>
+            )}
           </div>
         </DisclosurePanel>
       </Disclosure>
@@ -113,8 +122,7 @@ export function NightDashboardView({
       {isOpen && (
         <Card title={t.dashboard.manual.title}>
           {canEdit ? (
-            // Keyed so the fields start again from amounts that someone else saved.
-            <AmountsForm key={`${dashboard.manual.pot}|${dashboard.manual.time_chip}|${dashboard.main_event_pot}`} dashboard={dashboard} onChange={onChange} />
+            <AmountsForm dashboard={dashboard} onChange={onChange} />
           ) : (
             <dl className="text-sm">
               {amountRows({ pot: inUse.pot, mainEventPot: inUse.mainEventPot, timeChip: inUse.timeChip }).map(([label, amount]) => (
@@ -235,17 +243,27 @@ function PositionsList({ positions }: { positions: NightDashboard['positions'] }
   )
 }
 
-type AmountKey = 'pot' | 'timeChip' | 'mainEventPot'
+type AmountKey = 'pot' | 'timeChip' | 'mainEventPot' | 'nonCashAdjustment'
 
 /**
  * "Valores": the pot, the time chip and the Main Event pot, each in a field with a "Manual" mark beside it.
  * Unmarked, a field is closed and shows the amount worked out (for the Main Event pot, the season's share of the
- * pot). Marked, its amount is typed, and stands in for the one worked out once saved: one "Salvar" saves every
- * marked amount. Unmarking a saved amount goes back to the one worked out, at once.
+ * pot). Marked, its amount is typed, and stands in for the one worked out once saved. Unmarking a saved amount
+ * goes back to the one worked out, also once saved: nothing changes at the tap on a mark, so a tap by mistake
+ * costs nothing. Until then the field only closes, with the saved amount still in it. One "Salvar" saves every
+ * change.
+ *
+ * The dashboard is read again every few seconds, and someone else may save an amount meanwhile. A field that was
+ * not touched here follows what is saved; one that was marked, unmarked or typed in stays as it was left, until
+ * it is saved.
+ *
+ * Last comes "Ajustar o valor fora do dinheiro", an amount added to what was paid not in cash, for anything out of
+ * the ordinary. Its mark comes first, and its field shows only while it is marked: it starts empty and takes a
+ * negative amount.
  */
 function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onChange: OnChange }) {
   const { manual, totals } = dashboard
-  const fields: { key: AmountKey; label: string; checkLabel: string; saved: string | null; worked: string | null }[] = [
+  const fields: { key: AmountKey; label: string; help?: string; checkLabel: string; saved: string | null; worked: string | null }[] = [
     { key: 'pot', label: t.nights.moneyFields.pot({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkPot, saved: manual.pot, worked: totals.pot.owed },
     ...(totals.time_chip
       ? [{ key: 'timeChip' as const, label: t.nights.moneyFields.timeChip({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkTimeChip, saved: manual.time_chip, worked: totals.time_chip.owed }]
@@ -253,55 +271,98 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
     ...(hasFeature('mainEventPot')
       ? [{ key: 'mainEventPot' as const, label: t.nights.moneyFields.mainEventPot({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkMainEventPot, saved: dashboard.main_event_pot, worked: dashboard.suggested_main_event_pot }]
       : []),
+    {
+      key: 'nonCashAdjustment',
+      label: t.dashboard.manual.nonCashAdjustment({ currency: currencySymbol }),
+      help: t.dashboard.manual.nonCashAdjustmentHelp,
+      checkLabel: t.dashboard.manual.checkNonCashAdjustment,
+      saved: dashboard.received.non_cash_adjustment,
+      worked: null,
+    },
   ]
-  const [marked, setMarked] = useState<Partial<Record<AmountKey, boolean>>>(() => Object.fromEntries(fields.map((f) => [f.key, f.saved !== null])))
-  const [texts, setTexts] = useState<Partial<Record<AmountKey, string>>>(() => Object.fromEntries(fields.map((f) => [f.key, moneyText(f.saved)])))
+  type Field = (typeof fields)[number]
+  type Edit = { marked: boolean; text: string }
+  /** The fields touched here and not saved yet. */
+  const [edits, setEdits] = useState<Partial<Record<AmountKey, Edit>>>({})
+  const asSaved = (f: Field): Edit => ({ marked: f.saved !== null, text: moneyText(f.saved) })
+  const marked = Object.fromEntries(fields.map((f) => [f.key, (edits[f.key] ?? asSaved(f)).marked])) as Partial<Record<AmountKey, boolean>>
+  const texts = Object.fromEntries(fields.map((f) => [f.key, (edits[f.key] ?? asSaved(f)).text])) as Partial<Record<AmountKey, string>>
+  const edit = (f: Field, change: Partial<Edit>) => setEdits((all) => ({ ...all, [f.key]: { ...(all[f.key] ?? asSaved(f)), ...change } }))
   /** The amount typed in a field: null when it is empty or wrong. */
-  const typed = (key: AmountKey) => parseMoneyInput(texts[key] ?? '')
+  const typed = (key: AmountKey) => (key === 'nonCashAdjustment' ? parseSignedMoneyInput : parseMoneyInput)(texts[key] ?? '')
   const send = (amounts: Partial<Record<AmountKey, string | null>>) => {
     if ('pot' in amounts || 'timeChip' in amounts) {
       onChange({ type: 'amounts', ...('pot' in amounts && { pot: amounts.pot }), ...('timeChip' in amounts && { time_chip: amounts.timeChip }) })
     }
     if ('mainEventPot' in amounts) onChange({ type: 'mainEventPot', amount: amounts.mainEventPot ?? null })
+    if ('nonCashAdjustment' in amounts) onChange({ type: 'nonCashAdjustment', amount: amounts.nonCashAdjustment ?? null })
   }
   const open = fields.filter((f) => marked[f.key])
   const incomplete = open.some((f) => typed(f.key) === null)
-  const changed = open.filter((f) => typed(f.key) !== f.saved)
+  /** What "Salvar" sends: the amounts typed over the saved ones, and null for a saved amount that was unmarked. */
+  const changes = Object.fromEntries(
+    fields.flatMap((f) => {
+      const amount = marked[f.key] ? typed(f.key) : null
+      return amount === f.saved ? [] : [[f.key, amount]]
+    }),
+  ) as Partial<Record<AmountKey, string | null>>
+  const hasChanges = Object.keys(changes).length > 0
 
   return (
     <Form
       className="flex flex-col gap-3"
       onSubmit={(e) => {
         e.preventDefault()
-        if (!incomplete && changed.length > 0) send(Object.fromEntries(changed.map((f) => [f.key, typed(f.key)])))
+        if (incomplete || !hasChanges) return
+        send(changes)
+        // What was sent is the saved amount now: its fields follow the dashboard again.
+        setEdits((all) => Object.fromEntries(Object.entries(all).filter(([key]) => !(key in changes))))
       }}
     >
-      {fields.map((field) => (
-        <div key={field.key} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+      {fields.map((field) => {
+        const isAdjustment = field.key === 'nonCashAdjustment'
+        // A saved amount that was unmarked is still in use, and in its field, until "Salvar".
+        const isLeaving = !marked[field.key] && field.saved !== null
+        const textField = (
           <TextField
             label={field.label}
-            inputMode="decimal"
+            aria-describedby={field.help ? `${field.key}-help` : undefined}
+            // The keyboard of numbers has no minus sign on every phone.
+            inputMode={isAdjustment ? 'text' : 'decimal'}
             isDisabled={!marked[field.key]}
-            value={marked[field.key] ? (texts[field.key] ?? '') : moneyText(field.worked)}
-            onChange={(text) => setTexts({ ...texts, [field.key]: text })}
+            value={marked[field.key] || isLeaving ? (texts[field.key] ?? '') : moneyText(field.worked)}
+            onChange={(text) => edit(field, { text })}
             errorMessage={marked[field.key] && (texts[field.key] ?? '').trim() !== '' && typed(field.key) === null ? t.nights.invalidMoney : undefined}
           />
+        )
+        const mark = (
           <Checkbox
             aria-label={field.checkLabel}
             isSelected={Boolean(marked[field.key])}
             onChange={(checked) => {
-              setMarked({ ...marked, [field.key]: checked })
-              // Marking starts from the amount in use; unmarking drops the one that was saved.
-              setTexts({ ...texts, [field.key]: checked ? moneyText(field.worked) : '' })
-              if (!checked && field.saved !== null) send({ [field.key]: null })
+              // Marking starts from the amount in use, or goes on from what was typed. Nothing is sent until "Salvar".
+              edit(field, { marked: checked, ...(checked && (texts[field.key] ?? '') === '' && { text: moneyText(field.saved ?? field.worked) }) })
             }}
           >
-            {t.dashboard.manual.mark}
+            {isAdjustment ? field.checkLabel : t.dashboard.manual.mark}
           </Checkbox>
-        </div>
-      ))}
-      {open.length > 0 && (
-        <Button type="submit" variant="secondary" className="self-start" isDisabled={incomplete || changed.length === 0}>{t.dashboard.manual.save}</Button>
+        )
+        return isAdjustment ? (
+          // The mark first: the field is of no use to most nights, and shows only while it is marked.
+          <div key={field.key} className="flex flex-col gap-2 border-t border-border/60 pt-3">
+            {mark}
+            {(marked[field.key] || isLeaving) && textField}
+            {(marked[field.key] || isLeaving) && <p id={`${field.key}-help`} className="text-sm text-muted">{field.help}</p>}
+          </div>
+        ) : (
+          <div key={field.key} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+            {textField}
+            {mark}
+          </div>
+        )
+      })}
+      {(open.length > 0 || hasChanges) && (
+        <Button type="submit" variant="secondary" className="self-start" isDisabled={incomplete || !hasChanges}>{t.dashboard.manual.save}</Button>
       )}
     </Form>
   )
@@ -310,10 +371,11 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
 /**
  * The night's amounts, always in sight at the foot of the screen: the pot, the time chip apart from it, and the
  * two added up. An amount typed by hand stands in for the one worked out, which is still shown below it. Each
- * says what was paid and what is pending, of what the players owe.
+ * says what was paid and what is pending, of what the players owe. Once a payment was not in cash, a line below
+ * says how much of what was paid is in cash, to check the money in hand.
  */
 export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
-  const { totals, manual } = dashboard
+  const { totals, manual, received } = dashboard
   const inUse = amountsInUse(dashboard)
   const columns: { label: string; amount: string; amounts: Amounts; isManual: boolean }[] = [
     { label: t.dashboard.totals.pot, amount: inUse.pot, amounts: totals.pot, isManual: manual.pot !== null },
@@ -343,6 +405,12 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
           </div>
         ))}
       </dl>
+      {Number(received.non_cash) !== 0 && (
+        <p className="mt-1 flex flex-wrap gap-x-3 border-t border-border/60 pt-1 text-xs tabular">
+          <span className="font-semibold">{t.dashboard.totals.cash({ amount: formatMoney(received.cash) })}</span>
+          <span className="text-muted">{t.dashboard.totals.nonCash({ amount: formatMoney(received.non_cash) })}</span>
+        </p>
+      )}
     </section>
   )
 }

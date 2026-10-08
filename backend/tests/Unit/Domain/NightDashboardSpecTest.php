@@ -72,6 +72,34 @@ it('adds the buy-ins and every rebuy up as the pot, and keeps the time chip apar
         ->and(amounts($pot->plus($timeChip)))->toBe(['450.00', '295.00', '155.00']);
 });
 
+it('adds up what was paid not in cash: a buy-in with its time chip, and a rebuy with the one it pays', function () {
+    $money = nightMoney();
+    $night = [
+        ...theNight(),
+        'ana' => new NightEntry(1, buyInPaid: true, rebuysPaid: [true], rebuysNonCash: [true]),
+        'breno' => new NightEntry(2, buyInPaid: true, rebuysPaid: [true, true, false], buyInNonCash: true),
+    ];
+
+    expect($money->nonCashOf($night['ana'])->toDecimal())->toBe('55.00')
+        ->and($money->nonCashOf($night['breno'])->toDecimal())->toBe('50.00')
+        ->and($money->nonCash($night)->toDecimal())->toBe('105.00')
+        ->and($money->nonCash(theNight())->toDecimal())->toBe('0.00');
+});
+
+it('counts a time chip as paid the way the buy-in was, and nothing that is not paid', function () {
+    $money = nightMoney();
+
+    expect($money->nonCashOf(new NightEntry(3, buyInPaid: true, timeChip: true, timeChipPaid: true, buyInNonCash: true))->toDecimal())->toBe('55.00')
+        // The time chip is still owed.
+        ->and($money->nonCashOf(new NightEntry(3, buyInPaid: true, timeChip: true, buyInNonCash: true))->toDecimal())->toBe('50.00')
+        // The buy-in was paid in cash, and so was the time chip.
+        ->and($money->nonCashOf(new NightEntry(3, buyInPaid: true, timeChip: true, timeChipPaid: true))->toDecimal())->toBe('0.00')
+        // A mark left on a payment that is not paid counts for nothing.
+        ->and($money->nonCashOf(new NightEntry(3, rebuysPaid: [false], buyInNonCash: true, rebuysNonCash: [true]))->toDecimal())->toBe('0.00')
+        // The owner of the house pays the smaller buy-in.
+        ->and($money->nonCashOf(new NightEntry(5, isHouseOwner: true, buyInPaid: true, buyInNonCash: true))->toDecimal())->toBe('25.00');
+});
+
 it('charges the owner of the house the smaller buy-in, and the others the buy-in', function () {
     $money = nightMoney();
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatLongDate, formatMoney, fullNameIfDifferent, moneyText, nightTitle, parseMoneyInput, shareOf, titleOfNight } from './format'
+import { formatDate, formatLongDate, formatMoney, fullNameIfDifferent, moneyText, nightTitle, parseMoneyInput, parseSignedMoneyInput, shareOf, titleOfNight } from './format'
 
 describe('format', () => {
   it('formats money in reais', () => {
@@ -27,6 +27,15 @@ describe('format', () => {
     expect(parseMoneyInput('1.234,5')).toBe('1234.50')
     expect(parseMoneyInput('R$ 845,00')).toBe('845.00')
     expect(parseMoneyInput('abc')).toBeNull()
+  })
+
+  it('parses an amount that may be negative', () => {
+    expect(parseSignedMoneyInput('-5')).toBe('-5.00')
+    expect(parseSignedMoneyInput(' −1.234,5 ')).toBe('-1234.50')
+    expect(parseSignedMoneyInput('20,00')).toBe('20.00')
+    expect(parseSignedMoneyInput('-0')).toBe('0.00')
+    expect(parseSignedMoneyInput('--5')).toBeNull()
+    expect(parseSignedMoneyInput('-')).toBeNull()
   })
 
   it('fills a money field with the amount as the site writes it, so that it is read back the same', () => {
