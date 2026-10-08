@@ -178,8 +178,8 @@ export const admin: Messages['admin'] = {
 
   seasons: {
     newSeason: '+ New season',
-    summary: ({ start, planned, rounds, finished, percents, weekday, time, every }) =>
-      `Start ${start} · ${planned} of ${rounds} rounds (${finished} finished) · ${percents}% · ${weekday} ${time}, ${every}`,
+    listTitle: 'Seasons',
+    columns: { season: 'Season', start: 'Start', nights: 'Nights', finished: 'Finished', status: 'Status', actions: 'Actions' },
     finished: 'Finished',
     open: 'Open',
     closed: 'Closed',

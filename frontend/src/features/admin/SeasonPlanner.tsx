@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { ApiError, type CalendarHoliday, type PlannedDate, type Season } from '@/api/client'
-import { useHolidayCalendars, useNightPlan, useScheduleNights, useSeason } from '@/api/queries'
+import { useHolidayCalendars, useNightPlan, useScheduleNights, useSeason, useSeasonNights } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
@@ -21,18 +21,26 @@ import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 export function SeasonPlanner({ today: now = today() }: { today?: string }) {
   const seasonId = Number(useParams().seasonId)
   const season = useSeason(seasonId)
-  const start = [now, season.data?.starts_on ?? ''].sort()[1]
+  const seasonStart = season.data?.starts_on ?? ''
+  // New dates are suggested from today on, never in the past, unless the admin types an earlier "De".
+  const start = [now, seasonStart].sort()[1]
   const [from, setFrom] = useState<string | null>(null)
   const [to, setTo] = useState<string | null>(null)
   // Kept here, not in the calendar: scheduling refreshes the plan, which starts the calendar again.
   const [scheduled, setScheduled] = useState<number | null>(null)
-  const fromValue = from ?? start
+  const planFrom = from ?? start
+  // The calendar shows the whole season: from its start date, with the rounds it already has.
+  const fromValue = from ?? seasonStart
+  const nights = useSeasonNights(season.data && from === null && seasonStart < planFrom ? seasonId : undefined)
+  const earlier: PlannedDate[] = (nights.data ?? [])
+    .filter((n) => n.type === 'regular' && !n.is_extra && !n.archived && dayOf(n.starts_at) < planFrom)
+    .map((n) => ({ starts_at: n.starts_at, included: false, taken: true, night_id: n.id, skip_reason: null }))
   // Until "Até" is typed: plan the rounds the season still needs, or up to the end of the year when none are left.
   const remaining = season.data ? season.data.rounds - (season.data.nights_planned ?? 0) : 0
   const byRounds = to === null && remaining > 0
-  const toQuery = byRounds ? addDays(fromValue, 540) : to ?? `${fromValue.slice(0, 4)}-12-31`
-  const plan = useNightPlan(seasonId, season.data ? fromValue : '', season.data ? toQuery : '', byRounds ? remaining : undefined)
-  const lastPlanned = plan.data?.length ? dayOf(plan.data.at(-1)!.starts_at) : fromValue
+  const toQuery = byRounds ? addDays(planFrom, 540) : to ?? `${planFrom.slice(0, 4)}-12-31`
+  const plan = useNightPlan(seasonId, season.data ? planFrom : '', season.data ? toQuery : '', byRounds ? remaining : undefined)
+  const lastPlanned = plan.data?.length ? dayOf(plan.data.at(-1)!.starts_at) : planFrom
   const toValue = byRounds ? (plan.data ? lastPlanned : '') : toQuery
   const holidays = useHolidayCalendars(fromValue && toQuery >= fromValue ? yearsBetween(fromValue, toQuery) : [])
 
@@ -70,14 +78,14 @@ export function SeasonPlanner({ today: now = today() }: { today?: string }) {
           <p role="status" className="font-semibold text-success">{t.admin.planner.scheduledCount({ count: scheduled })}</p>
           <Link to="/calendar" className="mt-2 inline-block text-primary underline">{t.admin.planner.viewCalendar}</Link>
         </Card>
-      ) : plan.isPending || holidays.isPending ? <Loading label={t.admin.planner.calculating} /> : plan.error ? <ErrorBox error={plan.error} /> : (
+      ) : plan.isPending || holidays.isPending || nights.isLoading ? <Loading label={t.admin.planner.calculating} /> : plan.error ? <ErrorBox error={plan.error} /> : (
         // A new plan starts again from its own ticks.
         <PlanCalendar
-          key={`${fromValue}|${toValue}|${plan.dataUpdatedAt}`}
+          key={`${fromValue}|${toValue}|${plan.dataUpdatedAt}|${nights.dataUpdatedAt}`}
           season={s}
           from={fromValue}
           to={toValue}
-          dates={plan.data!}
+          dates={[...earlier, ...plan.data!]}
           holidays={holidays.data}
           onScheduled={setScheduled}
           today={now}

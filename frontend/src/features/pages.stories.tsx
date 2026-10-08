@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw'
 import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { RouterStory } from '@/mocks/RouterStory'
 import { handlers } from '@/mocks/handlers'
-import { extraNight, finishedNight, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, statisticsEmpty } from '@/mocks/data'
+import { extraNight, finishedNight, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, season, statisticsEmpty } from '@/mocks/data'
 import { MainEventAdmin } from './admin/MainEventAdmin'
 import { PlaceEditPage, PlacesAdmin } from './admin/PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './admin/PlayersAdmin'
@@ -30,6 +30,12 @@ export default meta
 /** A night is open and the player has not answered, so the banner above the title offers ALL IN and FOLD. */
 export const Standings: StoryObj = { render: () => <RouterStory path="/" url="/" element={<StandingsPage />} /> }
 
+/** "Classificação" of a season whose Main Event was played: its first three are above the table. */
+export const StandingsWithMainEvent: StoryObj = {
+  parameters: { msw: [http.get('/api/v1/seasons/:id/nights', () => HttpResponse.json({ data: [finishedNight, mainEventNight] })), ...handlers] },
+  render: () => <RouterStory path="/" url="/" element={<StandingsPage />} />,
+}
+
 /** The same banner above "Resultados", for a player who already answered: Ana is ALL IN. Then the upcoming nights, the chart and the results. */
 export const Results: StoryObj = {
   parameters: { msw: [http.get('/api/v1/me', () => HttpResponse.json({ data: { ...keeper, player: players[0] } })), ...handlers] },
@@ -53,6 +59,28 @@ const seasonNights = (nights: object[]) => [http.get('/api/v1/seasons/:id/nights
 /** "Resultados" of a season with an extra night and its Main Event: neither has a number, and each is marked. */
 export const ResultsWithExtraAndMainEvent: StoryObj = {
   parameters: { msw: seasonNights([finishedNight, extraNight, mainEventNight]) },
+  render: () => <RouterStory path="/results" url="/results" element={<ResultsPage />} />,
+}
+
+const laterNight = (id: number, startsAt: string) => ({ ...openNight, id, status: 'scheduled', starts_at: startsAt })
+
+/** "Resultados" of a season with three nights to come: "Próximos eventos" lists two and leads to the calendar. */
+export const ResultsManyUpcoming: StoryObj = {
+  parameters: {
+    msw: seasonNights([finishedNight, openNight, laterNight(21, '2026-04-25T21:00:00-03:00'), laterNight(22, '2026-05-02T21:00:00-03:00')]),
+  },
+  render: () => <RouterStory path="/results" url="/results" element={<ResultsPage />} />,
+}
+
+/** "Resultados" of a finished season: no "Próximos eventos", even for a results keeper and with a night left over. */
+export const ResultsFinishedSeason: StoryObj = {
+  parameters: {
+    msw: [
+      http.get('/api/v1/seasons/current', () => HttpResponse.json({ data: { ...season, is_open: false, is_finished: true } })),
+      http.get('/api/v1/me', () => HttpResponse.json({ data: keeper })),
+      ...seasonNights([finishedNight, laterNight(21, '2026-04-25T21:00:00-03:00')]),
+    ],
+  },
   render: () => <RouterStory path="/results" url="/results" element={<ResultsPage />} />,
 }
 

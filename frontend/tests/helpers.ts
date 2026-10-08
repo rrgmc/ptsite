@@ -31,7 +31,7 @@ export function seasonNotice(page: Page) {
 /** Picks a season in "Escolher temporada", opened from the header. The site returns to the season screen it was on. */
 export async function pickSeason(page: Page, name: string) {
   await seasonLink(page).click()
-  await page.getByRole('listitem').filter({ has: page.getByText(name, { exact: true }) }).getByRole('button').click()
+  await page.getByRole('row').filter({ has: page.getByText(name, { exact: true }) }).getByRole('button').click()
   await expect(seasonLink(page)).toContainText(name)
 }
 

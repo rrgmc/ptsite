@@ -8,6 +8,8 @@ export const results: Messages['results'] = {
   overPlanned: ({ planned, rounds }: { planned: number; rounds: number }) =>
     `The season already has ${planned} nights out of ${rounds} rounds. You can still schedule another.`,
   noUpcoming: 'No night scheduled.',
+  /** Below the next nights, when the season has more to come. */
+  seeCalendar: 'See all in the calendar',
   loadingChart: 'Loading chart…',
   seasonTotals: 'Season totals',
   noFinished: 'No night finished in this season.',

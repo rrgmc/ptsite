@@ -43,8 +43,10 @@ it.
 
 ### Planning
 
-5. The admin chooses the **start and end dates** of the plan (at most about 18 months). The start defaults to today,
-   or the season start if later. Until the admin types an end date, **the plan stops at the night that completes
+5. The admin chooses the **start and end dates** of the plan (at most about 18 months). **The calendar opens on
+   the whole season**: the start defaults to the season's start date, and the months before today show the
+   rounds the season already has. Until the admin types a start date, **no date before today is suggested**: new
+   dates start today, or at the season start if later. Until the admin types an end date, **the plan stops at the night that completes
    the season's rounds** (the rounds minus the nights it already has), so an empty season gets exactly its 26
    nights around the holidays. When no rounds are left, the end defaults to 31/12.
 6. The planner walks the season's **regular weekday** **every N weeks** (the season's frequency, from 1 to 4; 2
@@ -108,7 +110,7 @@ it.
 ## Screens
 
 - **Administração → Temporadas**: each season that is not finished has **"Planejar datas"**, and the list shows
-  "N de 26 rodadas". The season form has **"Rodadas"** and **"Frequência"** (toda semana, a cada 2, 3 ou 4
+  the rounds scheduled ("Eventos") and the ones played ("Finalizados"). The season form has **"Rodadas"** and **"Frequência"** (toda semana, a cada 2, 3 ou 4
   semanas) next to the regular weekday and time.
 - **Planejar datas** is a **calendar**: "De" and "Até" fields ("Até" shows the last round, with the hint "Até a
   última rodada (26ª)", or "Fim do ano" when no rounds are left), the "Rodadas" counter and a legend, then one month grid per month. Ticked days are filled; regular

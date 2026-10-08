@@ -23,43 +23,62 @@ export function SeasonsAdmin() {
   if (seasons.isPending) return <Loading />
   if (seasons.error) return <ErrorBox error={seasons.error} />
 
+  const status = (s: Season) =>
+    s.is_finished ? <Badge>{t.admin.seasons.finished}</Badge> : s.is_open ? <Badge tone="primary">{t.admin.seasons.open}</Badge> : <Badge tone="warning">{t.admin.seasons.closed}</Badge>
+  const actionLink = 'inline-flex min-h-touch items-center rounded-md px-3 font-semibold whitespace-nowrap text-primary hover:bg-primary-soft'
+  const actions = (s: Season) => (
+    <>
+      {!s.is_finished && hasFeature('seasonPlanner') && (
+        <Link to={`/admin/seasons/${s.id}/plan`} className={actionLink}>{t.admin.seasons.planDates}</Link>
+      )}
+      {hasFeature('mainEvent') && (
+        <Link to={`/admin/seasons/${s.id}/main-event`} aria-label={t.admin.mainEvent.linkLabel({ season: s.name })} className={actionLink}>{t.admin.seasons.mainEvent}</Link>
+      )}
+      <Button variant="ghost" onPress={() => navigate(`/admin/seasons/${s.id}`)} aria-label={t.admin.editItem({ name: s.name })}>{t.common.edit}</Button>
+    </>
+  )
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <Button className="self-start" onPress={() => navigate('/admin/seasons/new')}>{t.admin.seasons.newSeason}</Button>
-      <Card>
-        <ul className="divide-y divide-border/60">
-          {seasons.data!.map((s) => (
-            <li key={s.id} className="flex min-h-touch flex-wrap items-center justify-between gap-2 px-2 py-2 even:bg-surface-stripe">
-              <span>
-                <span className="font-semibold">{s.name}</span>
-                <span className="block text-sm text-muted">{t.admin.seasons.summary({
-                  start: formatDate(s.starts_on),
-                  planned: s.nights_planned ?? 0,
-                  rounds: s.rounds,
-                  finished: s.nights_count ?? 0,
-                  percents: s.percentages?.map((p) => p.percent).join('/') ?? '',
-                  weekday: WEEKDAYS[s.schedule.weekday - 1]?.label ?? '',
-                  time: s.schedule.time,
-                  every: EVERY_WEEKS[s.schedule.every_weeks - 1]?.label.toLowerCase() ?? '',
-                })}</span>
-              </span>
-              <span className="flex flex-wrap items-center gap-2">
-                {s.is_finished ? <Badge>{t.admin.seasons.finished}</Badge> : s.is_open ? <Badge tone="primary">{t.admin.seasons.open}</Badge> : <Badge tone="warning">{t.admin.seasons.closed}</Badge>}
-                {!s.is_finished && hasFeature('seasonPlanner') && (
-                  <Link to={`/admin/seasons/${s.id}/plan`} className="inline-flex min-h-touch items-center rounded-md px-4 font-semibold text-primary hover:bg-primary-soft">
-                    {t.admin.seasons.planDates}
-                  </Link>
-                )}
-                {hasFeature('mainEvent') && (
-                  <Link to={`/admin/seasons/${s.id}/main-event`} aria-label={t.admin.mainEvent.linkLabel({ season: s.name })} className="inline-flex min-h-touch items-center rounded-md px-4 font-semibold text-primary hover:bg-primary-soft">
-                    {t.admin.seasons.mainEvent}
-                  </Link>
-                )}
-                <Button variant="ghost" onPress={() => navigate(`/admin/seasons/${s.id}`)} aria-label={t.admin.editItem({ name: s.name })}>{t.common.edit}</Button>
-              </span>
-            </li>
-          ))}
-        </ul>
+      <Card title={t.admin.seasons.listTitle}>
+        {/* On a narrow screen the table scrolls sideways inside its card instead of widening the page. "relative" keeps the
+            headings that only screen readers get inside the scrolling area. */}
+        <div className="relative overflow-x-auto">
+          <table className="w-full border-collapse">
+            <caption className="sr-only">{t.admin.seasons.listTitle}</caption>
+            <thead>
+              <tr className="border-b border-border text-left text-xs uppercase text-muted">
+                <th scope="col" className="px-2 py-2">{t.admin.seasons.columns.season}</th>
+                <th scope="col" className="px-2 py-2">{t.admin.seasons.columns.start}</th>
+                <th scope="col" className="hidden px-2 py-2 text-right sm:table-cell">{t.admin.seasons.columns.nights}</th>
+                <th scope="col" className="hidden px-2 py-2 text-right sm:table-cell">{t.admin.seasons.columns.finished}</th>
+                <th scope="col" className="hidden px-2 py-2 sm:table-cell">{t.admin.seasons.columns.status}</th>
+                <th scope="col" className="hidden px-2 py-2 sm:table-cell"><span className="sr-only">{t.admin.seasons.columns.actions}</span></th>
+              </tr>
+            </thead>
+            {/* One body per season: a phone hides the two counts, and puts the status and the actions on a second line. */}
+            {seasons.data!.map((s) => (
+              <tbody key={s.id} className="border-b border-border/60 last:border-0 odd:bg-surface-stripe">
+                <tr>
+                  <th scope="row" className="px-2 py-2 text-left font-semibold wrap-anywhere">{s.name}</th>
+                  <td className="px-2 py-2 whitespace-nowrap tabular">{formatDate(s.starts_on)}</td>
+                  <td className="hidden px-2 py-2 text-right tabular sm:table-cell">{s.nights_planned ?? 0}</td>
+                  <td className="hidden px-2 py-2 text-right tabular sm:table-cell">{s.nights_count ?? 0}</td>
+                  <td className="hidden px-2 py-2 sm:table-cell">{status(s)}</td>
+                  <td className="hidden py-1 sm:table-cell">
+                    <span className="flex flex-wrap items-center justify-end gap-x-2">{actions(s)}</span>
+                  </td>
+                </tr>
+                <tr className="sm:hidden">
+                  <td colSpan={2} className="px-2 pb-1">
+                    <span className="flex flex-wrap items-center gap-x-1">{status(s)}{actions(s)}</span>
+                  </td>
+                </tr>
+              </tbody>
+            ))}
+          </table>
+        </div>
       </Card>
     </div>
   )

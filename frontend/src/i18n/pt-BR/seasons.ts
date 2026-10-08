@@ -17,6 +17,9 @@ export const seasons = {
   subtitle: 'Escolha a temporada que o site mostra.',
   noSeason: 'Nenhuma temporada cadastrada.',
   started: ({ date, count }: { date: string; count: number }) => `Início ${date} · ${count} ${plural(count, { one: 'evento', other: 'eventos' })}`,
+  /** "Escolher temporada": the title of the list and its columns. */
+  listTitle: 'Temporadas',
+  columns: { season: 'Temporada', start: 'Início', nights: 'Eventos', finished: 'Finalizados', status: 'Situação' },
   selected: '✓ Selecionada',
 
   // The badges
