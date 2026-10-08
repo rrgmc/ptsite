@@ -12,7 +12,7 @@ export const dashboard = {
   // Participants
   players: {
     heading: ({ count }: { count: number }) => `Players (${count})`,
-    empty: 'No players yet. Confirm who arrived in the list below.',
+    empty: 'No players yet. Add who arrived with the search below.',
     houseOwner: 'House owner',
     buyIn: 'Buy-in',
     timeChip: 'Time chip',
@@ -31,28 +31,46 @@ export const dashboard = {
 
   // Players who are not on the night yet
   others: {
-    heading: ({ count }: { count: number }) => `Not confirmed (${count})`,
+    heading: 'Add a player',
+    search: 'Find a player',
+    searchPlaceholder: 'Nickname or name',
+    hint: 'Type the nickname of who arrived to confirm them at one tap.',
+    noneFound: 'No player found.',
+    more: ({ shown, total }: { shown: number; total: number }) => `Showing ${shown} of ${total}. Type more to find one.`,
     confirm: 'Confirm',
     confirmPaid: 'Buy-in paid',
-    addOther: 'Another player',
     actionsOf: ({ nickname }: { nickname: string }) => `Confirm ${nickname}`,
   },
 
-  // Positions and the Main Event pot
+  // The pot and the time chip typed by hand
+  manual: {
+    title: 'Pot and time chip',
+    check: 'Set the pot and the time chip by hand',
+    checkPotOnly: 'Set the pot by hand',
+    help: 'For a night that does not record every player\'s payments. An empty amount uses the one worked out.',
+    calculated: ({ amount }: { amount: string }) => `Worked out: ${amount}`,
+    save: 'Save the amounts',
+    /** Beside an amount at the foot of the screen that was typed by hand. */
+    mark: 'by hand',
+  },
+
+  // Positions
   positions: {
     title: 'Positions',
-    help: 'Each position is saved when its player is picked. The points are from the pot worked out so far.',
+    help: 'Each position is saved when its player is picked. The points are from the pot so far.',
     empty: 'No position filled.',
   },
   mainEventPot: {
-    save: 'Save',
-    useSuggested: ({ amount }: { amount: string }) => `Use ${amount}`,
-    suggested: ({ amount }: { amount: string }) => `Suggested by the season: ${amount}`,
+    check: 'Set the Main Event pot by hand',
+    suggested: ({ amount }: { amount: string }) => `Main Event pot: ${amount}, the share of the pot set in the season.`,
+    none: 'Main Event pot: the season sets no share of the pot. Set it by hand, or enter it when finishing.',
+    save: 'Save the Main Event pot',
   },
 
   // The amounts
   totals: {
     label: 'Amounts of the night',
+    calculated: ({ amount }: { amount: string }) => `${amount} worked out`,
     pot: 'Pot',
     timeChip: 'Time chip',
     total: 'Total',

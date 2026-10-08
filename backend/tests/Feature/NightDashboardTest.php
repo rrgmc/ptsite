@@ -345,17 +345,58 @@ it('saves one position at a time, so two people do not undo each other', functio
         ->assertJsonPath('data.saved_by.name', 'Carla');
 });
 
-it('keeps a typed Main Event pot, and no typed pot or time chip', function () {
+it('keeps a typed Main Event pot', function () {
     $this->putJson("{$this->url}/main-event-pot", ['amount' => '90'])->assertOk()->assertJsonPath('data.main_event_pot', '90.00');
     $this->putJson("{$this->url}/positions/6", ['player_id' => $this->breno->id])->assertOk()->assertJsonPath('data.main_event_pot', '90.00');
 
-    $this->putJson("/api/v1/nights/{$this->night->id}/partial-result", ['pot' => '840.00', 'main_event_pot' => '100.00', 'time_chip' => '20.00', 'positions' => []])
-        ->assertOk()
-        ->assertJsonPath('data.pot', null)
-        ->assertJsonPath('data.time_chip', null)
-        ->assertJsonPath('data.main_event_pot', '100.00');
-
     $this->putJson("{$this->url}/main-event-pot", ['amount' => null])->assertOk()->assertJsonPath('data.main_event_pot', null);
+});
+
+it('takes a pot and a time chip typed by hand, and still works out its own', function () {
+    ($this->play)();
+
+    $this->getJson($this->url)->assertJsonPath('data.manual', ['pot' => null, 'time_chip' => null]);
+    $this->putJson("{$this->url}/amounts", ['pot' => '600', 'time_chip' => '40.00'])
+        ->assertOk()
+        ->assertJsonPath('data.manual', ['pot' => '600.00', 'time_chip' => '40.00'])
+        ->assertJsonPath('data.totals.pot.owed', '425.00')
+        ->assertJsonPath('data.totals.time_chip.owed', '25.00')
+        // 20% of the typed pot.
+        ->assertJsonPath('data.suggested_main_event_pot', '120.00');
+    // The positions and the Main Event pot do not touch them.
+    $this->putJson("{$this->url}/positions/6", ['player_id' => $this->breno->id])->assertOk()->assertJsonPath('data.manual.pot', '600.00');
+    $this->putJson("{$this->url}/main-event-pot", ['amount' => '100'])->assertOk()->assertJsonPath('data.manual.time_chip', '40.00');
+
+    // One amount can be typed and the other left to the dashboard.
+    $this->putJson("{$this->url}/amounts", ['pot' => null, 'time_chip' => '40'])
+        ->assertOk()
+        ->assertJsonPath('data.manual', ['pot' => null, 'time_chip' => '40.00'])
+        ->assertJsonPath('data.suggested_main_event_pot', '85.00');
+    $this->putJson("{$this->url}/amounts", ['pot' => null, 'time_chip' => null])
+        ->assertOk()
+        ->assertJsonPath('data.manual', ['pot' => null, 'time_chip' => null])
+        ->assertJsonPath('data.main_event_pot', '100.00')
+        ->assertJsonPath('data.positions.0.player.nickname', 'Breno');
+
+    $this->putJson("{$this->url}/amounts", ['pot' => '12,50', 'time_chip' => null])->assertUnprocessable()->assertJsonValidationErrors(['pot']);
+});
+
+it('takes typed amounts only while the night is open, and from who changes the dashboard', function () {
+    Sanctum::actingAs(User::factory()->create());
+    $this->putJson("{$this->url}/amounts", ['pot' => '600', 'time_chip' => null])->assertForbidden();
+
+    ($this->finish)()->assertOk();
+    Sanctum::actingAs($this->admin);
+    $this->putJson("{$this->url}/amounts", ['pot' => '600', 'time_chip' => null])->assertConflict()->assertJsonPath('rule', 'night.dashboard.finished');
+    $this->getJson($this->url)->assertJsonPath('data.manual', ['pot' => null, 'time_chip' => null]);
+});
+
+it('keeps no typed time chip on a site without the time chip', function () {
+    config(['ptsite.features' => ['nightDashboard' => true, 'timeChip' => false]]);
+
+    $this->putJson("{$this->url}/amounts", ['pot' => '600', 'time_chip' => '40'])
+        ->assertOk()
+        ->assertJsonPath('data.manual', ['pot' => '600.00', 'time_chip' => null]);
 });
 
 it('fixes the participants and the prices when the night is finished', function () {

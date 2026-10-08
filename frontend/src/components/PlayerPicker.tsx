@@ -19,13 +19,10 @@ import {
 import type { Player } from '@/api/client'
 import { useQuickAddPlayer } from '@/api/queries'
 import { t } from '@/i18n'
+import { searchKey as normalize } from '@/lib/search'
 
 const NEW = 'new:'
 const NONE = 'none'
-
-function normalize(text: string): string {
-  return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
-}
 
 /**
  * Picks a player for a finishing position. Opens a full-screen sheet on phones (a dropdown closes when the

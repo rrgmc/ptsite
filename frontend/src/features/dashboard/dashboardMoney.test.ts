@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { NightDashboard } from '@/api/client'
 import { nightDashboard, players } from '@/mocks/data'
-import { applyChange, hasPayments, recalculated } from './dashboardMoney'
+import { amountsInUse, applyChange, hasPayments, recalculated } from './dashboardMoney'
 
 // The same rules as the API, so that a tap shows at once what the API will answer
 // (docs/specs/night-dashboard.md, the example "A night": Ana, Breno, Carlão, Dudu and Estela, at Estela's house).
@@ -116,5 +116,34 @@ describe('hasPayments', () => {
     expect(hasPayments(line(nightDashboard, estela.id))).toBe(true)
     expect(hasPayments(line(nightDashboard, carlao.id))).toBe(true)
     expect(hasPayments({ ...line(nightDashboard, dudu.id), rebuys: [{ id: 9, paid: false }] })).toBe(true)
+  })
+})
+
+describe('amountsInUse', () => {
+  it('is what the dashboard works out, with the season\'s share of the pot as the Main Event pot', () => {
+    expect(amountsInUse(nightDashboard)).toEqual({ pot: '425.00', timeChip: '25.00', total: '450.00', mainEventPot: '85.00' })
+  })
+
+  it('takes an amount typed by hand in place of the one worked out, one at a time', () => {
+    const typed = applyChange(nightDashboard, { type: 'amounts', pot: '600.00', time_chip: null })
+    expect(typed.manual).toEqual({ pot: '600.00', time_chip: null })
+    expect(amountsInUse(typed)).toMatchObject({ pot: '600.00', timeChip: '25.00', total: '625.00' })
+    // What the players owe is still worked out.
+    expect(typed.totals).toEqual(nightDashboard.totals)
+
+    expect(amountsInUse({ ...nightDashboard, manual: { pot: null, time_chip: '40.00' } })).toMatchObject({ pot: '425.00', timeChip: '40.00', total: '465.00' })
+  })
+
+  it('takes a Main Event pot set by hand, and has none when the season sets no share', () => {
+    expect(amountsInUse({ ...nightDashboard, main_event_pot: '90.00' }).mainEventPot).toBe('90.00')
+    expect(amountsInUse({ ...nightDashboard, suggested_main_event_pot: null }).mainEventPot).toBeNull()
+  })
+
+  it('keeps no typed time chip on a site without it', () => {
+    const noTimeChip = { ...nightDashboard, totals: { ...nightDashboard.totals, time_chip: null } }
+    const typed = applyChange(noTimeChip, { type: 'amounts', pot: '600.00', time_chip: '40.00' })
+
+    expect(typed.manual).toEqual({ pot: '600.00', time_chip: null })
+    expect(amountsInUse(typed)).toMatchObject({ pot: '600.00', timeChip: null, total: '600.00' })
   })
 })

@@ -9,6 +9,7 @@ use PTSite\App\Actions\Nights\Dashboard\MarkRebuy;
 use PTSite\App\Actions\Nights\Dashboard\RemoveNightPlayer;
 use PTSite\App\Actions\Nights\Dashboard\RemoveRebuy;
 use PTSite\App\Actions\Nights\Dashboard\SetHouseOwner;
+use PTSite\App\Actions\Nights\Dashboard\SetPartialAmounts;
 use PTSite\App\Actions\Nights\Dashboard\SetPartialMainEventPot;
 use PTSite\App\Actions\Nights\Dashboard\SetPartialPosition;
 use PTSite\App\Http\Controllers\Controller;
@@ -17,6 +18,7 @@ use PTSite\App\Http\Requests\MarkNightPlayerRequest;
 use PTSite\App\Http\Requests\MarkRebuyRequest;
 use PTSite\App\Http\Requests\SetHouseOwnerRequest;
 use PTSite\App\Http\Requests\SetMainEventPotRequest;
+use PTSite\App\Http\Requests\SetPartialAmountsRequest;
 use PTSite\App\Http\Requests\SetPartialPositionRequest;
 use PTSite\App\Http\Resources\NightDashboardResource;
 use PTSite\App\Models\Night;
@@ -97,10 +99,19 @@ class NightDashboardController extends Controller
         return $this->resource($request, $set($request->user(), $night, $position, $player));
     }
 
-    /** Set the Main Event pot of the open night's partial result. */
+    /** Set the Main Event pot of the open night by hand, or null for the season's share of the pot. */
     public function setMainEventPot(SetMainEventPotRequest $request, Night $night, SetPartialMainEventPot $set): NightDashboardResource
     {
         return $this->resource($request, $set($request->user(), $night, $request->validated('amount')));
+    }
+
+    /**
+     * "Definir manualmente": type the pot and the time chip of the open night, for a night that does not record
+     * every player's payments. Null takes a typed amount away. The dashboard still answers the ones it works out.
+     */
+    public function setAmounts(SetPartialAmountsRequest $request, Night $night, SetPartialAmounts $set): NightDashboardResource
+    {
+        return $this->resource($request, $set($request->user(), $night, $request->validated('pot'), $request->validated('time_chip')));
     }
 
     private function resource(Request $request, Night $night): NightDashboardResource

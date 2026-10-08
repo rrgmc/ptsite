@@ -28,6 +28,10 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
    ALL IN ([attendance.md](attendance.md)). Each participant owes one **buy-in**.
 5. **Acting on a player makes them a participant.** While the night is open it also answers ALL IN for them,
    whatever their answer was. So does "Confirmar", which does nothing else.
+5a. **A player who is not on the night is found by a search** ("Adicionar jogador"), by nickname or name. The
+   dashboard lists none of them until someone searches, since a league may have more than a hundred players,
+   and then shows eight at most. Each one found has "Confirmar" and "Buy-in pago". An inactive player is found
+   too, and marked. Whoever may quick-add players adds a first-timer there, by nickname.
 6. **Whoever changes the dashboard can answer for any player** on the open night, also on the night's page. On a
    site without the dashboard only results keepers and admins can (rule 4 of [attendance.md](attendance.md)).
 7. Each participant has:
@@ -56,14 +60,20 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     also removes their answer.
 13. **The dashboard holds the partial result** of an open night (rules 18 to 24 of
     [seasons-and-nights.md](seasons-and-nights.md)). Each position is saved by itself when picked, so two people
-    filling different positions do not undo each other. The pot and the time chip are the calculated ones: the
-    partial result keeps none of its own.
-14. **The Main Event pot stays a typed amount**, on a site with it. When the season has a **Main Event pot share**
-    ("Pote ME: % do pote", from 0 to 100), the dashboard suggests that share of the pot, rounded to a whole unit,
-    and one tap takes the suggestion. Any amount can be typed instead.
-15. **"Finalizar" starts filled from the dashboard**: the pot and the time chip that are owed, the Main Event pot
-    and the positions. The keeper changes what is needed and finishes as usual. The form says how much is still
-    pending.
+    filling different positions do not undo each other.
+13a. **The pot and the time chip can be set by hand** ("Definir o pote e o time chip manualmente"), for a night
+    that does not record every player's payments. An amount typed there stands in for the one the dashboard
+    works out: at the foot of the screen, for the points shown beside the positions, for the Main Event pot's
+    share and at "Finalizar". The amount worked out stays in sight beside it ("Calculado"), with what was paid
+    and what is pending. One amount can be typed and the other left empty, which keeps the one worked out.
+    Unticking goes back to the amounts worked out.
+14. **The Main Event pot is the season's share of the pot**, on a site with it: the **Main Event pot share**
+    ("Pote ME: % do pote", from 0 to 100) of the pot, rounded to a whole unit. It can be set by hand instead
+    ("Definir o pote ME manualmente"), and unticking goes back to the season's share. A season with no share
+    has no Main Event pot until one is set by hand, or entered at "Finalizar".
+15. **"Finalizar" starts filled from the dashboard**: the pot and the time chip (the ones set by hand, or else
+    the ones that are owed), the Main Event pot and the positions. The keeper changes what is needed and
+    finishes as usual. The form says how much is still pending.
 16. **Finishing fixes the night's money.** Every player who answered ALL IN becomes a recorded participant, and
     the season's prices are copied to the night: changing the season's money settings later does not change a
     finished night.
@@ -99,8 +109,13 @@ house owner's buy-in:
 - **A site without the time chip.** The same night has no time chip: the total is the pot.
 - **A rebuy that does not pay the time chip.** With that setting off, the time chip owed is Carla's R$ 5,00.
 - **A season with no prices.** Every amount is R$ 0,00.
-- **The Main Event pot.** With a share of 20%, the pot of R$ 425,00 suggests R$ 85,00. With 15% it suggests
-  R$ 64,00, from R$ 63,75. A season with no share suggests nothing.
+- **The Main Event pot.** With a share of 20%, the pot of R$ 425,00 gives R$ 85,00. With 15% it gives
+  R$ 64,00, from R$ 63,75. A season with no share gives none. Ana sets it by hand to R$ 90,00: the dashboard
+  and "Finalizar" use R$ 90,00. She unticks it: R$ 85,00 again.
+- **Set by hand.** On another night nobody marks the rebuys. Ana ticks "Definir o pote e o time chip
+  manualmente" and types a pot of R$ 600,00, leaving the time chip empty. The foot of the screen shows the pot
+  R$ 600,00 with "Calculado R$ 425,00" below it, the time chip R$ 25,00 and the total R$ 625,00. The Main Event
+  pot is R$ 120,00, the 20% of the typed pot. "Finalizar" starts with R$ 600,00.
 
 Rebuys:
 
@@ -113,8 +128,8 @@ Rebuys:
 
 Participants, on the open night of 14/03:
 
-- **Acting confirms.** Dudu did not answer. Ana marks his buy-in as paid: Dudu is listed under "Vão jogar",
-  with the answer set by Ana.
+- **Acting confirms.** Dudu did not answer. Ana types "du" in "Adicionar jogador", finds Dudu and taps "Buy-in
+  pago": Dudu is on the dashboard with his buy-in paid, and listed under "Vão jogar" with the answer set by Ana.
 - **Leaving.** Carla answered ALL IN and has no marks. She changes to FOLD: she leaves the dashboard. Dudu, who
   paid, tries the same: refused ("Remova os pagamentos e os rebuys do jogador antes.").
 - **The house owner.** Élio did not answer. Ana picks him as the house owner: he is a participant and answered
@@ -131,7 +146,7 @@ Positions:
 Finishing:
 
 - **Filled.** Maria, a results keeper, taps "Finalizar" on the night above. The form has the pot R$ 425,00, the
-  time chip R$ 25,00 and the positions, and says R$ 155,00 is pending. She finishes.
+  Main Event pot R$ 85,00, the time chip R$ 25,00 and the positions, and says R$ 155,00 is pending. She finishes.
 - **Fixed.** An admin then changes the season's buy-in to R$ 60,00. The finished night's dashboard still charges
   R$ 50,00.
 - **After the night.** Breno pays his third rebuy the next day. Élio, an active player, cannot mark it; an admin

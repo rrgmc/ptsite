@@ -57,6 +57,13 @@ describe('seedFromDashboard', () => {
     expect(seed.order).toEqual([null, null, null, null, null, players[3]])
   })
 
+  it('prefers the pot and the time chip typed by hand to the ones worked out', () => {
+    const seed = seedFromDashboard(percentages, { ...nightDashboard, manual: { pot: '600.00', time_chip: '40.00' } })
+
+    expect(seed.potText).toBe('600,00')
+    expect(seed.timeChipText).toBe('40,00')
+  })
+
   it('prefers a typed Main Event pot to the suggested one', () => {
     expect(seedFromDashboard(percentages, { ...nightDashboard, main_event_pot: '90.00' }).mainEventPotText).toBe('90,00')
   })

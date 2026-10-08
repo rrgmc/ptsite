@@ -16,8 +16,8 @@ use PTSite\Domain\Scoring\PercentageTable;
 
 /**
  * Saves an open night's partial result ("Resultado parcial"): the amounts and positions known so far. There is
- * one per night and a save replaces all of it, so the last save wins. On a site with the night dashboard the pot
- * and the time chip are worked out from the payments, so the partial result keeps none.
+ * one per night and a save replaces all of it, so the last save wins. On a site with the night dashboard, a pot
+ * and a time chip saved here are the ones typed by hand, which stand in for the ones the dashboard works out.
  *
  * Not audited, whoever saves: it is a shared draft that shows who saved it last, and finishing the night, which
  * is audited, deletes it.
@@ -44,12 +44,11 @@ final class SavePartialResult
             $this->rules->assertValidPartialPositions($playerByPosition, PercentageTable::of($night->season->percentByPosition()));
             $this->players->assertExist(array_values($playerByPosition));
 
-            $typed = ! $this->features->enabled(Feature::NightDashboard);
             $partial = NightPartialResult::query()->updateOrCreate(['night_id' => $night->id], [
-                'pot' => $typed ? $pot : null,
+                'pot' => $pot,
                 // An amount of a feature this site has turned off is not kept, whatever was sent.
                 'main_event_pot' => $this->features->enabled(Feature::MainEventPot) ? $mainEventPot : null,
-                'time_chip' => $typed && $this->features->enabled(Feature::TimeChip) ? $timeChip : null,
+                'time_chip' => $this->features->enabled(Feature::TimeChip) ? $timeChip : null,
                 'saved_by_user_id' => $user->id,
                 'saved_at' => now(),
             ]);

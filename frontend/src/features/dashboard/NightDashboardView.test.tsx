@@ -12,12 +12,12 @@ import { NightDashboardView } from './NightDashboardView'
 
 const [ana, breno, , dudu, , fausto] = players
 
-function view(dashboard: NightDashboard = nightDashboard, props: { canFinish?: boolean; error?: string } = {}) {
+function view(dashboard: NightDashboard = nightDashboard, props: { canFinish?: boolean; error?: string; players?: typeof players } = {}) {
   const onChange = vi.fn()
   render(
     <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter>
-        <NightDashboardView night={openNight} dashboard={dashboard} percentages={season.percentages ?? []} players={players} onChange={onChange} {...props} />
+        <NightDashboardView night={openNight} dashboard={dashboard} percentages={season.percentages ?? []} players={props.players ?? players} onChange={onChange} canFinish={props.canFinish} error={props.error} />
       </MemoryRouter>
     </QueryClientProvider>,
   )
@@ -126,35 +126,120 @@ describe('NightDashboardView', () => {
     expect(onChange).toHaveBeenLastCalledWith({ type: 'removePlayer', player: dudu })
   })
 
-  it('confirms a player who is not on the night at one tap, with the buy-in paid or not', async () => {
+  it('finds a player who is not on the night by a search, and confirms them at one tap, with the buy-in paid or not', async () => {
     const onChange = view()
 
-    // The active players who are not on the night: 10 active, 5 of them on it.
-    await userEvent.click(screen.getByRole('button', { name: 'Não confirmados (5)' }))
-    const fausto_ = within(screen.getByRole('group', { name: 'Confirmar Fausto' }))
-    await userEvent.click(fausto_.getByRole('button', { name: 'Confirmar' }))
+    // Nobody is listed until someone searches: a league may have more than a hundred players.
+    expect(screen.getByText('Digite o apelido de quem chegou para confirmar com um toque.')).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: /^Confirmar / })).not.toBeInTheDocument()
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar jogador' }), 'fáu')
+    await userEvent.click(within(screen.getByRole('group', { name: 'Confirmar Fausto' })).getByRole('button', { name: 'Confirmar' }))
     expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: fausto })
-    await userEvent.click(fausto_.getByRole('button', { name: 'Buy-in pago' }))
+    // The search is empty again, ready for the next player.
+    expect(screen.getByRole('searchbox', { name: 'Buscar jogador' })).toHaveValue('')
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar jogador' }), 'Fausto da')
+    await userEvent.click(within(screen.getByRole('group', { name: 'Confirmar Fausto' })).getByRole('button', { name: 'Buy-in pago' }))
     expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: fausto, buy_in_paid: true })
   })
 
-  it('takes the suggested Main Event pot at one tap, or a typed one', async () => {
+  it('leaves out of the search who is already on the night, and marks an inactive player', async () => {
+    view()
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar jogador' }), 'ana')
+    // Ana is on the night; Joana is not.
+    expect(screen.queryByRole('group', { name: 'Confirmar Ana' })).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Confirmar Joana' })).toBeInTheDocument()
+
+    await userEvent.clear(screen.getByRole('searchbox', { name: 'Buscar jogador' }))
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar jogador' }), 'kiko')
+    expect(screen.getByRole('group', { name: 'Confirmar Kiko' }).closest('li')).toHaveTextContent(/inativo/i)
+
+    await userEvent.clear(screen.getByRole('searchbox', { name: 'Buscar jogador' }))
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar jogador' }), 'zzz')
+    expect(screen.getByText('Nenhum jogador encontrado.')).toBeInTheDocument()
+  })
+
+  it('shows eight players of a long search, and says how many there are', async () => {
+    const many = Array.from({ length: 30 }, (_, i) => ({ ...fausto, id: 100 + i, nickname: `Silva ${String(i + 1).padStart(2, '0')}` }))
+    view(nightDashboard, { players: [...players, ...many] })
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar jogador' }), 'silva 0')
+    expect(screen.getAllByRole('group', { name: /^Confirmar Silva/ })).toHaveLength(8)
+    expect(screen.getByText('Mostrando 8 de 9. Digite mais para encontrar.')).toBeInTheDocument()
+  })
+
+  it('uses the season\'s share of the pot as the Main Event pot, unless it is set by hand', async () => {
     const onChange = view()
 
-    expect(screen.getByText('Sugerido pela temporada: R$ 85,00')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: /^Usar R\$\s85,00$/ }))
-    expect(onChange).toHaveBeenLastCalledWith({ type: 'mainEventPot', amount: '85.00' })
+    expect(screen.getByText('Pote ME: R$ 85,00, a parte do pote definida na temporada.')).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: /Pote ME/ })).not.toBeInTheDocument()
 
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote ME manualmente' }))
     await userEvent.type(screen.getByRole('textbox', { name: /Pote ME/ }), '90')
-    await userEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar pote ME' }))
     expect(onChange).toHaveBeenLastCalledWith({ type: 'mainEventPot', amount: '90.00' })
+  })
+
+  it('goes back to the season\'s share when the Main Event pot is no longer set by hand', async () => {
+    const onChange = view({ ...nightDashboard, main_event_pot: '90.00' })
+
+    expect(screen.getByRole('checkbox', { name: 'Definir o pote ME manualmente' })).toBeChecked()
+    expect(screen.getByRole('textbox', { name: /Pote ME/ })).toHaveValue('90,00')
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote ME manualmente' }))
+    expect(onChange).toHaveBeenLastCalledWith({ type: 'mainEventPot', amount: null })
+  })
+
+  it('says that a season with no share of the pot suggests no Main Event pot', () => {
+    view({ ...nightDashboard, suggested_main_event_pot: null })
+
+    expect(screen.getByText(/^Pote ME: a temporada não define uma parte do pote\./)).toBeInTheDocument()
+  })
+
+  it('takes a pot and a time chip typed by hand, each beside the one worked out', async () => {
+    const onChange = view()
+
+    expect(screen.queryByRole('textbox', { name: 'Pote (R$)' })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote e o time chip manualmente' }))
+    // Nothing is sent until an amount is saved.
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.getByText('Calculado: R$ 425,00')).toBeInTheDocument()
+    expect(screen.getByText('Calculado: R$ 25,00')).toBeInTheDocument()
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Pote (R$)' }), '600')
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar valores' }))
+    // The time chip was left empty: it stays the one worked out.
+    expect(onChange).toHaveBeenLastCalledWith({ type: 'amounts', pot: '600.00', time_chip: null })
+  })
+
+  it('shows an amount typed by hand in place of the one worked out, which stays in sight', async () => {
+    const onChange = view({ ...nightDashboard, manual: { pot: '600.00', time_chip: null } })
+    const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
+
+    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(manual)R$ 600,00Calculado R$ 425,00Pago R$ 275,00Falta R$ 150,00')
+    expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
+    expect(totals.getByText('Total').closest('div')).toHaveTextContent('Total(manual)R$ 625,00Calculado R$ 450,00')
+
+    // Unticking goes back to the amounts worked out, at once.
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('600,00')
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote e o time chip manualmente' }))
+    expect(onChange).toHaveBeenLastCalledWith({ type: 'amounts', pot: null, time_chip: null })
+  })
+
+  it('asks for the pot alone on a site without the time chip', async () => {
+    view({ ...nightDashboard, totals: { ...nightDashboard.totals, time_chip: null } })
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Time chip (R$)' })).not.toBeInTheDocument()
   })
 
   it('has no Main Event pot on a site without it', () => {
     restore = overrideFeatures({ mainEventPot: false })
     view()
 
-    expect(screen.queryByRole('textbox', { name: /Pote ME/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('checkbox', { name: 'Definir o pote ME manualmente' })).not.toBeInTheDocument()
   })
 
   it('shows the positions filled so far, and the way to "Finalizar" to who finishes nights', () => {
@@ -171,7 +256,8 @@ describe('NightDashboardView', () => {
     expect(marksOf('Ana').getByRole('button', { name: 'Buy-in' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: '+ Rebuy' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Mais ações/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Não confirmados/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox', { name: 'Buscar jogador' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Finalizar evento' })).not.toBeInTheDocument()
   })
 

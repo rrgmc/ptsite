@@ -80,7 +80,7 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
      the night is played, on a site that turns this on (`houseOwnerBuyIn` in `features`,
      [`site/README.md`](../../site/README.md));
    - the **Main Event pot share** ("Pote ME: % do pote"): the share of a night's pot, from 0 to 100%, that the
-     night dashboard suggests as the night's Main Event pot, on a site with the Main Event pot and the night
+     night dashboard uses as the night's Main Event pot unless one is set by hand, on a site with the Main Event pot and the night
      dashboard.
 5c. **A season has rebuys** when it allows at least one, or allows rebuys past the limit. A season with rebuys
    must have a rebuy value. A season with 0 rebuys and none past the limit has no rebuys: its form shows no
@@ -190,8 +190,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
     recorded in the audit log, whoever makes them; the finish is.
 24a. **On a site with the night dashboard, the dashboard holds the partial result**
     ([night-dashboard.md](night-dashboard.md), rules 13 to 15): each position is saved by itself, the pot and
-    the time chip are the ones the dashboard works out, and the night's page shows the dashboard's amounts in
-    place of the partial result. Rules 19, 21, 22 and 24 hold as they are.
+    the time chip are the ones the dashboard works out unless they are set by hand there, and the night's page
+    shows the dashboard's amounts in place of the partial result. Rules 19, 21, 22 and 24 hold as they are.
 
 ## Examples
 

@@ -1,5 +1,6 @@
 import type { NightDashboard, PartialResult, Player } from '@/api/client'
 import { hasFeature } from '@/lib/features'
+import { amountsInUse } from '../dashboard/dashboardMoney'
 
 /** What a result form starts from: the amounts as typed text, and the players in the order of the percentage table. */
 export interface ResultSeed {
@@ -25,14 +26,16 @@ export function seedFromPartial(percentages: { position: number }[], partial: Pa
 }
 
 /**
- * The form values for "Finalizar" on a site with the night dashboard: the pot and the time chip that are owed,
- * the typed Main Event pot or else the one the season suggests, and the positions filled on the dashboard.
+ * The form values for "Finalizar" on a site with the night dashboard: the pot and the time chip (the ones typed by
+ * hand, or else the ones that are owed), the Main Event pot set by hand or else the season's share of the pot,
+ * and the positions filled on the dashboard.
  */
 export function seedFromDashboard(percentages: { position: number }[], dashboard: NightDashboard): ResultSeed {
+  const { pot, timeChip, mainEventPot } = amountsInUse(dashboard)
   return {
-    potText: Number(dashboard.totals.pot.owed) > 0 ? moneyText(dashboard.totals.pot.owed) : '',
-    mainEventPotText: moneyText(dashboard.main_event_pot ?? dashboard.suggested_main_event_pot),
-    timeChipText: moneyText(dashboard.totals.time_chip?.owed),
+    potText: Number(pot) > 0 ? moneyText(pot) : '',
+    mainEventPotText: moneyText(mainEventPot),
+    timeChipText: moneyText(timeChip),
     order: percentages.map((p) => dashboard.positions.find((line) => line.position === p.position)?.player ?? null),
   }
 }

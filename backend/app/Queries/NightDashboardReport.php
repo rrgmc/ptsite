@@ -17,6 +17,7 @@ final readonly class NightDashboardReport
      * @param  array{owed: string, paid: string, pending: string}  $pot
      * @param  array{owed: string, paid: string, pending: string}|null  $timeChip  null on a site without the time chip
      * @param  array{owed: string, paid: string, pending: string}  $total
+     * @param  array{pot: string|null, time_chip: string|null}  $manual  the amounts typed by hand on an open night
      * @param  array{pot: string|null, main_event_pot: string|null, time_chip: string|null}|null  $recorded
      */
     public function __construct(
@@ -32,6 +33,7 @@ final readonly class NightDashboardReport
         public array $pot,
         public ?array $timeChip,
         public array $total,
+        public array $manual,
         public ?array $recorded,
         public string $readAt,
     ) {}

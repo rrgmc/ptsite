@@ -26,6 +26,9 @@ export const NoPlayers: Story = {
 /** An inactive player, or an account with no player, sees the dashboard and changes nothing. */
 export const ReadOnly: Story = { args: { dashboard: { ...nightDashboard, can_edit: false }, canFinish: false, canQuickAdd: false } }
 
+/** A night that does not record every payment: the pot and the Main Event pot are set by hand, and the time chip is still worked out. */
+export const AmountsSetByHand: Story = { args: { dashboard: { ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '100.00', suggested_main_event_pot: '120.00' } } }
+
 /** The API refused the last tap. */
 export const ChangeRefused: Story = { args: { error: 'O limite é de 2 rebuys por jogador.' } }
 

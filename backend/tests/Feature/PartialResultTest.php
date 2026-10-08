@@ -16,8 +16,6 @@ use PTSite\App\Models\User;
 afterEach(fn () => Carbon::setTestNow());
 
 beforeEach(function () {
-    // On a site with the night dashboard the partial result keeps no typed pot (NightDashboardTest).
-    config(['ptsite.features' => ['nightDashboard' => false]]);
     $this->season = Season::factory()->create();
     $this->night = Night::factory()->for($this->season)->open()->create(['starts_at' => '2025-03-14 21:30:00']);
     foreach (['ana' => 'Ana', 'breno' => 'Breno', 'carla' => 'Carla', 'dudu' => 'Dudu'] as $key => $nickname) {

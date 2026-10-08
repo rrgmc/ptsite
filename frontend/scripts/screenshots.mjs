@@ -150,7 +150,7 @@ await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).waitFor()
 await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
 await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
 await page.getByText('Dono da casa: Duhamel').waitFor()
-await shot('24-night-dashboard')
+await shot('24-night-dashboard', true)
 await page.getByRole('link', { name: 'Voltar ao site' }).click()
 await page.getByText('Aberto', { exact: true }).waitFor()
 

@@ -4,7 +4,7 @@ import { Card } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { t } from '@/i18n'
 import { formatMoney } from '@/lib/format'
-import type { Amounts } from './dashboardMoney'
+import { type Amounts, amountsInUse } from './dashboardMoney'
 
 /**
  * The night dashboard on the night's page: the amounts so far and the way to the dashboard. It stands where a
@@ -16,22 +16,24 @@ export function NightDashboardCard({ nightId }: { nightId: number }) {
   if (dashboard.isPending) return <Loading />
   if (dashboard.error && !dashboard.data) return <ErrorBox error={dashboard.error} />
 
+  // An amount typed by hand stands in for the one worked out; what is pending is always of what the players owe.
   const { totals } = dashboard.data
-  const rows: [label: string, amounts: Amounts][] = [
-    [t.dashboard.totals.pot, totals.pot],
-    ...(totals.time_chip ? [[t.dashboard.totals.timeChip, totals.time_chip] as [string, Amounts]] : []),
-    [t.dashboard.totals.total, totals.total],
+  const inUse = amountsInUse(dashboard.data)
+  const rows: [label: string, amount: string, amounts: Amounts][] = [
+    [t.dashboard.totals.pot, inUse.pot, totals.pot],
+    ...(totals.time_chip ? [[t.dashboard.totals.timeChip, inUse.timeChip!, totals.time_chip] as [string, string, Amounts]] : []),
+    [t.dashboard.totals.total, inUse.total, totals.total],
   ]
 
   return (
     <Card className="max-w-md" title={t.dashboard.title}>
       <p className="mb-2 text-sm text-muted">{t.dashboard.card.help}</p>
       <dl className="text-sm">
-        {rows.map(([label, amounts]) => (
+        {rows.map(([label, amount, amounts]) => (
           <div key={label} className="flex items-baseline justify-between gap-2 py-0.5">
             <dt className="font-semibold">{label}</dt>
             <dd className="text-right tabular">
-              {formatMoney(amounts.owed)}
+              {formatMoney(amount)}
               {Number(amounts.pending) > 0 && <span className="ml-2 text-warning">{t.dashboard.totals.pending({ amount: formatMoney(amounts.pending) })}</span>}
             </dd>
           </div>

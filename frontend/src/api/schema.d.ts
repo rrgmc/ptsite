@@ -541,8 +541,28 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Set the Main Event pot of the open night's partial result */
+        /** Set the Main Event pot of the open night by hand, or null for the season's share of the pot */
         put: operations["nightDashboard.setMainEventPot"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/amounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * "Definir manualmente": type the pot and the time chip of the open night, for a night that does not record
+         *     every player's payments. Null takes a typed amount away. The dashboard still answers the ones it works out
+         */
+        put: operations["nightDashboard.setAmounts"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1242,9 +1262,9 @@ export interface components {
                 position: number;
                 player: components["schemas"]["PlayerResource"];
             }[];
-            /** @description The Main Event pot typed so far on the open night. */
+            /** @description The Main Event pot set by hand on the open night. Null: the suggested one is in use. */
             main_event_pot: string | null;
-            /** @description The season's share of the pot, rounded to a whole unit. Null when the season sets none. */
+            /** @description The season's share of the pot (the typed one, when there is one), rounded to a whole unit. Null when the season sets none. */
             suggested_main_event_pot: string | null;
             /** @description The amounts worked out from the participants. `time_chip` is null on a site without the time chip. */
             totals: {
@@ -1263,6 +1283,14 @@ export interface components {
                     paid: string;
                     pending: string;
                 };
+            };
+            /**
+             * @description The pot and the time chip typed by hand on an open night ("Definir manualmente"), which stand in
+             *     for the ones in `totals`. Null for an amount that was not typed.
+             */
+            manual: {
+                pot: string | null;
+                time_chip: string | null;
             };
             /** @description The amounts a finished night was finished with. Null while the night is open. */
             recorded: {
@@ -1693,8 +1721,15 @@ export interface components {
         };
         /** SetMainEventPotRequest */
         SetMainEventPotRequest: {
-            /** @description The Main Event pot so far, as a decimal string such as "85.00", or null when not known. */
+            /** @description The Main Event pot set by hand, as a decimal string such as "85.00", or null for the season's share of the pot. */
             amount: string | null;
+        };
+        /** SetPartialAmountsRequest */
+        SetPartialAmountsRequest: {
+            /** @description The pot typed for the night, as a decimal string such as "840.00", or null for the one the dashboard works out. */
+            pot: string | null;
+            /** @description The time chip typed for the night, as a decimal string, or null for the one the dashboard works out. Not kept on a site without the time chip. */
+            time_chip: string | null;
         };
         /** SetPartialPositionRequest */
         SetPartialPositionRequest: {
@@ -3013,6 +3048,38 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["SetMainEventPotRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.setAmounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetPartialAmountsRequest"];
             };
         };
         responses: {

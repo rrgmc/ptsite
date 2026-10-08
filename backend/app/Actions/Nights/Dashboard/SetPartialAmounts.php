@@ -11,10 +11,11 @@ use PTSite\Domain\Nights\NightDashboardRules;
 use PTSite\Domain\Nights\NightStatus;
 
 /**
- * "Definir o pote ME manualmente": sets the Main Event pot of an open night by hand, in its partial result. Null
- * goes back to the season's share of the pot. The positions and the other amounts stay as they are.
+ * "Definir manualmente": types the pot and the time chip of an open night, for a night that does not record
+ * every player's payments. They are kept in the partial result and stand in for the amounts the dashboard works
+ * out, which it still shows. Null takes a typed amount away.
  */
-final class SetPartialMainEventPot
+final class SetPartialAmounts
 {
     public function __construct(
         private readonly NightEntries $entries,
@@ -22,15 +23,16 @@ final class SetPartialMainEventPot
         private readonly Features $features,
     ) {}
 
-    /** @param  ?string  $amount  a decimal string, or null for the season's share of the pot */
-    public function __invoke(User $user, Night $night, ?string $amount): Night
+    /** @param  ?string  $pot, $timeChip  decimal strings, or null for the amount the dashboard works out */
+    public function __invoke(User $user, Night $night, ?string $pot, ?string $timeChip): Night
     {
-        return $this->entries->change($user, $night, null, function (Night $night) use ($user, $amount) {
+        return $this->entries->change($user, $night, null, function (Night $night) use ($user, $pot, $timeChip) {
             $this->rules->assertTakesPartialResult(NightStatus::from($night->status));
 
             NightPartialResult::query()->updateOrCreate(['night_id' => $night->id], [
+                'pot' => $pot,
                 // An amount of a feature this site has turned off is not kept, whatever was sent.
-                'main_event_pot' => $this->features->enabled(Feature::MainEventPot) ? $amount : null,
+                'time_chip' => $this->features->enabled(Feature::TimeChip) ? $timeChip : null,
                 'saved_by_user_id' => $user->id,
                 'saved_at' => now(),
             ]);

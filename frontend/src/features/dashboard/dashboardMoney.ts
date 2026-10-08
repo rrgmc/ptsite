@@ -17,6 +17,7 @@ export type DashboardChange =
   | { type: 'houseOwner'; player: Player | null }
   | { type: 'position'; position: number; player: Player | null }
   | { type: 'mainEventPot'; amount: string | null }
+  | { type: 'amounts'; pot: string | null; time_chip: string | null }
 
 const cents = (amount: string) => Math.round(Number(amount) * 100)
 const decimal = (amount: number) => (amount / 100).toFixed(2)
@@ -64,6 +65,18 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
       total: amounts(pot.owed + timeChip.owed, pot.paid + timeChip.paid),
     },
   }
+}
+
+/**
+ * The night's pot and time chip as they stand: the ones typed by hand ("Definir manualmente") when there are,
+ * and else the ones worked out from the players. `timeChip` is null on a site without the time chip. The Main
+ * Event pot is the one set by hand, or else the season's share of the pot; null when the season sets none.
+ */
+export function amountsInUse(dashboard: NightDashboard): { pot: string; timeChip: string | null; total: string; mainEventPot: string | null } {
+  const pot = dashboard.manual.pot ?? dashboard.totals.pot.owed
+  const timeChip = dashboard.totals.time_chip ? (dashboard.manual.time_chip ?? dashboard.totals.time_chip.owed) : null
+  const mainEventPot = dashboard.main_event_pot ?? dashboard.suggested_main_event_pot
+  return { pot, timeChip, total: decimal(cents(pot) + cents(timeChip ?? '0')), mainEventPot }
 }
 
 const emptyLine = (player: Player): DashboardPlayer => ({
@@ -136,5 +149,7 @@ export function applyChange(dashboard: NightDashboard, change: DashboardChange):
       })
     case 'mainEventPot':
       return { ...dashboard, main_event_pot: change.amount }
+    case 'amounts':
+      return { ...dashboard, manual: { pot: change.pot, time_chip: dashboard.totals.time_chip ? change.time_chip : null } }
   }
 }

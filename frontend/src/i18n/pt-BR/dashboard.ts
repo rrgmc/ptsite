@@ -12,7 +12,7 @@ export const dashboard = {
   // Participants
   players: {
     heading: ({ count }: { count: number }) => `Jogadores (${count})`,
-    empty: 'Nenhum jogador ainda. Confirme quem chegou na lista abaixo.',
+    empty: 'Nenhum jogador ainda. Adicione quem chegou na busca abaixo.',
     houseOwner: 'Dono da casa',
     buyIn: 'Buy-in',
     timeChip: 'Time chip',
@@ -31,28 +31,46 @@ export const dashboard = {
 
   // Players who are not on the night yet
   others: {
-    heading: ({ count }: { count: number }) => `Não confirmados (${count})`,
+    heading: 'Adicionar jogador',
+    search: 'Buscar jogador',
+    searchPlaceholder: 'Apelido ou nome',
+    hint: 'Digite o apelido de quem chegou para confirmar com um toque.',
+    noneFound: 'Nenhum jogador encontrado.',
+    more: ({ shown, total }: { shown: number; total: number }) => `Mostrando ${shown} de ${total}. Digite mais para encontrar.`,
     confirm: 'Confirmar',
     confirmPaid: 'Buy-in pago',
-    addOther: 'Outro jogador',
     actionsOf: ({ nickname }: { nickname: string }) => `Confirmar ${nickname}`,
   },
 
-  // Positions and the Main Event pot
+  // The pot and the time chip typed by hand
+  manual: {
+    title: 'Pote e time chip',
+    check: 'Definir o pote e o time chip manualmente',
+    checkPotOnly: 'Definir o pote manualmente',
+    help: 'Para um evento que não registra os pagamentos de cada jogador. Um valor em branco usa o calculado.',
+    calculated: ({ amount }: { amount: string }) => `Calculado: ${amount}`,
+    save: 'Salvar valores',
+    /** Beside an amount at the foot of the screen that was typed by hand. */
+    mark: 'manual',
+  },
+
+  // Positions
   positions: {
     title: 'Posições',
-    help: 'Cada posição é salva ao escolher o jogador. Os pontos são do pote calculado até agora.',
+    help: 'Cada posição é salva ao escolher o jogador. Os pontos são do pote até agora.',
     empty: 'Nenhuma posição preenchida.',
   },
   mainEventPot: {
-    save: 'Salvar',
-    useSuggested: ({ amount }: { amount: string }) => `Usar ${amount}`,
-    suggested: ({ amount }: { amount: string }) => `Sugerido pela temporada: ${amount}`,
+    check: 'Definir o pote ME manualmente',
+    suggested: ({ amount }: { amount: string }) => `Pote ME: ${amount}, a parte do pote definida na temporada.`,
+    none: 'Pote ME: a temporada não define uma parte do pote. Defina manualmente, ou informe ao finalizar.',
+    save: 'Salvar pote ME',
   },
 
   // The amounts
   totals: {
     label: 'Valores do evento',
+    calculated: ({ amount }: { amount: string }) => `Calculado ${amount}`,
     pot: 'Pote',
     timeChip: 'Time chip',
     total: 'Total',

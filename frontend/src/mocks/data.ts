@@ -154,6 +154,7 @@ export const nightDashboard: NightDashboard = recalculated({
   main_event_pot: null,
   suggested_main_event_pot: '85.00',
   totals: { pot: noAmounts, time_chip: noAmounts, total: noAmounts },
+  manual: { pot: null, time_chip: null },
   recorded: null,
   read_at: '2026-04-18T22:41:00-03:00',
 })

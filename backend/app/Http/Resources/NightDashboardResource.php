@@ -39,9 +39,9 @@ class NightDashboardResource extends JsonResource
              * @var list<array{position: int, player: PlayerResource}>
              */
             'positions' => array_map(fn (array $line) => ['position' => $line['position'], 'player' => new PlayerResource($line['player'])], $this->positions),
-            /** The Main Event pot typed so far on the open night. */
+            /** The Main Event pot set by hand on the open night. Null: the suggested one is in use. */
             'main_event_pot' => $this->mainEventPot,
-            /** The season's share of the pot, rounded to a whole unit. Null when the season sets none. */
+            /** The season's share of the pot (the typed one, when there is one), rounded to a whole unit. Null when the season sets none. */
             'suggested_main_event_pot' => $this->suggestedMainEventPot,
             /** The amounts worked out from the participants. `time_chip` is null on a site without the time chip. */
             'totals' => [
@@ -52,6 +52,13 @@ class NightDashboardResource extends JsonResource
                 /** @var array{owed: string, paid: string, pending: string} */
                 'total' => $this->total,
             ],
+            /**
+             * The pot and the time chip typed by hand on an open night ("Definir manualmente"), which stand in
+             * for the ones in `totals`. Null for an amount that was not typed.
+             *
+             * @var array{pot: string|null, time_chip: string|null}
+             */
+            'manual' => $this->manual,
             /**
              * The amounts a finished night was finished with. Null while the night is open.
              *
