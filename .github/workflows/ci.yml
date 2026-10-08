@@ -1,7 +1,6 @@
 name: CI
 
-# The repository is private and on GitHub's free plan: 2,000 minutes of jobs and 500 MB of stored artifacts a
-# month, for the whole account. So CI runs as little as it can (docs/architecture/deployment.md, "Build (CI)"):
+# CI runs each thing once, and nothing it does not need (docs/architecture/deployment.md, "Build (CI)"):
 #
 # - A pull request runs the tests. `master` only changes through pull requests, so nothing runs again there.
 # - A change that touches only docs runs nothing.
@@ -11,6 +10,10 @@ on:
   pull_request:
     paths-ignore: ['docs/**', '**/*.md']
   workflow_dispatch:
+
+# A pull request from a fork runs this workflow too. It only reads the code.
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -37,7 +40,7 @@ jobs:
         working-directory: backend
     steps:
       - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           extensions: pdo_mysql, mbstring, intl, gd, exif
@@ -77,7 +80,7 @@ jobs:
         working-directory: examples/site/backend
     steps:
       - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           extensions: pdo_mysql, mbstring, intl, gd, exif
@@ -169,9 +172,8 @@ jobs:
     name: End-to-end ${{ matrix.shard }}/2 (phone and desktop, axe)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    # Two jobs, each with half of the test files: the tests are the slowest part of CI, and this halves the wait
-    # for about three more billed minutes. When one half fails the other still finishes, so one run shows every
-    # failing test.
+    # Two jobs, each with half of the test files: the tests are the slowest part of CI, and this halves the wait.
+    # When one half fails the other still finishes, so one run shows every failing test.
     strategy:
       fail-fast: false
       matrix:
@@ -188,7 +190,7 @@ jobs:
           --health-interval 2s --health-timeout 5s --health-retries 60
     steps:
       - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           extensions: pdo_mysql, mbstring, intl, gd, exif
@@ -208,7 +210,7 @@ jobs:
       - run: sudo apt-get install -y -q gdb
       - name: PHP opcache settings (the test servers turn the JIT off)
         run: php -i | grep -E '^opcache\.(enable|enable_cli|jit|jit_buffer_size) '
-      # One job runs both sizes at once: a job is billed by how long it runs, so this costs fewer minutes.
+      # One job runs both sizes at once, so it takes less time.
       - name: End-to-end tests, phone and desktop side by side
         run: npm run test:e2e:parallel -- --shard=${{ matrix.shard }}/2
         working-directory: frontend
@@ -234,7 +236,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           coverage: none

@@ -144,7 +144,7 @@ in `local/deploy.env`, which `Taskfile.yml` loads and git ignores.
 |---|---|
 | `task package` | Builds `local/build/ptsite.zip` (the name is `packageName` of `site.json`) from the working tree with [`deploy/build-package.php`](../../deploy/build-package.php). It installs the PHP and frontend packages itself (`composer install --no-dev`, `npm ci`). It stages in `local/build/stage`, so `backend/vendor` keeps its dev packages |
 | `task deploy` | `task package`, uploads it, then runs `php artisan migrate --force` on the server. The data on the server stays |
-| `task deploy:ci` | The same, with the package CI built for the current commit (`gh run download`). CI builds it only when asked: run `gh workflow run ci.yml` on that commit first, and use the package within 3 days |
+| `task deploy:ci` | The same, with the package CI built for the current commit (`gh run download`). CI builds it only when asked: run `gh workflow run ci.yml` on that commit first, and use the package within 3 days. The task takes the package only from a run started by hand, never from a pull request's run |
 | `task deploy:release -- v2.1.0` | The same, with the package of a release (`gh release download`) |
 | `task deploy:mail` | Writes the mail settings into the server's `.env`. See "Email" |
 
