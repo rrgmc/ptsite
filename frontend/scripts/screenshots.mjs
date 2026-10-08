@@ -140,6 +140,20 @@ for (const [nickname, answer] of [['Jacobson', 'ALL IN'], ['Duhamel', 'ALL IN'],
 }
 await shot('05-attendance', true)
 
+// "Painel do evento": the payments of the open night, on a screen of its own with no menus
+await page.getByRole('link', { name: 'Abrir o painel' }).click()
+await page.getByRole('heading', { name: 'Painel do evento', level: 1 }).waitFor()
+const marksOf = (nickname) => page.getByRole('group', { name: `Pagamentos de ${nickname}` })
+await marksOf('Jacobson').getByRole('button', { name: 'Buy-in' }).click()
+await marksOf('Jacobson').getByRole('button', { name: '+ Rebuy' }).click()
+await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).waitFor()
+await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
+await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
+await page.getByText('Dono da casa: Duhamel').waitFor()
+await shot('23-night-dashboard')
+await page.getByRole('link', { name: 'Voltar ao site' }).click()
+await page.getByText('Aberto', { exact: true }).waitFor()
+
 await page.getByRole('link', { name: /Finalizar/ }).click()
 await page.getByLabel('Pote (R$)').fill('845')
 await page.getByLabel('Pote ME (R$)').fill('170')
@@ -204,7 +218,7 @@ await page.goto('seasons/2/main-event')
 await page.getByRole('list', { name: /^Classificação: Main Event/ }).waitFor()
 await shot('19-main-event', true)
 // "Classificação" of that season: the first three of its Main Event above the table
-await page.goto('./')
+await page.goto('seasons/2')
 await page.getByRole('link', { name: 'Ver Main Event' }).waitFor()
 await shot('22-standings-main-event', true)
 await page.goto('seasons/2/main-event')

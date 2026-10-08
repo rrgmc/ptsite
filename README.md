@@ -37,6 +37,8 @@ the screenshot browser shows them in US format.
 | Seasons, with the first ten of each | Menu | Choosing the season on screen |
 | <img src="docs/screens/mobile/19-main-event.png" width="240" alt="The Main Event of a season"> | <img src="docs/screens/mobile/20-main-event-result-form.png" width="240" alt="Entering the result of a Main Event"> | <img src="docs/screens/mobile/21-admin-main-event.png" width="240" alt="Admin: adding a season's Main Event"> |
 | The Main Event of a season | Entering the result of a Main Event | Admin: adding a season's Main Event |
+| <img src="docs/screens/mobile/23-night-dashboard.png" width="240" alt="The night dashboard: who paid what on an open night"> | | |
+| The night dashboard: who paid what | | |
 
 ### Desktop
 
@@ -64,6 +66,8 @@ the screenshot browser shows them in US format.
 | The Main Event of a season | Entering the result of a Main Event |
 | <img src="docs/screens/desktop/21-admin-main-event.png" width="400" alt="Admin: adding a season's Main Event"> | <img src="docs/screens/desktop/22-standings-main-event.png" width="400" alt="Standings with the first three of the Main Event"> |
 | Admin: adding a season's Main Event | Standings with the first three of the Main Event |
+| <img src="docs/screens/desktop/23-night-dashboard.png" width="400" alt="The night dashboard: who paid what on an open night"> | |
+| The night dashboard: who paid what | |
 
 ## What is here
 
