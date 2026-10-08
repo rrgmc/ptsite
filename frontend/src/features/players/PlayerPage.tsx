@@ -10,6 +10,7 @@ import { StatTiles } from '@/components/StatTiles'
 import { t } from '@/i18n'
 import { formatDate, formatPoints, fullNameIfDifferent, nightTitle, ordinal } from '@/lib/format'
 import { playerImageUrl } from '@/lib/playerImages'
+import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 
 // The charts load apart from the page, so the chart library stays out of the main bundle.
@@ -53,6 +54,7 @@ function StatisticsOf({ query }: { query: ReturnType<typeof usePlayerStatistics>
 function PlayerScreen({ playerId, allTime, period, children }: { playerId: number; allTime: boolean; period?: string; children: ReactNode }) {
   const player = usePlayer(playerId)
   const me = useMe()
+  const to = useSeasonPath()
 
   return (
     <>
@@ -69,7 +71,7 @@ function PlayerScreen({ playerId, allTime, period, children }: { playerId: numbe
               <h2 id="player-statistics" className="font-display text-xl font-bold">{t.players.statistics}</h2>
               {period && <p className="text-muted wrap-anywhere">{period}</p>}
             </div>
-            <PeriodSwitch seasonTo={`/players/${playerId}`} allTimeTo={`/players/${playerId}/all`} allTime={allTime} />
+            <PeriodSwitch seasonTo={to(`/players/${playerId}`)} allTimeTo={`/players/${playerId}/all`} allTime={allTime} />
             {children}
           </section>
         </div>

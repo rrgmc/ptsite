@@ -1,8 +1,10 @@
 import { useSyncExternalStore } from 'react'
 
 /**
- * The season the user picked in "Temporadas" (docs/specs/seasons-and-nights.md). It lasts until the browser tab
- * closes or the user logs out. No pick (null) means the current season, so a newly opened season is followed.
+ * The last season this browser tab showed (docs/specs/seasons-and-nights.md). A season screen takes its season
+ * from the address and never from here: this only tells the screens with no season of their own (Jogadores, a
+ * night) which season their menu leads back to. It lasts until the browser tab closes or the user logs out.
+ * None (null) means the current season, so a newly opened season is followed.
  */
 
 const KEY = 'selectedSeasonId'

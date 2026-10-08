@@ -52,9 +52,9 @@ frontend/
 | `/results` | Finished nights, the rounds numbered in the season's order, an extra night and the Main Event marked; the "Pontos acumulados" chart; the season's three amounts added up; the next two nights to come, in a season that is not finished, and "+ Agendar" with the next three regular weekdays suggested and the type of the night (a round or an extra night); the attendance banner | players; scheduling for results keepers |
 | `/main-event` | "Main Event", on a site that has it: the selected season's Main Event night, its players in order and the season's Main Event pot; "Editar Main Event" leads an admin to `/admin/seasons/:id/main-event` | players |
 | `/calendar` | Season calendar | players |
-| `/seasons` | "Temporadas": every season with the first ten of its standings and its Main Event champion, and "Ver esta temporada" to make it the selected season | players |
-| `/seasons/select` | "Escolher temporada": the table of seasons (start, nights, finished nights, status), where the user picks the selected season | players |
-| `/seasons/:id`, `/seasons/:id/results`, `/seasons/:id/calendar`, `/seasons/:id/simulator`, `/seasons/:id/statistics`, `/seasons/:id/main-event` | Links to one season: pick it, then redirect to `/`, `/results`, `/calendar`, `/simulator`, `/statistics` or `/main-event` | players |
+| `/seasons` | "Temporadas": every season with the first ten of its standings and its Main Event champion, and "Ver esta temporada" to open that season's standings | players |
+| `/seasons/select` | "Escolher temporada": the table of seasons (start, nights, finished nights, status), where the user picks the season to open | players |
+| `/seasons/:id`, `/seasons/:id/results`, `/seasons/:id/calendar`, `/seasons/:id/simulator`, `/seasons/:id/statistics`, `/seasons/:id/main-event`, `/seasons/:id/players/:id` | One season's own addresses: the same screens as `/`, `/results`, `/calendar`, `/simulator`, `/statistics`, `/main-event` and `/players/:id`, showing that season | players |
 | `/nights/:id` | Night: details, attendance ("ALL IN" / "FOLD"), the partial result while open, result, "Abrir", "Remarcar", "Cancelar evento", "Finalizar", "Editar resultado", "Editar evento" | players; actions for results keepers |
 | `/nights/:id/edit` | Edit a night ("Editar evento"): place, description and whether it is extra | results keepers and admins while scheduled; admins once open or finished |
 | `/nights/:id/result` | Results form: pot, Main Event pot, time chip, finishing order, live points. On an open night it starts from the partial result | results keepers, admins |
@@ -146,16 +146,27 @@ The standings, results, calendar, simulator, statistics (`/statistics`) and a pl
 one season, the **selected season**
 ([seasons-and-nights.md](../specs/seasons-and-nights.md) rules 3a to 3f).
 
-- `src/lib/selectedSeason.ts` keeps the picked season's id in the browser's `sessionStorage`, so it lasts until
-  the browser tab closes. No pick means the current season; the current season's id is never stored, so the site
-  follows a newly opened season.
-- `useSelectedSeason()` (`features/layout`) returns the season to show. Screens never read a season id from the
-  URL. A pick that answers 404 or is archived is cleared.
-- `useLogout` clears the pick. The `/seasons/:id…` routes are loaders that set it and redirect.
+The address says which season: `/results` is the current season and `/seasons/7/results` is season 7.
+
+- `src/routes.tsx` mounts one list of season screens twice: at the root and under `seasons/:seasonId`. So both
+  addresses render the same components.
+- `src/lib/seasonPath.ts` has the address helpers: `splitSeasonPath()` and `seasonPath()` take an address apart and
+  build one, `isSeasonScreen()` tells whether a path is a season screen, and `useSeasonPath()` returns the
+  function that makes a link keep the season on screen (`to('/results')`). A new season screen needs a line in
+  its list and a route.
+- `useSelectedSeason()` (`features/layout`) returns the season to show, from the address. Screens never read the
+  id themselves. A season that answers 404 or is archived is replaced by the same screen of the current season.
+  `usePathOfSeason()`, next to it, builds the address of a given season, for a link that leaves a night or the
+  admin section.
+- `src/lib/selectedSeason.ts` keeps the id of the last season shown in the browser's `sessionStorage`, so it lasts
+  until the browser tab closes. `AppLayout` writes it on every season screen. Only the screens with no season of
+  their own read it, for their header and their menu. The address with no season stores none, so the site follows
+  a newly opened season. `useLogout` clears it.
 - The header shows the selected season's name as a link to `/seasons/select`. `SeasonNotice` appears on the
-  season screens while the pick is not the current season.
-- `usePickSeason()` (`features/seasons`) makes a season the selected one. "Escolher temporada" and "Temporadas"
-  both use it.
+  season screens while the season is not the current one; "Voltar para a atual" opens the same screen at the
+  address with no season.
+- `usePickSeason()` (`features/seasons`) opens a season's address. "Escolher temporada" and "Temporadas" both use
+  it.
 
 ## Navigation
 

@@ -23,29 +23,38 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    cannot be saved.
 3. A season is **open** while it is being played and **finished** when it is over. The **current season** is
    the newest open season.
-3a. **One season on every screen.** The standings, the results, the calendar and the simulator all show the same
-   season: the **selected season**. It is the current season unless the user picks another. If no season is
-   open, it is the newest season.
+3a. **A season has its own addresses.** The standings, the results, the calendar, the simulator, the statistics,
+   the Main Event and a player's page are the **season screens**: each shows one season, the **selected season**.
+   The address says which. With no season in it (`/results`) it is the current season; if no season is open, it
+   is the newest season. With a season in it (`/seasons/7/results`) it is that season, on the same screen. So a
+   link, a bookmark and the browser's "back" all lead to the season they were made for.
 3b. **"Escolher temporada"** lists every season, newest first, in a table titled "Temporadas". Each season is a
    row with one value per column: its name, its start date ("Início"), its number of rounds scheduled
    ("Eventos"), how many were played ("Finalizados"), and whether it is the current one ("Atual"), finished,
    open or closed ("Situação"). On a phone the two counts are hidden. It marks the selected season. "Administração" lists the seasons in the same
    table, with each season's actions in a last column. Everyone
    logged in can open it, from the season name at the top of every screen.
-3c. **Picking a season** in that list makes it the selected season on every screen. The pick lasts until the user
-   picks another season, closes the browser tab or logs out ("Sair"). It belongs to that browser tab only: it
-   changes nothing for other people.
+3c. **Picking a season** in that list opens the season screen the list was opened from, at that season's address;
+   the standings when it was opened from another screen. Picking the current season opens the address with no
+   season in it. From a season screen, the menu and the links to other season screens keep the season: the
+   results of Liga 2022 lead to the calendar of Liga 2022.
+3c1. **Screens with no season of their own** ("Jogadores", "Temporadas", a night, the admin section) remember the
+   last season the browser tab showed. Their header names it, and their menu leads back to its addresses. This
+   memory lasts until the user opens another season, closes the browser tab or logs out ("Sair"). It never decides
+   what a season screen shows: the address does. Two links name a season of their own instead: cancelling a night
+   leads to the results of that night's season, and the season planner to the calendar of the season it planned.
 3d. While the selected season is not the current one, the season screens say so ("Você está vendo Liga 2022, que
-   não é a temporada atual.") and offer **"Voltar para a atual"**.
-3e. A link to one season (`/seasons/7/results`) picks that season, then opens the screen. If the picked season no
-   longer exists or was archived, the site goes back to the current season.
+   não é a temporada atual.") and offer **"Voltar para a atual"**, which opens the same screen at the address with
+   no season in it. The current season at its own address (`/seasons/12/results`) shows no notice and stays at
+   that address.
+3e. The address of a season that does not exist or was archived leads to the same screen of the current season.
 3f. **"Temporadas"**, in the menu, shows every season, newest first, each with the **first ten of its standings**:
    position, photo, nickname and points. On a wide screen two seasons stand side by side, each with its ten in
    one list. A finished season shows its final standings and the current season its standings so far. When the
    tenth place is shared, ten players are shown and the list says how many tied players did not fit ("e mais 2
    empatados").
-   A season with no finished night says so. **"Ver esta temporada"** makes a season the selected one and opens
-   its standings; the selected season shows "✓ Selecionada" instead. Everyone logged in can open it.
+   A season with no finished night says so. **"Ver esta temporada"** opens a season's standings, at that season's
+   address; the selected season shows "✓ Selecionada" instead. Everyone logged in can open it.
 4. A night belongs to a season explicitly. A night's season cannot be worked out from its date, because
    seasons no longer follow the calendar year.
 5. A season has a **regular night**: a weekday, a start time and a frequency (for example Friday at 21:30, every
@@ -189,20 +198,29 @@ The selected season, in the demo league (the current season, and Liga 2022, whic
 
 - **At first.** A player logs in. Every screen shows the current season, and "Escolher temporada" marks it
   "✓ Selecionada" and "Atual".
-- **Picking another.** The player opens "Escolher temporada" from the results and picks Liga 2022. The site returns to the
-  results, now of 2022. The calendar and the simulator also show 2022, and so does the site after a reload. Each
-  of those screens shows the notice; "Jogadores" does not.
-- **A finished season.** A results keeper with Liga 2022 selected sees no "+ Agendar". After "Voltar para a
-  atual" the notice is gone and "+ Agendar" is back.
-- **Logging out.** The player picks Liga 2022, logs out and logs in again: the current season is shown.
+- **Picking another.** The player opens "Escolher temporada" from the results and picks Liga 2022, which is
+  season 10. The site opens `/seasons/10/results`, the results of 2022. The menu leads to `/seasons/10/calendar`
+  and `/seasons/10/simulator`, and a reload shows 2022 again. Each of those screens shows the notice.
+- **A screen with no season.** From there the player opens "Jogadores" (`/players`). It has no notice, its header
+  still names Liga 2022, and "Resultados" in its menu leads back to `/seasons/10/results`.
+- **A player's page.** From the standings of Liga 2022 the player opens the champion: `/seasons/10/players/3`,
+  with the champion's numbers of 2022 and the notice. "Voltar para a atual" opens `/players/3`.
+- **A finished season.** A results keeper at the results of Liga 2022 sees no "+ Agendar". "Voltar para a atual"
+  opens `/results`: the notice is gone and "+ Agendar" is back. The browser's "back" returns to
+  `/seasons/10/results`.
+- **The address with no season.** In a tab that showed Liga 2022 last, typing `/results` shows the current season.
+- **The current season's own address.** The current season is season 12. `/seasons/12/results` shows its results,
+  stays at that address and has no notice.
+- **Logging out.** The player opens Liga 2022, logs out and logs in again: the current season is shown, and the
+  header of "Jogadores" names it.
 - **The first ten.** The player opens "Temporadas" from the menu. Liga 2022 is "Finalizada" and lists ten players,
   its champion first. The current season shows "✓ Selecionada" and no button. "Ver esta temporada" on Liga 2022
   opens the standings of 2022, with the notice.
 - **A shared tenth place.** Eleven players scored, and the tenth and the eleventh both have 15,00. The list shows
   ten players and "e mais 1 empatado".
-- **A link.** Opening `/seasons/10/results` shows the results of Liga 2022 at `/results`.
-- **A season that is gone.** Opening `/seasons/999999/results` shows the results of the current season, without
-  the notice.
+- **A link.** Opening `/seasons/10/results` shows the results of Liga 2022 and stays at that address.
+- **A season that is gone.** Opening `/seasons/999999/results` leads to `/results`: the results of the current
+  season, without the notice.
 
 Money settings:
 
@@ -292,7 +310,8 @@ Suggested dates, for a season whose regular night is Friday at 21:30:
 
 ## Changes already agreed
 
-- A picked season stays on every screen (rules 3a to 3e).
+- A season has its own addresses, and the address alone says which season a season screen shows (rules 3a to
+  3e). Before, the picked season was kept in the browser tab and every season shared one address.
 - Any active player can be entered in results; there are no rosters (see [players.md](players.md)).
 - Results keepers can run nights, not only admins (see [accounts-and-roles.md](accounts-and-roles.md)).
 - The **Main Event** is a night of its own type, on a site that turns it on ([main-event.md](main-event.md)).
