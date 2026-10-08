@@ -63,6 +63,10 @@ export const nights = {
     cancelConfirmBody: 'O evento sai do calendário e a data fica livre. As respostas de presença ficam guardadas no histórico.',
     openConfirmTitle: 'Abrir este evento?',
     openConfirmBody: 'Só um evento por temporada pode ficar aberto.',
+    undoOpen: 'Desfazer abertura',
+    undoOpenConfirmTitle: 'Desfazer a abertura deste evento?',
+    undoOpenConfirmBody: 'O evento volta a ficar agendado e o resultado parcial é apagado. As respostas de presença ficam.',
+    undoOpenConfirmBodyDashboard: 'O evento volta a ficar agendado e tudo o que foi lançado no painel é apagado: jogadores, pagamentos, rebuys e posições. As respostas de presença ficam.',
   },
 
   // Reschedule form

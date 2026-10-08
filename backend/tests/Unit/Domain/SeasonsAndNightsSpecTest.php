@@ -119,6 +119,14 @@ it('moves or cancels only a scheduled night', function (NightStatus $status, boo
     'finished' => [NightStatus::Finished, false],
 ]);
 
+it('undoes the opening only of an open night', function (NightStatus $status, bool $allowed) {
+    expect(violation(fn () => (new NightRules)->assertCanUndoOpen($status))?->rule)->toBe($allowed ? null : 'night.undo_open.not_open');
+})->with([
+    'scheduled' => [NightStatus::Scheduled, false],
+    'open' => [NightStatus::Open, true],
+    'finished' => [NightStatus::Finished, false],
+]);
+
 it('takes no Main Event pot and no time chip on a site that has neither', function (?string $mainEventPot, ?string $timeChip, ?string $rule) {
     $features = new Features(['mainEventPot' => false, 'timeChip' => false]);
 

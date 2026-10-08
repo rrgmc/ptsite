@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatLongDate, formatMoney, fullNameIfDifferent, nightTitle, parseMoneyInput, shareOf, titleOfNight } from './format'
+import { formatDate, formatLongDate, formatMoney, fullNameIfDifferent, moneyText, nightTitle, parseMoneyInput, shareOf, titleOfNight } from './format'
 
 describe('format', () => {
   it('formats money in reais', () => {
@@ -27,6 +27,12 @@ describe('format', () => {
     expect(parseMoneyInput('1.234,5')).toBe('1234.50')
     expect(parseMoneyInput('R$ 845,00')).toBe('845.00')
     expect(parseMoneyInput('abc')).toBeNull()
+  })
+
+  it('fills a money field with the amount as the site writes it, so that it is read back the same', () => {
+    expect(moneyText('125.00')).toBe('125,00')
+    expect(parseMoneyInput(moneyText('125.00'))).toBe('125.00')
+    expect(moneyText(null)).toBe('')
   })
 
   it('matches the backend points calculation', () => {

@@ -27,10 +27,10 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 4. **A participant** is a player the dashboard has a record of, or, while the night is open, a player who answered
    ALL IN ([attendance.md](attendance.md)). Each participant owes one **buy-in**.
 5. **Acting on a player makes them a participant.** While the night is open it also answers ALL IN for them,
-   whatever their answer was. So does "Confirmar", which does nothing else.
+   whatever their answer was. So does "ALL IN", beside a player found by the search, which does nothing else.
 5a. **A player who is not on the night is found by a search** ("Adicionar jogador"), at the top of the
    participants, by nickname or name. The dashboard lists none of them until someone searches, since a league may have more than a hundred players,
-   and then shows eight at most. Each one found has "Confirmar" and "Buy-in pago". An inactive player is found
+   and then shows eight at most. Each one found has "ALL IN" and "Buy-in pago". An inactive player is found
    too, and marked. **The dashboard creates no player**: a first-timer is added in the site first, by whoever
    may ([players.md](players.md)).
 5b. The participants ("Jogadores") can be folded away, with their search, to reach the amounts and the positions
@@ -84,6 +84,11 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 16. **Finishing fixes the night's money.** Every player who answered ALL IN becomes a recorded participant, and
     the season's prices are copied to the night: changing the season's money settings later does not change a
     finished night.
+16a. **Undoing the opening of a night deletes its dashboard**
+    ([seasons-and-nights.md](seasons-and-nights.md), rule 8a): the participants, their payments, the rebuys, the
+    house owner and the positions. The night is scheduled again and has no dashboard. The ALL IN answers stay,
+    also the ones the dashboard gave (rule 5), so those players are participants again if the night is opened
+    again, with nothing paid. The audit log keeps what was deleted.
 17. **The night's result is what the keeper finished it with.** Changes to the dashboard of a finished night
     never change the night's pot, time chip or points. When the calculated amounts differ from the recorded
     ones, the dashboard shows both.
@@ -151,6 +156,12 @@ Positions:
 
 - **One at a time.** Ana puts Breno in 6th place while Carla puts Dudu in 5th. Both stay.
 - **Same player twice.** Carla puts Dudu in 4th place too: refused ("Este jogador já está na 5ª posição.").
+
+Undoing the opening:
+
+- **The wrong night.** The night of the examples was opened by mistake. Helena, an admin, undoes its opening: the
+  five participants, the four rebuys, Élio as the house owner and the positions are deleted, and the night is
+  scheduled again. The five keep their ALL IN.
 
 Finishing:
 

@@ -11,6 +11,7 @@ use PTSite\App\Actions\Nights\OpenNight;
 use PTSite\App\Actions\Nights\RescheduleNight;
 use PTSite\App\Actions\Nights\ScheduleNight;
 use PTSite\App\Actions\Nights\ScheduleNights;
+use PTSite\App\Actions\Nights\UndoOpenNight;
 use PTSite\App\Actions\Nights\UpdateNight;
 use PTSite\App\Http\Controllers\Controller;
 use PTSite\App\Http\Requests\FinishNightRequest;
@@ -71,6 +72,15 @@ class NightController extends Controller
     public function open(Night $night, OpenNight $open): NightResource
     {
         return $this->resource($open(request()->user(), $night));
+    }
+
+    /**
+     * "Desfazer abertura": make a night opened by mistake scheduled again. Deletes its partial result and what the
+     * night dashboard recorded; the attendance answers stay. Admins.
+     */
+    public function undoOpen(Request $request, Night $night, UndoOpenNight $undoOpen): NightResource
+    {
+        return $this->resource($undoOpen($request->user(), $night));
     }
 
     /**

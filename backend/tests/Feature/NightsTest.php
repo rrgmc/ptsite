@@ -189,6 +189,48 @@ it('refuses to cancel an open or finished night', function (string $status) {
     $this->postJson("/api/v1/nights/{$night->id}/cancel")->assertConflict()->assertJsonPath('rule', 'night.cancel.not_scheduled');
 })->with(['open', 'finished']);
 
+it('lets an admin undo the opening of a night, which deletes its partial result and keeps the answers', function () {
+    $admin = User::factory()->admin()->create();
+    Sanctum::actingAs($admin);
+    $night = Night::factory()->for($this->season)->create(['starts_at' => '2027-03-12 21:30:00']);
+    $other = Night::factory()->for($this->season)->create(['starts_at' => '2027-03-19 21:30:00']);
+    $this->postJson("/api/v1/nights/{$night->id}/open")->assertOk();
+    $this->putJson("/api/v1/nights/{$night->id}/attendance/{$this->players[0]->id}", ['answer' => 'all_in'])->assertOk();
+    $this->putJson("/api/v1/nights/{$night->id}/partial-result", ['pot' => '840.00', 'main_event_pot' => null, 'time_chip' => null, 'positions' => positions([$this->players[0]])])->assertOk();
+
+    $this->postJson("/api/v1/nights/{$night->id}/undo-open")->assertOk()->assertJsonPath('data.status', 'scheduled');
+
+    expect($night->partialResult()->exists())->toBeFalse()
+        ->and($night->attendances()->count())->toBe(1);
+    $log = AuditLog::query()->where('action', 'night.open_undone')->sole();
+    expect($log->user_id)->toBe($admin->id)
+        ->and($log->before['status'])->toBe('open')
+        ->and($log->before['partial_result']['pot'])->toBe('840.00')
+        ->and($log->before['partial_result']['positions'])->toBe([['position' => 1, 'player_id' => $this->players[0]->id]])
+        ->and($log->after['status'])->toBe('scheduled');
+    // The season has no open night again, and the night can be opened again.
+    $this->postJson("/api/v1/nights/{$other->id}/open")->assertOk();
+    $this->postJson("/api/v1/nights/{$other->id}/undo-open")->assertOk();
+    $this->postJson("/api/v1/nights/{$night->id}/open")->assertOk()->assertJsonPath('data.status', 'open');
+});
+
+it('refuses to undo the opening of a scheduled or finished night', function (string $status) {
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $night = Night::factory()->for($this->season)->create(['status' => $status]);
+
+    $this->postJson("/api/v1/nights/{$night->id}/undo-open")->assertConflict()->assertJsonPath('rule', 'night.undo_open.not_open');
+})->with(['scheduled', 'finished']);
+
+it('lets only admins undo the opening of a night', function () {
+    $night = Night::factory()->for($this->season)->open()->create();
+
+    Sanctum::actingAs(User::factory()->resultsKeeper()->create());
+    $this->postJson("/api/v1/nights/{$night->id}/undo-open")->assertForbidden();
+    Sanctum::actingAs(User::factory()->create());
+    $this->postJson("/api/v1/nights/{$night->id}/undo-open")->assertForbidden();
+    expect($night->refresh()->status)->toBe('open');
+});
+
 it('lets only results keepers and admins move, edit or cancel nights', function () {
     Sanctum::actingAs(User::factory()->create());
     $night = Night::factory()->for($this->season)->create(['status' => 'scheduled']);

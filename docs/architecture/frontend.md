@@ -264,7 +264,7 @@ npm run test:e2e         # Playwright; starts its own Laravel servers with fresh
 npm run test:e2e:parallel # the same tests, phone and desktop at the same time, as CI runs them
 npm run build-storybook && npm run test:storybook   # every story renders and passes axe
 npm run api:types        # after the backend's API changes
-npm run screenshots      # mobile and desktop screenshots into docs/screens
+npm run screenshots      # phone screenshots into docs/screens
 npm run icons            # the app icons in public/icons, from public/favicon.svg
 ```
 
