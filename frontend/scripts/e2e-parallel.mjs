@@ -1,7 +1,7 @@
 // Runs the end-to-end tests of the two screen sizes at the same time, as two Playwright processes
 // (`npm run test:e2e:parallel`). Each size already has its own server and database (playwright.config.ts), so
 // they do not affect each other. Within one size the tests still run one at a time, because they share its data.
-// CI uses it to spend fewer minutes: a job is billed by how long it runs.
+// CI uses it to finish sooner.
 //
 // Arguments go to both processes: node scripts/e2e-parallel.mjs tests/admin.spec.ts
 // CI splits the test files over two jobs with one: --shard=1/2 and --shard=2/2.

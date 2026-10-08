@@ -67,8 +67,6 @@ export const admin: Messages['admin'] = {
       'season.updated': 'changed the season',
       'place.created': 'created the place',
       'place.updated': 'changed the place',
-      'v1.imported': 'imported the data of the previous site',
-      'v1.player_images_imported': 'imported the player photos of the previous site',
     },
   },
 

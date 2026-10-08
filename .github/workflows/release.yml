@@ -3,8 +3,7 @@ name: Release
 # A release is a tag on master, pushed by `task release` (see RELEASE.md). This builds the deploy package with
 # the tag as its version and publishes the GitHub release with the package attached.
 #
-# A release costs about 3 minutes of the plan's 2,000 a month. The package is a release asset, which does not
-# count against the 500 MB of stored artifacts.
+# It takes about 3 minutes. The package is a release asset, not a stored artifact, so it does not expire.
 on:
   push:
     tags: ['v*.*.*']
@@ -23,7 +22,7 @@ jobs:
           fetch-depth: 0
       - name: Refuse a tag that is not on master
         run: git merge-base --is-ancestor "$GITHUB_SHA" origin/master
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           coverage: none

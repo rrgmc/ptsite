@@ -2578,7 +2578,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            /** @description The address the link went to, with most of its name hidden: "m•••@gmail.com". */
+                            /** @description The address the link went to, with most of its name hidden: "m•••@example.com". */
                             email: string;
                         };
                     };

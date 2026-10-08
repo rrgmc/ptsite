@@ -297,4 +297,12 @@ tasks:
     status:
       - test -f local/build/ci-{{.SHA}}/ptsite-{{.SHA}}.zip
     cmds:
-      - gh run download --name ptsite-deploy-{{.SHA}} --dir local/build/ci-{{.SHA}}
+      # The artifact comes from a run someone with write access started by hand, named by its number. A pull
+      # request from a fork can store an artifact with the same name, and a download by name alone could take it.
+      - |
+        run="$(gh run list --workflow ci.yml --event workflow_dispatch --commit {{.SHA}} --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+        if [ -z "$run" ]; then
+          echo 'No finished CI run started by hand for {{.SHA}}. Run "gh workflow run ci.yml" on this commit and wait for it.' >&2
+          exit 1
+        fi
+        gh run download "$run" --name ptsite-deploy-{{.SHA}} --dir local/build/ci-{{.SHA}}

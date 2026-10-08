@@ -9,10 +9,8 @@ so the site is built on a developer's machine or in CI and uploaded as a zip.
 
 ## Build (CI)
 
-The repository is private and on GitHub's free plan, which gives the whole account 2,000 minutes of jobs and
-500 MB of stored artifacts a month. The tests of one pull request take about 6 minutes
-and about 26 minutes of that, because each of the seven jobs is billed on its own, rounded up. So
-[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs as little as it can:
+The tests of one pull request take about 6 minutes, in seven jobs.
+[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs each thing once, and nothing it does not need:
 
 | When | What runs |
 |---|---|
@@ -146,7 +144,7 @@ in `local/deploy.env`, which `Taskfile.yml` loads and git ignores.
 |---|---|
 | `task package` | Builds `local/build/ptsite.zip` (the name is `packageName` of `site.json`) from the working tree with [`deploy/build-package.php`](../../deploy/build-package.php). It installs the PHP and frontend packages itself (`composer install --no-dev`, `npm ci`). It stages in `local/build/stage`, so `backend/vendor` keeps its dev packages |
 | `task deploy` | `task package`, uploads it, then runs `php artisan migrate --force` on the server. The data on the server stays |
-| `task deploy:ci` | The same, with the package CI built for the current commit (`gh run download`). CI builds it only when asked: run `gh workflow run ci.yml` on that commit first, and use the package within 3 days |
+| `task deploy:ci` | The same, with the package CI built for the current commit (`gh run download`). CI builds it only when asked: run `gh workflow run ci.yml` on that commit first, and use the package within 3 days. The task takes the package only from a run started by hand, never from a pull request's run |
 | `task deploy:release -- v2.1.0` | The same, with the package of a release (`gh release download`) |
 | `task deploy:mail` | Writes the mail settings into the server's `.env`. See "Email" |
 
