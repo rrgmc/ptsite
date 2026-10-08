@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { Form } from 'react-aria-components'
+import { Button as AriaButton, Disclosure, DisclosurePanel, Form, Heading } from 'react-aria-components'
 import { Link } from 'react-router'
 import type { Night, NightDashboard, Player } from '@/api/client'
-import { useQuickAddPlayer } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
 import { Checkbox } from '@/components/Checkbox'
@@ -30,16 +29,14 @@ const SEARCH_LIMIT = 8
 
 /**
  * "Painel do evento": a night's money and positions on one screen, made for a phone at the table
- * (docs/specs/night-dashboard.md). Every tap is one change, sent at once; only the amounts typed by hand have a
- * "Salvar".
+ * (docs/specs/night-dashboard.md). Every tap is one change, sent at once; only an amount typed by hand has a
+ * "Salvar". No player is created here: a first-timer is added in the site, by whoever may.
  */
 export function NightDashboardView({
   night,
   dashboard,
   percentages,
   players,
-  canQuickAdd = false,
-  canFinish = false,
   error,
   onChange,
 }: {
@@ -49,9 +46,6 @@ export function NightDashboardView({
   percentages: Percentages
   /** Every player who can be picked. */
   players: Player[]
-  canQuickAdd?: boolean
-  /** Whether this user finishes nights, and so gets the way to "Finalizar". */
-  canFinish?: boolean
   /** Why the last change was refused. */
   error?: string
   onChange: OnChange
@@ -86,35 +80,42 @@ export function NightDashboardView({
       {notice && <p role="status" className="rounded-md bg-surface-sunken p-3 text-sm">{notice}</p>}
       {error && <p role="alert" className="rounded-md border border-danger bg-danger-soft p-3 text-danger">{error}</p>}
 
-      <Card title={t.dashboard.players.heading({ count: dashboard.players.length })}>
-        {dashboard.players.length === 0 ? (
-          <Empty>{t.dashboard.players.empty}</Empty>
-        ) : (
-          <ul className="-mx-2 divide-y divide-border/60">
-            {dashboard.players.map((line) => (
-              <DashboardPlayerRow
-                key={line.player.id}
-                line={line}
-                prices={dashboard.prices}
-                hasTimeChip={dashboard.totals.time_chip !== null}
-                canEdit={canEdit}
-                onChange={onChange}
-              />
-            ))}
-          </ul>
-        )}
-      </Card>
-
-      {canEdit && <AddPlayers players={players.filter((p) => !participantIds.includes(p.id))} everyone={players} canQuickAdd={canQuickAdd} onChange={onChange} />}
+      {/* The players can be folded away, to reach the amounts and the positions on a night with many of them. */}
+      <Disclosure defaultExpanded className="rounded-lg bg-surface shadow-card">
+        <Heading>
+          <AriaButton slot="trigger" className="group flex min-h-touch w-full items-center justify-between gap-2 rounded-lg px-4 py-3 text-left font-display text-lg font-bold focus-visible:outline-3 focus-visible:outline-focus">
+            {t.dashboard.players.heading({ count: dashboard.players.length })}
+            <span aria-hidden className="text-muted transition-transform group-aria-expanded:rotate-180">▾</span>
+          </AriaButton>
+        </Heading>
+        <DisclosurePanel>
+          <div className="px-4 pb-4">
+            {canEdit && <AddPlayers players={players.filter((p) => !participantIds.includes(p.id))} onChange={onChange} />}
+            {dashboard.players.length === 0 ? (
+              <Empty>{t.dashboard.players.empty}</Empty>
+            ) : (
+              <ul className="-mx-2 divide-y divide-border/60">
+                {dashboard.players.map((line) => (
+                  <DashboardPlayerRow
+                    key={line.player.id}
+                    line={line}
+                    prices={dashboard.prices}
+                    hasTimeChip={dashboard.totals.time_chip !== null}
+                    canEdit={canEdit}
+                    onChange={onChange}
+                  />
+                ))}
+              </ul>
+            )}
+          </div>
+        </DisclosurePanel>
+      </Disclosure>
 
       {isOpen && (
         <Card title={t.dashboard.manual.title}>
           {canEdit ? (
-            <div className="flex flex-col gap-4">
-              {/* Keyed so the fields start again from amounts that someone else saved. */}
-              <ManualAmounts key={`${dashboard.manual.pot}|${dashboard.manual.time_chip}`} dashboard={dashboard} onChange={onChange} />
-              {hasFeature('mainEventPot') && <ManualMainEventPot key={dashboard.main_event_pot ?? ''} dashboard={dashboard} onChange={onChange} />}
-            </div>
+            // Keyed so the fields start again from amounts that someone else saved.
+            <AmountsForm key={`${dashboard.manual.pot}|${dashboard.manual.time_chip}|${dashboard.main_event_pot}`} dashboard={dashboard} onChange={onChange} />
           ) : (
             <dl className="text-sm">
               {amountRows({ pot: inUse.pot, mainEventPot: inUse.mainEventPot, timeChip: inUse.timeChip }).map(([label, amount]) => (
@@ -132,7 +133,6 @@ export function NightDashboardView({
         <Card title={t.dashboard.positions.title}>
           {canEdit ? (
             <>
-              <p className="mb-3 text-sm text-muted">{t.dashboard.positions.help}</p>
               <FinishingOrderFields
                 percentages={percentages}
                 players={players}
@@ -146,7 +146,6 @@ export function NightDashboardView({
                 }}
                 pot={Number(inUse.pot) > 0 ? inUse.pot : null}
                 firstGroup={{ label: t.nights.confirmed, ids: participantIds }}
-                allowQuickAdd={canQuickAdd}
                 clearable
               />
             </>
@@ -170,25 +169,18 @@ export function NightDashboardView({
         </Card>
       )}
 
-      {isOpen && canFinish && (
-        <Link to={`/nights/${night.id}/result`} className="inline-flex min-h-touch items-center justify-center rounded-md border border-border bg-surface px-4 font-semibold hover:bg-surface-sunken">
-          {t.dashboard.finish}
-        </Link>
-      )}
-
       <DashboardTotals dashboard={dashboard} />
     </div>
   )
 }
 
 /**
- * Brings a player onto the night. A league may have more than a hundred players, so none is listed until
- * someone searches: then one tap confirms a player, or confirms and marks the buy-in as paid. Whoever may
- * quick-add players adds a first-timer by nickname here.
+ * "Adicionar jogador", at the top of the players: brings a player onto the night. A league may have more than a
+ * hundred players, so none is listed until someone searches: then one tap confirms a player, or confirms and
+ * marks the buy-in as paid.
  */
-function AddPlayers({ players, everyone, canQuickAdd, onChange }: { players: Player[]; everyone: Player[]; canQuickAdd: boolean; onChange: OnChange }) {
+function AddPlayers({ players, onChange }: { players: Player[]; onChange: OnChange }) {
   const [search, setSearch] = useState('')
-  const quickAdd = useQuickAddPlayer()
   const query = searchKey(search)
   // Active players first, then by name.
   const found =
@@ -197,53 +189,34 @@ function AddPlayers({ players, everyone, canQuickAdd, onChange }: { players: Pla
       : players
           .filter((p) => searchKey(p.nickname).includes(query) || searchKey(p.name ?? '').includes(query))
           .sort((a, b) => Number(a.status !== 'active') - Number(b.status !== 'active') || a.nickname.localeCompare(b.nickname))
-  const canAdd = canQuickAdd && query !== '' && !everyone.some((p) => searchKey(p.nickname) === query)
   const add = (change: DashboardChange) => {
     onChange(change)
     setSearch('')
   }
 
   return (
-    <Card title={t.dashboard.others.heading}>
-      <TextField
-        label={t.dashboard.others.search}
-        type="search"
-        value={search}
-        onChange={setSearch}
-        placeholder={t.dashboard.others.searchPlaceholder}
-        description={query === '' ? t.dashboard.others.hint : undefined}
-        errorMessage={quickAdd.error instanceof Error ? quickAdd.error.message : undefined}
-      />
-      {query !== '' && found.length === 0 && !canAdd && <p className="mt-3 text-muted">{t.dashboard.others.noneFound}</p>}
+    <div className="mb-3 border-b border-border pb-3">
+      <TextField label={t.dashboard.others.heading} type="search" value={search} onChange={setSearch} placeholder={t.dashboard.others.searchPlaceholder} />
+      {query !== '' && found.length === 0 && <p className="mt-3 text-muted">{t.dashboard.others.noneFound}</p>}
       {found.length > 0 && (
-        <ul className="-mx-2 mt-3 divide-y divide-border/60">
+        <ul className="-mx-2 mt-2 divide-y divide-border/60">
           {found.slice(0, SEARCH_LIMIT).map((player) => (
-            <li key={player.id} className="flex flex-wrap items-center justify-between gap-2 px-2 py-2 even:bg-surface-stripe">
+            <li key={player.id} className="flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 even:bg-surface-stripe">
               <span className="flex min-w-0 items-center gap-2">
                 <PlayerThumbnail player={player} size="xs" />
                 <span className="truncate font-semibold">{player.nickname}</span>
                 {player.status !== 'active' && <span className="text-xs text-muted">{t.common.inactive}</span>}
               </span>
-              <span role="group" aria-label={t.dashboard.others.actionsOf({ nickname: player.nickname })} className="flex gap-2">
-                <Button variant="secondary" className="px-3 text-sm" onPress={() => add({ type: 'mark', player })}>{t.dashboard.others.confirm}</Button>
-                <Button className="px-3 text-sm" onPress={() => add({ type: 'mark', player, buy_in_paid: true })}>{t.dashboard.others.confirmPaid}</Button>
+              <span role="group" aria-label={t.dashboard.others.actionsOf({ nickname: player.nickname })} className="flex gap-1.5">
+                <Button variant="secondary" className="min-h-9! px-2.5 text-sm" onPress={() => add({ type: 'mark', player })}>{t.dashboard.others.confirm}</Button>
+                <Button className="min-h-9! px-2.5 text-sm" onPress={() => add({ type: 'mark', player, buy_in_paid: true })}>{t.dashboard.others.confirmPaid}</Button>
               </span>
             </li>
           ))}
         </ul>
       )}
       {found.length > SEARCH_LIMIT && <p className="mt-2 text-sm text-muted">{t.dashboard.others.more({ shown: SEARCH_LIMIT, total: found.length })}</p>}
-      {canAdd && (
-        <Button
-          variant="ghost"
-          className="mt-2 px-2 text-left"
-          isPending={quickAdd.isPending}
-          onPress={() => quickAdd.mutate(search.trim(), { onSuccess: (player) => add({ type: 'mark', player }) })}
-        >
-          {t.components.playerPicker.addNew({ nickname: search.trim() })}
-        </Button>
-      )}
-    </Card>
+    </div>
   )
 }
 
@@ -263,118 +236,73 @@ function PositionsList({ positions }: { positions: NightDashboard['positions'] }
   )
 }
 
-/** An amount as typed: nothing is no amount, and a wrong one is undefined. */
-const typedAmount = (text: string) => (text.trim() === '' ? null : (parseMoneyInput(text) ?? undefined))
+type AmountKey = 'pot' | 'timeChip' | 'mainEventPot'
 
 /**
- * "Definir manualmente": the pot and the time chip typed by hand, for a night that does not record every
- * player's payments. Each field says what the dashboard works out, which an empty field keeps using. Unticking
- * goes back to the amounts worked out, at once.
+ * "Valores": the pot, the time chip and the Main Event pot, each in a field with a "Manual" mark beside it.
+ * Unmarked, a field is closed and shows the amount worked out (for the Main Event pot, the season's share of the
+ * pot). Marked, its amount is typed, and stands in for the one worked out once saved: one "Salvar" saves every
+ * marked amount. Unmarking a saved amount goes back to the one worked out, at once.
  */
-function ManualAmounts({ dashboard, onChange }: { dashboard: NightDashboard; onChange: OnChange }) {
+function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onChange: OnChange }) {
   const { manual, totals } = dashboard
-  const saved = manual.pot !== null || manual.time_chip !== null
-  const [isManual, setManual] = useState(saved)
-  const [potText, setPotText] = useState(moneyText(manual.pot))
-  const [timeChipText, setTimeChipText] = useState(moneyText(manual.time_chip))
-  const pot = typedAmount(potText)
-  const timeChip = totals.time_chip ? typedAmount(timeChipText) : null
-  const invalid = pot === undefined || timeChip === undefined
+  const fields: { key: AmountKey; label: string; checkLabel: string; saved: string | null; worked: string | null }[] = [
+    { key: 'pot', label: t.nights.moneyFields.pot({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkPot, saved: manual.pot, worked: totals.pot.owed },
+    ...(totals.time_chip
+      ? [{ key: 'timeChip' as const, label: t.nights.moneyFields.timeChip({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkTimeChip, saved: manual.time_chip, worked: totals.time_chip.owed }]
+      : []),
+    ...(hasFeature('mainEventPot')
+      ? [{ key: 'mainEventPot' as const, label: t.nights.moneyFields.mainEventPot({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkMainEventPot, saved: dashboard.main_event_pot, worked: dashboard.suggested_main_event_pot }]
+      : []),
+  ]
+  const [marked, setMarked] = useState<Partial<Record<AmountKey, boolean>>>(() => Object.fromEntries(fields.map((f) => [f.key, f.saved !== null])))
+  const [texts, setTexts] = useState<Partial<Record<AmountKey, string>>>(() => Object.fromEntries(fields.map((f) => [f.key, moneyText(f.saved)])))
+  /** The amount typed in a field: null when it is empty or wrong. */
+  const typed = (key: AmountKey) => parseMoneyInput(texts[key] ?? '')
+  const send = (amounts: Partial<Record<AmountKey, string | null>>) => {
+    if ('pot' in amounts || 'timeChip' in amounts) {
+      onChange({ type: 'amounts', ...('pot' in amounts && { pot: amounts.pot }), ...('timeChip' in amounts && { time_chip: amounts.timeChip }) })
+    }
+    if ('mainEventPot' in amounts) onChange({ type: 'mainEventPot', amount: amounts.mainEventPot ?? null })
+  }
+  const open = fields.filter((f) => marked[f.key])
+  const incomplete = open.some((f) => typed(f.key) === null)
+  const changed = open.filter((f) => typed(f.key) !== f.saved)
 
   return (
     <Form
-      className="flex flex-col gap-2"
+      className="flex flex-col gap-3"
       onSubmit={(e) => {
         e.preventDefault()
-        if (!invalid) onChange({ type: 'amounts', pot, time_chip: timeChip })
+        if (!incomplete && changed.length > 0) send(Object.fromEntries(changed.map((f) => [f.key, typed(f.key)])))
       }}
     >
-      <Checkbox
-        isSelected={isManual}
-        onChange={(checked) => {
-          setManual(checked)
-          if (!checked && saved) onChange({ type: 'amounts', pot: null, time_chip: null })
-        }}
-      >
-        {totals.time_chip ? t.dashboard.manual.check : t.dashboard.manual.checkPotOnly}
-      </Checkbox>
-      {isManual && (
-        <>
-          <p className="text-sm text-muted">{t.dashboard.manual.help}</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <TextField
-              label={t.nights.moneyFields.pot({ currency: currencySymbol })}
-              description={t.dashboard.manual.calculated({ amount: formatMoney(totals.pot.owed) })}
-              inputMode="decimal"
-              value={potText}
-              onChange={setPotText}
-              errorMessage={pot === undefined ? t.nights.invalidMoney : undefined}
-            />
-            {totals.time_chip && (
-              <TextField
-                label={t.nights.moneyFields.timeChip({ currency: currencySymbol })}
-                description={t.dashboard.manual.calculated({ amount: formatMoney(totals.time_chip.owed) })}
-                inputMode="decimal"
-                value={timeChipText}
-                onChange={setTimeChipText}
-                errorMessage={timeChip === undefined ? t.nights.invalidMoney : undefined}
-              />
-            )}
-          </div>
-          <Button type="submit" variant="secondary" className="self-start" isDisabled={invalid || (pot === manual.pot && timeChip === manual.time_chip)}>
-            {t.dashboard.manual.save}
-          </Button>
-        </>
-      )}
-    </Form>
-  )
-}
-
-/**
- * "Pote ME": the season's share of the pot unless it is set by hand. Unticking goes back to the season's share,
- * at once.
- */
-function ManualMainEventPot({ dashboard, onChange }: { dashboard: NightDashboard; onChange: OnChange }) {
-  const saved = dashboard.main_event_pot !== null
-  const [isManual, setManual] = useState(saved)
-  const [text, setText] = useState(moneyText(dashboard.main_event_pot))
-  const amount = typedAmount(text)
-  const suggested = dashboard.suggested_main_event_pot
-
-  return (
-    <Form
-      className="flex flex-col gap-2 border-t border-border pt-3"
-      onSubmit={(e) => {
-        e.preventDefault()
-        if (amount) onChange({ type: 'mainEventPot', amount })
-      }}
-    >
-      <Checkbox
-        isSelected={isManual}
-        onChange={(checked) => {
-          setManual(checked)
-          if (!checked && saved) onChange({ type: 'mainEventPot', amount: null })
-        }}
-      >
-        {t.dashboard.mainEventPot.check}
-      </Checkbox>
-      {isManual ? (
-        <>
+      {fields.map((field) => (
+        <div key={field.key} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
           <TextField
-            label={t.nights.moneyFields.mainEventPot({ currency: currencySymbol })}
-            description={suggested ? t.dashboard.manual.calculated({ amount: formatMoney(suggested) }) : undefined}
+            label={field.label}
             inputMode="decimal"
-            value={text}
-            onChange={setText}
-            placeholder={t.nights.moneyFields.mainEventPotPlaceholder}
-            errorMessage={amount === undefined ? t.nights.invalidMoney : undefined}
+            isDisabled={!marked[field.key]}
+            value={marked[field.key] ? (texts[field.key] ?? '') : moneyText(field.worked)}
+            onChange={(text) => setTexts({ ...texts, [field.key]: text })}
+            errorMessage={marked[field.key] && (texts[field.key] ?? '').trim() !== '' && typed(field.key) === null ? t.nights.invalidMoney : undefined}
           />
-          <Button type="submit" variant="secondary" className="self-start" isDisabled={!amount || amount === dashboard.main_event_pot}>
-            {t.dashboard.mainEventPot.save}
-          </Button>
-        </>
-      ) : (
-        <p className="text-sm text-muted">{suggested ? t.dashboard.mainEventPot.suggested({ amount: formatMoney(suggested) }) : t.dashboard.mainEventPot.none}</p>
+          <Checkbox
+            aria-label={field.checkLabel}
+            isSelected={Boolean(marked[field.key])}
+            onChange={(checked) => {
+              setMarked({ ...marked, [field.key]: checked })
+              // Marking starts from the amount in use; unmarking drops the one that was saved.
+              setTexts({ ...texts, [field.key]: checked ? moneyText(field.worked) : '' })
+              if (!checked && field.saved !== null) send({ [field.key]: null })
+            }}
+          >
+            {t.dashboard.manual.mark}
+          </Checkbox>
+        </div>
+      ))}
+      {open.length > 0 && (
+        <Button type="submit" variant="secondary" className="self-start" isDisabled={incomplete || changed.length === 0}>{t.dashboard.manual.save}</Button>
       )}
     </Form>
   )
@@ -403,7 +331,7 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
           <div key={label} className="min-w-0 flex-1">
             <dt className="text-xs font-semibold uppercase text-muted">
               {label}
-              {isManual && <span className="ml-1 normal-case text-primary">({t.dashboard.manual.mark})</span>}
+              {isManual && <span className="ml-1 lowercase text-primary">({t.dashboard.manual.mark})</span>}
             </dt>
             <dd>
               <span className="block truncate font-display text-lg font-extrabold tabular">{formatMoney(amount)}</span>

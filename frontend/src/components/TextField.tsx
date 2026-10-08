@@ -35,7 +35,7 @@ export function TextField({ label, description, errorMessage, placeholder, onCha
       <Label className="text-sm font-semibold">{label}</Label>
       <Input
         placeholder={placeholder}
-        className="min-h-touch w-full min-w-0 rounded-md border border-border bg-surface px-3 text-base invalid:border-danger focus:outline-3 focus:outline-focus"
+        className="min-h-touch w-full min-w-0 rounded-md border border-border bg-surface px-3 text-base invalid:border-danger focus:outline-3 focus:outline-focus disabled:cursor-not-allowed disabled:bg-surface-sunken disabled:text-muted"
       />
       {description && <Text slot="description" className="text-sm text-muted">{description}</Text>}
       <FieldError className="text-sm font-medium text-danger">{shown}</FieldError>

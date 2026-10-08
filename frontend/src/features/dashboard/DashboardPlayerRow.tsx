@@ -36,7 +36,7 @@ export function DashboardPlayerRow({
   const lastRebuy = rebuys.length - 1
 
   return (
-    <li className="px-2 py-2 even:bg-surface-stripe">
+    <li className="px-2 py-1.5 even:bg-surface-stripe">
       <div className="flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-2">
           <PlayerThumbnail player={player} size="xs" />
@@ -50,7 +50,7 @@ export function DashboardPlayerRow({
         )}
       </div>
 
-      <div role="group" aria-label={t.dashboard.players.marksOf({ nickname: player.nickname })} className="mt-2 flex flex-wrap items-center gap-2">
+      <div role="group" aria-label={t.dashboard.players.marksOf({ nickname: player.nickname })} className="mt-1 flex flex-wrap items-center gap-1.5">
         <ToggleChip isSelected={line.buy_in_paid} isDisabled={!canEdit} onChange={(paid) => onChange({ type: 'mark', player, buy_in_paid: paid })}>
           {t.dashboard.players.buyIn}
         </ToggleChip>
@@ -71,7 +71,7 @@ export function DashboardPlayerRow({
           </ToggleChip>
         ))}
         {canEdit && canRebuy && (
-          <Button variant="secondary" className="rounded-full px-3 text-sm" onPress={() => onChange({ type: 'addRebuy', player, count: rebuys.length })}>
+          <Button variant="secondary" className="min-h-9! rounded-full px-2.5 text-sm" onPress={() => onChange({ type: 'addRebuy', player, count: rebuys.length })}>
             {t.dashboard.players.addRebuy}
           </Button>
         )}
@@ -79,7 +79,7 @@ export function DashboardPlayerRow({
           <MenuTrigger>
             <AriaButton
               aria-label={t.dashboard.players.moreActions({ nickname: player.nickname })}
-              className="ml-auto flex min-h-touch min-w-touch items-center justify-center rounded-full text-xl text-muted hover:bg-surface-sunken focus-visible:outline-3 focus-visible:outline-focus"
+              className="ml-auto flex size-9 items-center justify-center rounded-full text-xl text-muted hover:bg-surface-sunken focus-visible:outline-3 focus-visible:outline-focus"
             >
               <span aria-hidden>⋯</span>
             </AriaButton>

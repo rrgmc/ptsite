@@ -53,7 +53,7 @@ class NightDashboardResource extends JsonResource
                 'total' => $this->total,
             ],
             /**
-             * The pot and the time chip typed by hand on an open night ("Definir manualmente"), which stand in
+             * The pot and the time chip set by hand on an open night ("Manual"), which stand in
              * for the ones in `totals`. Null for an amount that was not typed.
              *
              * @var array{pot: string|null, time_chip: string|null}

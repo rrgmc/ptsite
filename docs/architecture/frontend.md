@@ -60,7 +60,7 @@ frontend/
 | `/nights/:id/result` | Results form: pot, Main Event pot, time chip, finishing order, live points. On an open night it starts from the partial result, or from the night dashboard on a site that has it | results keepers, admins |
 | `/nights/:id/main-event-result` | Result form of a Main Event night: one player per position, the 1st place first, as many as are known | results keepers, admins |
 | `/nights/:id/partial-result` | Partial result form ("Resultado parcial"): the same fields, all optional, saved any number of times. On a site with the night dashboard it leads to the dashboard | active players, results keepers, admins |
-| `/nights/:id/dashboard` | "Painel do evento", on a site that has it: a screen of its own with no header and no menus, for a phone at the table. Each participant's buy-in, time chip and rebuys as chips that one tap turns on or off; the house owner; a search that brings a player onto the night; the pot, the time chip and the Main Event pot, each worked out unless set by hand; the positions of an open night; the pot, the time chip and the total always in sight. It refreshes every 10 seconds | players; changes for active players, results keepers and admins while the night is open, and for admins once it is finished |
+| `/nights/:id/dashboard` | "Painel do evento", on a site that has it: a screen of its own with no header and no menus, for a phone at the table. Each participant's buy-in, time chip and rebuys as chips that one tap turns on or off; a search that brings a player onto the night (it creates none), at the top of the participants, which fold away; the house owner; the pot, the time chip and the Main Event pot, each in a field that is closed and shows the amount worked out until its "Manual" is marked, with one "Salvar" for them; the positions of an open night; the pot, the time chip and the total always in sight. It refreshes every 10 seconds | players; changes for active players, results keepers and admins while the night is open, and for admins once it is finished |
 | `/simulator` | Ranking simulator | players |
 | `/statistics`, `/statistics/all` | Statistics of the selected season, and of every season: top ten lists and two charts | players |
 | `/players`, `/players?view=detailed` | Players, as a list or with the memos | players |
@@ -239,7 +239,8 @@ only on desktop also exists on another screen.
   `even:bg-surface-stripe`. The first and last cell have side padding, so the text does not touch the stripe's
   edge.
 - **One tap, one change, on the night dashboard.** A mark is a chip that one tap turns on or off (`ToggleChip`),
-  saved at once with no "Salvar" (only an amount typed by hand has one). The screen shows the change before the API answers
+  saved at once with no "Salvar" (only the amounts typed by hand have one). Its chips are 36px high, smaller
+  than the 44px of the rest of the site, so that a player's row fits a phone. The screen shows the change before the API answers
   (`features/dashboard/dashboardMoney.ts` has the API's rules for it) and puts it back if the API refuses. The
   changes of a night are sent one at a time, in order.
 - **Only the night dashboard refreshes by itself.** It asks the API again every 10 seconds while it is on screen

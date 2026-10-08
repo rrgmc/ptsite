@@ -367,18 +367,18 @@ it('takes a pot and a time chip typed by hand, and still works out its own', fun
     $this->putJson("{$this->url}/positions/6", ['player_id' => $this->breno->id])->assertOk()->assertJsonPath('data.manual.pot', '600.00');
     $this->putJson("{$this->url}/main-event-pot", ['amount' => '100'])->assertOk()->assertJsonPath('data.manual.time_chip', '40.00');
 
-    // One amount can be typed and the other left to the dashboard.
-    $this->putJson("{$this->url}/amounts", ['pot' => null, 'time_chip' => '40'])
+    // Each amount is set by itself: the one left out stays.
+    $this->putJson("{$this->url}/amounts", ['pot' => null])
         ->assertOk()
         ->assertJsonPath('data.manual', ['pot' => null, 'time_chip' => '40.00'])
         ->assertJsonPath('data.suggested_main_event_pot', '85.00');
-    $this->putJson("{$this->url}/amounts", ['pot' => null, 'time_chip' => null])
+    $this->putJson("{$this->url}/amounts", ['time_chip' => null])
         ->assertOk()
         ->assertJsonPath('data.manual', ['pot' => null, 'time_chip' => null])
         ->assertJsonPath('data.main_event_pot', '100.00')
         ->assertJsonPath('data.positions.0.player.nickname', 'Breno');
 
-    $this->putJson("{$this->url}/amounts", ['pot' => '12,50', 'time_chip' => null])->assertUnprocessable()->assertJsonValidationErrors(['pot']);
+    $this->putJson("{$this->url}/amounts", ['pot' => '12,50'])->assertUnprocessable()->assertJsonValidationErrors(['pot']);
 });
 
 it('takes typed amounts only while the night is open, and from who changes the dashboard', function () {

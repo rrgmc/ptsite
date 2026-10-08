@@ -8,7 +8,7 @@ import { NightDashboardView } from './NightDashboardView'
 const meta = {
   component: NightDashboardView,
   parameters: { layout: 'fullscreen' },
-  args: { night: openNight, dashboard: nightDashboard, percentages: season.percentages ?? [], players, canQuickAdd: true, canFinish: true, onChange: () => {} },
+  args: { night: openNight, dashboard: nightDashboard, percentages: season.percentages ?? [], players, onChange: () => {} },
   // The frame the screen has in the site (BareLayout).
   decorators: [(Story) => <MemoryRouter><main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pt-3"><Story /></main></MemoryRouter>],
 } satisfies Meta<typeof NightDashboardView>
@@ -24,16 +24,16 @@ export const NoPlayers: Story = {
 }
 
 /** An inactive player, or an account with no player, sees the dashboard and changes nothing. */
-export const ReadOnly: Story = { args: { dashboard: { ...nightDashboard, can_edit: false }, canFinish: false, canQuickAdd: false } }
+export const ReadOnly: Story = { args: { dashboard: { ...nightDashboard, can_edit: false } } }
 
-/** A night that does not record every payment: the pot and the Main Event pot are set by hand, and the time chip is still worked out. */
+/** A night that does not record every payment: the pot and the Main Event pot are marked "Manual", and the time chip is still worked out. */
 export const AmountsSetByHand: Story = { args: { dashboard: { ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '100.00', suggested_main_event_pot: '120.00' } } }
 
 /** The API refused the last tap. */
 export const ChangeRefused: Story = { args: { error: 'O limite é de 2 rebuys por jogador.' } }
 
 /** A finished night, as a player sees it: the amounts it was finished with, and no positions. */
-export const Finished: Story = { args: { night: finishedNight, dashboard: finishedNightDashboard, canFinish: false } }
+export const Finished: Story = { args: { night: finishedNight, dashboard: finishedNightDashboard } }
 
 /** A finished night, as an admin sees it: the payments can still be corrected. */
 export const FinishedAsAdmin: Story = { args: { night: finishedNight, dashboard: { ...finishedNightDashboard, can_edit: true } } }

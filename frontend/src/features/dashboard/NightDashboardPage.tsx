@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router'
 import { ApiError } from '@/api/client'
-import { useChangeNightDashboard, useMe, useNight, useNightDashboard, usePlayers, useSeason } from '@/api/queries'
+import { useChangeNightDashboard, useNight, useNightDashboard, usePlayers, useSeason } from '@/api/queries'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { t } from '@/i18n'
 import { NightDashboardView } from './NightDashboardView'
@@ -15,7 +15,6 @@ export function NightDashboardPage() {
   const dashboard = useNightDashboard(nightId)
   const season = useSeason(night.data?.season_id ?? 0)
   const players = usePlayers()
-  const me = useMe()
   const change = useChangeNightDashboard(nightId)
 
   const failed = night.error ?? dashboard.error ?? season.error
@@ -36,8 +35,6 @@ export function NightDashboardPage() {
       dashboard={dashboard.data}
       percentages={season.data.percentages ?? []}
       players={players.data ?? []}
-      canQuickAdd={me.data?.abilities.quick_add_players}
-      canFinish={me.data?.abilities.run_nights}
       error={change.error ? (change.error instanceof ApiError ? change.error.body.message : t.components.connectionError) : undefined}
       onChange={(next) => change.mutate(next)}
     />

@@ -357,7 +357,7 @@ async function sendDashboardChange(nightId: number, change: DashboardChange, lat
     case 'mainEventPot':
       return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/main-event-pot', { params: { path: night }, body: { amount: change.amount } }))).data
     case 'amounts':
-      return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/amounts', { params: { path: night }, body: { pot: change.pot, time_chip: change.time_chip } }))).data
+      return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/amounts', { params: { path: night }, body: { ...(change.pot !== undefined && { pot: change.pot }), ...(change.time_chip !== undefined && { time_chip: change.time_chip }) } }))).data
   }
 }
 

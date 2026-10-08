@@ -559,8 +559,9 @@ export interface paths {
         };
         get?: never;
         /**
-         * "Definir manualmente": type the pot and the time chip of the open night, for a night that does not record
-         *     every player's payments. Null takes a typed amount away. The dashboard still answers the ones it works out
+         * "Manual": type the pot or the time chip of the open night, for a night that does not record every player's
+         *     payments; leave out the one that stays. Null takes a typed amount away. The dashboard still answers the
+         *     ones it works out
          */
         put: operations["nightDashboard.setAmounts"];
         post?: never;
@@ -1285,7 +1286,7 @@ export interface components {
                 };
             };
             /**
-             * @description The pot and the time chip typed by hand on an open night ("Definir manualmente"), which stand in
+             * @description The pot and the time chip set by hand on an open night ("Manual"), which stand in
              *     for the ones in `totals`. Null for an amount that was not typed.
              */
             manual: {
@@ -1727,9 +1728,9 @@ export interface components {
         /** SetPartialAmountsRequest */
         SetPartialAmountsRequest: {
             /** @description The pot typed for the night, as a decimal string such as "840.00", or null for the one the dashboard works out. */
-            pot: string | null;
+            pot?: string | null;
             /** @description The time chip typed for the night, as a decimal string, or null for the one the dashboard works out. Not kept on a site without the time chip. */
-            time_chip: string | null;
+            time_chip?: string | null;
         };
         /** SetPartialPositionRequest */
         SetPartialPositionRequest: {
@@ -3077,7 +3078,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["SetPartialAmountsRequest"];
             };

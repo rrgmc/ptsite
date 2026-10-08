@@ -106,12 +106,13 @@ class NightDashboardController extends Controller
     }
 
     /**
-     * "Definir manualmente": type the pot and the time chip of the open night, for a night that does not record
-     * every player's payments. Null takes a typed amount away. The dashboard still answers the ones it works out.
+     * "Manual": type the pot or the time chip of the open night, for a night that does not record every player's
+     * payments; leave out the one that stays. Null takes a typed amount away. The dashboard still answers the
+     * ones it works out.
      */
     public function setAmounts(SetPartialAmountsRequest $request, Night $night, SetPartialAmounts $set): NightDashboardResource
     {
-        return $this->resource($request, $set($request->user(), $night, $request->validated('pot'), $request->validated('time_chip')));
+        return $this->resource($request, $set($request->user(), $night, $request->validated()));
     }
 
     private function resource(Request $request, Night $night): NightDashboardResource

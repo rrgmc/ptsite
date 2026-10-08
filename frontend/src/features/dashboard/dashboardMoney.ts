@@ -17,7 +17,7 @@ export type DashboardChange =
   | { type: 'houseOwner'; player: Player | null }
   | { type: 'position'; position: number; player: Player | null }
   | { type: 'mainEventPot'; amount: string | null }
-  | { type: 'amounts'; pot: string | null; time_chip: string | null }
+  | { type: 'amounts'; pot?: string | null; time_chip?: string | null }
 
 const cents = (amount: string) => Math.round(Number(amount) * 100)
 const decimal = (amount: number) => (amount / 100).toFixed(2)
@@ -150,6 +150,12 @@ export function applyChange(dashboard: NightDashboard, change: DashboardChange):
     case 'mainEventPot':
       return { ...dashboard, main_event_pot: change.amount }
     case 'amounts':
-      return { ...dashboard, manual: { pot: change.pot, time_chip: dashboard.totals.time_chip ? change.time_chip : null } }
+      return {
+        ...dashboard,
+        manual: {
+          pot: change.pot === undefined ? dashboard.manual.pot : change.pot,
+          time_chip: dashboard.totals.time_chip ? (change.time_chip === undefined ? dashboard.manual.time_chip : change.time_chip) : null,
+        },
+      }
   }
 }

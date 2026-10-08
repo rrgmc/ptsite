@@ -2153,7 +2153,7 @@
         "/v1/nights/{night}/dashboard/amounts": {
             "put": {
                 "operationId": "nightDashboard.setAmounts",
-                "summary": "\"Definir manualmente\": type the pot and the time chip of the open night, for a night that does not record\nevery player's payments. Null takes a typed amount away. The dashboard still answers the ones it works out",
+                "summary": "\"Manual\": type the pot or the time chip of the open night, for a night that does not record every player's\npayments; leave out the one that stays. Null takes a typed amount away. The dashboard still answers the\nones it works out",
                 "tags": [
                     "NightDashboard"
                 ],
@@ -2169,7 +2169,6 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
@@ -4759,7 +4758,7 @@
                     },
                     "manual": {
                         "type": "object",
-                        "description": "The pot and the time chip typed by hand on an open night (\"Definir manualmente\"), which stand in\nfor the ones in `totals`. Null for an amount that was not typed.",
+                        "description": "The pot and the time chip set by hand on an open night (\"Manual\"), which stand in\nfor the ones in `totals`. Null for an amount that was not typed.",
                         "properties": {
                             "pot": {
                                 "type": [
@@ -6412,10 +6411,6 @@
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     }
                 },
-                "required": [
-                    "pot",
-                    "time_chip"
-                ],
                 "title": "SetPartialAmountsRequest"
             },
             "SetPartialPositionRequest": {

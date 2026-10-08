@@ -36,9 +36,9 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(page.getByRole('heading', { name: 'Jogadores (0)' })).toBeVisible()
 
   // One tap confirms a player who did not answer and marks the buy-in as paid
-  // …found by a search: the dashboard lists nobody until someone searches
+  // …found by a search: the dashboard lists nobody until someone searches, and creates no player
   await expect(page.getByRole('group', { name: /^Confirmar / })).toHaveCount(0)
-  await page.getByRole('searchbox', { name: 'Buscar jogador' }).fill('jacob')
+  await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('jacob')
   await page.getByRole('group', { name: 'Confirmar Jacobson' }).getByRole('button', { name: 'Buy-in pago' }).click()
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true')
   await expect(totals(page)).toContainText('PoteR$ 50,00Pago R$ 50,00')
@@ -51,24 +51,29 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(totals(page)).toContainText('TotalR$ 105,00Pago R$ 105,00Falta R$ 0,00')
 
   // The owner of the house pays the smaller buy-in
-  await page.getByRole('searchbox', { name: 'Buscar jogador' }).fill('duha')
+  await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('duha')
   await page.getByRole('group', { name: 'Confirmar Duhamel' }).getByRole('button', { name: 'Confirmar', exact: true }).click()
   await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
   await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
   await expect(page.getByText('Dono da casa: Duhamel')).toBeVisible()
   await expect(totals(page)).toContainText('PoteR$ 125,00Pago R$ 100,00Falta R$ 25,00')
 
-  // The pot can be set by hand, for a night that does not record every payment; the one worked out stays in sight
-  await page.getByText('Definir o pote e o time chip manualmente').click()
+  // Each amount is in a closed field until it is marked "Manual". The Main Event pot is the season's share of the pot
+  await expect(page.getByLabel('Pote (R$)')).toBeDisabled()
+  await expect(page.getByLabel('Pote (R$)')).toHaveValue('125,00')
+  await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
+  // The pot is set by hand, for a night that does not record every payment; the one worked out stays in sight
+  // React Aria hides the checkbox itself: the mark's text is what a finger taps. The first "Manual" is the pot's.
+  await page.getByText('Manual', { exact: true }).first().click()
+  await expect(page.getByRole('checkbox', { name: 'Definir o pote manualmente' })).toBeChecked()
   await page.getByLabel('Pote (R$)').fill('300')
-  await page.getByRole('button', { name: 'Salvar valores' }).click()
-  await expect(totals(page)).toContainText('Pote(manual)R$ 300,00Calculado R$ 125,00')
-  // The Main Event pot is the season's share of the pot, unless it is set by hand too
-  await expect(page.getByText('Pote ME: R$ 60,00, a parte do pote definida na temporada.')).toBeVisible()
+  await page.getByRole('button', { name: 'Salvar' }).click()
+  await expect(totals(page)).toContainText('Pote(Manual)R$ 300,00Calculado R$ 125,00')
+  await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('60,00')
   await expectAccessible(page)
-  await page.getByText('Definir o pote e o time chip manualmente').click()
+  await page.getByText('Manual', { exact: true }).first().click()
   await expect(totals(page)).toContainText('PoteR$ 125,00Pago R$ 100,00Falta R$ 25,00')
-  await expect(page.getByText('Pote ME: R$ 25,00, a parte do pote definida na temporada.')).toBeVisible()
+  await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
 
   // A position is saved when its player is picked, with the points it earns from the pot so far
   await page.getByRole('button', { name: /^6º lugar/ }).click()
@@ -96,8 +101,11 @@ test('players record the payments of an open night on its dashboard, and the kee
   // …which the player's dashboard shows by itself a few seconds later
   await expect(marksOf(page, 'Duhamel').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true', { timeout: 20_000 })
 
-  // "Finalizar" starts from the dashboard: the pot, the season's share of it for the Main Event, the time chip
-  await keeper.getByRole('link', { name: 'Finalizar evento' }).click()
+  // The dashboard does not finish a night. On the night's page, "Finalizar" starts from the dashboard: the pot, the
+  // season's share of it for the Main Event, the time chip
+  await expect(keeper.getByRole('link', { name: /Finalizar/ })).toHaveCount(0)
+  await keeper.getByRole('link', { name: 'Voltar ao site' }).click()
+  await keeper.getByRole('link', { name: /Finalizar/ }).click()
   await expect(keeper.getByText('Preenchido com os valores e as posições do painel do evento.')).toBeVisible()
   await expect(keeper.getByLabel('Pote (R$)')).toHaveValue('125,00')
   await expect(keeper.getByLabel('Pote ME (R$)')).toHaveValue('25,00')

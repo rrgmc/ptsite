@@ -32,9 +32,7 @@ export const dashboard = {
   // Players who are not on the night yet
   others: {
     heading: 'Adicionar jogador',
-    search: 'Buscar jogador',
     searchPlaceholder: 'Apelido ou nome',
-    hint: 'Digite o apelido de quem chegou para confirmar com um toque.',
     noneFound: 'Nenhum jogador encontrado.',
     more: ({ shown, total }: { shown: number; total: number }) => `Mostrando ${shown} de ${total}. Digite mais para encontrar.`,
     confirm: 'Confirmar',
@@ -42,31 +40,22 @@ export const dashboard = {
     actionsOf: ({ nickname }: { nickname: string }) => `Confirmar ${nickname}`,
   },
 
-  // The pot and the time chip typed by hand
+  // The amounts, each worked out unless it is set by hand
   manual: {
-    title: 'Pote e time chip',
-    check: 'Definir o pote e o time chip manualmente',
-    checkPotOnly: 'Definir o pote manualmente',
-    help: 'Para um evento que não registra os pagamentos de cada jogador. Um valor em branco usa o calculado.',
-    calculated: ({ amount }: { amount: string }) => `Calculado: ${amount}`,
-    save: 'Salvar valores',
-    /** Beside an amount at the foot of the screen that was typed by hand. */
-    mark: 'manual',
+    title: 'Valores',
+    /** The mark beside each amount, and beside one set by hand at the foot of the screen. */
+    mark: 'Manual',
+    checkPot: 'Definir o pote manualmente',
+    checkTimeChip: 'Definir o time chip manualmente',
+    checkMainEventPot: 'Definir o pote ME manualmente',
+    save: 'Salvar',
   },
 
   // Positions
   positions: {
     title: 'Posições',
-    help: 'Cada posição é salva ao escolher o jogador. Os pontos são do pote até agora.',
     empty: 'Nenhuma posição preenchida.',
   },
-  mainEventPot: {
-    check: 'Definir o pote ME manualmente',
-    suggested: ({ amount }: { amount: string }) => `Pote ME: ${amount}, a parte do pote definida na temporada.`,
-    none: 'Pote ME: a temporada não define uma parte do pote. Defina manualmente, ou informe ao finalizar.',
-    save: 'Salvar pote ME',
-  },
-
   // The amounts
   totals: {
     label: 'Valores do evento',
@@ -81,7 +70,6 @@ export const dashboard = {
     title: 'Resultado registrado',
     help: 'Os valores com que o evento foi finalizado. Eles contam para os pontos; os do painel, não.',
   },
-  finish: 'Finalizar evento',
 
   // The card on the night's page
   card: {

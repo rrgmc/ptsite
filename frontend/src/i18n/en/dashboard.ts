@@ -32,9 +32,7 @@ export const dashboard = {
   // Players who are not on the night yet
   others: {
     heading: 'Add a player',
-    search: 'Find a player',
     searchPlaceholder: 'Nickname or name',
-    hint: 'Type the nickname of who arrived to confirm them at one tap.',
     noneFound: 'No player found.',
     more: ({ shown, total }: { shown: number; total: number }) => `Showing ${shown} of ${total}. Type more to find one.`,
     confirm: 'Confirm',
@@ -42,31 +40,22 @@ export const dashboard = {
     actionsOf: ({ nickname }: { nickname: string }) => `Confirm ${nickname}`,
   },
 
-  // The pot and the time chip typed by hand
+  // The amounts, each worked out unless it is set by hand
   manual: {
-    title: 'Pot and time chip',
-    check: 'Set the pot and the time chip by hand',
-    checkPotOnly: 'Set the pot by hand',
-    help: 'For a night that does not record every player\'s payments. An empty amount uses the one worked out.',
-    calculated: ({ amount }: { amount: string }) => `Worked out: ${amount}`,
-    save: 'Save the amounts',
-    /** Beside an amount at the foot of the screen that was typed by hand. */
-    mark: 'by hand',
+    title: 'Amounts',
+    /** The mark beside each amount, and beside one set by hand at the foot of the screen. */
+    mark: 'By hand',
+    checkPot: 'Set the pot by hand',
+    checkTimeChip: 'Set the time chip by hand',
+    checkMainEventPot: 'Set the Main Event pot by hand',
+    save: 'Save',
   },
 
   // Positions
   positions: {
     title: 'Positions',
-    help: 'Each position is saved when its player is picked. The points are from the pot so far.',
     empty: 'No position filled.',
   },
-  mainEventPot: {
-    check: 'Set the Main Event pot by hand',
-    suggested: ({ amount }: { amount: string }) => `Main Event pot: ${amount}, the share of the pot set in the season.`,
-    none: 'Main Event pot: the season sets no share of the pot. Set it by hand, or enter it when finishing.',
-    save: 'Save the Main Event pot',
-  },
-
   // The amounts
   totals: {
     label: 'Amounts of the night',
@@ -81,7 +70,6 @@ export const dashboard = {
     title: 'Recorded result',
     help: 'The amounts the night was finished with. They count for the points; the dashboard\'s do not.',
   },
-  finish: 'Finish the night',
 
   // The card on the night's page
   card: {
