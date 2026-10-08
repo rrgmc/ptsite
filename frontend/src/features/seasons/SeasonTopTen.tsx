@@ -6,8 +6,8 @@ import { t } from '@/i18n'
 import { formatPoints } from '@/lib/format'
 
 /**
- * The first ten of a season's standings, as one short list. From a tablet up it takes two columns, read down the
- * first and then down the second: 1 to 5, then 6 to 10. Under it, how many tied players did not fit.
+ * The first ten of a season's standings, as one short list, 1 to 10 from top to bottom. Under it, how many tied
+ * players did not fit.
  */
 export function SeasonTopTen({ caption, rows, tiedNotShown = 0 }: {
   /** For screen readers: what the list is. */
@@ -17,12 +17,12 @@ export function SeasonTopTen({ caption, rows, tiedNotShown = 0 }: {
 }) {
   return (
     <>
-      <ol aria-label={caption} className="gap-x-8 sm:columns-2">
+      <ol aria-label={caption}>
         {rows.map((row, i) => {
           const tied = rows[i - 1]?.rank === row.rank || rows[i + 1]?.rank === row.rank || (i === rows.length - 1 && tiedNotShown > 0)
           return (
             // With large text on a phone the nickname and the points do not fit beside the photo: they move down.
-            <li key={row.player.id} className="flex break-inside-avoid flex-wrap items-center gap-x-2 border-b border-border/60 py-1">
+            <li key={row.player.id} className="flex flex-wrap items-center gap-x-2 border-b border-border/60 px-2 py-1 last:border-0 even:bg-surface-stripe">
               <span className={`w-7 shrink-0 text-center font-display text-lg font-extrabold tabular ${rankColor(row.rank)}`}>
                 {row.rank}
                 {tied && <span className="sr-only"> {t.components.rankedList.tied}</span>}

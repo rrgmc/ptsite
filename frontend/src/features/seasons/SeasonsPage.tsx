@@ -13,7 +13,8 @@ import { usePickSeason } from './usePickSeason'
 
 /**
  * "Temporadas", from the menu: every season, newest first, each with the first ten of its standings and, on a
- * site that has the Main Event, its Main Event champion. A season can be made the one that every screen shows.
+ * site that has the Main Event, its Main Event champion. From a tablet up, two seasons stand side by side. A
+ * season can be made the one that every screen shows.
  */
 export function SeasonsPage() {
   const seasons = useSeasonsTopStandings()
@@ -28,7 +29,7 @@ export function SeasonsPage() {
       {seasons.data.length === 0 ? (
         <Empty>{t.seasons.noSeason}</Empty>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
           {seasons.data.map(({ season, rows, tied_not_shown, main_event_champion: champion }) => (
             <Card
               key={season.id}
@@ -50,11 +51,14 @@ export function SeasonsPage() {
                 {t.seasons.started({ date: formatDate(season.starts_on), count: season.nights_count ?? 0 })}
               </p>
               {hasFeature('mainEvent') && champion && (
-                <p className="mb-2 flex flex-wrap items-center gap-2 rounded-md bg-surface-sunken px-2 py-1">
-                  <span aria-hidden>🏅</span>
-                  <span className="font-semibold">{t.seasons.mainEventChampion}</span>
-                  <PlayerThumbnail player={champion} size="xs" />
-                  <PlayerLink player={champion} className="min-w-0 font-semibold" />
+                // A box in the site's color, so it does not read as one more row of the list under it.
+                <p className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md border-l-4 border-primary bg-primary-soft px-3 py-2">
+                  <span aria-hidden className="text-xl">🏅</span>
+                  <span className="text-sm font-semibold text-primary">{t.seasons.mainEventChampion}</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <PlayerThumbnail player={champion} size="xs" />
+                    <PlayerLink player={champion} className="min-w-0 font-display text-lg font-extrabold" />
+                  </span>
                 </p>
               )}
               {rows.length === 0 ? (
