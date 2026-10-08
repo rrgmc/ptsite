@@ -40,7 +40,9 @@ test('a picked season has its own address, which the menu keeps until the user g
   await tab('Calendário').click()
   await expect(page).toHaveURL(/\/seasons\/\d+\/calendar$/)
   await expect(page.getByRole('region', { name: 'Abril de 2022' })).toBeVisible()
-  await tab('Simulação').click()
+  // "Simulação" is only in the left menu.
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('dialog', { name: 'Menu' }).getByRole('link', { name: 'Simulação' }).click()
   await expect(page).toHaveURL(/\/seasons\/\d+\/simulator$/)
   await expect(page.getByText(/· Liga 2022$/)).toBeVisible()
 
@@ -196,7 +198,7 @@ test('the menu lists every place of the site, and "Administração" only for adm
   await login(page, 'dev-player')
   await page.getByRole('button', { name: 'Menu' }).click()
   const menu = page.getByRole('dialog', { name: 'Menu' })
-  for (const name of ['Classificação', 'Resultados', 'Calendário', 'Simulação', 'Jogadores', 'Temporadas']) {
+  for (const name of ['Classificação', 'Resultados', 'Calendário', 'Simulação', 'Jogadores', 'Temporadas', 'Meu perfil']) {
     await expect(menu.getByRole('link', { name })).toBeVisible()
   }
   await expect(menu.getByRole('link', { name: 'Administração' })).toHaveCount(0)

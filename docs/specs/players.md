@@ -53,7 +53,7 @@ seconds, at the table, on a phone.
    - Images that came from an older site stay as they are until a new photo is sent. A player who has only a
      thumbnail sees it in place of the photo, and can replace or remove it.
 10. **"Meu perfil".** A player with a login changes their own **nickname, full name, email and birthday**, and
-    their photo, on the page "Meu perfil", reached from the menu.
+    their photo, on the page "Meu perfil", reached from the menu, the top bar and the phone's bottom bar.
     - A player cannot change their own status (active, inactive, archived). Only admins can.
     - The nickname must still be unique (rule 6).
     - The email and the birthday are shown only to the player and to admins.

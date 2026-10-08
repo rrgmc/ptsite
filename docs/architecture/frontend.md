@@ -176,6 +176,7 @@ The address says which season: `/results` is the current season and `/seasons/7/
   and "Sair", on phones and on desktop.
 - **Phones:** the bottom tab bar holds the items marked `tab`, five at most. "Sair" is only in the menu.
 - **Desktop:** the top bar holds the items marked `top`.
+- **"Simulação" and "Main Event" are only in the menu.** The standings also link to the simulator.
 
 ## Footer
 
@@ -191,8 +192,8 @@ The version is the constant `__APP_VERSION__`, set at build time in `vite.config
 The same screens adapt from 640px wide (Tailwind's `sm`) upwards. No feature is desktop-only: a shortcut shown
 only on desktop also exists on another screen.
 
-- **Navigation:** the bottom tab bar on phones becomes links in the top bar, which also has "Temporadas",
-  "Administração" (admins) and "Sair".
+- **Navigation:** the bottom tab bar on phones becomes links in the top bar, which also has "Estatísticas",
+  "Temporadas", "Administração" (admins) and "Sair". "Meu perfil" is the last item before "Administração".
 - **Width:** content is centred with a maximum width of 1024px (`max-w-5xl`).
 - **Standings:** the table gains the "Pontuou" and "Vitórias" columns, and the last result and simulator link
   move to a side column (from 1024px, `lg`).
