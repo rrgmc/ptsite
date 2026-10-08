@@ -148,7 +148,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, with the full width, below "Próximos
   eventos" and above the finished nights. The box "Totais da temporada" adds up the season's three amounts:
-  "Pote Total", "Pote ME" and "Time chip". On a wide screen it is at the right of "Próximos eventos", with a
+  "Pote Total", "Pote ME" and "Time chip". On a wide screen it is at the left of "Próximos eventos", with a
   quarter of the width; on a phone it is under "Próximos eventos" and above the chart. A screen with no
   "Próximos eventos", as of a finished season, shows the box with the full width and its amounts side by side. A season with no finished
   night has neither the chart nor the box.

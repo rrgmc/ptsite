@@ -56,9 +56,9 @@ export function ResultsPage() {
       <OpenNightAttendance />
       <PageHeader title={t.results.title} subtitle={season.name} />
 
-      {/* On a wide screen the totals are at the right of the next nights, with a quarter of the width. */}
+      {/* On a wide screen the totals are at the left of the next nights, with a quarter of the width. On a phone they are under them. */}
       {(showUpcoming || totals) && (
-        <div className={`mb-4 grid grid-cols-1 gap-4 ${showUpcoming && totals ? 'lg:grid-cols-[3fr_1fr]' : ''}`}>
+        <div className={`mb-4 grid grid-cols-1 gap-4 ${showUpcoming && totals ? 'lg:grid-cols-[1fr_3fr]' : ''}`}>
           {showUpcoming && (
             <Card title={t.results.upcoming} action={canRun && !scheduling && <Button variant="secondary" onPress={() => setScheduling(true)}>{t.results.schedule}</Button>}>
               {scheduling && (season.nights_planned ?? 0) >= season.rounds && (
@@ -90,11 +90,12 @@ export function ResultsPage() {
             </Card>
           )}
           {totals && (
-            <Card title={t.results.seasonTotals}>
+            <Card title={t.results.seasonTotals} className="lg:order-first">
               {/* Alone, the box has the full width: its amounts are then side by side, each beside its name. */}
               <dl className={showUpcoming ? '' : 'flex flex-wrap gap-x-10'}>
                 {amountRows({ pot: totals.pot_total, mainEventPot: totals.main_event_pot_total, timeChip: totals.time_chip_total }).map(([label, amount]) => (
-                  <div key={label} className="flex items-center justify-between gap-3 py-0.5">
+                  // With very large text the amount goes under its name instead of widening the page.
+                  <div key={label} className="flex flex-wrap items-center justify-between gap-x-3 py-0.5">
                     <dt className="font-semibold">{label}</dt>
                     <dd className="tabular">{formatMoney(amount)}</dd>
                   </div>
