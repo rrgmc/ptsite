@@ -76,6 +76,7 @@ Route::prefix('v1')->group(function () {
             Route::put('positions/{position}', [NightDashboardController::class, 'setPosition'])->whereNumber('position');
             Route::put('main-event-pot', [NightDashboardController::class, 'setMainEventPot']);
             Route::put('amounts', [NightDashboardController::class, 'setAmounts']);
+            Route::put('non-cash-adjustment', [NightDashboardController::class, 'setNonCashAdjustment']);
         });
 
         Route::get('statistics', [StatisticsController::class, 'show']);

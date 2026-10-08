@@ -223,6 +223,96 @@ it('lets only admins change a finished night, and audits it', function () {
         ->and($this->night->results()->pluck('points', 'position')->all())->toBe($points);
 });
 
+it('splits what was paid into cash and not in cash', function () {
+    ($this->play)();
+    $this->getJson($this->url)
+        ->assertJsonPath('data.received', ['cash' => '295.00', 'non_cash' => '0.00', 'non_cash_marked' => '0.00', 'non_cash_adjustment' => null]);
+
+    $anasRebuy = NightRebuy::query()->where('player_id', $this->ana->id)->value('id');
+    $this->patchJson("{$this->url}/rebuys/{$anasRebuy}", ['paid' => true, 'non_cash' => true])->assertOk();
+    ($this->mark)($this->breno, ['buy_in_paid' => true, 'buy_in_non_cash' => true])
+        ->assertOk()
+        ->assertJsonPath('data.players.0.rebuys.0', ['id' => $anasRebuy, 'paid' => true, 'non_cash' => true])
+        ->assertJsonPath('data.players.0.buy_in_non_cash', false)
+        ->assertJsonPath('data.players.1.buy_in_non_cash', true)
+        ->assertJsonPath('data.players.1.rebuys.*.non_cash', [false, false, false])
+        // The pot and the time chip do not change.
+        ->assertJsonPath('data.totals.total', ['owed' => '450.00', 'paid' => '295.00', 'pending' => '155.00'])
+        ->assertJsonPath('data.received', ['cash' => '190.00', 'non_cash' => '105.00', 'non_cash_marked' => '105.00', 'non_cash_adjustment' => null]);
+});
+
+it('counts a time chip as paid the way the buy-in was', function () {
+    ($this->mark)($this->carla, ['buy_in_non_cash' => true, 'time_chip_paid' => true])
+        ->assertOk()
+        ->assertJsonPath('data.received.non_cash', '55.00')
+        ->assertJsonPath('data.received.cash', '0.00');
+    ($this->mark)($this->carla, ['buy_in_non_cash' => false])
+        ->assertJsonPath('data.players.0.buy_in_paid', true)
+        ->assertJsonPath('data.received.non_cash', '0.00')
+        ->assertJsonPath('data.received.cash', '55.00');
+});
+
+it('marks a payment that was not in cash as paid, and one that is not paid as paid in no way', function () {
+    ($this->mark)($this->ana, ['buy_in_non_cash' => true])
+        ->assertJsonPath('data.players.0.buy_in_paid', true)
+        ->assertJsonPath('data.players.0.buy_in_non_cash', true);
+    // A mark that is left out stays.
+    ($this->mark)($this->ana, ['buy_in_paid' => true])->assertJsonPath('data.players.0.buy_in_non_cash', true);
+    ($this->mark)($this->ana, ['buy_in_paid' => false])
+        ->assertJsonPath('data.players.0.buy_in_paid', false)
+        ->assertJsonPath('data.players.0.buy_in_non_cash', false);
+    ($this->mark)($this->ana, ['buy_in_paid' => true])->assertJsonPath('data.players.0.buy_in_non_cash', false);
+
+    $rebuy = ($this->rebuy)($this->ana);
+    $this->patchJson("{$this->url}/rebuys/{$rebuy}", ['paid' => false, 'non_cash' => true])
+        ->assertJsonPath('data.players.0.rebuys.0', ['id' => $rebuy, 'paid' => true, 'non_cash' => true]);
+    $this->patchJson("{$this->url}/rebuys/{$rebuy}", ['paid' => true])->assertJsonPath('data.players.0.rebuys.0.non_cash', true);
+    $this->patchJson("{$this->url}/rebuys/{$rebuy}", ['paid' => false])->assertJsonPath('data.players.0.rebuys.0.non_cash', false);
+    $this->patchJson("{$this->url}/rebuys/{$rebuy}", ['paid' => true])->assertJsonPath('data.players.0.rebuys.0.non_cash', false);
+});
+
+it('adds an amount typed by hand to what was paid not in cash, also a negative one', function () {
+    ($this->play)();
+    ($this->mark)($this->breno, ['buy_in_non_cash' => true])->assertOk();
+
+    $this->putJson("{$this->url}/non-cash-adjustment", ['amount' => '-5.00'])
+        ->assertOk()
+        ->assertJsonPath('data.received', ['cash' => '250.00', 'non_cash' => '45.00', 'non_cash_marked' => '50.00', 'non_cash_adjustment' => '-5.00']);
+    $this->putJson("{$this->url}/non-cash-adjustment", ['amount' => '20'])
+        ->assertJsonPath('data.received.non_cash', '70.00')
+        ->assertJsonPath('data.received.cash', '225.00');
+
+    foreach (['abc', '1.234', '--5'] as $wrong) {
+        $this->putJson("{$this->url}/non-cash-adjustment", ['amount' => $wrong])->assertUnprocessable();
+    }
+    $this->putJson("{$this->url}/non-cash-adjustment", [])->assertUnprocessable();
+
+    // It stays when the night is finished.
+    ($this->finish)()->assertOk();
+    $this->getJson($this->url)->assertJsonPath('data.received.non_cash_adjustment', '20.00');
+    Sanctum::actingAs($this->elioUser);
+    $this->putJson("{$this->url}/non-cash-adjustment", ['amount' => null])->assertForbidden();
+    Sanctum::actingAs($this->admin);
+    $this->putJson("{$this->url}/non-cash-adjustment", ['amount' => null])
+        ->assertOk()
+        ->assertJsonPath('data.received', ['cash' => '245.00', 'non_cash' => '50.00', 'non_cash_marked' => '50.00', 'non_cash_adjustment' => null]);
+});
+
+it('audits how a payment of a finished night was made', function () {
+    ($this->play)();
+    ($this->finish)()->assertOk();
+    AuditLog::query()->delete();
+
+    Sanctum::actingAs($this->admin);
+    ($this->mark)($this->breno, ['buy_in_non_cash' => true])->assertOk();
+
+    $log = AuditLog::query()->sole();
+    expect($log->action)->toBe('night.payments_changed')
+        ->and($log->before['buy_in_non_cash'])->toBeFalse()
+        ->and($log->after['buy_in_non_cash'])->toBeTrue()
+        ->and($log->after['rebuys_non_cash'])->toBe([false, false, false]);
+});
+
 it('does not audit the taps on an open night', function () {
     ($this->mark)($this->ana, ['buy_in_paid' => true])->assertOk();
     ($this->rebuy)($this->ana, paid: true);

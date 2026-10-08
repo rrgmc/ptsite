@@ -68,6 +68,39 @@ final readonly class NightMoney
     }
 
     /**
+     * What one participant paid, but not in cash (rule 11a): a buy-in paid that way, with the time chip the player
+     * paid, and each rebuy paid that way, with the time chip it pays.
+     */
+    public function nonCashOf(NightEntry $entry): Money
+    {
+        $nonCash = Money::zero();
+        if ($entry->buyInPaid && $entry->buyInNonCash) {
+            $nonCash = $nonCash->plus($this->buyInOf($entry));
+            if ($entry->timeChip && $entry->timeChipPaid) {
+                $nonCash = $nonCash->plus($this->prices->timeChipValue);
+            }
+        }
+        foreach ($entry->rebuysPaid as $index => $paid) {
+            if ($paid && ($entry->rebuysNonCash[$index] ?? false)) {
+                $nonCash = $nonCash->plus($this->prices->rebuyValue)->plus($this->prices->timeChipOfRebuy());
+            }
+        }
+
+        return $nonCash;
+    }
+
+    /** @param  iterable<NightEntry>  $entries */
+    public function nonCash(iterable $entries): Money
+    {
+        $nonCash = Money::zero();
+        foreach ($entries as $entry) {
+            $nonCash = $nonCash->plus($this->nonCashOf($entry));
+        }
+
+        return $nonCash;
+    }
+
+    /**
      * The Main Event pot the season suggests for a pot: its share, rounded to a whole unit so the money is easy
      * to handle. Null when the season sets no share.
      */

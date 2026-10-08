@@ -28,9 +28,10 @@ class NightDashboardResource extends JsonResource
             'house_owner' => $this->houseOwner === null ? null : new PlayerResource($this->houseOwner),
             /**
              * The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and
-             * `pending` add up the buy-in, the rebuys and the time chips of the player.
+             * `pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a
+             * rebuy's `non_cash` say that it was paid, but not in cash.
              *
-             * @var list<array{player: PlayerResource, is_house_owner: bool, buy_in: string, buy_in_paid: bool, time_chip: bool, time_chip_paid: bool, rebuys: list<array{id: int, paid: bool}>, owed: string, paid: string, pending: string}>
+             * @var list<array{player: PlayerResource, is_house_owner: bool, buy_in: string, buy_in_paid: bool, buy_in_non_cash: bool, time_chip: bool, time_chip_paid: bool, rebuys: list<array{id: int, paid: bool, non_cash: bool}>, owed: string, paid: string, pending: string}>
              */
             'players' => array_map(fn (array $line) => [...$line, 'player' => new PlayerResource($line['player'])], $this->players),
             /**
@@ -52,6 +53,14 @@ class NightDashboardResource extends JsonResource
                 /** @var array{owed: string, paid: string, pending: string} */
                 'total' => $this->total,
             ],
+            /**
+             * The total paid, split by how: `cash` is what should be in hand, `non_cash` what was paid another way
+             * (a bank transfer, for instance). `non_cash` adds `non_cash_marked`, from the players' marks, and
+             * `non_cash_adjustment`, typed by hand: it may be negative, and is null when there is none.
+             *
+             * @var array{cash: string, non_cash: string, non_cash_marked: string, non_cash_adjustment: string|null}
+             */
+            'received' => $this->received,
             /**
              * The pot and the time chip set by hand on an open night ("Manual"), which stand in
              * for the ones in `totals`. Null for an amount that was not typed.

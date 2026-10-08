@@ -42,6 +42,11 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
    - **rebuys**: one record for each, each with its own paid mark;
    - **"Time chip"**, on a site with the time chip: whether the player arrived late and owes one, and whether it
      was paid. Marking it as paid also marks it as owed. Unmarking it as owed also unmarks it as paid.
+7a. **A paid buy-in and a paid rebuy each say how they were paid**: in cash, or not in cash (a bank transfer, for
+   instance). A tap on the mark goes from not paid to paid in cash, then to paid not in cash, then back to not
+   paid. Marking a payment as not in cash also marks it as paid. Unmarking it as paid also clears "not in cash".
+   The time chip has no such mark of its own: a late player's time chip counts as paid the way their buy-in
+   was, and a rebuy's time chip the way the rebuy was.
 8. **The prices are the season's money settings** (rules 5b to 5f of
    [seasons-and-nights.md](seasons-and-nights.md)). A price the season does not have counts as zero.
 9. **A night has at most one house owner** ("Dono da casa"), picked on the dashboard. Picking one makes them a
@@ -58,6 +63,12 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
       season says a rebuy also pays the time chip, one for each rebuy. A rebuy's time chip is paid with the rebuy;
     - **"Total"**: the two added up.
     The time chip is never mixed into the pot.
+11a. **What was paid is split by how**, so that the money in hand can be checked:
+    - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
+      each rebuy paid not in cash, with the time chip it pays; and the adjustment of rule 13c, when there is one;
+    - **"Em dinheiro"** (in cash): the total paid, less what was not in cash.
+    The foot of the screen shows both below the total paid, once anything is not in cash. Neither changes the
+    pot, the time chip, what is pending or the night's result.
 12. **A participant with a mark or a rebuy cannot leave the night**: FOLD, removing the answer and "Remover do
     evento" are refused until the marks and rebuys are removed. A participant with none can be removed, which
     also removes their answer.
@@ -73,6 +84,10 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 13b. An amount set by hand is used at the foot of the screen, for the points shown beside the positions, for the
     Main Event pot's share and at "Finalizar". The amount worked out stays in sight beside it ("Calculado"),
     with what was paid and what is pending.
+13c. **"Valores" also has "Ajuste fora do dinheiro"**, for anything out of the ordinary: an amount that is added
+    to what was paid not in cash. Its field is closed and shows R$ 0,00 until its mark "Usar" is ticked. The
+    amount may be negative, which takes it from what was not in cash. Unmarking it takes the adjustment away, at
+    once. It is kept when the night is finished.
 14. **The Main Event pot worked out is the season's share of the pot**: the **Main Event pot share** ("Pote ME: %
     do pote", from 0 to 100) of the pot in use, rounded to a whole unit. A season with no share has an empty
     Main Event pot until it is marked "Manual" and typed, or entered at "Finalizar".
@@ -87,8 +102,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 17. **The night's result is what the keeper finished it with.** Changes to the dashboard of a finished night
     never change the night's pot, time chip or points. When the calculated amounts differ from the recorded
     ones, the dashboard shows both.
-18. **What is recorded in the audit log:** every change to the dashboard of a finished night, the change of the
-    house owner, and an answer given for someone else. The taps on an open night are not: each record keeps who
+18. **What is recorded in the audit log:** every change to the dashboard of a finished night, with how each
+    payment was made, the change of the house owner, and an answer given for someone else. The taps on an open night are not: each record keeps who
     changed it last and when.
 19. **Without the feature** none of this exists: the night has no dashboard, the partial result keeps its typed
     pot and time chip, and only results keepers and admins answer for others.
@@ -112,6 +127,15 @@ house owner's buy-in:
   | Total | 450,00 | 295,00 | 155,00 |
 
   Élio owes R$ 25,00 of buy-in. Breno owes R$ 215,00 in all and has R$ 55,00 pending.
+- **Not in cash.** On that night Ana paid her rebuy by bank transfer, and Breno his buy-in. Ana's rebuy is
+  R$ 55,00, with the time chip it pays, and Breno's buy-in R$ 50,00: of the R$ 295,00 paid, R$ 105,00 are not in
+  cash and R$ 190,00 are in cash. The pot and the time chip are the same.
+- **The time chip goes with the buy-in.** Carla pays her buy-in and her time chip by bank transfer: one tap more
+  on "Buy-in" says so, and R$ 55,00 are not in cash. Had she paid the buy-in in cash, her time chip would count
+  as cash too.
+- **An adjustment.** Breno alone marked his buy-in as not in cash: R$ 50,00 not in cash and R$ 245,00 in cash.
+  Ana ticks "Usar" beside "Ajuste fora do dinheiro", types -5,00 and saves: R$ 45,00 not in cash and R$ 250,00
+  in cash. With 20,00 instead: R$ 70,00 and R$ 225,00.
 - **A site without the house owner's buy-in.** The same night: Élio owes R$ 50,00, and the pot owed is R$ 450,00.
 - **A site without the time chip.** The same night has no time chip: the total is the pot.
 - **A rebuy that does not pay the time chip.** With that setting off, the time chip owed is Carla's R$ 5,00.

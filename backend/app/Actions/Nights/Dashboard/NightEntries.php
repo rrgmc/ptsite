@@ -84,14 +84,17 @@ final class NightEntries
     private function snapshot(Night $night, Player $player): array
     {
         $row = $night->entries()->where('player_id', $player->id)->first();
+        $rebuys = $night->rebuys()->where('player_id', $player->id)->get();
 
         return [
             'player_id' => $player->id,
             'participant' => $row !== null,
             'buy_in_paid' => $row?->buy_in_paid_at !== null,
+            'buy_in_non_cash' => (bool) $row?->buy_in_non_cash,
             'time_chip' => $row?->time_chip_at !== null,
             'time_chip_paid' => $row?->time_chip_paid_at !== null,
-            'rebuys_paid' => $night->rebuys()->where('player_id', $player->id)->get()->map(fn ($rebuy) => $rebuy->paid_at !== null)->all(),
+            'rebuys_paid' => $rebuys->map(fn ($rebuy) => $rebuy->paid_at !== null)->all(),
+            'rebuys_non_cash' => $rebuys->map(fn ($rebuy) => (bool) $rebuy->non_cash)->all(),
         ];
     }
 }

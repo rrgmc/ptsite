@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use PTSite\App\Models\Concerns\Archivable;
 use PTSite\Database\Factories\NightFactory;
 
-#[Fillable(['season_id', 'starts_at', 'place_id', 'house_owner_player_id', 'description', 'status', 'type', 'is_extra', 'pot', 'main_event_pot', 'time_chip'])]
+#[Fillable(['season_id', 'starts_at', 'place_id', 'house_owner_player_id', 'description', 'status', 'type', 'is_extra', 'pot', 'main_event_pot', 'time_chip', 'non_cash_adjustment'])]
 class Night extends Model
 {
     /** @use HasFactory<NightFactory> */
@@ -31,6 +31,7 @@ class Night extends Model
             'pot' => 'decimal:2',
             'main_event_pot' => 'decimal:2',
             'time_chip' => 'decimal:2',
+            'non_cash_adjustment' => 'decimal:2',
             'archived_at' => 'datetime',
         ];
     }

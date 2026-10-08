@@ -121,9 +121,11 @@ from `lang/pt_BR/rules.php`. The domain has no user-facing text.
 - **Stored: what the night dashboard records**, on a site that has it: a night's participants with their marks
   (`night_players`), one row for each rebuy (`night_rebuys`), the house owner (`nights.house_owner_player_id`)
   and, once the night is finished, the season's prices as they were (`night_prices`). A mark is a date, which
-  says when it was set. They are kept after the night is finished.
+  says when it was set. A paid buy-in and a paid rebuy also say whether they were paid not in cash
+  (`night_players.buy_in_non_cash`, `night_rebuys.non_cash`), and the night keeps the amount typed to adjust
+  that (`nights.non_cash_adjustment`). They are kept after the night is finished.
 - **Calculated on every request: a night's money on the dashboard** (`NightDashboard`, with `NightMoney`): the
-  pot, the time chip and what each player has pending are added up from those rows. A finished night's `pot`
+  pot, the time chip, what each player has pending and how much was paid in cash are added up from those rows. A finished night's `pot`
   and `time_chip` are still the stored amounts the keeper finished it with, and only they count for the points.
 - **Calculated on every request:** season standings (`SeasonStandings`, a sum of the stored points) and the
   simulator. Standings of one season take a few milliseconds. The statistics (`LeagueStatistics`, and
