@@ -99,6 +99,14 @@ export function parseMoneyInput(text: string): string | null {
   return Number(cleaned).toFixed(2)
 }
 
+/** As parseMoneyInput, for an amount that may be negative: "-5,00" → "-5.00". */
+export function parseSignedMoneyInput(text: string): string | null {
+  const trimmed = text.trim()
+  const isNegative = /^[-−]/.test(trimmed)
+  const amount = parseMoneyInput(isNegative ? trimmed.slice(1) : trimmed)
+  return amount !== null && isNegative && Number(amount) !== 0 ? `-${amount}` : amount
+}
+
 /** Points share for display in the simulator and results form: pot × percent ÷ 100, rounded half up. */
 export function shareOf(pot: string, percent: number): string {
   const cents = Math.round(Number(pot) * 100)

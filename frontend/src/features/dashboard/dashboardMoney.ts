@@ -7,17 +7,19 @@ export type Amounts = NightDashboard['totals']['pot']
 /**
  * One tap on the dashboard. A rebuy is named by its place in the player's list and by its id, which is 0 while
  * the API has not answered the tap that added it. `count` is how many rebuys the player had when tapped.
+ * `buy_in_non_cash` and a rebuy's `non_cash` say that the payment was not in cash.
  */
 export type DashboardChange =
-  | { type: 'mark'; player: Player; buy_in_paid?: boolean; time_chip?: boolean; time_chip_paid?: boolean }
+  | { type: 'mark'; player: Player; buy_in_paid?: boolean; buy_in_non_cash?: boolean; time_chip?: boolean; time_chip_paid?: boolean }
   | { type: 'addRebuy'; player: Player; count: number }
-  | { type: 'markRebuy'; player: Player; index: number; id: number; paid: boolean }
+  | { type: 'markRebuy'; player: Player; index: number; id: number; paid: boolean; non_cash?: boolean }
   | { type: 'removeRebuy'; player: Player; index: number; id: number }
   | { type: 'removePlayer'; player: Player }
   | { type: 'houseOwner'; player: Player | null }
   | { type: 'position'; position: number; player: Player | null }
   | { type: 'mainEventPot'; amount: string | null }
   | { type: 'amounts'; pot?: string | null; time_chip?: string | null }
+  | { type: 'nonCashAdjustment'; amount: string | null }
 
 const cents = (amount: string) => Math.round(Number(amount) * 100)
 const decimal = (amount: number) => (amount / 100).toFixed(2)
@@ -29,8 +31,18 @@ export function hasPayments(line: DashboardPlayer): boolean {
 }
 
 /**
+ * What one tap on a payment turns it into (rule 7a): not paid, then paid in cash, then paid not in cash, then not
+ * paid again.
+ */
+export function nextPayment(paid: boolean, nonCash: boolean): { paid: boolean; nonCash: boolean } {
+  if (!paid) return { paid: true, nonCash: false }
+  return nonCash ? { paid: false, nonCash: false } : { paid: true, nonCash: true }
+}
+
+/**
  * The dashboard with every amount worked out again from its prices and its players, as the API does
- * (docs/specs/night-dashboard.md, rule 11). The suggested Main Event pot is left as it was: the API sends it.
+ * (docs/specs/night-dashboard.md, rules 11 and 11a). The suggested Main Event pot is left as it was: the API
+ * sends it.
  */
 export function recalculated(dashboard: NightDashboard): NightDashboard {
   const { prices } = dashboard
@@ -39,6 +51,7 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
   const rebuyTimeChip = prices.rebuy_charges_time_chip ? timeChipValue : 0
   const pot = { owed: 0, paid: 0 }
   const timeChip = { owed: 0, paid: 0 }
+  let nonCashMarked = 0
 
   const players = dashboard.players.map((line) => {
     const isHouseOwner = line.player.id === dashboard.house_owner?.id
@@ -53,9 +66,14 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
     pot.paid += ofPot.paid
     timeChip.owed += ofTimeChip.owed
     timeChip.paid += ofTimeChip.paid
+    // A late player's time chip counts as paid the way the buy-in was, and a rebuy's the way the rebuy was.
+    if (line.buy_in_paid && line.buy_in_non_cash) nonCashMarked += buyIn + (line.time_chip && line.time_chip_paid ? timeChipValue : 0)
+    nonCashMarked += line.rebuys.filter((rebuy) => rebuy.paid && rebuy.non_cash).length * (cents(prices.rebuy_value) + rebuyTimeChip)
     return { ...line, is_house_owner: isHouseOwner, buy_in: decimal(buyIn), ...amounts(ofPot.owed + ofTimeChip.owed, ofPot.paid + ofTimeChip.paid) }
   })
 
+  const adjustment = dashboard.received.non_cash_adjustment
+  const nonCash = nonCashMarked + cents(adjustment ?? '0')
   return {
     ...dashboard,
     players,
@@ -63,6 +81,12 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
       pot: amounts(pot.owed, pot.paid),
       time_chip: hasTimeChip ? amounts(timeChip.owed, timeChip.paid) : null,
       total: amounts(pot.owed + timeChip.owed, pot.paid + timeChip.paid),
+    },
+    received: {
+      cash: decimal(pot.paid + timeChip.paid - nonCash),
+      non_cash: decimal(nonCash),
+      non_cash_marked: decimal(nonCashMarked),
+      non_cash_adjustment: adjustment,
     },
   }
 }
@@ -84,6 +108,7 @@ const emptyLine = (player: Player): DashboardPlayer => ({
   is_house_owner: false,
   buy_in: '0.00',
   buy_in_paid: false,
+  buy_in_non_cash: false,
   time_chip: false,
   time_chip_paid: false,
   rebuys: [],
@@ -113,20 +138,31 @@ export function applyChange(dashboard: NightDashboard, change: DashboardChange):
         players: withPlayer(players, change.player, (line) => {
           // A time chip that is paid is owed, and one that is not owed is not paid.
           const timeChip = change.time_chip ?? (change.time_chip_paid ? true : line.time_chip)
+          // A buy-in paid not in cash is paid, and one that is not paid was not paid in any way.
+          const buyInPaid = change.buy_in_non_cash ? true : (change.buy_in_paid ?? line.buy_in_paid)
           return {
             ...line,
-            buy_in_paid: change.buy_in_paid ?? line.buy_in_paid,
+            buy_in_paid: buyInPaid,
+            buy_in_non_cash: buyInPaid && (change.buy_in_non_cash ?? line.buy_in_non_cash),
             time_chip: timeChip,
             time_chip_paid: timeChip ? (change.time_chip_paid ?? line.time_chip_paid) : false,
           }
         }),
       })
     case 'addRebuy':
-      return recalculated({ ...dashboard, players: withPlayer(players, change.player, (line) => ({ ...line, rebuys: [...line.rebuys, { id: 0, paid: false }] })) })
+      return recalculated({ ...dashboard, players: withPlayer(players, change.player, (line) => ({ ...line, rebuys: [...line.rebuys, { id: 0, paid: false, non_cash: false }] })) })
     case 'markRebuy':
       return recalculated({
         ...dashboard,
-        players: withPlayer(players, change.player, (line) => ({ ...line, rebuys: line.rebuys.map((rebuy, i) => (i === change.index ? { ...rebuy, paid: change.paid } : rebuy)) })),
+        players: withPlayer(players, change.player, (line) => ({
+          ...line,
+          rebuys: line.rebuys.map((rebuy, i) => {
+            if (i !== change.index) return rebuy
+            // As with the buy-in.
+            const paid = change.paid || change.non_cash === true
+            return { ...rebuy, paid, non_cash: paid && (change.non_cash ?? rebuy.non_cash) }
+          }),
+        })),
       })
     case 'removeRebuy':
       return recalculated({ ...dashboard, players: withPlayer(players, change.player, (line) => ({ ...line, rebuys: line.rebuys.filter((_, i) => i !== change.index) })) })
@@ -149,6 +185,8 @@ export function applyChange(dashboard: NightDashboard, change: DashboardChange):
       })
     case 'mainEventPot':
       return { ...dashboard, main_event_pot: change.amount }
+    case 'nonCashAdjustment':
+      return recalculated({ ...dashboard, received: { ...dashboard.received, non_cash_adjustment: change.amount } })
     case 'amounts':
       return {
         ...dashboard,

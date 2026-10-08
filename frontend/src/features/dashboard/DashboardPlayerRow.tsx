@@ -6,7 +6,7 @@ import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { ToggleChip } from '@/components/ToggleChip'
 import { t } from '@/i18n'
 import { formatMoney } from '@/lib/format'
-import { type DashboardChange, type DashboardPlayer, hasPayments } from './dashboardMoney'
+import { type DashboardChange, type DashboardPlayer, hasPayments, nextPayment } from './dashboardMoney'
 
 /** The most rebuys the API takes for one player, whatever the season allows past its limit. */
 const MAX_REBUYS = 50
@@ -14,8 +14,10 @@ const MAX_REBUYS = 50
 const menuItem = 'flex min-h-touch cursor-pointer items-center rounded-sm px-3 outline-none focus:bg-primary-soft disabled:cursor-not-allowed disabled:text-muted'
 
 /**
- * One participant of the night: what they paid and what is pending, as chips that one tap turns on or off. The
- * less common actions (the house owner, removing a rebuy or the player) are in a menu at the end of the row.
+ * One participant of the night: what they paid and what is pending, as chips that one tap turns on or off. A
+ * buy-in and a rebuy have one state more: a second tap says they were paid, but not in cash, and a third unmarks
+ * them. The less common actions (the house owner, removing a rebuy or the player) are in a menu at the end of the
+ * row.
  */
 export function DashboardPlayerRow({
   line,
@@ -51,7 +53,16 @@ export function DashboardPlayerRow({
       </div>
 
       <div role="group" aria-label={t.dashboard.players.marksOf({ nickname: player.nickname })} className="mt-1 flex flex-wrap items-center gap-1.5">
-        <ToggleChip isSelected={line.buy_in_paid} isDisabled={!canEdit} onChange={(paid) => onChange({ type: 'mark', player, buy_in_paid: paid })}>
+        <ToggleChip
+          tone={line.buy_in_non_cash ? 'otherWay' : 'done'}
+          aria-label={line.buy_in_non_cash ? t.dashboard.players.nonCash({ payment: t.dashboard.players.buyIn }) : undefined}
+          isSelected={line.buy_in_paid}
+          isDisabled={!canEdit}
+          onChange={() => {
+            const next = nextPayment(line.buy_in_paid, line.buy_in_non_cash)
+            onChange({ type: 'mark', player, buy_in_paid: next.paid, buy_in_non_cash: next.nonCash })
+          }}
+        >
           {t.dashboard.players.buyIn}
         </ToggleChip>
         {hasTimeChip && (
@@ -66,7 +77,17 @@ export function DashboardPlayerRow({
         )}
         {rebuys.map((rebuy, index) => (
           // Named by its place: a rebuy has no id until the API answers the tap that added it.
-          <ToggleChip key={index} isSelected={rebuy.paid} isDisabled={!canEdit} onChange={(paid) => onChange({ type: 'markRebuy', player, index, id: rebuy.id, paid })}>
+          <ToggleChip
+            key={index}
+            tone={rebuy.non_cash ? 'otherWay' : 'done'}
+            aria-label={rebuy.non_cash ? t.dashboard.players.nonCash({ payment: t.dashboard.players.rebuy({ number: index + 1 }) }) : undefined}
+            isSelected={rebuy.paid}
+            isDisabled={!canEdit}
+            onChange={() => {
+              const next = nextPayment(rebuy.paid, rebuy.non_cash)
+              onChange({ type: 'markRebuy', player, index, id: rebuy.id, paid: next.paid, non_cash: next.nonCash })
+            }}
+          >
             {t.dashboard.players.rebuy({ number: index + 1 })}
           </ToggleChip>
         ))}

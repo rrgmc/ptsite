@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { NightDashboard } from '@/api/client'
 import { overrideFeatures } from '@/lib/features'
 import { finishedNightDashboard, nightDashboard, openNight, players, season } from '@/mocks/data'
+import { applyChange } from './dashboardMoney'
 import { NightDashboardView } from './NightDashboardView'
 
 // The night dashboard as a screen (docs/specs/night-dashboard.md): each tap is one change.
@@ -52,16 +53,76 @@ describe('NightDashboardView', () => {
     expect(totals.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
   })
 
-  it('marks a buy-in as paid at one tap, and unmarks it at another', async () => {
+  it('marks a buy-in as paid in cash at one tap, as not in cash at another, and unmarks it at a third', async () => {
     const onChange = view()
 
     expect(marksOf('Dudu').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'false')
     await userEvent.click(marksOf('Dudu').getByRole('button', { name: 'Buy-in' }))
-    expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: dudu, buy_in_paid: true })
+    expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: dudu, buy_in_paid: true, buy_in_non_cash: false })
 
     expect(marksOf('Ana').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true')
     await userEvent.click(marksOf('Ana').getByRole('button', { name: 'Buy-in' }))
-    expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: ana, buy_in_paid: false })
+    expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: ana, buy_in_paid: true, buy_in_non_cash: true })
+    cleanup()
+
+    const again = view(applyChange(nightDashboard, { type: 'mark', player: ana, buy_in_non_cash: true }))
+    // Still a pressed button, with a sign and a name of its own.
+    const notInCash = marksOf('Ana').getByRole('button', { name: 'Buy-in (fora do dinheiro)' })
+    expect(notInCash).toHaveAttribute('aria-pressed', 'true')
+    expect(notInCash).toHaveTextContent('⇄')
+    await userEvent.click(notInCash)
+    expect(again).toHaveBeenLastCalledWith({ type: 'mark', player: ana, buy_in_paid: false, buy_in_non_cash: false })
+  })
+
+  it('marks a rebuy the same way', async () => {
+    const onChange = view()
+
+    await userEvent.click(marksOf('Ana').getByRole('button', { name: 'Rebuy 1' }))
+    expect(onChange).toHaveBeenLastCalledWith({ type: 'markRebuy', player: ana, index: 0, id: 1, paid: true, non_cash: true })
+    cleanup()
+
+    const again = view(applyChange(nightDashboard, { type: 'markRebuy', player: ana, index: 0, id: 1, paid: true, non_cash: true }))
+    await userEvent.click(marksOf('Ana').getByRole('button', { name: 'Rebuy 1 (fora do dinheiro)' }))
+    expect(again).toHaveBeenLastCalledWith({ type: 'markRebuy', player: ana, index: 0, id: 1, paid: false, non_cash: false })
+  })
+
+  it('says how much of what was paid is in cash, once a payment was not', () => {
+    view()
+    const totals = screen.getByRole('region', { name: 'Valores do evento' })
+    expect(totals).not.toHaveTextContent('Em dinheiro')
+    cleanup()
+
+    view(applyChange(applyChange(nightDashboard, { type: 'markRebuy', player: ana, index: 0, id: 1, paid: true, non_cash: true }), { type: 'mark', player: breno, buy_in_non_cash: true }))
+    const split = within(screen.getByRole('region', { name: 'Valores do evento' }))
+    expect(split.getByText('Em dinheiro R$ 190,00')).toBeInTheDocument()
+    expect(split.getByText('Fora do dinheiro R$ 105,00')).toBeInTheDocument()
+    expect(split.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
+  })
+
+  it('opens the adjustment of what was not in cash when it is marked "Usar", and takes a negative amount', async () => {
+    const onChange = view()
+
+    const field = () => screen.getByRole('textbox', { name: 'Ajuste fora do dinheiro (R$)' })
+    expect(field()).toBeDisabled()
+    expect(field()).toHaveValue('0,00')
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Usar o ajuste fora do dinheiro' }))
+    expect(onChange).not.toHaveBeenCalled()
+
+    await userEvent.clear(field())
+    await userEvent.type(field(), '5-')
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled()
+    await userEvent.clear(field())
+    await userEvent.type(field(), '-5')
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+    expect(onChange.mock.calls).toEqual([[{ type: 'nonCashAdjustment', amount: '-5.00' }]])
+    cleanup()
+
+    // A saved one is in use: it shows, and unmarking takes it away at once.
+    const again = view(applyChange(nightDashboard, { type: 'nonCashAdjustment', amount: '-5.00' }))
+    expect(field()).toHaveValue('-5,00')
+    expect(within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Fora do dinheiro -R$ 5,00')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Usar o ajuste fora do dinheiro' }))
+    expect(again).toHaveBeenLastCalledWith({ type: 'nonCashAdjustment', amount: null })
   })
 
   it('adds a rebuy with the number the player had, and marks one as paid', async () => {
@@ -72,7 +133,7 @@ describe('NightDashboardView', () => {
 
     expect(marksOf('Breno').getByRole('button', { name: 'Rebuy 3' })).toHaveAttribute('aria-pressed', 'false')
     await userEvent.click(marksOf('Breno').getByRole('button', { name: 'Rebuy 3' }))
-    expect(onChange).toHaveBeenLastCalledWith({ type: 'markRebuy', player: breno, index: 2, id: 4, paid: true })
+    expect(onChange).toHaveBeenLastCalledWith({ type: 'markRebuy', player: breno, index: 2, id: 4, paid: true, non_cash: false })
   })
 
   it('offers no rebuy past the limit in a season that allows none there', () => {
@@ -183,6 +244,7 @@ describe('NightDashboardView', () => {
       'Definir o pote manualmente',
       'Definir o time chip manualmente',
       'Definir o pote ME manualmente',
+      'Usar o ajuste fora do dinheiro',
     ])
     expect(screen.queryByRole('button', { name: 'Salvar' })).not.toBeInTheDocument()
   })

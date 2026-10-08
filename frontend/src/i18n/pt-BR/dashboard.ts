@@ -18,6 +18,8 @@ export const dashboard = {
     timeChip: 'Time chip',
     timeChipPaid: 'TC pago',
     rebuy: ({ number }: { number: number }) => `Rebuy ${number}`,
+    /** What a screen reader says for a payment that was not in cash: "Buy-in (fora do dinheiro)". */
+    nonCash: ({ payment }: { payment: string }) => `${payment} (fora do dinheiro)`,
     addRebuy: '+ Rebuy',
     pending: ({ amount }: { amount: string }) => `Falta ${amount}`,
     settled: 'Tudo pago',
@@ -49,6 +51,11 @@ export const dashboard = {
     checkPot: 'Definir o pote manualmente',
     checkTimeChip: 'Definir o time chip manualmente',
     checkMainEventPot: 'Definir o pote ME manualmente',
+    /** An amount added to what was paid not in cash, for anything out of the ordinary. It may be negative. */
+    nonCashAdjustment: ({ currency }: { currency: string }) => `Ajuste fora do dinheiro (${currency})`,
+    /** The mark beside the adjustment. */
+    use: 'Usar',
+    checkNonCashAdjustment: 'Usar o ajuste fora do dinheiro',
     save: 'Salvar',
   },
 
@@ -66,6 +73,9 @@ export const dashboard = {
     total: 'Total',
     paid: ({ amount }: { amount: string }) => `Pago ${amount}`,
     pending: ({ amount }: { amount: string }) => `Falta ${amount}`,
+    /** Of what was paid: what should be in hand, and what was paid another way, such as a bank transfer. */
+    cash: ({ amount }: { amount: string }) => `Em dinheiro ${amount}`,
+    nonCash: ({ amount }: { amount: string }) => `Fora do dinheiro ${amount}`,
   },
   recorded: {
     title: 'Resultado registrado',

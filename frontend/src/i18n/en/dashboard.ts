@@ -18,6 +18,7 @@ export const dashboard = {
     timeChip: 'Time chip',
     timeChipPaid: 'TC paid',
     rebuy: ({ number }: { number: number }) => `Rebuy ${number}`,
+    nonCash: ({ payment }: { payment: string }) => `${payment} (not in cash)`,
     addRebuy: '+ Rebuy',
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
     settled: 'All paid',
@@ -49,6 +50,9 @@ export const dashboard = {
     checkPot: 'Set the pot by hand',
     checkTimeChip: 'Set the time chip by hand',
     checkMainEventPot: 'Set the Main Event pot by hand',
+    nonCashAdjustment: ({ currency }: { currency: string }) => `Not-in-cash adjustment (${currency})`,
+    use: 'Use',
+    checkNonCashAdjustment: 'Use the not-in-cash adjustment',
     save: 'Save',
   },
 
@@ -66,6 +70,8 @@ export const dashboard = {
     total: 'Total',
     paid: ({ amount }: { amount: string }) => `${amount} paid`,
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
+    cash: ({ amount }: { amount: string }) => `${amount} in cash`,
+    nonCash: ({ amount }: { amount: string }) => `${amount} not in cash`,
   },
   recorded: {
     title: 'Recorded result',

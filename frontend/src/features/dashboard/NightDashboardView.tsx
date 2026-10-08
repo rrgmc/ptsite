@@ -11,7 +11,7 @@ import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { rich } from '@/i18n/rich'
 import { hasFeature } from '@/lib/features'
-import { formatMoney, formatTime, formatWeekday, ordinal, parseMoneyInput, titleOfNight } from '@/lib/format'
+import { formatMoney, formatTime, formatWeekday, ordinal, parseMoneyInput, parseSignedMoneyInput, titleOfNight } from '@/lib/format'
 import { searchKey } from '@/lib/search'
 import { currencySymbol } from '@/lib/site'
 import { usePageTitle } from '@/lib/usePageTitle'
@@ -115,7 +115,7 @@ export function NightDashboardView({
         <Card title={t.dashboard.manual.title}>
           {canEdit ? (
             // Keyed so the fields start again from amounts that someone else saved.
-            <AmountsForm key={`${dashboard.manual.pot}|${dashboard.manual.time_chip}|${dashboard.main_event_pot}`} dashboard={dashboard} onChange={onChange} />
+            <AmountsForm key={`${dashboard.manual.pot}|${dashboard.manual.time_chip}|${dashboard.main_event_pot}|${dashboard.received.non_cash_adjustment}`} dashboard={dashboard} onChange={onChange} />
           ) : (
             <dl className="text-sm">
               {amountRows({ pot: inUse.pot, mainEventPot: inUse.mainEventPot, timeChip: inUse.timeChip }).map(([label, amount]) => (
@@ -236,17 +236,20 @@ function PositionsList({ positions }: { positions: NightDashboard['positions'] }
   )
 }
 
-type AmountKey = 'pot' | 'timeChip' | 'mainEventPot'
+type AmountKey = 'pot' | 'timeChip' | 'mainEventPot' | 'nonCashAdjustment'
 
 /**
  * "Valores": the pot, the time chip and the Main Event pot, each in a field with a "Manual" mark beside it.
  * Unmarked, a field is closed and shows the amount worked out (for the Main Event pot, the season's share of the
  * pot). Marked, its amount is typed, and stands in for the one worked out once saved: one "Salvar" saves every
  * marked amount. Unmarking a saved amount goes back to the one worked out, at once.
+ *
+ * The last field is "Ajuste fora do dinheiro", an amount added to what was paid not in cash, for anything out of
+ * the ordinary. It works the same way, from zero, and takes a negative amount.
  */
 function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onChange: OnChange }) {
   const { manual, totals } = dashboard
-  const fields: { key: AmountKey; label: string; checkLabel: string; saved: string | null; worked: string | null }[] = [
+  const fields: { key: AmountKey; label: string; mark?: string; checkLabel: string; saved: string | null; worked: string | null }[] = [
     { key: 'pot', label: t.nights.moneyFields.pot({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkPot, saved: manual.pot, worked: totals.pot.owed },
     ...(totals.time_chip
       ? [{ key: 'timeChip' as const, label: t.nights.moneyFields.timeChip({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkTimeChip, saved: manual.time_chip, worked: totals.time_chip.owed }]
@@ -254,16 +257,25 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
     ...(hasFeature('mainEventPot')
       ? [{ key: 'mainEventPot' as const, label: t.nights.moneyFields.mainEventPot({ currency: currencySymbol }), checkLabel: t.dashboard.manual.checkMainEventPot, saved: dashboard.main_event_pot, worked: dashboard.suggested_main_event_pot }]
       : []),
+    {
+      key: 'nonCashAdjustment',
+      label: t.dashboard.manual.nonCashAdjustment({ currency: currencySymbol }),
+      mark: t.dashboard.manual.use,
+      checkLabel: t.dashboard.manual.checkNonCashAdjustment,
+      saved: dashboard.received.non_cash_adjustment,
+      worked: '0.00',
+    },
   ]
   const [marked, setMarked] = useState<Partial<Record<AmountKey, boolean>>>(() => Object.fromEntries(fields.map((f) => [f.key, f.saved !== null])))
   const [texts, setTexts] = useState<Partial<Record<AmountKey, string>>>(() => Object.fromEntries(fields.map((f) => [f.key, moneyText(f.saved)])))
   /** The amount typed in a field: null when it is empty or wrong. */
-  const typed = (key: AmountKey) => parseMoneyInput(texts[key] ?? '')
+  const typed = (key: AmountKey) => (key === 'nonCashAdjustment' ? parseSignedMoneyInput : parseMoneyInput)(texts[key] ?? '')
   const send = (amounts: Partial<Record<AmountKey, string | null>>) => {
     if ('pot' in amounts || 'timeChip' in amounts) {
       onChange({ type: 'amounts', ...('pot' in amounts && { pot: amounts.pot }), ...('timeChip' in amounts && { time_chip: amounts.timeChip }) })
     }
     if ('mainEventPot' in amounts) onChange({ type: 'mainEventPot', amount: amounts.mainEventPot ?? null })
+    if ('nonCashAdjustment' in amounts) onChange({ type: 'nonCashAdjustment', amount: amounts.nonCashAdjustment ?? null })
   }
   const open = fields.filter((f) => marked[f.key])
   const incomplete = open.some((f) => typed(f.key) === null)
@@ -281,7 +293,8 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
         <div key={field.key} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
           <TextField
             label={field.label}
-            inputMode="decimal"
+            // The keyboard of numbers has no minus sign on every phone.
+            inputMode={field.key === 'nonCashAdjustment' ? 'text' : 'decimal'}
             isDisabled={!marked[field.key]}
             value={marked[field.key] ? (texts[field.key] ?? '') : moneyText(field.worked)}
             onChange={(text) => setTexts({ ...texts, [field.key]: text })}
@@ -297,7 +310,7 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
               if (!checked && field.saved !== null) send({ [field.key]: null })
             }}
           >
-            {t.dashboard.manual.mark}
+            {field.mark ?? t.dashboard.manual.mark}
           </Checkbox>
         </div>
       ))}
@@ -311,10 +324,11 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
 /**
  * The night's amounts, always in sight at the foot of the screen: the pot, the time chip apart from it, and the
  * two added up. An amount typed by hand stands in for the one worked out, which is still shown below it. Each
- * says what was paid and what is pending, of what the players owe.
+ * says what was paid and what is pending, of what the players owe. Once a payment was not in cash, a line below
+ * says how much of what was paid is in cash, to check the money in hand.
  */
 export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
-  const { totals, manual } = dashboard
+  const { totals, manual, received } = dashboard
   const inUse = amountsInUse(dashboard)
   const columns: { label: string; amount: string; amounts: Amounts; isManual: boolean }[] = [
     { label: t.dashboard.totals.pot, amount: inUse.pot, amounts: totals.pot, isManual: manual.pot !== null },
@@ -344,6 +358,12 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
           </div>
         ))}
       </dl>
+      {Number(received.non_cash) !== 0 && (
+        <p className="mt-1 flex flex-wrap gap-x-3 border-t border-border/60 pt-1 text-xs tabular">
+          <span className="font-semibold">{t.dashboard.totals.cash({ amount: formatMoney(received.cash) })}</span>
+          <span className="text-muted">{t.dashboard.totals.nonCash({ amount: formatMoney(received.non_cash) })}</span>
+        </p>
+      )}
     </section>
   )
 }
