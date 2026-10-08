@@ -7,6 +7,10 @@ const port = ports.storybookTest
 
 export default defineConfig({
   testDir: './tests-storybook',
+  // Every story is a test of the one file, on a page of its own, so they run side by side. CI's runner has two
+  // cores, and Playwright would use only one of them.
+  fullyParallel: true,
+  workers: process.env.CI ? '100%' : undefined,
   reporter: 'list',
   use: {
     baseURL: `http://127.0.0.1:${port}/`,

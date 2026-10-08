@@ -15,7 +15,7 @@ The repository is private and on GitHub's free plan, which gives the whole accou
 
 | When | What runs |
 |---|---|
-| A pull request | The tests: backend, frontend with Storybook, end to end |
+| A pull request | The tests: backend, frontend with Storybook, end to end in two jobs |
 | A push to `master`, which is a merged pull request | Nothing. The pull request already ran the tests |
 | A change that touches only `docs/` or `.md` files | Nothing |
 | Started by hand (`gh workflow run ci.yml`, or "Run workflow" on GitHub) | The `package` job only |
