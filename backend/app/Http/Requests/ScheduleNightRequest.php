@@ -17,7 +17,8 @@ class ScheduleNightRequest extends FormRequest
             'place_id' => ['nullable', 'integer', 'exists:places,id'],
             'description' => ['nullable', 'string', 'max:2000'],
             /**
-             * regular when left out. main_event only on a site that has the Main Event; a season takes one.
+             * regular when left out. main_event only on a site that has the Main Event, and from an admin; a season
+             * takes one.
              *
              * @var 'regular'|'main_event'
              */

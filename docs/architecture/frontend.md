@@ -49,8 +49,8 @@ frontend/
 | `/forgot-password` | "Esqueci minha senha": asks for a password link by email, with the username or the email | everyone |
 | `/reset-password?token=…` | "Nova senha": the screen behind the link in the email, with the new password typed twice | whoever has the link |
 | `/` | Standings, next night, last result; the attendance banner while a night of the current season is open | players |
-| `/results` | Finished nights, the rounds numbered in the season's order, an extra night and the Main Event marked; the "Pontos acumulados" chart; the season's three amounts added up; upcoming nights and "+ Agendar" with the next three regular weekdays suggested and the type of the night (a round, an extra night or the Main Event); the attendance banner | players; scheduling for results keepers |
-| `/main-event` | "Main Event", on a site that has it: the selected season's Main Event night, its players in order and the season's Main Event pot; recording a Main Event already played | players; recording for results keepers |
+| `/results` | Finished nights, the rounds numbered in the season's order, an extra night and the Main Event marked; the "Pontos acumulados" chart; the season's three amounts added up; upcoming nights and "+ Agendar" with the next three regular weekdays suggested and the type of the night (a round or an extra night); the attendance banner | players; scheduling for results keepers |
+| `/main-event` | "Main Event", on a site that has it: the selected season's Main Event night, its players in order and the season's Main Event pot; "Editar Main Event" leads an admin to `/admin/seasons/:id/main-event` | players |
 | `/calendar` | Season calendar | players |
 | `/seasons` | "Temporadas": every season with the first ten of its standings and its Main Event champion, and "Ver esta temporada" to make it the selected season | players |
 | `/seasons/select` | "Escolher temporada": the season list, where the user picks the selected season | players |
@@ -65,6 +65,7 @@ frontend/
 | `/players`, `/players?view=detailed` | Players, as a list or with the memos | players |
 | `/players/:id`, `/players/:id/all` | A player's page: photo, names, memo, and the player's statistics of the selected season, or of every season. Contact details for the player and admins only | players |
 | `/admin`, `/admin/players`, `/admin/places`, `/admin/audit-log` | Seasons, players, places, audit log | admins |
+| `/admin/seasons/:id/main-event` | The Main Event of one season, on a site that has it: the form that schedules it, or records it with its players; then the Main Event, with the ways to its night and its result. The only place where a Main Event is added | admins |
 | `/admin/seasons/new`, `/admin/seasons/:id`, `/admin/players/new`, `/admin/players/:id`, `/admin/places/new`, `/admin/places/:id` | The form of one season, player or place, on a page of its own | admins |
 
 Screenshots of the demo site are in `docs/screens/`, and `README.md` shows them.

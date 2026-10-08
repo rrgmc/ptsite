@@ -32,7 +32,7 @@ beforeEach(function () {
 });
 
 it('schedules a Main Event night, which is always extra', function () {
-    Sanctum::actingAs(User::factory()->resultsKeeper()->create());
+    Sanctum::actingAs(User::factory()->admin()->create());
 
     $this->postJson("/api/v1/seasons/{$this->season->id}/nights", ['starts_at' => '2027-12-11 13:00', 'type' => 'main_event'])
         ->assertCreated()
@@ -45,7 +45,7 @@ it('schedules a Main Event night, which is always extra', function () {
 });
 
 it('refuses a second Main Event night in a season, unless the first was cancelled', function () {
-    Sanctum::actingAs(User::factory()->resultsKeeper()->create());
+    Sanctum::actingAs(User::factory()->admin()->create());
     $first = ($this->mainEvent)();
     $body = ['starts_at' => '2027-12-11 13:00', 'type' => 'main_event'];
 
@@ -166,7 +166,7 @@ it('moves and edits a Main Event night like any other, and keeps it extra', func
 });
 
 it('records a past Main Event in one step, in a finished season too', function () {
-    $keeper = User::factory()->resultsKeeper()->create();
+    $keeper = User::factory()->admin()->create();
     Sanctum::actingAs($keeper);
     $this->season->update(['is_finished' => true, 'is_open' => false]);
     $url = "/api/v1/seasons/{$this->season->id}/main-event/import";
@@ -187,7 +187,22 @@ it('records a past Main Event in one step, in a finished season too', function (
     expect(Night::query()->count())->toBe(1);
 });
 
-it('lets only results keepers and admins record a Main Event', function () {
+it('lets only an admin add a Main Event to a season, while a results keeper runs its night', function () {
+    Sanctum::actingAs(User::factory()->resultsKeeper()->create());
+    $body = ['starts_at' => '2026-12-12 13:00', 'player_ids' => ($this->ids)(3)];
+
+    $this->postJson("/api/v1/seasons/{$this->season->id}/nights", ['starts_at' => '2026-12-12 13:00', 'type' => 'main_event'])->assertForbidden();
+    $this->postJson("/api/v1/seasons/{$this->season->id}/main-event/import", $body)->assertForbidden();
+    expect(Night::query()->count())->toBe(0);
+    // A regular night is still the results keeper's to schedule.
+    $this->postJson("/api/v1/seasons/{$this->season->id}/nights", ['starts_at' => '2026-12-11 21:30'])->assertCreated();
+
+    $night = ($this->mainEvent)();
+    $this->postJson("/api/v1/nights/{$night->id}/open")->assertOk();
+    $this->postJson("/api/v1/nights/{$night->id}/main-event-result", ['player_ids' => ($this->ids)(3)])->assertOk();
+});
+
+it('lets only results keepers and admins record the result of a Main Event', function () {
     Sanctum::actingAs(User::factory()->create());
     $night = ($this->mainEvent)(['status' => 'open']);
 

@@ -20,10 +20,8 @@ export const results = {
     kinds: {
       round: 'Rodada da temporada',
       extra: 'Evento extra',
-      mainEvent: 'Main Event',
     },
     extraHelp: 'Um evento extra não conta como rodada e pode ser no mesmo dia de outro evento. Os pontos valem como em qualquer evento.',
-    mainEventHelp: 'O Main Event não tem pote nem pontos: só a classificação dos jogadores.',
     submit: 'Agendar evento',
   },
 

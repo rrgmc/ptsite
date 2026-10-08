@@ -4,6 +4,7 @@ import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { RouterStory } from '@/mocks/RouterStory'
 import { handlers } from '@/mocks/handlers'
 import { extraNight, finishedNight, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, statisticsEmpty } from '@/mocks/data'
+import { MainEventAdmin } from './admin/MainEventAdmin'
 import { PlaceEditPage, PlacesAdmin } from './admin/PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './admin/PlayersAdmin'
 import { SeasonEditPage, SeasonsAdmin } from './admin/SeasonsAdmin'
@@ -67,24 +68,32 @@ export const MainEventNotPlayed: StoryObj = {
   render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
 }
 
-/** A season with no Main Event night. A results keeper can record one that was already played. */
+/** A season with no Main Event night. */
 export const MainEventNotScheduled: StoryObj = {
   render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
 }
 
-/** The same screen for a player: nothing to record. */
-export const MainEventNotScheduledAsPlayer: StoryObj = {
-  parameters: { msw: [http.get('/api/v1/me', () => HttpResponse.json({ data: { ...keeper, role: 'player', abilities: { ...keeper.abilities, run_nights: false } } })), ...handlers] },
+/** The same screen for an admin, with the way to the season's Main Event in "Administração". */
+export const MainEventAsAdmin: StoryObj = {
+  parameters: { msw: [http.get('/api/v1/me', () => HttpResponse.json({ data: { ...keeper, role: 'admin', abilities: { ...keeper.abilities, manage_seasons: true } } })), ...seasonNights([finishedNight, mainEventNight])] },
   render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
 }
 
-/** Recording a Main Event that was already played: its day, its place and its players in order. */
-export const MainEventRecordPast: StoryObj = {
-  render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(await canvas.findByRole('button', { name: 'Registrar um Main Event já jogado' }))
-    await canvas.findByRole('form', { name: 'Registrar Main Event já jogado' })
-  },
+/** "Administração": a season with no Main Event. The form schedules it, or records it with its players. */
+export const AdminMainEventAdd: StoryObj = {
+  render: () => <RouterStory path="/admin/seasons/:seasonId/main-event" url="/admin/seasons/1/main-event" element={<MainEventAdmin />} />,
+}
+
+/** "Administração": the Main Event of a season after it was played, with the ways to its night and its result. */
+export const AdminMainEventPlayed: StoryObj = {
+  parameters: { msw: seasonNights([finishedNight, mainEventNight]) },
+  render: () => <RouterStory path="/admin/seasons/:seasonId/main-event" url="/admin/seasons/1/main-event" element={<MainEventAdmin />} />,
+}
+
+/** "Administração": the Main Event night is open, so its result can be entered. */
+export const AdminMainEventOpen: StoryObj = {
+  parameters: { msw: seasonNights([finishedNight, openMainEventNight]) },
+  render: () => <RouterStory path="/admin/seasons/:seasonId/main-event" url="/admin/seasons/1/main-event" element={<MainEventAdmin />} />,
 }
 
 /** An open Main Event night: the answers, and no partial result. */

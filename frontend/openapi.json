@@ -805,7 +805,7 @@
         "/v1/seasons/{season}/main-event/import": {
             "post": {
                 "operationId": "mainEvent.import",
-                "summary": "Record a past Main Event in one step, saved as finished (\"Importar\"). Results keepers and admins. A\nfinished season takes it too",
+                "summary": "Record a past Main Event in one step, saved as finished (\"Importar\"). Admins. A finished season takes it\ntoo",
                 "tags": [
                     "MainEvent"
                 ],
@@ -947,7 +947,7 @@
         "/v1/seasons/{season}/nights": {
             "post": {
                 "operationId": "night.store",
-                "summary": "Schedule a night in a season (\"Adicionar\"). Results keepers and admins. An extra night is not a round and may\nshare its date. A Main Event night is always extra, and a season takes one",
+                "summary": "Schedule a night in a season (\"Adicionar\"). Results keepers and admins. An extra night is not a round and may\nshare its date. A Main Event night is always extra, a season takes one, and only an admin schedules it",
                 "tags": [
                     "Night"
                 ],
@@ -5113,7 +5113,7 @@
                     },
                     "type": {
                         "type": "string",
-                        "description": "regular when left out. main_event only on a site that has the Main Event; a season takes one.",
+                        "description": "regular when left out. main_event only on a site that has the Main Event, and from an admin; a season\ntakes one.",
                         "enum": [
                             "regular",
                             "main_event"

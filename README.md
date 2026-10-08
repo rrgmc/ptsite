@@ -35,8 +35,8 @@ the screenshot browser shows them in US format.
 | Planning a season's dates | Admin: holidays | Season calendar |
 | <img src="docs/screens/mobile/16-seasons.png" width="240" alt="Seasons, with the first ten of each"> | <img src="docs/screens/mobile/17-menu.png" width="240" alt="Menu"> | <img src="docs/screens/mobile/18-season-picker.png" width="240" alt="Choosing the season on screen"> |
 | Seasons, with the first ten of each | Menu | Choosing the season on screen |
-| <img src="docs/screens/mobile/19-main-event.png" width="240" alt="The Main Event of a season"> | <img src="docs/screens/mobile/20-main-event-result-form.png" width="240" alt="Entering the result of a Main Event"> |  |
-| The Main Event of a season | Entering the result of a Main Event |  |
+| <img src="docs/screens/mobile/19-main-event.png" width="240" alt="The Main Event of a season"> | <img src="docs/screens/mobile/20-main-event-result-form.png" width="240" alt="Entering the result of a Main Event"> | <img src="docs/screens/mobile/21-admin-main-event.png" width="240" alt="Admin: adding a season's Main Event"> |
+| The Main Event of a season | Entering the result of a Main Event | Admin: adding a season's Main Event |
 
 ### Desktop
 
@@ -62,6 +62,8 @@ the screenshot browser shows them in US format.
 | Menu | Choosing the season on screen |
 | <img src="docs/screens/desktop/19-main-event.png" width="400" alt="The Main Event of a season"> | <img src="docs/screens/desktop/20-main-event-result-form.png" width="400" alt="Entering the result of a Main Event"> |
 | The Main Event of a season | Entering the result of a Main Event |
+| <img src="docs/screens/desktop/21-admin-main-event.png" width="400" alt="Admin: adding a season's Main Event"> |  |
+| Admin: adding a season's Main Event |  |
 
 ## What is here
 

@@ -16,7 +16,7 @@ use PTSite\Domain\Shared\RuleViolation;
  * Schedules a new night in an open season. The place defaults to the season's default place.
  *
  * An extra night is outside the season's calendar: it is not a round and may share its date. A Main Event night
- * is always extra, and a season has one.
+ * is always extra, and a season has one. Only who manages the season adds its Main Event: an admin.
  */
 final class ScheduleNight
 {
@@ -33,6 +33,9 @@ final class ScheduleNight
             throw new RuleViolation('season.not_open');
         }
         $type = NightType::from($type);
+        if ($type === NightType::MainEvent) {
+            Gate::forUser($user)->authorize('update', $season);
+        }
 
         return DB::transaction(function () use ($user, $season, $startsAt, $placeId, $description, $type, $isExtra) {
             if ($type === NightType::MainEvent) {

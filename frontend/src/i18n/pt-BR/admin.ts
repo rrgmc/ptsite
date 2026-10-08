@@ -164,6 +164,25 @@ export const admin = {
     create: 'Criar acesso',
   },
 
+  // The Main Event of a season
+  mainEvent: {
+    title: ({ season }: { season: string }) => `Main Event · ${season}`,
+    /** For screen readers: the link of one season among many. */
+    linkLabel: ({ season }: { season: string }) => `Main Event: ${season}`,
+    formLabel: 'Adicionar Main Event',
+    intro: 'Esta temporada ainda não tem Main Event. Informe a data e a hora: o Main Event não segue o dia e o horário habituais da temporada.',
+    time: 'Hora',
+    orderTitle: 'Classificação (se já foi jogado)',
+    orderHelp: 'Deixe em branco para agendar o Main Event. Se ele já foi jogado, informe os jogadores na ordem de chegada, a partir do campeão: ele é registrado como finalizado.',
+    schedule: 'Agendar Main Event',
+    record: 'Registrar Main Event',
+    nightHelp: 'A data, o local, a descrição e o cancelamento ficam na página do evento.',
+    seeNight: 'Ver o evento',
+    finish: 'Finalizar: lançar classificação',
+    editResult: 'Editar classificação',
+    notOpenYet: 'Abra o evento para lançar a classificação.',
+  },
+
   // Seasons
   seasons: {
     newSeason: '+ Nova temporada',
@@ -182,6 +201,7 @@ export const admin = {
     open: 'Aberta',
     closed: 'Fechada',
     planDates: 'Planejar datas',
+    mainEvent: 'Main Event',
     back: '‹ Temporadas',
     notFound: 'Temporada não encontrada.',
     newTitle: 'Nova temporada',

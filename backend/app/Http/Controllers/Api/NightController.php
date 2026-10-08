@@ -34,7 +34,7 @@ class NightController extends Controller
 
     /**
      * Schedule a night in a season ("Adicionar"). Results keepers and admins. An extra night is not a round and may
-     * share its date. A Main Event night is always extra, and a season takes one.
+     * share its date. A Main Event night is always extra, a season takes one, and only an admin schedules it.
      */
     public function store(ScheduleNightRequest $request, Season $season, ScheduleNight $schedule): JsonResponse
     {

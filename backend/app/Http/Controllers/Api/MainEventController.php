@@ -13,8 +13,8 @@ use PTSite\App\Models\Night;
 use PTSite\App\Models\Season;
 
 /**
- * The result of a Main Event night: the order of its players, with no pot and no points. The night itself is
- * scheduled, opened, edited and cancelled like any other, with type main_event.
+ * The result of a Main Event night: the order of its players, with no pot and no points. An admin adds the night
+ * to its season, with type main_event; it is then opened, edited and cancelled like any other.
  */
 class MainEventController extends Controller
 {
@@ -25,8 +25,8 @@ class MainEventController extends Controller
     }
 
     /**
-     * Record a past Main Event in one step, saved as finished ("Importar"). Results keepers and admins. A
-     * finished season takes it too.
+     * Record a past Main Event in one step, saved as finished ("Importar"). Admins. A finished season takes it
+     * too.
      */
     public function import(ImportMainEventNightRequest $request, Season $season, ImportMainEventNight $import): JsonResponse
     {

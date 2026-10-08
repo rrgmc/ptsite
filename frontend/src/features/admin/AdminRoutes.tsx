@@ -5,6 +5,7 @@ import { ErrorBox } from '@/components/Feedback'
 import { t } from '@/i18n'
 import { AuditLogPage } from './AuditLogPage'
 import { HolidaysAdmin } from './HolidaysAdmin'
+import { MainEventAdmin } from './MainEventAdmin'
 import { PlaceEditPage, PlacesAdmin } from './PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './PlayersAdmin'
 import { hasFeature } from '@/lib/features'
@@ -35,6 +36,7 @@ export function AdminRoutes() {
         <Route index element={<SeasonsAdmin />} />
         <Route path="seasons/:seasonId" element={<SeasonEditPage />} />
         {hasFeature('seasonPlanner') && <Route path="seasons/:seasonId/plan" element={<SeasonPlanner />} />}
+        {hasFeature('mainEvent') && <Route path="seasons/:seasonId/main-event" element={<MainEventAdmin />} />}
         <Route path="holidays" element={<HolidaysPage />} />
         <Route path="players" element={<PlayersAdmin />} />
         <Route path="players/:playerId" element={<PlayerEditPage />} />

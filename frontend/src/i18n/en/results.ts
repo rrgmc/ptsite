@@ -20,10 +20,8 @@ export const results: Messages['results'] = {
     kinds: {
       round: 'Round of the season',
       extra: 'Extra night',
-      mainEvent: 'Main Event',
     },
     extraHelp: "An extra night is not a round and may be on the same day as another night. Its points count like any night's.",
-    mainEventHelp: 'The Main Event has no pot and no points: only the order of its players.',
     submit: 'Schedule night',
   },
 

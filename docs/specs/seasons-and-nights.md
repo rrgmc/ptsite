@@ -113,8 +113,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 ### Extra nights ("Evento extra")
 
 25. A night can be **extra**: outside the season's calendar. It is for what is not one of the season's rounds,
-    such as a second table played on the day of another night. It is chosen when the night is scheduled ("Tipo")
-    and can be changed in "Editar evento".
+    such as a second table played on the day of another night. It is chosen when the night is scheduled ("Tipo":
+    "Rodada da temporada" or "Evento extra") and can be changed in "Editar evento".
 26. **An extra night is not a round.** It does not count in the season's rounds ("Rodadas: N de 26"), in the
     number of nights of a season, or in the numbers of the nights on "Resultados".
 27. **An extra night may share its day** with another night. The [season planner](season-planner.md), the

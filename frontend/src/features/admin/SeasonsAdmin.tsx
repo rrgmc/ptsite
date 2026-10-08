@@ -50,6 +50,11 @@ export function SeasonsAdmin() {
                     {t.admin.seasons.planDates}
                   </Link>
                 )}
+                {hasFeature('mainEvent') && (
+                  <Link to={`/admin/seasons/${s.id}/main-event`} aria-label={t.admin.mainEvent.linkLabel({ season: s.name })} className="inline-flex min-h-touch items-center rounded-md px-4 font-semibold text-primary hover:bg-primary-soft">
+                    {t.admin.seasons.mainEvent}
+                  </Link>
+                )}
                 <Button variant="ghost" onPress={() => navigate(`/admin/seasons/${s.id}`)} aria-label={t.admin.editItem({ name: s.name })}>{t.common.edit}</Button>
               </span>
             </li>
