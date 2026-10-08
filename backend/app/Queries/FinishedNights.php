@@ -31,6 +31,23 @@ final class FinishedNights
     }
 
     /**
+     * The finished Main Event nights of the same seasons, oldest first, with their players in order.
+     *
+     * @return Collection<int, Night>
+     */
+    public function mainEvents(?Season $season): Collection
+    {
+        return Night::query()
+            ->finished()
+            ->where('type', 'main_event')
+            ->when($season, fn ($q) => $q->where('season_id', $season->id), fn ($q) => $q->whereHas('season', fn ($s) => $s->notArchived()))
+            ->with('mainEventPositions')
+            ->orderBy('starts_at')
+            ->orderBy('id')
+            ->get();
+    }
+
+    /**
      * @param  Collection<int, Night>  $nights
      * @return list<NightRecord>
      */

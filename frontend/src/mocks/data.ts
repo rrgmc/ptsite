@@ -328,6 +328,13 @@ export const statistics: Statistics = {
     ],
   },
   wins_not_shown: 0,
+  // The season's own Main Event. The screen lists the Main Events only over every season.
+  main_event: {
+    count: 1,
+    titles: playerList([[2, 1, 1]], 'count'),
+    podiums: playerList([[0, 1, 1], [2, 1, 1], [7, 1, 1]], 'count'),
+    appearances: playerList([[0, 1, 1], [1, 1, 1], [2, 1, 1], [3, 1, 1], [7, 1, 1]], 'count'),
+  },
 }
 
 /** Every season: one step per season, the season named under each pot, and first places left out of the list. */
@@ -360,6 +367,13 @@ export const statisticsAllTime: Statistics = {
     ],
   },
   wins_not_shown: 8,
+  // Three Main Events, with ties in every list.
+  main_event: {
+    count: 3,
+    titles: playerList([[2, 1, 2], [0, 2, 1]], 'count'),
+    podiums: playerList([[0, 1, 3], [2, 1, 3], [7, 3, 2], [1, 4, 1]], 'count'),
+    appearances: playerList([[0, 1, 3], [2, 1, 3], [7, 1, 3], [1, 4, 2], [3, 4, 2], [4, 4, 2], [5, 7, 1], [6, 7, 1], [8, 7, 1], [9, 7, 1]], 'count', { tied_not_shown: 1 }),
+  },
 }
 
 export const statisticsEmpty: Statistics = {
@@ -375,6 +389,7 @@ export const statisticsEmpty: Statistics = {
   places: playerList([], 'count'),
   points_progress: { steps: [], series: [] },
   wins_not_shown: 0,
+  main_event: null,
 }
 
 /** The memo an admin wrote about Ana, with a line break. */

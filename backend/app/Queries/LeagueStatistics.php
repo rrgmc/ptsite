@@ -2,23 +2,31 @@
 
 namespace PTSite\App\Queries;
 
+use PTSite\App\Models\Night;
 use PTSite\App\Models\Place;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
+use PTSite\Domain\Features\Feature;
+use PTSite\Domain\Features\Features;
 use PTSite\Domain\Shared\Money;
+use PTSite\Domain\Statistics\MainEventStatistics;
+use PTSite\Domain\Statistics\MainEventSummary;
 use PTSite\Domain\Statistics\RankedRow;
 use PTSite\Domain\Statistics\Statistics;
 use PTSite\Domain\Statistics\TopList;
 
 /**
  * The statistics of one season, or of every season that is not archived, calculated from the finished,
- * non-archived nights. Nothing is stored: a corrected result changes them at once.
+ * non-archived nights. Nothing is stored: a corrected result changes them at once. On a site with the Main
+ * Event, the finished Main Events of the same seasons give lists of their own.
  */
 final class LeagueStatistics
 {
     public function __construct(
         private readonly Statistics $statistics,
         private readonly FinishedNights $finishedNights,
+        private readonly MainEventStatistics $mainEventStatistics,
+        private readonly Features $features,
     ) {}
 
     public function __invoke(?Season $season): StatisticsReport
@@ -26,8 +34,12 @@ final class LeagueStatistics
         $nights = ($this->finishedNights)($season);
 
         $summary = $this->statistics->summarise($this->finishedNights->records($nights), stepPerSeason: $season === null);
+        $mainEvent = $this->features->enabled(Feature::MainEvent) ? $this->mainEvent($season) : null;
 
-        $playerLists = [$summary->totalPoints, $summary->nightsScored, ...$summary->positions];
+        $playerLists = [
+            $summary->totalPoints, $summary->nightsScored, ...$summary->positions,
+            ...($mainEvent ? [$mainEvent->titles, $mainEvent->podiums, $mainEvent->appearances] : []),
+        ];
         $players = Player::query()->findMany([
             ...array_merge(...array_map(fn (TopList $list) => array_map(fn (RankedRow $row) => $row->id, $list->rows), $playerLists)),
             ...array_keys($summary->progress->totals),
@@ -67,6 +79,22 @@ final class LeagueStatistics
                 array_values($summary->progress->totals),
             ),
             $summary->winsNotShown,
+            $mainEvent ? new MainEventStatisticsReport(
+                $mainEvent->count,
+                $counted($mainEvent->titles),
+                $counted($mainEvent->podiums),
+                $counted($mainEvent->appearances),
+            ) : null,
+        );
+    }
+
+    private function mainEvent(?Season $season): MainEventSummary
+    {
+        return $this->mainEventStatistics->summarise(
+            $this->finishedNights->mainEvents($season)
+                ->map(fn (Night $night) => $night->mainEventPositions->pluck('player_id')->all())
+                ->values()
+                ->all(),
         );
     }
 }

@@ -4487,6 +4487,34 @@
                 ],
                 "title": "LoginRequest"
             },
+            "MainEventStatisticsResource": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "description": "How many finished Main Events count."
+                    },
+                    "titles": {
+                        "description": "Players by Main Events won (`count`).",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    },
+                    "podiums": {
+                        "description": "Players by times in the first three of a Main Event (`count`).",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    },
+                    "appearances": {
+                        "description": "Players by Main Events played (`count`).",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    }
+                },
+                "required": [
+                    "count",
+                    "titles",
+                    "podiums",
+                    "appearances"
+                ],
+                "title": "MainEventStatisticsResource"
+            },
             "MarkNightPlayerRequest": {
                 "type": "object",
                 "properties": {
@@ -6664,6 +6692,17 @@
                     "wins_not_shown": {
                         "type": "integer",
                         "description": "First places of the players who are not in the first \"Posi\u00e7\u00e3o\" list (\"Outros\")."
+                    },
+                    "main_event": {
+                        "anyOf": [
+                            {
+                                "description": "The lists of the finished Main Events of the same seasons. Null on a site with no Main Event.",
+                                "$ref": "#/components/schemas/MainEventStatisticsResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -6678,7 +6717,8 @@
                     "biggest_pots",
                     "places",
                     "points_progress",
-                    "wins_not_shown"
+                    "wins_not_shown",
+                    "main_event"
                 ],
                 "title": "StatisticsResource"
             },

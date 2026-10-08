@@ -51,6 +51,8 @@ class StatisticsResource extends JsonResource
             ],
             /** First places of the players who are not in the first "Posição" list ("Outros"). */
             'wins_not_shown' => $this->winsNotShown,
+            /** The lists of the finished Main Events of the same seasons. Null on a site with no Main Event. */
+            'main_event' => $this->mainEvent === null ? null : new MainEventStatisticsResource($this->mainEvent),
         ];
     }
 }

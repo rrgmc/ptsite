@@ -28,5 +28,7 @@ final readonly class StatisticsReport
         public array $progressSteps,
         public array $progressSeries,
         public int $winsNotShown,
+        /** Null on a site with no Main Event. */
+        public ?MainEventStatisticsReport $mainEvent,
     ) {}
 }

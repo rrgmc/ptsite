@@ -1203,6 +1203,17 @@ export interface components {
             /** @description Keep the login for 30 days. */
             remember?: boolean;
         };
+        /** MainEventStatisticsResource */
+        MainEventStatisticsResource: {
+            /** @description How many finished Main Events count. */
+            count: number;
+            /** @description Players by Main Events won (`count`). */
+            titles: components["schemas"]["RankedListResource"];
+            /** @description Players by times in the first three of a Main Event (`count`). */
+            podiums: components["schemas"]["RankedListResource"];
+            /** @description Players by Main Events played (`count`). */
+            appearances: components["schemas"]["RankedListResource"];
+        };
         /** MarkNightPlayerRequest */
         MarkNightPlayerRequest: {
             /** @description Whether the player paid the buy-in. */
@@ -1814,6 +1825,7 @@ export interface components {
             };
             /** @description First places of the players who are not in the first "Posição" list ("Outros"). */
             wins_not_shown: number;
+            main_event: components["schemas"]["MainEventStatisticsResource"] | null;
         };
         /** SuggestedNightResource */
         SuggestedNightResource: {

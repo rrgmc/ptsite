@@ -7,6 +7,7 @@
 
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
+use PTSite\Domain\Statistics\MainEventStatistics;
 use PTSite\Domain\Statistics\NightRecord;
 use PTSite\Domain\Statistics\PlayerStatistics;
 use PTSite\Domain\Statistics\Statistics;
@@ -15,6 +16,7 @@ use PTSite\Domain\Statistics\TopList;
 const S_ANA = 1;
 const S_BRENO = 2;
 const S_CARLA = 3;
+const S_DUDU = 9;
 
 /** @param list<int> $order player ids, first place first */
 function statsNight(int $id, int $season, string $pot, ?int $place, array $order): NightRecord
@@ -191,4 +193,28 @@ it('has empty lists when no night is finished', function () {
         ->and($summary->positions)->toBe([])
         ->and($summary->progress->steps)->toBe([])
         ->and($summary->winsNotShown)->toBe(0);
+});
+
+it('counts the titles, the podiums and the appearances of the Main Events', function () {
+    // Season A's Main Event: Ana, Breno, Carla, Dudu. Season B's: Breno, Ana, Dudu.
+    $summary = (new MainEventStatistics)->summarise([[S_ANA, S_BRENO, S_CARLA, S_DUDU], [S_BRENO, S_ANA, S_DUDU]]);
+
+    expect($summary->count)->toBe(2)
+        ->and(rows($summary->titles))->toBe([[1, S_ANA, 1], [1, S_BRENO, 1]])
+        ->and(rows($summary->podiums))->toBe([[1, S_ANA, 2], [1, S_BRENO, 2], [3, S_CARLA, 1], [3, S_DUDU, 1]])
+        ->and(rows($summary->appearances))->toBe([[1, S_ANA, 2], [1, S_BRENO, 2], [1, S_DUDU, 2], [4, S_CARLA, 1]]);
+});
+
+it('counts a Main Event of which only the champion is known', function () {
+    $summary = (new MainEventStatistics)->summarise([[S_CARLA]]);
+
+    expect(rows($summary->titles))->toBe([[1, S_CARLA, 1]])
+        ->and(rows($summary->podiums))->toBe([[1, S_CARLA, 1]])
+        ->and(rows($summary->appearances))->toBe([[1, S_CARLA, 1]]);
+});
+
+it('has empty Main Event lists when no Main Event is finished', function () {
+    $summary = (new MainEventStatistics)->summarise([]);
+
+    expect($summary->count)->toBe(0)->and($summary->titles->rows)->toBe([])->and($summary->appearances->rows)->toBe([]);
 });
