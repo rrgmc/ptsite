@@ -26,25 +26,27 @@
 | `POST /password-resets/{token}/complete` | anyone | Sets the new password: `password` (8 characters or more). Answers 204. The link stops working, and every session and API token of the account ends |
 | `GET /seasons` | logged in | Seasons, newest first. `updated_since` |
 | `GET /seasons/current` | logged in | Newest open, unfinished season (404 if none) |
-| `GET /seasons/top-standings` | logged in | Every season that is not archived, newest first, each with the first ten of its standings: `season`, `rows` (as in the standings; empty before the first finished night) and `tied_not_shown` (players left out who have the same total as the last one shown) |
+| `GET /seasons/top-standings` | logged in | Every season that is not archived, newest first, each with the first ten of its standings: `season`, `rows` (as in the standings; empty before the first finished night), `tied_not_shown` (players left out who have the same total as the last one shown) and `main_event_champion` (the 1st place of its finished Main Event; null without one, and on a site with no Main Event) |
 | `GET /seasons/{id}` | logged in | One season with its percentage table |
 | `GET /seasons/{id}/standings` | logged in | Standings: `rank` (shared on ties), `player`, `points`, `nights_scored`, `wins` |
-| `GET /seasons/{id}/nights` | logged in | Nights oldest first, with results. `status`, `updated_since` |
-| `GET /seasons/{id}/night-suggestions` | logged in | Suggested dates for a new night: the next three regular weekdays at the regular time (`starts_at`), leaving out dates that already have a night |
-| `GET /seasons/{id}/night-plan` | admin | The season planner: the regular nights from `from` to `to` (Y-m-d; with `count`, stopping at that many planned nights), carrying on the season's rhythm, each with `starts_at`, `included`, `taken` (with `night_id`: every existing night in the range, on any day) and `skip_reason` (`kind`: `holiday`, `bridge` or `carnival`; `holiday`). Saves nothing. 404 on a site with no season planner |
-| `GET /seasons/{id}/calendar` | logged in | The season calendar in date order: `kind` `night` (with `night`: `id`, `status`, `place`, `winner`, `pot`, `all_in_count`, `my_answer`) or `no_night` (with `skip_reason`) |
-| `POST /seasons/{id}/nights/batch` | admin | Schedule several nights at once, all or none: `starts_at` (a list). Refuses dates that already have a night. 404 on a site with no season planner |
+| `GET /seasons/{id}/nights` | logged in | Nights oldest first, with results: the rounds, the extra nights and the Main Event night. `status`, `updated_since` |
+| `GET /seasons/{id}/night-suggestions` | logged in | Suggested dates for a new night: the next three regular weekdays at the regular time (`starts_at`), leaving out dates that already have a round |
+| `GET /seasons/{id}/night-plan` | admin | The season planner: the regular nights from `from` to `to` (Y-m-d; with `count`, stopping at that many planned nights), carrying on the season's rhythm, each with `starts_at`, `included`, `taken` (with `night_id`: every existing round in the range, on any day; an extra night is not shown) and `skip_reason` (`kind`: `holiday`, `bridge` or `carnival`; `holiday`). Saves nothing. 404 on a site with no season planner |
+| `GET /seasons/{id}/calendar` | logged in | The season calendar in date order: `kind` `night` (with `night`: `id`, `status`, `type`, `is_extra`, `place`, `winner`, `pot`, `all_in_count`, `my_answer`; a day may have two) or `no_night` (with `skip_reason`) |
+| `POST /seasons/{id}/nights/batch` | admin | Schedule several nights at once, all or none: `starts_at` (a list). Refuses dates that already have a round. 404 on a site with no season planner |
 | `POST /seasons/{id}/simulate` | logged in | Simulated standings for `pot` and `positions`. Saves nothing |
 | `GET /statistics` | logged in | Statistics of the finished nights of one season (`season`: its id) or, without it, of every season that is not archived: `nights_count`, `pot_total`, `main_event_pot_total`, `time_chip_total`, the top ten lists `total_points`, `nights_scored`, `positions` (one per finishing position), `biggest_pots` and `places` (each with `rows` and `tied_not_shown`; a row has `rank`, shared on ties, a `player`, `night` or `place`, and a `count` or `amount`), `points_progress` (the eight leaders' running totals: `steps` per night, or per season without `season`, and `series`) and `wins_not_shown` |
-| `POST /seasons/{id}/nights` | results keeper, admin | Schedule a night |
-| `POST /seasons/{id}/nights/import` | results keeper, admin | Record a past night, saved as finished: `starts_at`, `place_id`, `pot`, `main_event_pot`, `time_chip`, `positions` |
-| `POST /seasons` / `PATCH /seasons/{id}` | admin | Create or update a season, its `percentages` and its regular night (`schedule_weekday`, `schedule_time`, `schedule_every_weeks`) and `rounds`. Seasons also return `nights_planned` (nights that are not archived) |
-| `GET /nights/{id}` | logged in | One night with results, `pot`, `main_event_pot` and `time_chip` (each null until recorded) |
-| `PATCH /nights/{id}` | results keeper, admin; admin only once the night is open or finished | "Editar evento": `place_id` (may be `null`), `description` (only the fields sent). Any status; 403 for a cancelled night |
-| `POST /nights/{id}/reschedule` | results keeper, admin | "Remarcar" a scheduled night: `starts_at`. 409 if not scheduled; 422 if the day already has a night |
+| `POST /seasons/{id}/nights` | results keeper, admin | Schedule a night: `starts_at`, `place_id`, `description`, `type` (`regular` unless given; `main_event` on a site with the Main Event, one per season) and `is_extra` (outside the season's calendar; always true for a Main Event) |
+| `POST /seasons/{id}/nights/import` | results keeper, admin | Record a past night, saved as finished: `starts_at`, `place_id`, `pot`, `main_event_pot`, `time_chip`, `positions`, `is_extra` |
+| `POST /seasons/{id}/main-event/import` | results keeper, admin | Record a past Main Event, saved as finished: `starts_at`, `place_id`, `description`, `player_ids`. A finished season takes it too. 422 if the season has one. 404 on a site with no Main Event |
+| `POST /seasons` / `PATCH /seasons/{id}` | admin | Create or update a season, its `percentages` and its regular night (`schedule_weekday`, `schedule_time`, `schedule_every_weeks`) and `rounds`. Seasons also return `nights_planned` (rounds that are not archived) and `nights_count` (finished rounds); an extra night is in neither |
+| `GET /nights/{id}` | logged in | One night with results, `pot`, `main_event_pot` and `time_chip` (each null until recorded), its `type`, `is_extra` and, for a Main Event night, `main_event_positions` (each with `position` and `player`) |
+| `PATCH /nights/{id}` | results keeper, admin; admin only once the night is open or finished | "Editar evento": `place_id` (may be `null`), `description`, `is_extra` (only the fields sent; `is_extra` is not changed on a Main Event night). Any status; 403 for a cancelled night |
+| `POST /nights/{id}/reschedule` | results keeper, admin | "Remarcar" a scheduled night: `starts_at`. 409 if not scheduled; 422 if a round moves onto a day that already has a round |
 | `POST /nights/{id}/cancel` | results keeper, admin | "Cancelar" a scheduled night: archives it. 409 if not scheduled |
 | `POST /nights/{id}/open` | results keeper, admin | Open a scheduled night |
-| `POST /nights/{id}/finish` | results keeper, admin | Enter or correct results: `pot`, `main_event_pot`, `time_chip` (decimal strings; the last two may be `"0"`), `positions`. On a site with no Main Event pot or no time chip, that amount is not required and not kept |
+| `POST /nights/{id}/finish` | results keeper, admin | Enter or correct results: `pot`, `main_event_pot`, `time_chip` (decimal strings; the last two may be `"0"`), `positions`. On a site with no Main Event pot or no time chip, that amount is not required and not kept. 422 on a Main Event night |
+| `POST /nights/{id}/main-event-result` | results keeper, admin | Enter or correct the result of a Main Event night: `player_ids`, the 1st place first, at least one and nobody twice. 409 if the night is scheduled; 422 on a regular night. 404 on a site with no Main Event |
 | `GET /nights/{id}/attendance` | logged in | Answers in the order given: `player`, `answer` (`all_in`/`fold`), `answered_at`, `answered_by` |
 | `PUT /nights/{id}/attendance/{player}` | the player; results keeper, admin for anyone | Set an answer: `answer`. Repeating the same answer changes nothing. 422 unless the night is open (`attendance.not_open` while scheduled, `attendance.closed` once finished or archived) |
 | `DELETE /nights/{id}/attendance/{player}` | the player; results keeper, admin for anyone | Remove the answer ("Não confirmado"). 422 unless the night is open |
@@ -65,7 +67,8 @@
 | `POST /holiday-exceptions` / `DELETE /holiday-exceptions/{id}` | admin | A change for one year: `year` with `holiday_id` (cancel it) or `date` and `name` (an extra holiday); delete to undo |
 | `GET /audit-log` | admin | Changes, newest first, 50 per page. `subject_type`, `subject_id` |
 
-`positions` is a list of `{ "position": 1, "player_id": 42 }`. `percentages` is a list of
+`positions` is a list of `{ "position": 1, "player_id": 42 }`. `player_ids` is a list of player ids in finishing
+order, such as `[42, 7, 19]`. `percentages` is a list of
 `{ "position": 1, "percent": 38 }`.
 
 ## Player images

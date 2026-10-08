@@ -53,8 +53,10 @@ Names and figures are invented. All examples use the percentage table **38, 23, 
 
 ## Main Event
 
-The Main Event is left out for now (see [seasons-and-nights.md](seasons-and-nights.md)). The Main Event pot and
-the time chip of a night give no points.
+The Main Event gives no points: its night records only the order of its players, and is left out of the
+standings and of the simulator ([main-event.md](main-event.md)). The Main Event pot and the time chip of a night
+give no points either. An extra night scores like any other ([seasons-and-nights.md](seasons-and-nights.md),
+rule 28).
 
 ## Open questions
 

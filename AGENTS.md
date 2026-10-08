@@ -47,7 +47,7 @@ public; the results are invented. Write nothing about them but public facts.
   (`frontend/`), one repository, and shared hosting.
 - The code covers: login, the password link by email ("Esqueci minha senha"), standings, results, running nights
   (schedule, edit, open, finish, correct, quick add, partial result), attendance (ALL IN / FOLD), the season
-  planner (a calendar) with its holiday table, the season calendar, the simulator, the statistics, the players'
+  planner (a calendar) with its holiday table, the season calendar, extra nights, the Main Event, the simulator, the statistics, the players'
   pages with their statistics and memo, the admin section and the audit log.
 - The development data is an invented demo league (`backend/database/seeders/DemoLeagueSeeder.php`).
 - Tables keep a `legacy_id` column, and login upgrades old MD5 password hashes, to support data imported from an
@@ -161,7 +161,8 @@ to map one to the other. The English texts of the screens are in `frontend/src/i
 |---|---|---|
 | Torneio | Season | A series of game nights with its own standings |
 | Evento, "Liga - date" | Game night (`Night`) | One evening of poker |
-| Main Event, "ME" | Main Event | A special final game; not built yet |
+| Main Event, "ME" | Main Event (a night of type `main_event`) | A season's final game. Its night records the order of its players, with no pot and no points |
+| Evento extra, "Extra" | Extra night (`is_extra`) | A night outside the season's calendar: not a round, and it may share its day. It scores like any night |
 | Local | Place | Where a night happens |
 | Pote | Pot | The total money played for on a night |
 | Pote ME | Main Event pot (`main_event_pot`) | The money set aside on a night for the Main Event; gives no points |

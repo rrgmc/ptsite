@@ -48,7 +48,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    2 weeks). A new season starts with the previous season's regular night; the very first one defaults to Friday
    at 21:00, every 2 weeks. It is only used for suggestions and for the
    [season planner](season-planner.md).
-5a. A season has a number of **rounds** ("Rodadas"): how many nights it has, usually 26. A new season starts with the
+5a. A season has a number of **rounds** ("Rodadas"): how many nights it has, usually 26, not counting the extra
+   nights (rule 25). A new season starts with the
    previous season's number. It is a target, not a limit: scheduling a night past it shows a warning ("A temporada
    já tem 26 eventos de 26 rodadas") but is allowed.
 
@@ -58,7 +59,11 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 6a. A night's title is a word set by the site and the night's date: "Liga - 14/03/2026". The first word is the
    site's setting (`nightTitlePrefix` in its `site.json`); the demo league uses "Liga", and so do the
    examples in these specs. On "Resultados" the title also has the night's number in the season, counting the
-   finished nights from the oldest: "Liga 3 - 14/03/2026".
+   finished rounds from the oldest: "Liga 3 - 14/03/2026". An extra night (rule 25) has no number.
+6b. A night has a **type**. Almost every night is a regular one, with a pot and points. On a site with the Main
+   Event, a season can also have one **Main Event night**, which has a result of its own: see
+   [main-event.md](main-event.md). The rules below about the pot, the positions and the partial result are for
+   regular nights.
 7. A night goes through these states: **scheduled** → **open** → **finished**.
 8. **Only one night per season can be open at a time.** Opening a second night is refused until the first is
    finished.
@@ -68,8 +73,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    - the **time chip** (required, zero allowed): the money set aside that night for the year party. A time chip
      is paid with every rebuy, and by a player who arrives late. The keeper enters the night's total;
    - which active or inactive player finished in each **scoring position**.
-9a. Only the pot counts for points. The Main Event pot and the time chip are recorded; they are not added up
-   anywhere yet.
+9a. Only the pot counts for points. The Main Event pot and the time chip are recorded and added up per season
+   ([statistics.md](statistics.md), rule 7).
 9b. Wherever a finished night's result is shown (the results list and the night's page), the three amounts come
    below the positions: "Pote Total", "Pote ME" and "Time chip". An amount that was never recorded shows "—".
 9c. A site can do without the Main Event pot, the time chip or both (`features` in
@@ -81,28 +86,45 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 12. A finished night can be **corrected**. The standings change at once, and the change is recorded in the
     audit log.
 13. A past night can be **imported** in one step (date, place, pot, Main Event pot, time chip, finishing
-    order). It is saved as finished.
+    order). It is saved as finished. It can be marked as extra (rule 25).
 14. **Suggested dates.** A night is usually created early in its week (on the Monday), so when scheduling, the
     site offers the **next three regular weekdays** at the regular time, starting today (or at the season's
     start, if later). The first is chosen at the start. Today counts if it is the regular weekday. Dates that
-    already have a night in the season are left out.
+    already have a round of the season are left out.
 15. **Suggestions are only suggestions.** Any date and time can be chosen. These suggestions do not look at
     holidays: the person scheduling picks another date when needed. Planning a whole season, with holidays, is the
     [season planner](season-planner.md).
 16. **Remarcar.** A scheduled night can be moved to another date and time by a results keeper or an admin. Any
-    attendance answers it has stay, and so does its place. It cannot be moved onto a day that already has another
-    night in the season. An open or finished night cannot be moved.
+    attendance answers it has stay, and so does its place. A round cannot be moved onto a day that already has
+    another round of the season; an extra night can be on any day. An open or finished night cannot be moved.
 17. **Cancelar.** A scheduled night can be cancelled by a results keeper or an admin, after confirming. It is
     archived, not deleted: it leaves the season's lists and calendar, its date is free again, and the audit log
     keeps it. An open or finished night cannot be cancelled; a finished night's result is corrected instead.
 17a. **Editar evento.** A night's **place** and **description** can be changed on a page of their own, whatever
-    the night's state. The place can be removed: the night then shows "Local a definir". A results keeper or an
+    the night's state. The same page marks a regular night as extra, or as a round again (rule 25). The place can be removed: the night then shows "Local a definir". A results keeper or an
     admin edits a scheduled night; **only an admin** edits an open or finished one. A cancelled night cannot be
     edited. Nothing else changes: the date, the amounts, the result and the standings stay as they are. The change
     is recorded in the audit log.
 17b. The night's page shows the description, when it has one. A description is plain text. The ones imported from
     an older site may be HTML from its text editor (`<p>&nbsp;Liga - 07/26</p>`): the site shows only their text,
     and the stored value keeps its markup until someone rewrites the description.
+
+### Extra nights ("Evento extra")
+
+25. A night can be **extra**: outside the season's calendar. It is for what is not one of the season's rounds,
+    such as a second table played on the day of another night. It is chosen when the night is scheduled ("Tipo")
+    and can be changed in "Editar evento".
+26. **An extra night is not a round.** It does not count in the season's rounds ("Rodadas: N de 26"), in the
+    number of nights of a season, or in the numbers of the nights on "Resultados".
+27. **An extra night may share its day** with another night. The [season planner](season-planner.md), the
+    suggested dates (rule 14) and the calendar's "Sem evento" days ignore it: only the rounds carry the season's
+    rhythm.
+28. **An extra night scores like any night.** It is opened and finished the same way, and its pot, its Main Event
+    pot, its time chip and its points count in the standings and in the statistics.
+29. **Only one night per season can be open at a time** (rule 8), an extra night too. On a day with two nights,
+    the first is finished before the second is opened. The second can also be imported (rule 13).
+30. An extra night is marked **"Extra"** wherever a night is listed. A Main Event night is always extra
+    ([main-event.md](main-event.md)).
 
 ### Partial result ("Resultado parcial")
 
@@ -164,6 +186,22 @@ Moving and cancelling:
 - **Cancelar.** The 12/03/2027 night is cancelled: it leaves the season's nights, and another night can then be
   moved to 12/03.
 
+Extra nights, in a season with 26 rounds whose regular night is Friday at 21:30:
+
+- **A second table.** The season has a round on Friday 12/03/2027. A results keeper schedules an extra night on
+  the same day. The season still has one night planned of its 26 rounds.
+- **One open at a time.** The round of 12/03 is open. Opening the extra night is refused until the round is
+  finished. Then the extra night is opened and finished.
+- **It scores.** Both nights have a pot of R$ 300,00. Each winner has 114,00 points, and the standings show them
+  both in 1st place. The statistics count two nights and a total pot of R$ 600,00. The season still shows one
+  round played.
+- **The numbers.** The season's finished nights are a round, an extra night and a round. "Resultados" titles
+  them "Liga 1", "Liga" marked "Extra", and "Liga 2".
+- **Moving.** A round moves onto a day that has only an extra night. An extra night moves onto a day that has a
+  round. A round still cannot move onto the day of another round.
+- **The planner.** An extra night is on Friday 22/01/2027, a regular Friday. The planner still offers 22/01, and
+  the season's rhythm does not start from it.
+
 Editing a night:
 
 - **A scheduled night.** Maria, a results keeper, changes the 12/03/2027 night to another place and writes "Noite
@@ -209,15 +247,14 @@ Suggested dates, for a season whose regular night is Friday at 21:30:
 - A picked season stays on every screen (rules 3a to 3e).
 - Any active player can be entered in results; there are no rosters (see [players.md](players.md)).
 - Results keepers can run nights, not only admins (see [accounts-and-roles.md](accounts-and-roles.md)).
-- The **Main Event** is left out for now (see open questions). The **Main Event pot** is recorded on every
-  night.
+- The **Main Event** is a night of its own type, on a site that turns it on ([main-event.md](main-event.md)).
+  The **Main Event pot** is recorded on every night.
+- A night can be **extra**, outside the season's calendar (rules 25 to 30).
 - The **time chip** is recorded on every night.
 - Attendance answers ("ALL IN" / "FOLD") are described in [attendance.md](attendance.md).
 
 ## Open questions
 
-- **Main Event.** The Main Event itself is not built, yet a Main Event pot is recorded on every night and never
-  added up. Should the Main Event come back, and should the pot be added up per season?
 - **Time chip total.** Should the season show the time chips added up (the year party fund)?
 - **Buy-in.** A season can store a buy-in that no rule uses yet. Keep it?
 - **Deleting nights.** Archiving, like players, could replace hiding deleted nights.

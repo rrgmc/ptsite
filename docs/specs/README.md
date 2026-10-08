@@ -28,6 +28,7 @@ designer, acting as product manager, owns these documents. The reasons for this 
 | [season-planner.md](season-planner.md) | Agreed |
 | [season-calendar.md](season-calendar.md) | Agreed |
 | [statistics.md](statistics.md) | **Draft** for designer review |
+| [main-event.md](main-event.md) | **Draft** for designer review |
 
 ## Template
 

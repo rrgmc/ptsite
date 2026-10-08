@@ -20,6 +20,9 @@ Everyone logged in: players, results keepers and admins.
    **your own answer**; a scheduled night takes no answers yet (see [attendance.md](attendance.md)), so it shows
    them only if it already has some. On the grid, a finished night is a filled green circle (played) and a
    scheduled or open night an outlined one (still to come).
+2a. A **Main Event night** and an **extra night** are named as such ("Main Event", "Extra"). A finished Main
+   Event shows its champion and no pot. **A day can have two nights**: the day on the grid names both and opens
+   the first, and the month's list has a line for each.
 3. It shows **"Sem evento"** on the regular nights that are not played because of a holiday, an emenda or
    Carnival, with the reason. These are the same dates the [season planner](season-planner.md) leaves out,
    following the season's own rhythm (rule 9 there).

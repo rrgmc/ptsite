@@ -19,8 +19,9 @@ backend/
                             Ranking, NightRecord
   app/Actions/            one class per change; check policy, call domain, save, audit
     Nights/                 OpenNight, FinishNight, ScheduleNight, ScheduleNights (the planner's batch),
-                            ImportNight, RescheduleNight, CancelNight, UpdateNight (place and description),
-                            WriteNightResult, NightSnapshot, SavePartialResult, KnownPlayers
+                            ImportNight, RescheduleNight, CancelNight, UpdateNight (place, description, extra),
+                            WriteNightResult, NightSnapshot, SavePartialResult, KnownPlayers,
+                            FinishMainEventNight, ImportMainEventNight, WriteMainEventResult, MainEventNight
     Attendance/             AnswerAttendance
     Holidays/               SaveHoliday, SaveHolidayException, DeleteHolidayException
     Players/                QuickAddPlayer, SavePlayer, NicknameCheck
@@ -180,7 +181,8 @@ A feature flag lets a site do without a part of the product ([0021](../decisions
 flags are listed in [`site/README.md`](../../site/README.md), "Features".
 
 1. Add a case to `PTSite\Domain\Features\Feature`. Its value is the name written in `site.json`. Give it a
-   default in `default()`: `true` for a part that exists already, so no site changes.
+   default in `default()`: `true` for a part that exists already, so no site changes; `false` for a new part
+   that only some leagues want, such as the Main Event.
 2. Add the same name and default to `frontend/src/site/features.ts`. A frontend test fails while the two lists
    differ.
 3. Ask `Features::enabled()` where the rule is: inject `Features` into the action or pass it to the domain class.

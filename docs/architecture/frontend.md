@@ -49,14 +49,16 @@ frontend/
 | `/forgot-password` | "Esqueci minha senha": asks for a password link by email, with the username or the email | everyone |
 | `/reset-password?token=…` | "Nova senha": the screen behind the link in the email, with the new password typed twice | whoever has the link |
 | `/` | Standings, next night, last result; the attendance banner while a night of the current season is open | players |
-| `/results` | Finished nights, numbered in the season's order; the "Pontos acumulados" chart; the season's three amounts added up; upcoming nights and "+ Agendar" with the next three regular weekdays suggested; the attendance banner | players; scheduling for results keepers |
+| `/results` | Finished nights, the rounds numbered in the season's order, an extra night and the Main Event marked; the "Pontos acumulados" chart; the season's three amounts added up; upcoming nights and "+ Agendar" with the next three regular weekdays suggested and the type of the night (a round, an extra night or the Main Event); the attendance banner | players; scheduling for results keepers |
+| `/main-event` | "Main Event", on a site that has it: the selected season's Main Event night, its players in order and the season's Main Event pot; recording a Main Event already played | players; recording for results keepers |
 | `/calendar` | Season calendar | players |
-| `/seasons` | "Temporadas": every season with the first ten of its standings, and "Ver esta temporada" to make it the selected season | players |
+| `/seasons` | "Temporadas": every season with the first ten of its standings and its Main Event champion, and "Ver esta temporada" to make it the selected season | players |
 | `/seasons/select` | "Escolher temporada": the season list, where the user picks the selected season | players |
-| `/seasons/:id`, `/seasons/:id/results`, `/seasons/:id/calendar`, `/seasons/:id/simulator`, `/seasons/:id/statistics` | Links to one season: pick it, then redirect to `/`, `/results`, `/calendar`, `/simulator` or `/statistics` | players |
+| `/seasons/:id`, `/seasons/:id/results`, `/seasons/:id/calendar`, `/seasons/:id/simulator`, `/seasons/:id/statistics`, `/seasons/:id/main-event` | Links to one season: pick it, then redirect to `/`, `/results`, `/calendar`, `/simulator`, `/statistics` or `/main-event` | players |
 | `/nights/:id` | Night: details, attendance ("ALL IN" / "FOLD"), the partial result while open, result, "Abrir", "Remarcar", "Cancelar evento", "Finalizar", "Editar resultado", "Editar evento" | players; actions for results keepers |
-| `/nights/:id/edit` | Edit a night ("Editar evento"): place and description | results keepers and admins while scheduled; admins once open or finished |
+| `/nights/:id/edit` | Edit a night ("Editar evento"): place, description and whether it is extra | results keepers and admins while scheduled; admins once open or finished |
 | `/nights/:id/result` | Results form: pot, Main Event pot, time chip, finishing order, live points. On an open night it starts from the partial result | results keepers, admins |
+| `/nights/:id/main-event-result` | Result form of a Main Event night: one player per position, the 1st place first, as many as are known | results keepers, admins |
 | `/nights/:id/partial-result` | Partial result form ("Resultado parcial"): the same fields, all optional, saved any number of times | active players, results keepers, admins |
 | `/simulator` | Ranking simulator | players |
 | `/statistics`, `/statistics/all` | Statistics of the selected season, and of every season: top ten lists and two charts | players |
@@ -103,7 +105,7 @@ A site turns a part of the product off in `features` of its `site.json`
   against it and stops the build on a name it does not know.
 - **A screen asks `hasFeature('timeChip')`** of `src/lib/features.ts`, and leaves out the field, the row or the
   link when the answer is no. Hiding is cosmetic: the API refuses the feature too.
-- **The demo site has every feature**, so a test or a story shows the other way with `overrideFeatures` (a test)
+- **The demo site has every feature**, the Main Event too, which it turns on in `site/site.json`. So a test or a story shows the other way with `overrideFeatures` (a test)
   or the decorator `withFeatures` of `src/mocks/withFeatures.tsx` (a story).
 - To add a flag, follow "Adding a feature flag" in [backend-layers.md](backend-layers.md).
 

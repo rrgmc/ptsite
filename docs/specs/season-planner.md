@@ -58,16 +58,18 @@ it.
      one);
    - it falls in the four days before Carnival Tuesday (**"Carnaval"**), while Carnival is a holiday that year.
 8. A night that is left out **moves one week later**, and the cadence carries on from the new date.
-9. **Every night the season already has in the range** is shown as **"Já agendado"**, on whatever day it is (a
-   Thursday, or a Friday off the usual weeks), with a link to it. **A week that already has a night does not get
-   another**, and the cadence carries on N weeks after that night's week.
+9. **Every round the season already has in the range** is shown as **"Já agendado"**, on whatever day it is (a
+   Thursday, or a Friday off the usual weeks), with a link to it. **A week that already has a round does not get
+   another**, and the cadence carries on N weeks after that night's week. An **extra night** is outside the
+   calendar ([seasons-and-nights.md](seasons-and-nights.md), rule 25): the planner does not show it, and its week
+   and its day stay free.
 10. **Everything is only a suggestion.** The admin can tick any date that was left out, untick any other, and tap
     any other day to add a night on it at the regular time.
 11. **Rounds.** A season has a number of rounds ("Rodadas", usually 26). The planner shows "Rodadas: N de 26":
-    the season's nights plus the ticked dates. Going past the rounds shows a warning, but scheduling is still
+    the season's rounds (its nights that are not extra) plus the ticked dates. Going past the rounds shows a warning, but scheduling is still
     allowed (for example a replacement night).
 12. Confirming ("Agendar N eventos") schedules **all the ticked dates at once**, at the season's default place, or
-    none of them if one is refused (for example a date that already has a night). Each night is recorded in the
+    none of them if one is refused (for example a date that already has a round). Each night is recorded in the
     audit log like a night scheduled on its own.
 
 ## Examples

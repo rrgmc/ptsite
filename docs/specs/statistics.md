@@ -16,6 +16,8 @@ Everyone logged in: players, results keepers and admins.
    [seasons-and-nights.md](seasons-and-nights.md) rule 3a) and **"Geral"** (every season). Both show the same lists
    and charts.
 2. Only **finished nights** count. Archived nights do not count, and "Geral" also leaves out archived seasons.
+   A Main Event night has no pot and no points, so it does not count ([main-event.md](main-event.md)). An extra
+   night counts like any other.
    Inactive players count: the lists are the league's history.
 3. Each list shows the **first 10**, highest first:
    - **"Pontuação Total"**: players by total points.
