@@ -2,9 +2,11 @@ import { Link } from 'react-router'
 import { useAttendance, useMe, useSeasonNights, useStandings } from '@/api/queries'
 import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
+import { hasFeature } from '@/lib/features'
 import { formatDate, formatMoney, formatWeekday } from '@/lib/format'
 import { t } from '@/i18n'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
+import { MainEventPodium } from '../mainEvent/MainEventPodium'
 import { NightMark } from '../nights/NightMark'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { StandingsTable } from './StandingsTable'
@@ -22,6 +24,10 @@ export function StandingsPage() {
   const finished = (nights.data ?? []).filter((n) => n.status === 'finished' && n.type === 'regular')
   const next = (nights.data ?? []).find((n) => n.status === 'open') ?? (nights.data ?? []).find((n) => n.status === 'scheduled')
   const last = finished.at(-1)
+  // The season's Main Event, once it is played: its first three go above the standings.
+  const mainEvent = hasFeature('mainEvent')
+    ? (nights.data ?? []).find((n) => n.type === 'main_event' && n.status === 'finished' && (n.main_event_positions?.length ?? 0) > 0)
+    : undefined
 
   return (
     <>
@@ -32,18 +38,21 @@ export function StandingsPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_20rem]">
-        {/* On a phone the table needs the width more than the card needs its padding. */}
-        <Card className="max-sm:p-2">
-          {standings.isPending ? (
-            <Loading />
-          ) : standings.error ? (
-            <ErrorBox error={standings.error} />
-          ) : standings.data!.length === 0 ? (
-            <Empty>{t.standings.nobodyScored}</Empty>
-          ) : (
-            <StandingsTable rows={standings.data!} caption={t.standings.tableCaption({ season: season.name })} />
-          )}
-        </Card>
+        <div className="flex min-w-0 flex-col gap-4">
+          {mainEvent && <MainEventPodium night={mainEvent} />}
+          {/* On a phone the table needs the width more than the card needs its padding. */}
+          <Card className="max-sm:p-2">
+            {standings.isPending ? (
+              <Loading />
+            ) : standings.error ? (
+              <ErrorBox error={standings.error} />
+            ) : standings.data!.length === 0 ? (
+              <Empty>{t.standings.nobodyScored}</Empty>
+            ) : (
+              <StandingsTable rows={standings.data!} caption={t.standings.tableCaption({ season: season.name })} />
+            )}
+          </Card>
+        </div>
 
         <div className="flex flex-col gap-4">
           {next && (
