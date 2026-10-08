@@ -164,7 +164,7 @@ cd frontend && npm run storybook               # browse components and screens o
 ```
 
 CI runs them on every pull request ([.github/workflows/ci.yml](.github/workflows/ci.yml)). Nothing runs after
-the merge into `master`, and a change that touches only docs runs nothing. CI builds the zip for shared hosting only when started by hand, and never uploads it. The reasons are in
+the merge into `master`: a pull request merges only when they passed on a branch that is up to date. CI builds the zip for shared hosting only when started by hand, and never uploads it. The reasons are in
 [deployment.md](docs/architecture/deployment.md) ("Build (CI)").
 
 ## Author
