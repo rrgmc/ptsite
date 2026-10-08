@@ -47,7 +47,7 @@ public; the results are invented. Write nothing about them but public facts.
   (`frontend/`), one repository, and shared hosting.
 - The code covers: login, the password link by email ("Esqueci minha senha"), standings, results, running nights
   (schedule, edit, open, finish, correct, quick add, partial result), attendance (ALL IN / FOLD), the season
-  planner (a calendar) with its holiday table, the season calendar, extra nights, the Main Event, a season's money settings, the simulator, the statistics, the players'
+  planner (a calendar) with its holiday table, the season calendar, extra nights, the Main Event, a season's money settings, the night dashboard, the simulator, the statistics, the players'
   pages with their statistics and memo, the admin section and the audit log.
 - The development data is an invented demo league (`backend/database/seeders/DemoLeagueSeeder.php`).
 - Tables keep a `legacy_id` column, and login upgrades old MD5 password hashes, to support data imported from an
@@ -169,9 +169,11 @@ to map one to the other. The English texts of the screens are in `frontend/src/i
 | Pote | Pot | The total money played for on a night |
 | Pote ME | Main Event pot (`main_event_pot`) | The money set aside on a night for the Main Event; gives no points |
 | Time chip | Time chip (`time_chip`) | The money set aside on a night for the year party: paid with every rebuy and by late arrivals |
-| Valores | Money settings (`SeasonMoney`) | What a night of a season costs: the buy-in, the rebuy, the time chip and the rebuys allowed. Recorded only; no rule calculates with them |
+| Valores | Money settings (`SeasonMoney`) | What a night of a season costs: the buy-in, the rebuy, the time chip and the rebuys allowed. The night dashboard works a night's money out from them |
+| Painel do evento | Night dashboard (`NightDashboard`, `NightMoney`) | A screen for a phone at the table, on a site that turns it on: who paid the buy-in, the rebuys and the time chips of a night, and the pot and the time chip added up from them |
+| Jogador (no painel) | Participant (`NightPlayer`, `NightEntry`) | A player the night dashboard has a record of, or who answered ALL IN on the open night. Owes one buy-in |
 | Rebuy | Rebuy | Buying in again on the same night. A season says how many are allowed (`rebuys_allowed`) and whether more can be made without counting for points (`allows_extra_rebuys`) |
-| Dono da casa | House owner | The owner of the house where a night is played, who may pay a smaller buy-in (`house_owner_buy_in`) |
+| Dono da casa | House owner (`house_owner_player_id`) | The owner of the house where a night is played, picked on the night dashboard, who may pay a smaller buy-in (`house_owner_buy_in`) |
 | Pontuação | Percentage table | Each scoring position's share of the pot |
 | Pessoas pontuam por evento | Scoring positions | How many places earn points (6 so far) |
 | Pontos | Points | A player's share of the pot for a night |

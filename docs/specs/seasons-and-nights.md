@@ -77,13 +77,18 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    - whether **a rebuy also pays the time chip** ("O rebuy também paga o time chip"), on a site with the time chip;
    - the **house owner's buy-in** ("Buy-in do dono da casa"): the smaller buy-in of the owner of the house where
      the night is played, on a site that turns this on (`houseOwnerBuyIn` in `features`,
-     [`site/README.md`](../../site/README.md)).
+     [`site/README.md`](../../site/README.md));
+   - the **Main Event pot share** ("Pote ME: % do pote"): the share of a night's pot, from 0 to 100%, that the
+     night dashboard suggests as the night's Main Event pot, on a site with the Main Event pot and the night
+     dashboard.
 5c. **A season has rebuys** when it allows at least one, or allows rebuys past the limit. A season with rebuys
    must have a rebuy value. A season with 0 rebuys and none past the limit has no rebuys: its form shows no
    rebuy value and no "O rebuy também paga o time chip".
 5d. The house owner's buy-in needs a buy-in, and cannot be above it. It can be the same, or zero.
-5e. **The season only records its money settings. No rule calculates with them yet**: a night's pot and time chip
-   are still the totals the keeper enters (rule 9), and a night records no rebuys.
+5e. **On a site with the night dashboard, a night's money is worked out from these settings**: the dashboard
+   records each player's buy-in, rebuys and time chip, and "Finalizar" starts from the amounts it adds up
+   ([night-dashboard.md](night-dashboard.md)). On a site without it the season only records them: a night's pot
+   and time chip are the totals the keeper enters (rule 9), and a night records no rebuys.
 5f. A setting of a feature the site does not have is not shown, and the API refuses it. A value recorded before
    the feature was turned off stays in the database.
 
@@ -182,6 +187,10 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
     so, with who saved it last. They change what is needed and finish as usual: all the rules of finishing apply.
 24. **Finishing the night deletes the partial result.** A scheduled or finished night takes none. Saves are not
     recorded in the audit log, whoever makes them; the finish is.
+24a. **On a site with the night dashboard, the dashboard holds the partial result**
+    ([night-dashboard.md](night-dashboard.md), rules 13 to 15): each position is saved by itself, the pot and
+    the time chip are the ones the dashboard works out, and the night's page shows the dashboard's amounts in
+    place of the partial result. Rules 19, 21, 22 and 24 hold as they are.
 
 ## Examples
 
@@ -318,12 +327,13 @@ Suggested dates, for a season whose regular night is Friday at 21:30:
   The **Main Event pot** is recorded on every night.
 - A night can be **extra**, outside the season's calendar (rules 25 to 30).
 - The **time chip** is recorded on every night.
-- A season records its **money settings** (rules 5b to 5f). Nothing calculates with them yet.
+- A season records its **money settings** (rules 5b to 5f). The **night dashboard** works a night's money out
+  from them, on a site that turns it on ([night-dashboard.md](night-dashboard.md)).
 - Attendance answers ("ALL IN" / "FOLD") are described in [attendance.md](attendance.md).
 
 ## Open questions
 
 - **Time chip total.** Should the season show the time chips added up (the year party fund)?
-- **Using the money settings.** Should a night record each player's rebuys, and work out the pot, the time chip
-  and the points from the season's settings? Then a night also needs to say who owns the house.
+- **Using the money settings for the points.** The night dashboard works out the pot and the time chip, and the
+  keeper still confirms them at "Finalizar". Should the points come from the dashboard's pot with no typing?
 - **Deleting nights.** Archiving, like players, could replace hiding deleted nights.

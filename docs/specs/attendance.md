@@ -10,6 +10,7 @@ Know who is coming to the night that is open, so the host can plan, and make ent
 
 - **Players** answer for themselves.
 - **Results keepers** and **admins** can answer for any player, for example for someone who told them in person.
+- On a site with the [night dashboard](night-dashboard.md), so can every **active player**.
 - Everyone can see the answers.
 
 ## Rules
@@ -25,6 +26,11 @@ Know who is coming to the night that is open, so the host can plan, and make ent
    time. Repeating the same answer changes nothing, so nobody loses their place in the list.
 4. Results keepers and admins can set or remove the answer of any player who is not archived. The answer records
    who set it, and the change goes to the audit log. A player's own answers are not audited.
+4a. On a site with the night dashboard, whoever changes the dashboard of the open night answers for any player
+   too: active players, results keepers and admins. These answers record who set them and go to the audit log
+   in the same way.
+4b. On such a site, a player with a payment or a rebuy recorded on the dashboard **cannot answer FOLD or remove
+   the answer** until those are removed ([night-dashboard.md](night-dashboard.md), rule 12).
 5. An account that is not linked to a player (an admin who does not play) cannot answer for itself.
 6. The night's page lists **who is coming**, numbered in the order they answered, and **who folded**. Players
    without an answer are not listed.
@@ -54,6 +60,9 @@ Names are invented.
 - **Removing.** Carla removes her answer. She is no longer listed.
 - **For someone else.** Dudu tells the host he is coming. Maria, a results keeper, answers ALL IN for him. The
   answer shows that Maria set it, and the audit log records it.
+- **With the night dashboard.** Ana, an active player, answers ALL IN for Dudu, who told her he is coming. Dudu
+  pays his buy-in, which Ana marks on the dashboard. Dudu then tries FOLD: refused ("Remova os pagamentos e os
+  rebuys do jogador antes.").
 - **Closed.** After the night is finished, nobody can answer; the lists stay as they were.
 - **At the table.** When Maria finishes the night, the picker for each position lists Breno and Dudu first,
   under "Confirmados".

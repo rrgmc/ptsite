@@ -55,11 +55,12 @@ frontend/
 | `/seasons` | "Temporadas": every season with the first ten of its standings and its Main Event champion, and "Ver esta temporada" to open that season's standings | players |
 | `/seasons/select` | "Escolher temporada": the table of seasons (start, nights, finished nights, status), where the user picks the season to open | players |
 | `/seasons/:id`, `/seasons/:id/results`, `/seasons/:id/calendar`, `/seasons/:id/simulator`, `/seasons/:id/statistics`, `/seasons/:id/main-event`, `/seasons/:id/players/:id` | One season's own addresses: the same screens as `/`, `/results`, `/calendar`, `/simulator`, `/statistics`, `/main-event` and `/players/:id`, showing that season | players |
-| `/nights/:id` | Night: details, attendance ("ALL IN" / "FOLD"), the partial result while open, result, "Abrir", "Remarcar", "Cancelar evento", "Finalizar", "Editar resultado", "Editar evento" | players; actions for results keepers |
+| `/nights/:id` | Night: details, attendance ("ALL IN" / "FOLD"), the partial result while open (on a site with the night dashboard, the dashboard's amounts and the way to it instead), result, "Abrir", "Remarcar", "Cancelar evento", "Finalizar", "Editar resultado", "Editar evento" | players; actions for results keepers |
 | `/nights/:id/edit` | Edit a night ("Editar evento"): place, description and whether it is extra | results keepers and admins while scheduled; admins once open or finished |
-| `/nights/:id/result` | Results form: pot, Main Event pot, time chip, finishing order, live points. On an open night it starts from the partial result | results keepers, admins |
+| `/nights/:id/result` | Results form: pot, Main Event pot, time chip, finishing order, live points. On an open night it starts from the partial result, or from the night dashboard on a site that has it | results keepers, admins |
 | `/nights/:id/main-event-result` | Result form of a Main Event night: one player per position, the 1st place first, as many as are known | results keepers, admins |
-| `/nights/:id/partial-result` | Partial result form ("Resultado parcial"): the same fields, all optional, saved any number of times | active players, results keepers, admins |
+| `/nights/:id/partial-result` | Partial result form ("Resultado parcial"): the same fields, all optional, saved any number of times. On a site with the night dashboard it leads to the dashboard | active players, results keepers, admins |
+| `/nights/:id/dashboard` | "Painel do evento", on a site that has it: a screen of its own with no header and no menus, for a phone at the table. Each participant's buy-in, time chip and rebuys as chips that one tap turns on or off; the house owner; the players not confirmed yet; the positions and the Main Event pot of an open night; the pot, the time chip and the total always in sight. It refreshes every 10 seconds | players; changes for active players, results keepers and admins while the night is open, and for admins once it is finished |
 | `/simulator` | Ranking simulator | players |
 | `/statistics`, `/statistics/all` | Statistics of the selected season, and of every season: top ten lists and two charts | players |
 | `/players`, `/players?view=detailed` | Players, as a list or with the memos | players |
@@ -106,7 +107,7 @@ A site turns a part of the product off in `features` of its `site.json`
   against it and stops the build on a name it does not know.
 - **A screen asks `hasFeature('timeChip')`** of `src/lib/features.ts`, and leaves out the field, the row or the
   link when the answer is no. Hiding is cosmetic: the API refuses the feature too.
-- **The demo site has every feature**, the Main Event and the house owner's buy-in too, which it turns on in `site/site.json`. So a test or a story shows the other way with `overrideFeatures` (a test)
+- **The demo site has every feature**, the Main Event, the house owner's buy-in and the night dashboard too, which it turns on in `site/site.json`. So a test or a story shows the other way with `overrideFeatures` (a test)
   or the decorator `withFeatures` of `src/mocks/withFeatures.tsx` (a story).
 - To add a flag, follow "Adding a feature flag" in [backend-layers.md](backend-layers.md).
 
@@ -180,8 +181,12 @@ The address says which season: `/results` is the current season and `/seasons/7/
 ## Footer
 
 Every page ends with `SiteFooter` (`features/layout/SiteFooter.tsx`), which shows the site's version, for example
-"Liga Demo v2.1.0". No single layout wraps every route, so the footer is in each of the three page frames:
-`AppLayout`, `AuthShell` (the screens before login) and `ErrorPage`. A new frame must add it too.
+"Liga Demo v2.1.0". No single layout wraps every route, so the footer is in each of the four page frames:
+`AppLayout`, `AuthShell` (the screens before login), `BareLayout` and `ErrorPage`. A new frame must add it too.
+
+`BareLayout` (`features/layout/BareLayout.tsx`) is the frame of a screen that fills the phone, with no header and
+no menus: the night dashboard. It sends a visitor who is not logged in to the login page, as `AppLayout` does.
+Its screen has its own way back to the site.
 
 The version is the constant `__APP_VERSION__`, set at build time in `vite.config.ts` and declared in
 `src/vite-env.d.ts`. Where it comes from: [deployment.md](deployment.md), "Releases".
@@ -225,6 +230,13 @@ only on desktop also exists on another screen.
   positions, the admin lists, the audit log, the seasons list), use
   `even:bg-surface-stripe`. The first and last cell have side padding, so the text does not touch the stripe's
   edge.
+- **One tap, one change, on the night dashboard.** A mark is a chip that one tap turns on or off (`ToggleChip`),
+  saved at once with no "Salvar". The screen shows the change before the API answers
+  (`features/dashboard/dashboardMoney.ts` has the API's rules for it) and puts it back if the API refuses. The
+  changes of a night are sent one at a time, in order.
+- **Only the night dashboard refreshes by itself.** It asks the API again every 10 seconds while it is on screen
+  ([0022](../decisions/0022-polling-for-the-night-dashboard.md)). Every other screen is read again when the
+  window gets the focus back.
 - **The API decides.** Screens show the API's messages. Permissions come from `GET /me` `abilities`; hiding an
   action is cosmetic.
 - **Every component and screen state has a story.** Empty, loading, error, long text, phone width.

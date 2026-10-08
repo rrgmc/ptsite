@@ -37,7 +37,8 @@ After changing `brandColor` or `logo`, run `npm run icons` in `frontend/`. It dr
 ## Features
 
 A league that does not use a part of the site turns it off in `features`, and turns on the ones that are off
-unless asked for. A site that names none has every feature but the Main Event and the house owner's buy-in:
+unless asked for. A site that names none has every feature but the Main Event, the house owner's buy-in and the
+night dashboard:
 
 ```json
 "features": { "mainEventPot": false, "timeChip": false, "mainEvent": true, "houseOwnerBuyIn": true }
@@ -50,6 +51,7 @@ unless asked for. A site that names none has every feature but the Main Event an
 | `seasonPlanner` | on | "Planejar datas": the calendar that schedules a season's regular nights at once. | "Administração" has no "Planejar datas". Nights are scheduled one at a time with "+ Agendar". The holiday table and the season calendar stay. |
 | `mainEvent` | off | "Main Event": a season's final game, as a night of its own type that records the order of its players, with no pot and no points. | A night cannot be scheduled as a Main Event, the menu has no "Main Event", and "Temporadas" shows no Main Event champion. Extra nights stay. |
 | `houseOwnerBuyIn` | off | "Buy-in do dono da casa": a season's smaller buy-in for the owner of the house where the night is played. | A season's form has no "Buy-in do dono da casa". |
+| `nightDashboard` | off | "Painel do evento": a screen for a phone at the table that records who paid the buy-in, the rebuys and the time chips of a night, and works out its pot and time chip. It holds the night's partial result, and "Finalizar" starts from it. | A night has no dashboard and records no payments. The partial result has its own form with a typed pot and time chip, and only results keepers and admins answer ALL IN or FOLD for other players. |
 
 The build stops on a name that is not in this table, or on a value that is not `true` or `false`.
 
