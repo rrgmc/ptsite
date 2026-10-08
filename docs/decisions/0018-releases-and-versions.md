@@ -9,8 +9,8 @@ A deployed site needs to say which build it runs. Without tags and releases, and
 holding the template's `0.0.0`, a problem report cannot name a version and a deploy cannot be traced to a
 commit.
 
-Two rules of this repository shape the choice. `master` changes only through a pull request (PR), and CI
-minutes are limited, about 15 for each PR that touches code.
+Two rules of this repository shape the choice. `master` changes only through a pull request (PR), and every
+PR waits for the whole set of tests.
 
 ## Decision
 
@@ -27,7 +27,7 @@ The steps are in [RELEASE.md](../../RELEASE.md).
 
 ## Consequences
 
-- A release needs no commit, no PR and no test run, so it costs about 3 CI minutes.
+- A release needs no commit, no PR and no test run. Its workflow takes about 3 minutes.
 - Every build has a version, also between releases: `v2.1.0-3-gabc1234` names the commit.
 - The package of a release is built once, on GitHub, and kept with the release. The site can run exactly that
   file.
@@ -38,11 +38,11 @@ The steps are in [RELEASE.md](../../RELEASE.md).
 
 ## Alternatives considered
 
-- **The version in `frontend/package.json`, raised by a commit.** The commit would need a PR and its 15
-  minutes of tests for every release, and the file and the tag could disagree.
+- **The version in `frontend/package.json`, raised by a commit.** The commit would need a PR and its run
+  of the tests for every release, and the file and the tag could disagree.
 - **A calendar version, such as `2026.10.1`.** It says when, which the tag's date already says, and it does
   not tell a fix from a new feature.
 - **The commit hash only.** It needs no process, but a hash is hard to say or compare, and gives no release
   notes.
-- **The release made on a developer's machine.** No CI minutes, but the package would depend on that machine,
+- **The release made on a developer's machine.** No workflow to wait for, but the package would depend on that machine,
   and nothing would be attached to the release.

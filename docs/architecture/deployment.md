@@ -9,12 +9,12 @@ so the site is built on a developer's machine or in CI and uploaded as a zip.
 
 ## Build (CI)
 
-The tests of one pull request take about 6 minutes, in seven jobs.
+The tests of one pull request take about 4 minutes, in nine jobs and one that sums them up.
 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs each thing once:
 
 | When | What runs |
 |---|---|
-| A pull request | The tests: backend, frontend, Storybook in two jobs, end to end in two jobs |
+| A pull request | The tests: backend, frontend, Storybook in two jobs, end to end in four jobs |
 | A push to `master`, which is a merged pull request | Nothing. The pull request already ran the tests |
 | Started by hand (`gh workflow run ci.yml`, or "Run workflow" on GitHub) | The `package` job only |
 | A version tag (`vX.Y.Z`) is pushed | [`release.yml`](../../.github/workflows/release.yml), about 3 minutes. See "Releases" |

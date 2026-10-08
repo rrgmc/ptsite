@@ -145,11 +145,11 @@ jobs:
       - run: npm run build
 
   storybook:
-    name: Storybook ${{ matrix.shard }}/2 (every story renders and passes axe)
+    name: Storybook ${{ matrix.shard }}/${{ strategy.job-total }} (every story renders and passes axe)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    # Two jobs, each with half of the stories, as for the end-to-end tests below: the runner's cores are the
-    # limit, so only a second runner makes this faster.
+    # Two jobs, each with half of the stories. A job is about half setup already, and the end-to-end jobs below
+    # take longer, so more jobs here would not shorten a run.
     strategy:
       fail-fast: false
       matrix:
@@ -167,18 +167,19 @@ jobs:
       - run: npm ci && npx playwright install --with-deps chromium
       - run: npm run build-storybook
       - name: Every story renders and passes axe
-        run: npm run test:storybook -- --shard=${{ matrix.shard }}/2
+        run: npm run test:storybook -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
   e2e:
-    name: End-to-end ${{ matrix.shard }}/2 (phone and desktop, axe)
+    name: End-to-end ${{ matrix.shard }}/${{ strategy.job-total }} (phone and desktop, axe)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    # Two jobs, each with half of the test files: the tests are the slowest part of CI, and this halves the wait.
-    # When one half fails the other still finishes, so one run shows every failing test.
+    # Four jobs, each with a quarter of the test files: the tests are the slowest part of CI. Each job spends
+    # about a minute and a half on setup, so more jobs than this gain little. When one job fails the others
+    # still finish, so one run shows every failing test.
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4]
     services:
       mysql:
         image: mysql:5.7
@@ -213,7 +214,7 @@ jobs:
         run: php -i | grep -E '^opcache\.(enable|enable_cli|jit|jit_buffer_size) '
       # One job runs both sizes at once, so it takes less time.
       - name: End-to-end tests, phone and desktop side by side
-        run: npm run test:e2e:parallel -- --shard=${{ matrix.shard }}/2
+        run: npm run test:e2e:parallel -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
         working-directory: frontend
         env:
           E2E_GDB: '1'
