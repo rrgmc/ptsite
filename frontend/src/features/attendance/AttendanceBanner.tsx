@@ -4,6 +4,7 @@ import { Button } from '@/components/Button'
 import { t } from '@/i18n'
 import { rich } from '@/i18n/rich'
 import { formatWeekday } from '@/lib/format'
+import { NightMark } from '../nights/NightMark'
 import type { Answer } from './AttendancePanel'
 
 const labels: Record<Answer, string> = { all_in: t.attendance.allIn, fold: t.attendance.fold }
@@ -29,7 +30,7 @@ export function AttendanceBanner({
     <aside aria-label={t.attendance.banner.label} className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-md bg-primary-soft p-3">
       <p className="min-w-0 wrap-anywhere">
         <Link to={nightPath} className="font-semibold underline">{t.attendance.banner.title({ weekday: formatWeekday(night.starts_at) })}</Link>
-        <span className="text-muted"> · {night.place?.name ?? t.nights.noPlace}</span>
+        <span className="text-muted"> · {night.place?.name ?? t.nights.noPlace}</span> <NightMark night={night} />
         <span className="block">
           {answer ? rich(t.attendance.banner.you, { answer: <strong>{labels[answer]}</strong> }) : t.attendance.banner.confirmPresence}
         </span>

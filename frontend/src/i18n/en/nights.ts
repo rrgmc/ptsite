@@ -12,6 +12,12 @@ export const nights: Messages['nights'] = {
   nightOrder: 'Night standings',
   partialResult: 'Partial result',
 
+  marks: {
+    mainEvent: 'Main Event',
+    extra: 'Extra',
+  },
+  mainEventTitlePrefix: 'Main Event',
+
   status: {
     scheduled: 'Scheduled',
     open: 'Open',
@@ -67,6 +73,8 @@ export const nights: Messages['nights'] = {
     onlyAdminsEdit: 'Only admins edit an open or finished night.',
     description: 'Description',
     descriptionHelp: "Shown on the night's page.",
+    extra: 'Extra night',
+    extraHelp: "It is outside the season's calendar: it is not a round and may be on the same day as another night. Its points count like any night's.",
   },
 
   // The partial result card

@@ -231,6 +231,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/seasons/{season}/main-event/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a past Main Event in one step, saved as finished ("Importar"). Results keepers and admins. A
+         *     finished season takes it too
+         */
+        post: operations["mainEvent.import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/main-event-result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enter or correct the result of a Main Event night ("Finalizar"). Results keepers and admins */
+        post: operations["mainEvent.finish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/seasons/{season}/nights": {
         parameters: {
             query?: never;
@@ -238,10 +275,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The season's nights, oldest first, with results. Accepts status and updated_since filters */
+        /**
+         * The season's nights, oldest first, with results: the rounds, the extra nights and the Main Event night.
+         *     Accepts status and updated_since filters
+         */
         get: operations["season.nights"];
         put?: never;
-        /** Schedule a night in a season ("Adicionar"). Results keepers and admins */
+        /**
+         * Schedule a night in a season ("Adicionar"). Results keepers and admins. An extra night is not a round and may
+         *     share its date. A Main Event night is always extra, and a season takes one
+         */
         post: operations["night.store"];
         delete?: never;
         options?: never;
@@ -300,8 +343,8 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * "Editar evento": change a night's place or description. Results keepers and admins for a scheduled night;
-         *     only admins for an open or finished one
+         * "Editar evento": change a night's place or description, or whether it is extra. Results keepers and admins
+         *     for a scheduled night; only admins for an open or finished one
          */
         patch: operations["night.update"];
         trace?: never;
@@ -366,7 +409,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Enter or correct a night's results ("Finalizar"). Points are calculated from the pot */
+        /**
+         * Enter or correct a night's results ("Finalizar"). Points are calculated from the pot. A Main Event night is
+         *     finished with POST nights/{night}/main-event-result
+         */
         post: operations["night.finish"];
         delete?: never;
         options?: never;
@@ -866,8 +912,12 @@ export interface components {
                 id: number | null;
                 /** @enum {string} */
                 status: "scheduled" | "open" | "finished";
+                /** @enum {string} */
+                type: "regular" | "main_event";
+                /** @description Outside the season's calendar: not a round. Always true for a Main Event. */
+                is_extra: boolean;
                 place: string | null;
-                /** @description Nickname of the 1st place, for finished nights. */
+                /** @description Nickname of the 1st place, for finished nights. A Main Event has one too. */
                 winner: string | null;
                 pot: string | null;
                 /** @description How many players answered ALL IN. */
@@ -907,6 +957,11 @@ export interface components {
             password: string;
             /** @description A name for the device or app, shown when managing tokens. */
             device_name: string;
+        };
+        /** FinishMainEventNightRequest */
+        FinishMainEventNightRequest: {
+            /** @description Player ids in finishing order, the 1st place first. At least one, and nobody twice. */
+            player_ids: number[];
         };
         /** FinishNightRequest */
         FinishNightRequest: {
@@ -959,6 +1014,15 @@ export interface components {
          * @enum {string}
          */
         HolidayScope: "national" | "state" | "city";
+        /** ImportMainEventNightRequest */
+        ImportMainEventNightRequest: {
+            /** Format: date-time */
+            starts_at: string;
+            place_id?: number | null;
+            description?: string | null;
+            /** @description Player ids in finishing order, the 1st place first. At least one, and nobody twice. */
+            player_ids: number[];
+        };
         /** ImportNightRequest */
         ImportNightRequest: {
             /** Format: date-time */
@@ -969,6 +1033,8 @@ export interface components {
             main_event_pot?: string | null;
             /** @description Required, unless the site has no time chip: then it is not kept. */
             time_chip?: string | null;
+            /** @description An extra night is outside the season's calendar: not a round, and it may share its date. */
+            is_extra?: boolean;
             positions: {
                 position: number;
                 player_id: number;
@@ -1005,6 +1071,13 @@ export interface components {
             starts_at: string;
             /** @enum {string} */
             status: "scheduled" | "open" | "finished";
+            /**
+             * @description What the result is. regular: a pot and points. main_event: the order of the players, with no pot.
+             * @enum {string}
+             */
+            type: "regular" | "main_event";
+            /** @description Outside the season's calendar: not a round, and it may share its date. Always true for a Main Event. */
+            is_extra: boolean;
             description: string | null;
             pot: string | null;
             main_event_pot: string | null;
@@ -1014,6 +1087,11 @@ export interface components {
             results?: {
                 position: number;
                 points: string;
+                player: components["schemas"]["PlayerResource"];
+            }[];
+            /** @description The result of a Main Event night: its players in finishing order. Empty on any other night. */
+            main_event_positions?: {
+                position: number;
                 player: components["schemas"]["PlayerResource"];
             }[];
             updated_at: string | null;
@@ -1297,6 +1375,13 @@ export interface components {
             starts_at: string;
             place_id?: number | null;
             description?: string | null;
+            /**
+             * @description regular when left out. main_event only on a site that has the Main Event; a season takes one.
+             * @enum {string}
+             */
+            type?: "regular" | "main_event";
+            /** @description An extra night is outside the season's calendar: not a round, and it may share its date. */
+            is_extra?: boolean;
         };
         /** ScheduleNightsRequest */
         ScheduleNightsRequest: {
@@ -1342,6 +1427,7 @@ export interface components {
             rows: components["schemas"]["StandingResource"][];
             /** @description Players left out who have the same total as the last one shown. */
             tied_not_shown: number;
+            main_event_champion: components["schemas"]["PlayerResource"] | null;
         };
         /** SimulateRequest */
         SimulateRequest: {
@@ -1448,6 +1534,8 @@ export interface components {
         UpdateNightRequest: {
             place_id?: number | null;
             description?: string | null;
+            /** @description Whether the night is outside the season's calendar. Not changed on a Main Event night. */
+            is_extra?: boolean;
         };
         /**
          * UpdatePlaceRequest
@@ -2000,6 +2088,70 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "mainEvent.import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The season ID */
+                season: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportMainEventNightRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "mainEvent.finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FinishMainEventNightRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "season.nights": {

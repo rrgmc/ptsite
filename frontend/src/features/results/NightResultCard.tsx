@@ -4,10 +4,11 @@ import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { PlayerLink } from '@/components/PlayerLink'
 import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
 import { amountRows } from '../nights/amounts'
+import { NightMark } from '../nights/NightMark'
 
 /**
  * A finished night: who finished in each scoring position, then the night's amounts.
- * `number` is the night's place in its season, counting from 1.
+ * `number` is the night's place in its season, counting from 1. An extra night has no number, and is marked.
  */
 export function NightResultCard({ night, number }: { night: Night; number?: number }) {
   const amounts = amountRows({ pot: night.pot, mainEventPot: night.main_event_pot, timeChip: night.time_chip })
@@ -16,8 +17,9 @@ export function NightResultCard({ night, number }: { night: Night; number?: numb
     // On a phone the rows are shorter and the card has less padding, so that a night takes less of the screen.
     <article className="rounded-lg bg-surface p-2 shadow-card sm:p-4">
       <header className="mb-2 px-1 sm:px-0">
-        <h3 className="font-display font-bold">
+        <h3 className="flex flex-wrap items-center gap-2 font-display font-bold">
           <Link to={`/nights/${night.id}`} className="hover:underline">{nightTitle(night.starts_at, number)}</Link>
+          <NightMark night={night} />
         </h3>
       </header>
       <ol className="divide-y divide-border/60">

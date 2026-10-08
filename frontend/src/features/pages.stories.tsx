@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw'
 import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { RouterStory } from '@/mocks/RouterStory'
 import { handlers } from '@/mocks/handlers'
-import { keeper, openNight, partialResult, players, statisticsEmpty } from '@/mocks/data'
+import { extraNight, finishedNight, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, statisticsEmpty } from '@/mocks/data'
 import { PlaceEditPage, PlacesAdmin } from './admin/PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './admin/PlayersAdmin'
 import { SeasonEditPage, SeasonsAdmin } from './admin/SeasonsAdmin'
@@ -12,6 +12,8 @@ import { LoginPage } from './auth/LoginPage'
 import { ResetPasswordPage } from './auth/ResetPasswordPage'
 import { ProfilePage } from './profile/ProfilePage'
 import { AppLayout } from './layout/AppLayout'
+import { MainEventPage } from './mainEvent/MainEventPage'
+import { MainEventResultFormPage } from './mainEvent/MainEventResultFormPage'
 import { NightEditPage } from './nights/NightEditPage'
 import { NightPage, RescheduleForm } from './nights/NightPage'
 import { PartialResultFormPage } from './nights/PartialResultFormPage'
@@ -43,6 +45,66 @@ export const ResultsNoFinishedNight: StoryObj = {
     ],
   },
   render: () => <RouterStory path="/results" url="/results" element={<ResultsPage />} />,
+}
+
+const seasonNights = (nights: object[]) => [http.get('/api/v1/seasons/:id/nights', () => HttpResponse.json({ data: nights })), ...handlers]
+
+/** "Resultados" of a season with an extra night and its Main Event: neither has a number, and each is marked. */
+export const ResultsWithExtraAndMainEvent: StoryObj = {
+  parameters: { msw: seasonNights([finishedNight, extraNight, mainEventNight]) },
+  render: () => <RouterStory path="/results" url="/results" element={<ResultsPage />} />,
+}
+
+/** "Main Event": the season's Main Event after it was played, with the season's Main Event pot. */
+export const MainEvent: StoryObj = {
+  parameters: { msw: seasonNights([finishedNight, mainEventNight]) },
+  render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
+}
+
+/** The Main Event night is open: the screen gives its day and place and leads to the night, for the answers. */
+export const MainEventNotPlayed: StoryObj = {
+  parameters: { msw: seasonNights([finishedNight, openMainEventNight]) },
+  render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
+}
+
+/** A season with no Main Event night. A results keeper can record one that was already played. */
+export const MainEventNotScheduled: StoryObj = {
+  render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
+}
+
+/** The same screen for a player: nothing to record. */
+export const MainEventNotScheduledAsPlayer: StoryObj = {
+  parameters: { msw: [http.get('/api/v1/me', () => HttpResponse.json({ data: { ...keeper, role: 'player', abilities: { ...keeper.abilities, run_nights: false } } })), ...handlers] },
+  render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
+}
+
+/** Recording a Main Event that was already played: its day, its place and its players in order. */
+export const MainEventRecordPast: StoryObj = {
+  render: () => <RouterStory path="/main-event" url="/main-event" element={<MainEventPage />} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByRole('button', { name: 'Registrar um Main Event já jogado' }))
+    await canvas.findByRole('form', { name: 'Registrar Main Event já jogado' })
+  },
+}
+
+/** An open Main Event night: the answers, and no partial result. */
+export const MainEventNight: StoryObj = {
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/14" element={<NightPage />} />,
+}
+
+/** A finished Main Event night, with the order of its players. */
+export const MainEventNightFinished: StoryObj = {
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/13" element={<NightPage />} />,
+}
+
+/** "Finalizar" for a Main Event night: one picker for the 1st place, and one more after each player chosen. */
+export const MainEventResultForm: StoryObj = {
+  render: () => <RouterStory path="/nights/:nightId/main-event-result" url="/nights/14/main-event-result" element={<MainEventResultFormPage />} />,
+}
+
+/** Correcting the result of a finished Main Event. */
+export const MainEventResultFormCorrecting: StoryObj = {
+  render: () => <RouterStory path="/nights/:nightId/main-event-result" url="/nights/13/main-event-result" element={<MainEventResultFormPage />} />,
 }
 
 /** A screen inside the site's header and menus. The header names the season on screen and leads to "Temporadas". */

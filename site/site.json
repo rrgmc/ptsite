@@ -8,5 +8,8 @@
   "currency": "BRL",
   "timeZone": "America/Sao_Paulo",
   "brandColor": "#14532d",
-  "siteDomain": ""
+  "siteDomain": "",
+  "features": {
+    "mainEvent": true
+  }
 }

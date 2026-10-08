@@ -12,6 +12,8 @@ export const FEATURE_DEFAULTS = {
   timeChip: true,
   /** "Planejar datas": the calendar that schedules a season's regular nights at once. */
   seasonPlanner: true,
+  /** "Main Event": a night of its own type, finished with the order of its players and no points. Off unless a site turns it on. */
+  mainEvent: false,
 }
 
 export type FeatureName = keyof typeof FEATURE_DEFAULTS

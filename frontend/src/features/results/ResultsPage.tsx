@@ -10,11 +10,15 @@ import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { formatMoney, formatWeekday, formatTime } from '@/lib/format'
+import { hasFeature } from '@/lib/features'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
+import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
 import { amountRows } from '../nights/amounts'
+import { NightMark } from '../nights/NightMark'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { NightResultCard } from './NightResultCard'
 import { NightSuggestions } from './NightSuggestions'
+import { numberRounds } from './rounds'
 import { suggestionValue } from './suggestionValue'
 
 // The chart loads apart from the page, so the chart library stays out of the main bundle.
@@ -33,8 +37,10 @@ export function ResultsPage() {
   if (!season) return <Empty>{t.results.noSeason}</Empty>
 
   const all = nights.data ?? []
-  // Each finished night with its number in the season, newest first.
-  const finished = all.filter((n) => n.status === 'finished').map((night, i) => ({ night, number: i + 1 })).reverse()
+  // Each finished night with its number in the season, newest first. Only a round has a number.
+  const finished = numberRounds(all).reverse()
+  // A season takes one Main Event night, on a site that has the Main Event.
+  const canAddMainEvent = hasFeature('mainEvent') && !all.some((n) => n.type === 'main_event' && !n.archived)
   const upcoming = all.filter((n) => n.status !== 'finished')
   const canRun = me.data?.abilities.run_nights && !season.is_finished
 
@@ -50,7 +56,7 @@ export function ResultsPage() {
               {t.results.overPlanned({ planned: season.nights_planned ?? 0, rounds: season.rounds })}
             </p>
           )}
-          {scheduling && <ScheduleForm seasonId={season.id} defaultPlaceId={season.default_place?.id} defaultTime={season.schedule.time} onDone={(id) => { setScheduling(false); if (id) navigate(`/nights/${id}`) }} />}
+          {scheduling && <ScheduleForm seasonId={season.id} defaultPlaceId={season.default_place?.id} defaultTime={season.schedule.time} canAddMainEvent={canAddMainEvent} onDone={(id) => { setScheduling(false); if (id) navigate(`/nights/${id}`) }} />}
           <ul className="flex flex-col gap-1">
             {upcoming.map((n) => (
               <li key={n.id}>
@@ -59,7 +65,10 @@ export function ResultsPage() {
                     <span className="font-semibold">{formatWeekday(n.starts_at)}</span>
                     <span className="text-muted"> · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>
                   </span>
-                  <Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{n.status === 'open' ? t.nights.status.open : t.nights.status.scheduled}</Badge>
+                  <span className="flex flex-wrap items-center gap-2">
+                    <NightMark night={n} />
+                    <Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{n.status === 'open' ? t.nights.status.open : t.nights.status.scheduled}</Badge>
+                  </span>
                 </Link>
               </li>
             ))}
@@ -99,14 +108,16 @@ export function ResultsPage() {
         <Empty>{t.results.noFinished}</Empty>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-          {finished.map(({ night, number }) => <NightResultCard key={night.id} night={night} number={number} />)}
+          {finished.map(({ night, number }) =>
+            night.type === 'main_event' ? <MainEventResultCard key={night.id} night={night} /> : <NightResultCard key={night.id} night={night} number={number} />,
+          )}
         </div>
       )}
     </>
   )
 }
 
-function ScheduleForm({ seasonId, defaultPlaceId, defaultTime, onDone }: { seasonId: number; defaultPlaceId?: number; defaultTime: string; onDone: (nightId?: number) => void }) {
+function ScheduleForm({ seasonId, defaultPlaceId, defaultTime, canAddMainEvent, onDone }: { seasonId: number; defaultPlaceId?: number; defaultTime: string; canAddMainEvent: boolean; onDone: (nightId?: number) => void }) {
   const suggestions = useNightSuggestions(seasonId)
   if (suggestions.isPending) return <Loading label={t.results.scheduleForm.loadingSuggestions} />
 
@@ -119,10 +130,13 @@ function ScheduleForm({ seasonId, defaultPlaceId, defaultTime, onDone }: { seaso
       initialDate={regular ? suggestionValue(regular).date : ''}
       initialTime={regular ? suggestionValue(regular).time : defaultTime}
       defaultPlaceId={defaultPlaceId}
+      canAddMainEvent={canAddMainEvent}
       onDone={onDone}
     />
   )
 }
+
+type Kind = 'round' | 'extra' | 'mainEvent'
 
 function ScheduleFields({
   seasonId,
@@ -130,6 +144,7 @@ function ScheduleFields({
   initialDate,
   initialTime,
   defaultPlaceId,
+  canAddMainEvent,
   onDone,
 }: {
   seasonId: number
@@ -137,6 +152,7 @@ function ScheduleFields({
   initialDate: string
   initialTime: string
   defaultPlaceId?: number
+  canAddMainEvent: boolean
   onDone: (nightId?: number) => void
 }) {
   const places = usePlaces()
@@ -144,6 +160,13 @@ function ScheduleFields({
   const [date, setDate] = useState(initialDate)
   const [time, setTime] = useState(initialTime)
   const [placeId, setPlaceId] = useState<number | null>(defaultPlaceId ?? null)
+  // A round of the season, a night outside its calendar, or the season's Main Event.
+  const [kind, setKind] = useState<Kind>('round')
+  const kinds = [
+    { id: 'round', label: t.results.scheduleForm.kinds.round },
+    { id: 'extra', label: t.results.scheduleForm.kinds.extra },
+    ...(canAddMainEvent ? [{ id: 'mainEvent', label: t.results.scheduleForm.kinds.mainEvent }] : []),
+  ]
   const error = schedule.error instanceof ApiError ? schedule.error : null
   const chosen = suggestions.find((s) => suggestionValue(s).date === date && suggestionValue(s).time === time)
 
@@ -152,7 +175,10 @@ function ScheduleFields({
       className="mb-4 grid grid-cols-1 gap-3 rounded-md bg-surface-sunken p-3 sm:grid-cols-3"
       onSubmit={(e) => {
         e.preventDefault()
-        schedule.mutate({ starts_at: `${date} ${time}:00`, place_id: placeId }, { onSuccess: (night) => onDone(night.id) })
+        schedule.mutate(
+          { starts_at: `${date} ${time}:00`, place_id: placeId, ...(kind === 'mainEvent' ? { type: 'main_event' as const } : { is_extra: kind === 'extra' }) },
+          { onSuccess: (night) => onDone(night.id) },
+        )
       }}
     >
       {suggestions.length > 0 && (
@@ -170,7 +196,11 @@ function ScheduleFields({
       <TextField label={t.common.date} type="date" value={date} onChange={setDate} isRequired errorMessage={error?.fieldError('starts_at')} />
       <TextField label={t.results.scheduleForm.time} type="time" value={time} onChange={setTime} isRequired />
       <Select label={t.common.place} options={(places.data ?? []).map((p) => ({ id: p.id, label: p.name }))} selectedKey={placeId} onSelectionChange={(k) => setPlaceId(k === null ? null : Number(k))} />
-      {error && !error.fieldError('starts_at') && <p role="alert" className="text-danger sm:col-span-3">{error.body.message}</p>}
+      <div className="sm:col-span-3">
+        <Select label={t.results.scheduleForm.kind} options={kinds} selectedKey={kind} onSelectionChange={(k) => setKind((k as Kind | null) ?? 'round')} errorMessage={error?.fieldError('type')} />
+        {kind !== 'round' && <p className="mt-1 text-sm text-muted">{kind === 'extra' ? t.results.scheduleForm.extraHelp : t.results.scheduleForm.mainEventHelp}</p>}
+      </div>
+      {error && !error.fieldError('starts_at') && !error.fieldError('type') && <p role="alert" className="text-danger sm:col-span-3">{error.body.message}</p>}
       <div className="flex gap-2 sm:col-span-3">
         <Button type="submit" isPending={schedule.isPending}>{t.results.scheduleForm.submit}</Button>
         <Button variant="ghost" onPress={() => onDone()}>{t.common.cancel}</Button>

@@ -2,15 +2,18 @@ import { useSeasonsTopStandings } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
+import { PlayerLink } from '@/components/PlayerLink'
+import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { t } from '@/i18n'
+import { hasFeature } from '@/lib/features'
 import { formatDate } from '@/lib/format'
 import { SeasonBadge } from './SeasonBadge'
 import { SeasonTopTen } from './SeasonTopTen'
 import { usePickSeason } from './usePickSeason'
 
 /**
- * "Temporadas", from the menu: every season, newest first, each with the first ten of its standings. A season can
- * be made the one that every screen shows.
+ * "Temporadas", from the menu: every season, newest first, each with the first ten of its standings and, on a
+ * site that has the Main Event, its Main Event champion. A season can be made the one that every screen shows.
  */
 export function SeasonsPage() {
   const seasons = useSeasonsTopStandings()
@@ -26,7 +29,7 @@ export function SeasonsPage() {
         <Empty>{t.seasons.noSeason}</Empty>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {seasons.data.map(({ season, rows, tied_not_shown }) => (
+          {seasons.data.map(({ season, rows, tied_not_shown, main_event_champion: champion }) => (
             <Card
               key={season.id}
               title={season.name}
@@ -46,6 +49,14 @@ export function SeasonsPage() {
               <p className="-mt-2 mb-2 text-sm text-muted">
                 {t.seasons.started({ date: formatDate(season.starts_on), count: season.nights_count ?? 0 })}
               </p>
+              {hasFeature('mainEvent') && champion && (
+                <p className="mb-2 flex flex-wrap items-center gap-2 rounded-md bg-surface-sunken px-2 py-1">
+                  <span aria-hidden>🏅</span>
+                  <span className="font-semibold">{t.seasons.mainEventChampion}</span>
+                  <PlayerThumbnail player={champion} size="xs" />
+                  <PlayerLink player={champion} className="min-w-0 font-semibold" />
+                </p>
+              )}
               {rows.length === 0 ? (
                 <p className="text-muted">{t.seasons.noResults}</p>
               ) : (
