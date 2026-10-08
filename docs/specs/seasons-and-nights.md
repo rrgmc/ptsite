@@ -10,6 +10,7 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 
 - **Admins** create seasons and their percentage tables.
 - **Results keepers** and **admins** schedule, open and finish nights and enter results.
+- **Admins** undo the opening of a night that was opened by mistake.
 - **Players** see nights and results.
 - **Active players** fill the partial result of the open night.
 
@@ -107,6 +108,13 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 7. A night goes through these states: **scheduled** → **open** → **finished**.
 8. **Only one night per season can be open at a time.** Opening a second night is refused until the first is
    finished.
+8a. **Desfazer abertura.** An **admin** can make an open night scheduled again, after confirming. It is for a
+   night that was opened by mistake, and it works whatever the night has on record. **What was recorded while
+   the night was open is deleted**: the partial result and, on a site with the night dashboard, its
+   participants, payments, rebuys and house owner ([night-dashboard.md](night-dashboard.md), rule 16a). The
+   attendance answers stay. The night can then be moved, cancelled or opened again, and another night of the
+   season can be opened. The audit log records it, with what was deleted. A scheduled or finished night has no
+   opening to undo; a finished night's result is corrected instead (rule 12).
 9. **Finishing a night** ("Finalizar") records:
    - the **pot** (required, above zero);
    - the **Main Event pot** ("Pote ME", required, zero allowed): the money set aside that night for the Main Event;
@@ -186,7 +194,7 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
     when the night is finished.
 23. When a results keeper or admin opens "Finalizar", the form **starts filled** from the partial result and says
     so, with who saved it last. They change what is needed and finish as usual: all the rules of finishing apply.
-24. **Finishing the night deletes the partial result.** A scheduled or finished night takes none. Saves are not
+24. **Finishing the night deletes the partial result**, and so does undoing its opening (rule 8a). A scheduled or finished night takes none. Saves are not
     recorded in the audit log, whoever makes them; the finish is.
 24a. **On a site with the night dashboard, the dashboard holds the partial result**
     ([night-dashboard.md](night-dashboard.md), rules 13 to 15): each position is saved by itself, the pot and
@@ -252,6 +260,16 @@ Money settings:
   chip", and the API refuses both.
 - **A site without the house owner's buy-in.** The form does not show it and the API refuses it. A season that
   already has one can still change its buy-in.
+
+Undoing an opening:
+
+- **Opened by mistake.** Helena, an admin, meant to open the night of 21/03 and opened the one of 14/03. Ana had
+  already answered ALL IN and saved a partial result with the pot 840,00. Helena taps "Desfazer abertura" and
+  confirms. The night of 14/03 is "Agendado" again and has no partial result; Ana's answer stays. Helena then
+  opens the night of 21/03.
+- **Not an admin.** Maria, a results keeper, has no "Desfazer abertura", and the API refuses her.
+- **Not open.** Undoing the opening of a scheduled or a finished night is refused: "Só é possível desfazer a
+  abertura de um evento aberto."
 
 Moving and cancelling:
 

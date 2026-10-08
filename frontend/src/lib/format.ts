@@ -107,6 +107,14 @@ export function parseSignedMoneyInput(text: string): string | null {
   return amount !== null && isNegative && Number(amount) !== 0 ? `-${amount}` : amount
 }
 
+/**
+ * An API decimal string as typed in a money field, in the site's language: "840.00" → "840,00" in pt-BR. Nothing
+ * when the amount is not known. parseMoneyInput reads it back.
+ */
+export function moneyText(amount: string | null | undefined): string {
+  return amount ? amount.replace('.', decimalSeparator) : ''
+}
+
 /** Points share for display in the simulator and results form: pot × percent ÷ 100, rounded half up. */
 export function shareOf(pot: string, percent: number): string {
   const cents = Math.round(Number(pot) * 100)

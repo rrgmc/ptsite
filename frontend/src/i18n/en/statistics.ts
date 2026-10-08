@@ -5,7 +5,7 @@ export const statistics: Messages['statistics'] = {
   noSeason: 'No seasons yet.',
   allSeasons: 'All seasons',
   noNights: 'No finished nights yet.',
-  summary: ({ count, pot }) => `${count} ${count === 1 ? 'night' : 'nights'} · Total pot ${pot}`,
+  tabs: 'Lists and charts',
 
   // Top ten lists
   totalPoints: 'Total Points',
@@ -17,9 +17,21 @@ export const statistics: Messages['statistics'] = {
   places: 'Places',
   noPlaces: 'No nights with a place.',
   placesCaption: 'Places by number of nights',
-  positionTitle: ({ position }) => `Position: ${position}`,
-  positionCaption: ({ position }) => `Players by times finishing ${position}`,
+  positionTableCaption: 'Players by times in each position',
+  never: '–',
+  highestOfPosition: '(the highest of the position)',
+  showAll: ({ count }) => `Show all (${count})`,
+  showFirst: ({ count }) => `Show only the first ${count}`,
   times: 'Times',
+
+  // The Main Events of every season, on a site that has the Main Event
+  mainEvent: 'Main Event',
+  mainEventTitles: 'Titles',
+  mainEventTitlesCaption: 'Players by Main Events won',
+  mainEventPodiums: 'Podiums',
+  mainEventPodiumsCaption: 'Players by times in the first three of a Main Event',
+  mainEventAppearances: 'Appearances',
+  mainEventAppearancesCaption: 'Players by Main Events played',
 
   // Charts
   pointsProgress: 'Accumulated points',
@@ -34,6 +46,13 @@ export const statistics: Messages['statistics'] = {
   pointsProgressCaption: ({ perSeason }) => `Accumulated points by ${perSeason ? 'season' : 'night'}`,
   winsDescription: ({ top }) =>
     `Bar chart: wins by player.${top ? ` ${top.nickname} has the most: ${top.wins}.` : ''} The numbers are in the table below.`,
+
+  potsPerNight: 'Pot per night',
+  potsPerSeason: 'Pot per season',
+  potsDescription: ({ perSeason, top }) =>
+    `Line chart: pot per ${perSeason ? 'season' : 'night'}.${top ? ` The biggest is ${top.pot}, in ${top.label}.` : ''} The numbers are in the table below.`,
+  placesDescription: ({ top }) =>
+    `Pie chart: nights by place.${top ? ` ${top.name} has the most: ${top.count}.` : ''} The numbers are in the table below.`,
 
   // One player's charts
   positions: 'Positions',

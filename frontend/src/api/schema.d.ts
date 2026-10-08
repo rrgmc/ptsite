@@ -400,6 +400,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/nights/{night}/undo-open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * "Desfazer abertura": make a night opened by mistake scheduled again. Deletes its partial result and what the
+         *     night dashboard recorded; the attendance answers stay. Admins
+         */
+        post: operations["night.undoOpen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/nights/{night}/finish": {
         parameters: {
             query?: never;
@@ -1223,6 +1243,17 @@ export interface components {
             /** @description Keep the login for 30 days. */
             remember?: boolean;
         };
+        /** MainEventStatisticsResource */
+        MainEventStatisticsResource: {
+            /** @description How many finished Main Events count. */
+            count: number;
+            /** @description Players by Main Events won (`count`). */
+            titles: components["schemas"]["RankedListResource"];
+            /** @description Players by times in the first three of a Main Event (`count`). */
+            podiums: components["schemas"]["RankedListResource"];
+            /** @description Players by Main Events played (`count`). */
+            appearances: components["schemas"]["RankedListResource"];
+        };
         /** MarkNightPlayerRequest */
         MarkNightPlayerRequest: {
             /** @description Whether the player paid the buy-in. */
@@ -1856,9 +1887,24 @@ export interface components {
                     player: components["schemas"]["PlayerResource"];
                     points: string[];
                 }[];
+                /** @description The pot of each step, as decimal strings: of the night, or of the season's nights added up. */
+                pots: string[];
             };
             /** @description First places of the players who are not in the first "Posição" list ("Outros"). */
             wins_not_shown: number;
+            /**
+             * @description Every player who scored, with the times in each scoring position (zeros included), ordered as a
+             *     medal table: most 1st places first, then most 2nd places, and so on. Equal lines share a `rank`.
+             */
+            position_table: {
+                rank: number;
+                player: components["schemas"]["PlayerResource"];
+                positions: {
+                    position: number;
+                    count: number;
+                }[];
+            }[];
+            main_event: components["schemas"]["MainEventStatisticsResource"] | null;
         };
         /** SuggestedNightResource */
         SuggestedNightResource: {
@@ -2770,6 +2816,33 @@ export interface operations {
         };
     };
     "night.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `NightResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "night.undoOpen": {
         parameters: {
             query?: never;
             header?: never;

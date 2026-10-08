@@ -152,3 +152,50 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(page.getByRole('heading', { name: 'Resultado registrado' })).toBeVisible()
   await expectAccessible(page)
 })
+
+// "Desfazer abertura" (docs/specs/seasons-and-nights.md, rule 8a), in the same season, whose night above is finished.
+test('an admin undoes the opening of a night opened by mistake, and what its dashboard recorded is deleted', async ({ page }) => {
+  await login(page, 'dev-keeper')
+  await page.goto('results')
+  await pickSeason(page, 'E2E Parcial')
+  await expect(page).toHaveURL(/\/results$/)
+  await page.getByRole('button', { name: '+ Agendar' }).click()
+  await page.getByLabel('Data').fill('2021-03-26')
+  await page.getByRole('button', { name: 'Agendar evento' }).click()
+  await expect(page).toHaveURL(/\/nights\/\d+$/)
+  const nightUrl = page.url()
+  await page.getByRole('button', { name: 'Abrir evento' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
+  await page.getByRole('link', { name: 'Abrir o painel' }).click()
+  await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('jacob')
+  await page.getByRole('group', { name: 'Adicionar Jacobson' }).getByRole('button', { name: 'Buy-in pago' }).click()
+  await expect(totals(page)).toContainText('PoteR$ 50,00Pago R$ 50,00')
+  // A results keeper cannot undo the opening
+  await page.goto(nightUrl)
+  await expect(page.getByRole('link', { name: /Finalizar/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Desfazer abertura' })).toHaveCount(0)
+
+  // An admin can: it asks first, and says what is deleted
+  await logout(page)
+  await login(page, 'dev-admin')
+  await page.goto(nightUrl)
+  await page.getByRole('button', { name: 'Desfazer abertura' }).click()
+  await expect(page.getByRole('alertdialog')).toContainText('tudo o que foi lançado no painel é apagado')
+  await expectAccessible(page)
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Desfazer abertura' }).click()
+  await expect(page.getByText('Agendado', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Painel do evento' })).toHaveCount(0)
+  // The answer the dashboard gave for the player stays
+  await expect(page.getByRole('region', { name: /^Vão jogar/ }).getByRole('listitem')).toHaveCount(1)
+
+  // Opened again, the dashboard starts with the player who answered and no payment
+  await page.getByRole('button', { name: 'Abrir evento' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
+  await page.getByRole('link', { name: 'Abrir o painel' }).click()
+  await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'false')
+  // Undone again, so the season is left with no open night
+  await page.goto(nightUrl)
+  await page.getByRole('button', { name: 'Desfazer abertura' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Desfazer abertura' }).click()
+  await expect(page.getByText('Agendado', { exact: true })).toBeVisible()
+})

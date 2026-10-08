@@ -29,6 +29,19 @@ export const CutTie: Story = {
   args: { rows: [{ key: 1, rank: 1, label: 'Ana', value: 2 }, { key: 2, rank: 2, label: 'Breno', value: 1 }], tiedNotShown: 3 },
 }
 
+/** Short lines and no header line, for a list that stands beside others under its own title. */
+export const Compact: Story = {
+  args: {
+    compact: true,
+    rows: [
+      { key: 1, rank: 1, label: 'Ana', value: 7 },
+      { key: 2, rank: 2, label: 'Breno', value: 5 },
+      { key: 3, rank: 2, label: 'Carlão', value: 5 },
+    ],
+    tiedNotShown: 2,
+  },
+}
+
 export const LongName: Story = {
   args: { rows: [{ key: 1, rank: 1, label: <span className="wrap-anywhere">Casa do Carlão, salão de festas do condomínio</span>, value: 120 }] },
 }

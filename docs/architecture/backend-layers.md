@@ -18,11 +18,12 @@ backend/
                             SaoPauloHolidays (the starting table), SeasonPlanner (a season's dates around holidays)
     Attendance/             AttendanceAnswer, AttendanceRules
     Standings/              Standings, RankingSimulator, ScoreLine, StandingRow, SimulatedRow
-    Statistics/             Statistics (top ten lists and the leaders' running totals), PlayerStatistics (one player's),
-                            Ranking, NightRecord
+    Statistics/             Statistics (top ten lists and the leaders' running totals), MainEventStatistics,
+                            PlayerStatistics (one player's), Ranking, NightRecord
   app/Actions/            one class per change; check policy, call domain, save, audit
     Nights/                 OpenNight, FinishNight, ScheduleNight, ScheduleNights (the planner's batch),
-                            ImportNight, RescheduleNight, CancelNight, UpdateNight (place, description, extra),
+                            ImportNight, RescheduleNight, CancelNight, UndoOpenNight (an opening by mistake),
+                            UpdateNight (place, description, extra),
                             WriteNightResult, NightSnapshot, SavePartialResult, KnownPlayers,
                             FinishMainEventNight, ImportMainEventNight, WriteMainEventResult, MainEventNight
     Nights/Dashboard/       the night dashboard, one change each: MarkNightPlayer, RemoveNightPlayer, AddRebuy,

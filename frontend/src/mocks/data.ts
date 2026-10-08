@@ -282,6 +282,10 @@ const playerList = (values: [player: number, rank: number, value: number][], key
   ...extra,
 })
 
+/** The medal table: each player's times in the 1st, 2nd and 3rd place. */
+const positionTable = (lines: [player: number, rank: number, counts: number[]][]): Statistics['position_table'] =>
+  lines.map(([player, rank, counts]) => ({ rank, player: players[player], positions: counts.map((count, i) => ({ position: i + 1, count })) }))
+
 const potNight = (id: number, day: string, seasonName: string) => ({ id, starts_at: `${day}T21:30:00-03:00`, season_id: 1, season_name: seasonName })
 
 /** One season: five nights, with ties in the lists and a cut tie in "Posição: 3º". */
@@ -329,8 +333,20 @@ export const statistics: Statistics = {
       { player: players[5], points: ['0.00', '0.00', '121.50', '121.50', '248.00'] },
       { player: players[6], points: ['42.00', '42.00', '42.00', '190.20', '190.20'] },
     ],
+    pots: ['840.00', '755.00', '810.00', '900.00', '840.00'],
   },
   wins_not_shown: 0,
+  position_table: positionTable([
+    [0, 1, [2, 1, 0]], [2, 2, [1, 2, 0]], [1, 3, [1, 0, 1]], [7, 3, [1, 0, 1]], [3, 5, [0, 1, 1]], [4, 6, [0, 1, 0]],
+    [5, 7, [0, 0, 1]], [6, 7, [0, 0, 1]], [8, 7, [0, 0, 1]], [9, 7, [0, 0, 1]], [10, 7, [0, 0, 1]], [11, 7, [0, 0, 1]],
+  ]),
+  // The season's own Main Event. The screen lists the Main Events only over every season.
+  main_event: {
+    count: 1,
+    titles: playerList([[2, 1, 1]], 'count'),
+    podiums: playerList([[0, 1, 1], [2, 1, 1], [7, 1, 1]], 'count'),
+    appearances: playerList([[0, 1, 1], [1, 1, 1], [2, 1, 1], [3, 1, 1], [7, 1, 1]], 'count'),
+  },
 }
 
 /** Every season: one step per season, the season named under each pot, and first places left out of the list. */
@@ -361,8 +377,16 @@ export const statisticsAllTime: Statistics = {
       { player: players[5], points: ['1980.75', '2890.00', '3138.00'] },
       { player: players[6], points: ['1400.00', '1400.00', '1590.20'] },
     ],
+    pots: ['27300.00', '29875.00', '4145.00'],
   },
   wins_not_shown: 8,
+  // Three Main Events, with ties in every list.
+  main_event: {
+    count: 3,
+    titles: playerList([[2, 1, 2], [0, 2, 1]], 'count'),
+    podiums: playerList([[0, 1, 3], [2, 1, 3], [7, 3, 2], [1, 4, 1]], 'count'),
+    appearances: playerList([[0, 1, 3], [2, 1, 3], [7, 1, 3], [1, 4, 2], [3, 4, 2], [4, 4, 2], [5, 7, 1], [6, 7, 1], [8, 7, 1], [9, 7, 1]], 'count', { tied_not_shown: 1 }),
+  },
 }
 
 export const statisticsEmpty: Statistics = {
@@ -376,8 +400,10 @@ export const statisticsEmpty: Statistics = {
   positions: [],
   biggest_pots: playerList([], 'amount'),
   places: playerList([], 'count'),
-  points_progress: { steps: [], series: [] },
+  points_progress: { steps: [], series: [], pots: [] },
   wins_not_shown: 0,
+  position_table: [],
+  main_event: null,
 }
 
 /** The memo an admin wrote about Ana, with a line break. */

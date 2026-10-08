@@ -156,6 +156,7 @@ export const LayoutWithAnotherSeason: StoryObj = {
 
 // The partial result as a site without the night dashboard has it: with the dashboard, the dashboard holds it.
 const withoutDashboard = [withFeatures({ nightDashboard: false })]
+const asAdmin = http.get('/api/v1/me', () => HttpResponse.json({ data: { ...keeper, role: 'admin', abilities: { ...keeper.abilities, edit_played_nights: true } } }))
 
 /** An open night before anyone filled the partial result. */
 export const OpenNight: StoryObj = {
@@ -166,6 +167,13 @@ export const OpenNight: StoryObj = {
 /** An open night on a site with the night dashboard: its amounts so far, and the way to the dashboard. */
 export const OpenNightWithDashboard: StoryObj = {
   decorators: [withFeatures({ nightDashboard: true })],
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/11" element={<NightPage />} />,
+}
+
+/** An open night as an admin sees it: "Desfazer abertura" is for a night opened by mistake. */
+export const OpenNightAsAdmin: StoryObj = {
+  decorators: [withFeatures({ nightDashboard: true })],
+  parameters: { msw: [asAdmin, ...handlers] },
   render: () => <RouterStory path="/nights/:nightId" url="/nights/11" element={<NightPage />} />,
 }
 
@@ -335,7 +343,6 @@ export const Rescheduling: StoryObj = {
 
 const scheduledNight = { ...openNight, status: 'scheduled' as const, results: [], description: 'Noite de pizza. Tragam a bebida.' }
 const withScheduledNight = [http.get('/api/v1/nights/:id', () => HttpResponse.json({ data: scheduledNight })), ...handlers]
-const asAdmin = http.get('/api/v1/me', () => HttpResponse.json({ data: { ...keeper, role: 'admin', abilities: { ...keeper.abilities, edit_played_nights: true } } }))
 const nightEdit = (id: number) => <RouterStory path="/nights/:nightId/edit" url={`/nights/${id}/edit`} element={<NightEditPage />} />
 
 /** A scheduled night with a description, as a results keeper sees it: "Abrir", "Remarcar", "Cancelar" and "Editar evento". */

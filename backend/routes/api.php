@@ -57,6 +57,7 @@ Route::prefix('v1')->group(function () {
         Route::post('nights/{night}/reschedule', [NightController::class, 'reschedule']);
         Route::post('nights/{night}/cancel', [NightController::class, 'cancel']);
         Route::post('nights/{night}/open', [NightController::class, 'open']);
+        Route::post('nights/{night}/undo-open', [NightController::class, 'undoOpen']);
         Route::post('nights/{night}/finish', [NightController::class, 'finish']);
         Route::post('nights/{night}/main-event-result', [MainEventController::class, 'finish'])->middleware(RequireFeature::for(Feature::MainEvent));
         Route::get('nights/{night}/attendance', [AttendanceController::class, 'index']);

@@ -283,6 +283,49 @@ it('has no Main Event on a site that did not turn it on', function () {
     $this->postJson("/api/v1/seasons/{$this->season->id}/nights", ['starts_at' => '2026-12-12 13:00', 'type' => 'main_event'])
         ->assertUnprocessable()->assertJsonValidationErrors(['type']);
     $this->getJson('/api/v1/seasons/top-standings')->assertOk()->assertJsonPath('data.0.main_event_champion', null);
+    $this->getJson('/api/v1/statistics')->assertOk()->assertJsonPath('data.main_event', null);
     // A regular night is scheduled as before.
     $this->postJson("/api/v1/seasons/{$this->season->id}/nights", ['starts_at' => '2026-12-12 13:00', 'type' => 'regular'])->assertCreated();
+});
+
+it('counts the titles, the podiums and the appearances of the finished Main Events in the statistics', function () {
+    Sanctum::actingAs(User::factory()->create());
+    $record = function (Season $season, array $players, array $attributes = []): Night {
+        $night = Night::factory()->for($season)->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'finished', ...$attributes]);
+        foreach ($players as $index => $player) {
+            $night->mainEventPositions()->create(['position' => $index + 1, 'player_id' => $player->id]);
+        }
+
+        return $night;
+    };
+    [$ana, $breno, $carla, $dudu] = $this->players;
+    $other = Season::factory()->create();
+    $record($this->season, [$ana, $breno, $carla, $dudu], ['starts_at' => '2026-12-12 13:00:00']);
+    $record($other, [$breno, $ana, $dudu], ['starts_at' => '2027-12-11 13:00:00']);
+    // Not counted: one that is not finished yet, an archived one and the one of an archived season.
+    Night::factory()->for(Season::factory()->create())->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'open']);
+    $record(Season::factory()->create(), [$carla], ['archived_at' => now()]);
+    $record(Season::factory()->create(['archived_at' => now()]), [$carla]);
+
+    $this->getJson('/api/v1/statistics')->assertOk()
+        ->assertJsonPath('data.nights_count', 0)
+        ->assertJsonPath('data.main_event.count', 2)
+        ->assertJsonPath('data.main_event.titles.rows.0.player.id', $ana->id)
+        ->assertJsonPath('data.main_event.titles.rows.0.count', 1)
+        ->assertJsonPath('data.main_event.titles.rows.1.player.id', $breno->id)
+        ->assertJsonPath('data.main_event.titles.rows.1.rank', 1)
+        ->assertJsonCount(2, 'data.main_event.titles.rows')
+        ->assertJsonPath('data.main_event.podiums.rows.0.count', 2)
+        ->assertJsonPath('data.main_event.podiums.rows.2.player.id', $carla->id)
+        ->assertJsonPath('data.main_event.podiums.rows.2.rank', 3)
+        ->assertJsonCount(4, 'data.main_event.podiums.rows')
+        ->assertJsonPath('data.main_event.appearances.rows.2.player.id', $dudu->id)
+        ->assertJsonPath('data.main_event.appearances.rows.2.count', 2)
+        ->assertJsonPath('data.main_event.appearances.rows.3.player.id', $carla->id)
+        ->assertJsonPath('data.main_event.appearances.rows.3.rank', 4);
+
+    $this->getJson("/api/v1/statistics?season={$other->id}")->assertOk()
+        ->assertJsonPath('data.main_event.count', 1)
+        ->assertJsonPath('data.main_event.titles.rows.0.player.id', $breno->id)
+        ->assertJsonCount(3, 'data.main_event.appearances.rows');
 });

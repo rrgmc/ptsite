@@ -61,7 +61,15 @@ it('shows the statistics of every season', function () {
         ->assertJsonPath('data.points_progress.steps.1.season_name', $this->seasonB->name)
         ->assertJsonPath('data.points_progress.series.0.player.id', $this->ana->id)
         ->assertJsonPath('data.points_progress.series.0.points', ['174.00', '288.00'])
-        ->assertJsonPath('data.wins_not_shown', 0);
+        ->assertJsonPath('data.points_progress.pots', ['700.00', '300.00'])
+        ->assertJsonPath('data.wins_not_shown', 0)
+        ->assertJsonCount(7, 'data.position_table')
+        ->assertJsonPath('data.position_table.0.rank', 1)
+        ->assertJsonPath('data.position_table.0.player.id', $this->ana->id)
+        ->assertJsonPath('data.position_table.0.positions.0', ['position' => 1, 'count' => 2])
+        ->assertJsonPath('data.position_table.0.positions.1', ['position' => 2, 'count' => 0])
+        ->assertJsonPath('data.position_table.1.player.id', $this->breno->id)
+        ->assertJsonCount(6, 'data.position_table.0.positions');
 });
 
 it('shows the statistics of one season', function () {
@@ -72,7 +80,8 @@ it('shows the statistics of one season', function () {
         ->assertJsonPath('data.total_points.rows.0.amount', '221.00')
         ->assertJsonPath('data.points_progress.steps.0.night_id', $this->night1->id)
         ->assertJsonPath('data.points_progress.steps.1.night_id', $this->night2->id)
-        ->assertJsonPath('data.points_progress.series.0.points', ['69.00', '221.00']);
+        ->assertJsonPath('data.points_progress.series.0.points', ['69.00', '221.00'])
+        ->assertJsonPath('data.points_progress.pots', ['300.00', '400.00']);
 });
 
 it('leaves out archived nights and, over every season, archived seasons', function () {

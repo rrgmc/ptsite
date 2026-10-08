@@ -38,7 +38,8 @@ A site has the Main Event only if it turns it on (`mainEvent` in `features`, see
    so on, **as many as are known**. Only the 1st place is required. No position is skipped, and the same player
    cannot appear twice. Any active or inactive player can be entered; an archived one cannot.
 6. A Main Event night has **no pot, no Main Event pot, no time chip and no points**, and no partial result. It is
-   left out of the standings, the simulator, the statistics and the players' statistics.
+   left out of the standings, the simulator and the players' statistics. In the statistics it counts in the
+   Main Event lists only ([statistics.md](statistics.md), rule 13).
 7. A finished Main Event night can be **corrected** at any time, by whoever can finish it, also after its season
    is finished. The change is recorded in the audit log.
 8. **A Main Event that was already played** is recorded in one step, by an admin, on the same form: with its
