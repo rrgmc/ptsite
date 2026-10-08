@@ -56,6 +56,7 @@ final class NightDashboard
                     'rebuys' => ($rebuys[$entry->playerId] ?? collect())
                         ->map(fn (NightRebuy $rebuy) => ['id' => $rebuy->id, 'paid' => $rebuy->paid_at !== null, 'non_cash' => $rebuy->paid_at !== null && $rebuy->non_cash])->values()->all(),
                     ...$this->amounts($owes),
+                    'non_cash' => $money->nonCashOf($entry)->toDecimal(),
                 ];
             })->all();
 

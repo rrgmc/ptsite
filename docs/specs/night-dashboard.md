@@ -45,8 +45,9 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 7a. **A paid buy-in and a paid rebuy each say how they were paid**: in cash, or not in cash (a bank transfer, for
    instance). A tap on the mark goes from not paid to paid in cash, then to paid not in cash, then back to not
    paid. Marking a payment as not in cash also marks it as paid. Unmarking it as paid also clears "not in cash".
-   The time chip has no such mark of its own: a late player's time chip counts as paid the way their buy-in
-   was, and a rebuy's time chip the way the rebuy was.
+   A line under the participants says what the two signs mean. The time chip has no such mark of its own: a
+   late player's time chip counts as paid the way their buy-in was, and a rebuy's time chip the way the rebuy
+   was.
 8. **The prices are the season's money settings** (rules 5b to 5f of
    [seasons-and-nights.md](seasons-and-nights.md)). A price the season does not have counts as zero.
 9. **A night has at most one house owner** ("Dono da casa"), picked on the dashboard. Picking one makes them a
@@ -67,8 +68,9 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
       each rebuy paid not in cash, with the time chip it pays; and the adjustment of rule 13c, when there is one;
     - **"Em dinheiro"** (in cash): the total paid, less what was not in cash.
-    The foot of the screen shows both below the total paid, once anything is not in cash. Neither changes the
-    pot, the time chip, what is pending or the night's result.
+    The foot of the screen shows both below the total paid, once anything is not in cash. A player's row says
+    how much that player paid not in cash, beside what they have pending. Neither changes the pot, the time
+    chip, what is pending or the night's result.
 12. **A participant with a mark or a rebuy cannot leave the night**: FOLD, removing the answer and "Remover do
     evento" are refused until the marks and rebuys are removed. A participant with none can be removed, which
     also removes their answer.
@@ -79,15 +81,19 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     chip (on a site with it) and the Main Event pot (on a site with it). **While an amount is not marked, its
     field is closed and shows the amount worked out.** Marking it opens the field, which starts from that
     amount: the amount typed there stands in for the one worked out, for a night that does not record every
-    player's payments. One "Salvar", shown while an amount is marked, saves every marked amount. Unmarking a
-    saved amount goes back to the one worked out, at once.
+    player's payments. Unmarking a saved amount goes back to the one worked out. **Nothing changes at the tap on
+    a mark**, so that a tap by mistake costs nothing: one "Salvar" saves every amount typed and every amount
+    unmarked. Until then an unmarked field only closes, with its saved amount still in it. When someone else
+    saves an amount meanwhile, the fields that were not touched show it, and the ones that were marked, unmarked
+    or typed in stay as they were left.
 13b. An amount set by hand is used at the foot of the screen, for the points shown beside the positions, for the
     Main Event pot's share and at "Finalizar". The amount worked out stays in sight beside it ("Calculado"),
     with what was paid and what is pending.
 13c. **"Valores" also has "Ajuste fora do dinheiro"**, for anything out of the ordinary: an amount that is added
-    to what was paid not in cash. Its field is closed and shows R$ 0,00 until its mark "Usar" is ticked. The
-    amount may be negative, which takes it from what was not in cash. Unmarking it takes the adjustment away, at
-    once. It is kept when the night is finished.
+    to what was paid not in cash. Its mark, "Ajustar o valor fora do dinheiro", comes first, and its field shows
+    only while the mark is ticked. The amount may be negative, which takes it from what was not in cash; a line
+    below the field says so. Unmarking it takes the adjustment away. Both are saved by the same "Salvar". It is
+    kept when the night is finished.
 14. **The Main Event pot worked out is the season's share of the pot**: the **Main Event pot share** ("Pote ME: %
     do pote", from 0 to 100) of the pot in use, rounded to a whole unit. A season with no share has an empty
     Main Event pot until it is marked "Manual" and typed, or entered at "Finalizar".
@@ -142,7 +148,7 @@ house owner's buy-in:
 - **A season with no prices.** Every amount is R$ 0,00.
 - **The Main Event pot.** With a share of 20%, the pot of R$ 425,00 gives R$ 85,00, shown in a closed field. With
   15% it gives R$ 64,00, from R$ 63,75. A season with no share gives none. Ana marks its "Manual" and saves
-  R$ 90,00: the dashboard and "Finalizar" use R$ 90,00. She unmarks it: R$ 85,00 again.
+  R$ 90,00: the dashboard and "Finalizar" use R$ 90,00. She unmarks it and saves: R$ 85,00 again.
 - **Set by hand.** On another night nobody marks the rebuys. The pot's field is closed and shows R$ 425,00. Ana
   marks its "Manual", types R$ 600,00 over it and taps "Salvar", leaving the time chip unmarked. The foot of the screen shows
   the pot R$ 600,00 with "Calculado R$ 425,00" below it, the time chip R$ 25,00 and the total R$ 625,00. The

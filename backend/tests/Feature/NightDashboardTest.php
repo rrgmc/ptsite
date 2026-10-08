@@ -236,6 +236,7 @@ it('splits what was paid into cash and not in cash', function () {
         ->assertJsonPath('data.players.0.buy_in_non_cash', false)
         ->assertJsonPath('data.players.1.buy_in_non_cash', true)
         ->assertJsonPath('data.players.1.rebuys.*.non_cash', [false, false, false])
+        ->assertJsonPath('data.players.*.non_cash', ['55.00', '50.00', '0.00', '0.00', '0.00'])
         // The pot and the time chip do not change.
         ->assertJsonPath('data.totals.total', ['owed' => '450.00', 'paid' => '295.00', 'pending' => '155.00'])
         ->assertJsonPath('data.received', ['cash' => '190.00', 'non_cash' => '105.00', 'non_cash_marked' => '105.00', 'non_cash_adjustment' => null]);

@@ -12,7 +12,7 @@ final readonly class NightDashboardReport
 {
     /**
      * @param  array{buy_in: string, house_owner_buy_in: string, rebuy_value: string, time_chip_value: string, rebuys_allowed: int, allows_extra_rebuys: bool, rebuy_charges_time_chip: bool, fixed: bool}  $prices
-     * @param  list<array{player: Player, is_house_owner: bool, buy_in: string, buy_in_paid: bool, buy_in_non_cash: bool, time_chip: bool, time_chip_paid: bool, rebuys: list<array{id: int, paid: bool, non_cash: bool}>, owed: string, paid: string, pending: string}>  $players
+     * @param  list<array{player: Player, is_house_owner: bool, buy_in: string, buy_in_paid: bool, buy_in_non_cash: bool, time_chip: bool, time_chip_paid: bool, rebuys: list<array{id: int, paid: bool, non_cash: bool}>, owed: string, paid: string, pending: string, non_cash: string}>  $players
      * @param  list<array{position: int, player: Player}>  $positions
      * @param  array{owed: string, paid: string, pending: string}  $pot
      * @param  array{owed: string, paid: string, pending: string}|null  $timeChip  null on a site without the time chip

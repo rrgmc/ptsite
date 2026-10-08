@@ -74,6 +74,18 @@ describe('NightDashboardView', () => {
     expect(again).toHaveBeenLastCalledWith({ type: 'mark', player: ana, buy_in_paid: false, buy_in_non_cash: false })
   })
 
+  it('says what the signs of a payment mean, and how to change one, to whoever can', () => {
+    view()
+    expect(screen.getByText(/Pago em dinheiro/)).toHaveTextContent('✓ Pago em dinheiro')
+    expect(screen.getByText(/Pago fora do dinheiro \(/)).toHaveTextContent('⇄ Pago fora do dinheiro (transferência, Pix)')
+    expect(screen.getByText('Toque de novo no pagamento para trocar.')).toBeInTheDocument()
+    cleanup()
+
+    view({ ...nightDashboard, can_edit: false })
+    expect(screen.getByText(/Pago em dinheiro/)).toBeInTheDocument()
+    expect(screen.queryByText('Toque de novo no pagamento para trocar.')).not.toBeInTheDocument()
+  })
+
   it('marks a rebuy the same way', async () => {
     const onChange = view()
 
@@ -99,16 +111,17 @@ describe('NightDashboardView', () => {
     expect(split.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
   })
 
-  it('opens the adjustment of what was not in cash when it is marked "Usar", and takes a negative amount', async () => {
+  it('shows the field of the adjustment of what was not in cash only while it is marked, and takes a negative amount', async () => {
     const onChange = view()
 
     const field = () => screen.getByRole('textbox', { name: 'Ajuste fora do dinheiro (R$)' })
-    expect(field()).toBeDisabled()
-    expect(field()).toHaveValue('0,00')
-    await userEvent.click(screen.getByRole('checkbox', { name: 'Usar o ajuste fora do dinheiro' }))
+    expect(screen.queryByRole('textbox', { name: 'Ajuste fora do dinheiro (R$)' })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Ajustar o valor fora do dinheiro' }))
+    expect(field()).toHaveValue('')
+    expect(field()).toHaveAccessibleDescription(/somado ao que foi pago fora do dinheiro/)
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled()
     expect(onChange).not.toHaveBeenCalled()
 
-    await userEvent.clear(field())
     await userEvent.type(field(), '5-')
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled()
     await userEvent.clear(field())
@@ -117,12 +130,26 @@ describe('NightDashboardView', () => {
     expect(onChange.mock.calls).toEqual([[{ type: 'nonCashAdjustment', amount: '-5.00' }]])
     cleanup()
 
-    // A saved one is in use: it shows, and unmarking takes it away at once.
+    // A saved one is in use and in its field. Unmarking only closes the field, until "Salvar".
     const again = view(applyChange(nightDashboard, { type: 'nonCashAdjustment', amount: '-5.00' }))
     expect(field()).toHaveValue('-5,00')
     expect(within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Fora do dinheiro -R$ 5,00')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('checkbox', { name: 'Usar o ajuste fora do dinheiro' }))
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Ajustar o valor fora do dinheiro' }))
+    expect(field()).toBeDisabled()
+    expect(field()).toHaveValue('-5,00')
+    expect(again).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar' }))
     expect(again).toHaveBeenLastCalledWith({ type: 'nonCashAdjustment', amount: null })
+  })
+
+  it('says beside what a player has pending how much they paid not in cash', () => {
+    view(applyChange(applyChange(nightDashboard, { type: 'markRebuy', player: ana, index: 0, id: 1, paid: true, non_cash: true }), { type: 'mark', player: breno, buy_in_non_cash: true }))
+    const row = (nickname: string) => screen.getByRole('group', { name: `Pagamentos de ${nickname}` }).closest('li')
+
+    expect(row('Ana')).toHaveTextContent('Tudo pago (⇄ R$ 55,00)R$ 55,00 fora do dinheiro')
+    expect(row('Breno')).toHaveTextContent('Falta R$ 55,00 (⇄ R$ 50,00)')
+    expect(row('Estela')).toHaveTextContent('Tudo pago')
+    expect(row('Estela')).not.toHaveTextContent('⇄')
   })
 
   it('adds a rebuy with the number the player had, and marks one as paid', async () => {
@@ -244,7 +271,7 @@ describe('NightDashboardView', () => {
       'Definir o pote manualmente',
       'Definir o time chip manualmente',
       'Definir o pote ME manualmente',
-      'Usar o ajuste fora do dinheiro',
+      'Ajustar o valor fora do dinheiro',
     ])
     expect(screen.queryByRole('button', { name: 'Salvar' })).not.toBeInTheDocument()
   })
@@ -322,11 +349,57 @@ describe('NightDashboardView', () => {
     expect(screen.getByRole('checkbox', { name: 'Definir o time chip manualmente' })).not.toBeChecked()
     expect(screen.getByRole('textbox', { name: 'Pote ME (R$)' })).toHaveValue('90,00')
 
-    // Unmarking goes back to the amount worked out, at once.
+    // Unmarking only closes the field, with its amount still in it: a tap by mistake costs nothing.
     await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
-    expect(onChange).toHaveBeenLastCalledWith({ type: 'amounts', pot: null })
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toBeDisabled()
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('600,00')
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled()
+    expect(onChange).not.toHaveBeenCalled()
+
+    // "Salvar" goes back to the amounts worked out.
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
     await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote ME manualmente' }))
-    expect(onChange).toHaveBeenLastCalledWith({ type: 'mainEventPot', amount: null })
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+    expect(onChange.mock.calls).toEqual([[{ type: 'amounts', pot: null }], [{ type: 'mainEventPot', amount: null }]])
+  })
+
+  it('goes back to the amount worked out when an amount that was never saved is unmarked', async () => {
+    const onChange = view()
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
+    await userEvent.clear(screen.getByRole('textbox', { name: 'Pote (R$)' }))
+    await userEvent.type(screen.getByRole('textbox', { name: 'Pote (R$)' }), '600')
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
+
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('425,00')
+    expect(screen.queryByRole('button', { name: 'Salvar' })).not.toBeInTheDocument()
+    // What was typed is back when it is marked again.
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('600')
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('keeps what was typed when someone else saves an amount, and shows theirs in the fields left alone', async () => {
+    const dashboardView = (dashboard: NightDashboard) => (
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter>
+          <NightDashboardView night={openNight} dashboard={dashboard} percentages={season.percentages ?? []} players={players} onChange={() => {}} />
+        </MemoryRouter>
+      </QueryClientProvider>
+    )
+    const { rerender } = render(dashboardView(nightDashboard))
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
+    await userEvent.clear(screen.getByRole('textbox', { name: 'Pote (R$)' }))
+    await userEvent.type(screen.getByRole('textbox', { name: 'Pote (R$)' }), '600')
+
+    // The dashboard is read again: on another phone, someone saved a pot and a time chip.
+    rerender(dashboardView({ ...nightDashboard, manual: { pot: '500.00', time_chip: '30.00' } }))
+
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('600')
+    expect(screen.getByRole('checkbox', { name: 'Definir o time chip manualmente' })).toBeChecked()
+    expect(screen.getByRole('textbox', { name: 'Time chip (R$)' })).toHaveValue('30,00')
   })
 
   it('has an empty Main Event pot when the season sets no share of the pot', () => {

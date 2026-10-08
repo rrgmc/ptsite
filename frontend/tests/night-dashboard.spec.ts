@@ -56,6 +56,8 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1 (fora do dinheiro)' })).toHaveAttribute('aria-pressed', 'true')
   await expect(totals(page)).toContainText('Em dinheiro R$ 50,00')
   await expect(totals(page)).toContainText('Fora do dinheiro R$ 55,00')
+  await expect(page.getByRole('listitem').filter({ hasText: 'Jacobson' })).toContainText('Tudo pago (⇄ R$ 55,00)')
+  await expect(page.getByText('Pago fora do dinheiro (transferência, Pix)')).toBeVisible()
   await expect(totals(page)).toContainText('TotalR$ 105,00Pago R$ 105,00Falta R$ 0,00')
 
   // The owner of the house pays the smaller buy-in
@@ -79,12 +81,18 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(totals(page)).toContainText('Pote(Manual)R$ 300,00Calculado R$ 125,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('60,00')
   await expectAccessible(page)
+  // Unmarking it changes nothing until it is saved: a tap by mistake costs nothing
   await page.getByText('Manual', { exact: true }).first().click()
+  await expect(page.getByLabel('Pote (R$)')).toBeDisabled()
+  await expect(page.getByLabel('Pote (R$)')).toHaveValue('300,00')
+  await expect(totals(page)).toContainText('Pote(Manual)R$ 300,00')
+  await page.getByRole('button', { name: 'Salvar' }).click()
   await expect(totals(page)).toContainText('PoteR$ 125,00Pago R$ 100,00Falta R$ 25,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
   // An adjustment of what was not in cash, for anything out of the ordinary, takes a negative amount
-  await expect(page.getByLabel('Ajuste fora do dinheiro (R$)')).toBeDisabled()
-  await page.getByText('Usar', { exact: true }).click()
+  // …in a field that shows only once its mark is ticked
+  await expect(page.getByLabel('Ajuste fora do dinheiro (R$)')).toHaveCount(0)
+  await page.getByText('Ajustar o valor fora do dinheiro', { exact: true }).click()
   await page.getByLabel('Ajuste fora do dinheiro (R$)').fill('-5')
   await page.getByRole('button', { name: 'Salvar' }).click()
   await expect(totals(page)).toContainText('Em dinheiro R$ 55,00')

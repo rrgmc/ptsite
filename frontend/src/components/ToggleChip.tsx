@@ -31,10 +31,29 @@ export function ToggleChip({ tone = 'done', children, ...props }: Omit<ToggleBut
     >
       {({ isSelected }) => (
         <>
-          {isSelected && <span aria-hidden>{sign[tone]}</span>}
+          {isSelected && <ChipSign tone={tone} />}
           {children}
         </>
       )}
     </ToggleButton>
+  )
+}
+
+/** The colors of a chip that is on, as in `selected`, for something that is no button. */
+const swatch: Record<keyof typeof selected, string> = {
+  done: 'border-primary bg-primary text-on-primary',
+  owed: 'border-warning bg-warning-soft text-warning',
+  otherWay: 'border-primary bg-primary-soft text-primary',
+}
+
+/**
+ * The sign a chip of this tone has when it is on. A screen reader does not say it. With `swatch`, it is a small
+ * chip in the colors of one that is on, for a legend.
+ */
+export function ChipSign({ tone, swatch: asSwatch = false }: { tone: keyof typeof selected; swatch?: boolean }) {
+  return (
+    <span aria-hidden className={asSwatch ? `inline-flex h-5 min-w-6 items-center justify-center rounded-full border px-1 text-xs font-semibold ${swatch[tone]}` : undefined}>
+      {sign[tone]}
+    </span>
   )
 }

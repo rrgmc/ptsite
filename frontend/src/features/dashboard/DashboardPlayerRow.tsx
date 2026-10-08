@@ -45,11 +45,21 @@ export function DashboardPlayerRow({
           <span className="truncate font-semibold">{player.nickname}</span>
           {line.is_house_owner && <Badge tone="primary">{t.dashboard.players.houseOwner}</Badge>}
         </span>
-        {Number(line.pending) > 0 ? (
-          <span className="shrink-0 text-sm font-semibold text-warning tabular">{t.dashboard.players.pending({ amount: formatMoney(line.pending) })}</span>
-        ) : (
-          Number(line.owed) > 0 && <span className="shrink-0 text-sm text-muted">{t.dashboard.players.settled}</span>
-        )}
+        <span className="shrink-0 text-sm tabular">
+          {Number(line.pending) > 0 ? (
+            <span className="font-semibold text-warning">{t.dashboard.players.pending({ amount: formatMoney(line.pending) })}</span>
+          ) : (
+            Number(line.owed) > 0 && <span className="text-muted">{t.dashboard.players.settled}</span>
+          )}
+          {Number(line.non_cash) > 0 && (
+            // With the sign of a payment that was not in cash; a screen reader gets it in words.
+            <span className="text-muted">
+              {' '}
+              <span aria-hidden>{t.dashboard.players.nonCashAmount({ amount: formatMoney(line.non_cash) })}</span>
+              <span className="sr-only">{t.dashboard.players.nonCashAmountSpoken({ amount: formatMoney(line.non_cash) })}</span>
+            </span>
+          )}
+        </span>
       </div>
 
       <div role="group" aria-label={t.dashboard.players.marksOf({ nickname: player.nickname })} className="mt-1 flex flex-wrap items-center gap-1.5">

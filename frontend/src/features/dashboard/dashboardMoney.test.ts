@@ -129,6 +129,7 @@ describe('payments not in cash', () => {
     const after = transfers()
 
     expect(after.received).toEqual({ cash: '190.00', non_cash: '105.00', non_cash_marked: '105.00', non_cash_adjustment: null })
+    expect(after.players.map((l) => l.non_cash)).toEqual(['55.00', '50.00', '0.00', '0.00', '0.00'])
     expect(after.totals).toEqual(nightDashboard.totals)
   })
 

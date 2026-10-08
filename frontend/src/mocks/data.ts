@@ -131,6 +131,7 @@ const dashboardLine = (player: Player, marks: Partial<NightDashboard['players'][
   time_chip_paid: false,
   rebuys: [],
   ...noAmounts,
+  non_cash: '0.00',
   ...marks,
 })
 

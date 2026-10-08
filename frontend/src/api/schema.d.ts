@@ -1266,7 +1266,8 @@ export interface components {
             /**
              * @description The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and
              *     `pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a
-             *     rebuy's `non_cash` say that it was paid, but not in cash.
+             *     rebuy's `non_cash` say that it was paid, but not in cash; the player's `non_cash` is how much of
+             *     `paid` that is.
              */
             players: {
                 player: components["schemas"]["PlayerResource"];
@@ -1284,6 +1285,7 @@ export interface components {
                 owed: string;
                 paid: string;
                 pending: string;
+                non_cash: string;
             }[];
             /** @description The positions of the open night's partial result filled so far. Empty once the night is finished. */
             positions: {

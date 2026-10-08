@@ -19,6 +19,8 @@ export const dashboard = {
     timeChipPaid: 'TC paid',
     rebuy: ({ number }: { number: number }) => `Rebuy ${number}`,
     nonCash: ({ payment }: { payment: string }) => `${payment} (not in cash)`,
+    nonCashAmount: ({ amount }: { amount: string }) => `(⇄ ${amount})`,
+    nonCashAmountSpoken: ({ amount }: { amount: string }) => `${amount} not in cash`,
     addRebuy: '+ Rebuy',
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
     settled: 'All paid',
@@ -28,6 +30,13 @@ export const dashboard = {
     unsetHouseOwner: 'Is not the house owner',
     removeLastRebuy: 'Remove the last rebuy',
     removeFromNight: 'Remove from the night',
+  },
+
+  // Under the participants: what the signs on a buy-in and on a rebuy mean
+  legend: {
+    cash: 'Paid in cash',
+    nonCash: 'Paid not in cash (a bank transfer)',
+    howTo: 'Tap the payment again to change it.',
   },
 
   // Players who are not on the night yet
@@ -51,8 +60,8 @@ export const dashboard = {
     checkTimeChip: 'Set the time chip by hand',
     checkMainEventPot: 'Set the Main Event pot by hand',
     nonCashAdjustment: ({ currency }: { currency: string }) => `Not-in-cash adjustment (${currency})`,
-    use: 'Use',
-    checkNonCashAdjustment: 'Use the not-in-cash adjustment',
+    nonCashAdjustmentHelp: 'For anything out of the ordinary. The amount is added to what was paid not in cash; with a minus sign, it is taken from it.',
+    checkNonCashAdjustment: 'Adjust the amount not in cash',
     save: 'Save',
   },
 

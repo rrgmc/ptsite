@@ -4655,7 +4655,7 @@
                     },
                     "players": {
                         "type": "array",
-                        "description": "The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and\n`pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a\nrebuy's `non_cash` say that it was paid, but not in cash.",
+                        "description": "The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and\n`pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a\nrebuy's `non_cash` say that it was paid, but not in cash; the player's `non_cash` is how much of\n`paid` that is.",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -4710,6 +4710,9 @@
                                 },
                                 "pending": {
                                     "type": "string"
+                                },
+                                "non_cash": {
+                                    "type": "string"
                                 }
                             },
                             "required": [
@@ -4723,7 +4726,8 @@
                                 "rebuys",
                                 "owed",
                                 "paid",
-                                "pending"
+                                "pending",
+                                "non_cash"
                             ]
                         }
                     },

@@ -29,9 +29,10 @@ class NightDashboardResource extends JsonResource
             /**
              * The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and
              * `pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a
-             * rebuy's `non_cash` say that it was paid, but not in cash.
+             * rebuy's `non_cash` say that it was paid, but not in cash; the player's `non_cash` is how much of
+             * `paid` that is.
              *
-             * @var list<array{player: PlayerResource, is_house_owner: bool, buy_in: string, buy_in_paid: bool, buy_in_non_cash: bool, time_chip: bool, time_chip_paid: bool, rebuys: list<array{id: int, paid: bool, non_cash: bool}>, owed: string, paid: string, pending: string}>
+             * @var list<array{player: PlayerResource, is_house_owner: bool, buy_in: string, buy_in_paid: bool, buy_in_non_cash: bool, time_chip: bool, time_chip_paid: bool, rebuys: list<array{id: int, paid: bool, non_cash: bool}>, owed: string, paid: string, pending: string, non_cash: string}>
              */
             'players' => array_map(fn (array $line) => [...$line, 'player' => new PlayerResource($line['player'])], $this->players),
             /**

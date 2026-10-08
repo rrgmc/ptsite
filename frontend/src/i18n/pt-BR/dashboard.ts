@@ -20,6 +20,9 @@ export const dashboard = {
     rebuy: ({ number }: { number: number }) => `Rebuy ${number}`,
     /** What a screen reader says for a payment that was not in cash: "Buy-in (fora do dinheiro)". */
     nonCash: ({ payment }: { payment: string }) => `${payment} (fora do dinheiro)`,
+    /** Beside what the player has pending: how much they paid not in cash, with the sign of such a payment. */
+    nonCashAmount: ({ amount }: { amount: string }) => `(⇄ ${amount})`,
+    nonCashAmountSpoken: ({ amount }: { amount: string }) => `${amount} fora do dinheiro`,
     addRebuy: '+ Rebuy',
     pending: ({ amount }: { amount: string }) => `Falta ${amount}`,
     settled: 'Tudo pago',
@@ -29,6 +32,13 @@ export const dashboard = {
     unsetHouseOwner: 'Não é o dono da casa',
     removeLastRebuy: 'Remover o último rebuy',
     removeFromNight: 'Remover do evento',
+  },
+
+  // Under the participants: what the signs on a buy-in and on a rebuy mean
+  legend: {
+    cash: 'Pago em dinheiro',
+    nonCash: 'Pago fora do dinheiro (transferência, Pix)',
+    howTo: 'Toque de novo no pagamento para trocar.',
   },
 
   // Players who are not on the night yet
@@ -53,9 +63,8 @@ export const dashboard = {
     checkMainEventPot: 'Definir o pote ME manualmente',
     /** An amount added to what was paid not in cash, for anything out of the ordinary. It may be negative. */
     nonCashAdjustment: ({ currency }: { currency: string }) => `Ajuste fora do dinheiro (${currency})`,
-    /** The mark beside the adjustment. */
-    use: 'Usar',
-    checkNonCashAdjustment: 'Usar o ajuste fora do dinheiro',
+    nonCashAdjustmentHelp: 'Para algo fora do comum. O valor é somado ao que foi pago fora do dinheiro; com sinal de menos, é subtraído.',
+    checkNonCashAdjustment: 'Ajustar o valor fora do dinheiro',
     save: 'Salvar',
   },
 

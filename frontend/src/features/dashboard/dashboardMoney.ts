@@ -67,9 +67,11 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
     timeChip.owed += ofTimeChip.owed
     timeChip.paid += ofTimeChip.paid
     // A late player's time chip counts as paid the way the buy-in was, and a rebuy's the way the rebuy was.
-    if (line.buy_in_paid && line.buy_in_non_cash) nonCashMarked += buyIn + (line.time_chip && line.time_chip_paid ? timeChipValue : 0)
-    nonCashMarked += line.rebuys.filter((rebuy) => rebuy.paid && rebuy.non_cash).length * (cents(prices.rebuy_value) + rebuyTimeChip)
-    return { ...line, is_house_owner: isHouseOwner, buy_in: decimal(buyIn), ...amounts(ofPot.owed + ofTimeChip.owed, ofPot.paid + ofTimeChip.paid) }
+    const nonCash =
+      (line.buy_in_paid && line.buy_in_non_cash ? buyIn + (line.time_chip && line.time_chip_paid ? timeChipValue : 0) : 0) +
+      line.rebuys.filter((rebuy) => rebuy.paid && rebuy.non_cash).length * (cents(prices.rebuy_value) + rebuyTimeChip)
+    nonCashMarked += nonCash
+    return { ...line, is_house_owner: isHouseOwner, buy_in: decimal(buyIn), ...amounts(ofPot.owed + ofTimeChip.owed, ofPot.paid + ofTimeChip.paid), non_cash: decimal(nonCash) }
   })
 
   const adjustment = dashboard.received.non_cash_adjustment
@@ -115,6 +117,7 @@ const emptyLine = (player: Player): DashboardPlayer => ({
   owed: '0.00',
   paid: '0.00',
   pending: '0.00',
+  non_cash: '0.00',
 })
 
 /** The players with this one changed. A player who was not on the night joins it, in the order of the names. */
