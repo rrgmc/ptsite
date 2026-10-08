@@ -10,7 +10,7 @@ const bar = (flag: 'tab' | 'top') => navItemsFor('player').filter((item) => item
 
 it('has "Meu perfil" on both bars, the last one, and the simulator only in the left menu', () => {
   expect(bar('tab')).toEqual(['/', '/results', '/calendar', '/players', '/profile'])
-  expect(bar('top')).toEqual(['/', '/results', '/calendar', '/players', '/statistics', '/seasons', '/profile'])
+  expect(bar('top')).toEqual(['/', '/results', '/calendar', '/players', '/seasons', '/statistics', '/profile'])
   expect(paths('player')).toContain('/simulator')
 })
 
