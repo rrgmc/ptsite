@@ -10,10 +10,12 @@ import { Badge, ErrorBox, Loading } from '@/components/Feedback'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { dayOf } from '@/lib/dates'
+import { hasFeature } from '@/lib/features'
 import { formatTime, formatWeekday, titleOfNight } from '@/lib/format'
 import { plainText } from '@/lib/plainText'
 import { canEditNight } from './canEditNight'
 import { NightAttendance } from '../attendance/NightAttendance'
+import { NightDashboardCard } from '../dashboard/NightDashboardCard'
 import { usePathOfSeason } from '../layout/useSelectedSeason'
 import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
 import { NightResultCard } from '../results/NightResultCard'
@@ -44,6 +46,8 @@ export function NightPage() {
   // A Main Event night has a result of its own: the order of its players, with no pot.
   const isMainEvent = n.type === 'main_event'
   const resultPath = `/nights/${n.id}/${isMainEvent ? 'main-event-result' : 'result'}`
+  // On a site with the night dashboard, a regular night that was opened has one; it holds the partial result.
+  const hasDashboard = hasFeature('nightDashboard') && !isMainEvent && !n.archived && n.status !== 'scheduled'
 
   return (
     <>
@@ -91,7 +95,12 @@ export function NightPage() {
           <Card><p className="text-muted">{t.mainEvent.resultPlaceholder}</p></Card>
         )
       ) : n.status === 'finished' ? (
-        <div className="max-w-md"><NightResultCard night={n} /></div>
+        <div className="flex max-w-md flex-col gap-4">
+          <NightResultCard night={n} />
+          {hasDashboard && <NightDashboardCard nightId={n.id} />}
+        </div>
+      ) : hasDashboard ? (
+        <NightDashboardCard nightId={n.id} />
       ) : n.status === 'open' && !n.archived ? (
         <NightPartialResult night={n} />
       ) : (

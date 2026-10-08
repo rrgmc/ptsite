@@ -11,6 +11,7 @@
   "siteDomain": "",
   "features": {
     "mainEvent": true,
-    "houseOwnerBuyIn": true
+    "houseOwnerBuyIn": true,
+    "nightDashboard": true
   }
 }

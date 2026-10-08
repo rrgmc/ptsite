@@ -16,7 +16,7 @@ return new class extends Migration
             // How many rebuys a player can make on a night; 0 means none.
             $table->unsignedTinyInteger('rebuys_allowed')->default(0)->after('time_chip_value');
             $table->boolean('rebuy_charges_time_chip')->default(false)->after('rebuys_allowed');
-            // Rebuys past the allowed number, which do not count for the season's points.
+            // Rebuys past the allowed number. A player who makes one is not recorded in a scoring position of that night.
             $table->boolean('allows_extra_rebuys')->default(false)->after('rebuy_charges_time_chip');
             // The smaller buy-in of the owner of the house where the night is played.
             $table->decimal('house_owner_buy_in', 12, 2)->nullable()->after('allows_extra_rebuys');

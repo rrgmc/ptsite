@@ -28,7 +28,7 @@ class SaveSeasonRequest extends FormRequest
             'starts_on' => [$creating ? 'required' : 'sometimes', 'date_format:Y-m-d'],
             'default_place_id' => ['sometimes', 'nullable', 'integer', 'exists:places,id'],
             'description' => ['sometimes', 'nullable', 'string', 'max:5000'],
-            /** What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             'buy_in' => ['sometimes', 'nullable', 'string', self::MONEY],
             /** A rebuy's price, without the time chip it may also charge. Required when the season has rebuys. */
             'rebuy_value' => ['sometimes', 'nullable', 'string', self::MONEY],
@@ -38,10 +38,12 @@ class SaveSeasonRequest extends FormRequest
             'rebuys_allowed' => ['sometimes', 'integer', 'min:0', 'max:'.SeasonMoney::MAX_REBUYS],
             /** Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
             'rebuy_charges_time_chip' => [$noTimeChip, 'sometimes', 'boolean'],
-            /** Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             'allows_extra_rebuys' => ['sometimes', 'boolean'],
             /** The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             'house_owner_buy_in' => [Rule::prohibitedIf(! $this->siteHas(Feature::HouseOwnerBuyIn)), 'sometimes', 'nullable', 'string', self::MONEY],
+            /** The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. Refused on a site without the Main Event pot. */
+            'main_event_pot_percent' => [Rule::prohibitedIf(! $this->siteHas(Feature::MainEventPot)), 'sometimes', 'nullable', 'integer', 'min:0', 'max:100'],
             /** How many nights ("rodadas") the season has; 26 by default. Scheduling more is allowed, with a warning. */
             'rounds' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'is_open' => ['sometimes', 'boolean'],

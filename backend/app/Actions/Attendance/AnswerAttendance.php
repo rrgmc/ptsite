@@ -4,6 +4,7 @@ namespace PTSite\App\Actions\Attendance;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use PTSite\App\Actions\Nights\Dashboard\LeaveNightDashboard;
 use PTSite\App\Models\Night;
 use PTSite\App\Models\NightAttendance;
 use PTSite\App\Models\Player;
@@ -11,18 +12,23 @@ use PTSite\App\Models\User;
 use PTSite\App\Support\AuditLogger;
 use PTSite\Domain\Attendance\AttendanceAnswer;
 use PTSite\Domain\Attendance\AttendanceRules;
+use PTSite\Domain\Features\Feature;
+use PTSite\Domain\Features\Features;
 use PTSite\Domain\Nights\NightStatus;
 use PTSite\Domain\Shared\RuleViolation;
 
 /**
  * Sets or removes a player's "ALL IN" / "FOLD" answer for a night (docs/specs/attendance.md). Players answer for
- * themselves; results keepers and admins for anyone, and those changes are audited.
+ * themselves; results keepers and admins for anyone, and those changes are audited. On a site with the night
+ * dashboard, whoever changes the dashboard answers for anyone too, and a player with payments cannot leave.
  */
 final class AnswerAttendance
 {
     public function __construct(
         private readonly AttendanceRules $rules,
         private readonly AuditLogger $audit,
+        private readonly Features $features,
+        private readonly LeaveNightDashboard $leave,
     ) {}
 
     /** @param AttendanceAnswer|null $answer null removes the answer */
@@ -37,6 +43,9 @@ final class AnswerAttendance
         return DB::transaction(function () use ($user, $night, $player, $answer) {
             $row = NightAttendance::query()->where('night_id', $night->id)->where('player_id', $player->id)->lockForUpdate()->first();
             $current = $row ? AttendanceAnswer::from($row->answer) : null;
+            if ($answer !== AttendanceAnswer::AllIn && $this->features->enabled(Feature::NightDashboard)) {
+                ($this->leave)($user, $night, $player);
+            }
             if (! $this->rules->changes($current, $answer)) {
                 return $row;
             }

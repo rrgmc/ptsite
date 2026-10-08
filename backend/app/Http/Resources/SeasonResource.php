@@ -16,7 +16,7 @@ class SeasonResource extends JsonResource
             'name' => $this->name,
             'starts_on' => $this->starts_on->toDateString(),
             'description' => $this->description,
-            /** What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             'buy_in' => $this->buy_in,
             /** A rebuy's price, without the time chip it may also charge. */
             'rebuy_value' => $this->rebuy_value,
@@ -26,10 +26,12 @@ class SeasonResource extends JsonResource
             'rebuys_allowed' => $this->rebuys_allowed,
             /** Whether a rebuy also charges a time chip. */
             'rebuy_charges_time_chip' => $this->rebuy_charges_time_chip,
-            /** Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             'allows_extra_rebuys' => $this->allows_extra_rebuys,
             /** The smaller buy-in of the owner of the house where the night is played. */
             'house_owner_buy_in' => $this->house_owner_buy_in,
+            /** The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. */
+            'main_event_pot_percent' => $this->main_event_pot_percent,
             /** How many nights ("rodadas") the season has. */
             'rounds' => $this->rounds,
             /** The season's nights that are not archived, in any state; compare with rounds. */

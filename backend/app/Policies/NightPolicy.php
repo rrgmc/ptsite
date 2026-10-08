@@ -6,18 +6,44 @@ use PTSite\App\Enums\PlayerStatus;
 use PTSite\App\Models\Night;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\User;
+use PTSite\Domain\Features\Feature;
+use PTSite\Domain\Features\Features;
 
 class NightPolicy
 {
+    public function __construct(private readonly Features $features) {}
+
     public function view(User $user, Night $night): bool
     {
         return ! $night->isArchived() || $user->isAdmin();
     }
 
-    /** Players answer for themselves; results keepers and admins for anyone. */
+    /** Players answer for themselves; whoever answers for others, for anyone. */
     public function answerFor(User $user, Night $night, Player $player): bool
     {
-        return $user->player_id === $player->id || $user->canRunNights();
+        return $user->player_id === $player->id || $this->answerForOthers($user);
+    }
+
+    /**
+     * Results keepers and admins answer for any player. On a site with the night dashboard, so does whoever
+     * changes the dashboard of an open night.
+     */
+    public function answerForOthers(User $user): bool
+    {
+        return $user->canRunNights() || ($this->features->enabled(Feature::NightDashboard) && $this->savePartialResult($user));
+    }
+
+    /**
+     * The night dashboard: the same people as the partial result while the night is open, and only admins once
+     * it is finished. A cancelled night has none.
+     */
+    public function manageDashboard(User $user, Night $night): bool
+    {
+        if ($night->isArchived()) {
+            return false;
+        }
+
+        return $night->status === 'finished' ? $user->isAdmin() : $this->savePartialResult($user);
     }
 
     /** Active players fill the open night's partial result; so do results keepers and admins. */

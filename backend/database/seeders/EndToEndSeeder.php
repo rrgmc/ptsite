@@ -90,6 +90,7 @@ class EndToEndSeeder extends Seeder
             'rebuy_charges_time_chip' => true,
             'allows_extra_rebuys' => true,
             'house_owner_buy_in' => '25.00',
+            'main_event_pot_percent' => 20,
             'is_open' => true,
             'is_finished' => false,
             'schedule_weekday' => 5,

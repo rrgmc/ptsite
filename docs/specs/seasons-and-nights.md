@@ -71,19 +71,25 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    - the **time chip value**: the price of one time chip, on a site with the time chip (rule 9c);
    - the **rebuys allowed** ("Rebuys permitidos"): how many rebuys a player can make on a night, from 0 to 20.
      A new season starts with 0;
-   - whether a player can make **rebuys past the limit** ("Permitir rebuys além do limite"). Those rebuys do not
-     count for the season's points;
+   - whether a player can make **rebuys past the limit** ("Permitir rebuys além do limite"). **A player who makes
+     one scores no points on that night**: they are not recorded in a scoring position. Nothing else changes: the
+     rebuy's money is part of the night's pot like any other, and the pot gives the same points to the others;
    - the **rebuy value**: the price of a rebuy, without the time chip it may also charge;
    - whether **a rebuy also pays the time chip** ("O rebuy também paga o time chip"), on a site with the time chip;
    - the **house owner's buy-in** ("Buy-in do dono da casa"): the smaller buy-in of the owner of the house where
      the night is played, on a site that turns this on (`houseOwnerBuyIn` in `features`,
-     [`site/README.md`](../../site/README.md)).
+     [`site/README.md`](../../site/README.md));
+   - the **Main Event pot share** ("Pote ME: % do pote"): the share of a night's pot, from 0 to 100%, that the
+     night dashboard uses as the night's Main Event pot unless one is set by hand, on a site with the Main Event pot and the night
+     dashboard.
 5c. **A season has rebuys** when it allows at least one, or allows rebuys past the limit. A season with rebuys
    must have a rebuy value. A season with 0 rebuys and none past the limit has no rebuys: its form shows no
    rebuy value and no "O rebuy também paga o time chip".
 5d. The house owner's buy-in needs a buy-in, and cannot be above it. It can be the same, or zero.
-5e. **The season only records its money settings. No rule calculates with them yet**: a night's pot and time chip
-   are still the totals the keeper enters (rule 9), and a night records no rebuys.
+5e. **On a site with the night dashboard, a night's money is worked out from these settings**: the dashboard
+   records each player's buy-in, rebuys and time chip, and "Finalizar" starts from the amounts it adds up
+   ([night-dashboard.md](night-dashboard.md)). On a site without it the season only records them: a night's pot
+   and time chip are the totals the keeper enters (rule 9), and a night records no rebuys.
 5f. A setting of a feature the site does not have is not shown, and the API refuses it. A value recorded before
    the feature was turned off stays in the database.
 
@@ -182,6 +188,10 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
     so, with who saved it last. They change what is needed and finish as usual: all the rules of finishing apply.
 24. **Finishing the night deletes the partial result.** A scheduled or finished night takes none. Saves are not
     recorded in the audit log, whoever makes them; the finish is.
+24a. **On a site with the night dashboard, the dashboard holds the partial result**
+    ([night-dashboard.md](night-dashboard.md), rules 13 to 15): each position is saved by itself, the pot and
+    the time chip are the ones the dashboard works out unless they are set by hand there, and the night's page
+    shows the dashboard's amounts in place of the partial result. Rules 19, 21, 22 and 24 hold as they are.
 
 ## Examples
 
@@ -228,8 +238,10 @@ Money settings:
   R$ 5,00 that every rebuy also pays, and rebuys past the limit. All of it is saved.
 - **No rebuys.** A new season has 0 rebuys allowed and none past the limit. It has no rebuys, and needs no rebuy
   value.
-- **Only past the limit.** A season allows 0 rebuys but allows rebuys past the limit. It has rebuys, none of which
-  counts for points, and needs a rebuy value.
+- **Only past the limit.** A season allows 0 rebuys but allows rebuys past the limit. It has rebuys, a player who
+  makes one scores no points on that night, and it needs a rebuy value.
+- **Past the limit, in the pot.** A season allows 2 rebuys at R$ 50,00 and more past the limit. Breno makes 3.
+  All R$ 150,00 are in the night's pot. Breno is not recorded in a scoring position of that night.
 - **No rebuy value.** A season with no rebuy value is changed to allow 2 rebuys: refused ("Informe o valor do
   rebuy, ou deixe a temporada sem rebuys.").
 - **Too many.** 21 rebuys allowed is refused; 20 is accepted.
@@ -318,12 +330,13 @@ Suggested dates, for a season whose regular night is Friday at 21:30:
   The **Main Event pot** is recorded on every night.
 - A night can be **extra**, outside the season's calendar (rules 25 to 30).
 - The **time chip** is recorded on every night.
-- A season records its **money settings** (rules 5b to 5f). Nothing calculates with them yet.
+- A season records its **money settings** (rules 5b to 5f). The **night dashboard** works a night's money out
+  from them, on a site that turns it on ([night-dashboard.md](night-dashboard.md)).
 - Attendance answers ("ALL IN" / "FOLD") are described in [attendance.md](attendance.md).
 
 ## Open questions
 
 - **Time chip total.** Should the season show the time chips added up (the year party fund)?
-- **Using the money settings.** Should a night record each player's rebuys, and work out the pot, the time chip
-  and the points from the season's settings? Then a night also needs to say who owns the house.
+- **Using the money settings for the points.** The night dashboard works out the pot and the time chip, and the
+  keeper still confirms them at "Finalizar". Should the points come from the dashboard's pot with no typing?
 - **Deleting nights.** Archiving, like players, could replace hiding deleted nights.

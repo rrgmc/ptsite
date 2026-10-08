@@ -1,7 +1,9 @@
-import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useIsMutating, useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRef } from 'react'
+import { applyChange, type DashboardChange } from '@/features/dashboard/dashboardMoney'
 import { t } from '@/i18n'
 import { setSelectedSeasonId } from '@/lib/selectedSeason'
-import { ApiError, api, type Attendance, fetchCsrfCookie, type PartialResult, type Player, unwrap } from './client'
+import { ApiError, api, type Attendance, fetchCsrfCookie, type NightDashboard, type PartialResult, type Player, unwrap } from './client'
 
 // One place for every server call the screens make, as TanStack Query hooks.
 
@@ -22,6 +24,7 @@ export const keys = {
   night: (id: number) => ['nights', id] as const,
   attendance: (nightId: number) => ['nights', nightId, 'attendance'] as const,
   partialResult: (nightId: number) => ['nights', nightId, 'partial-result'] as const,
+  nightDashboard: (nightId: number) => ['nights', nightId, 'dashboard'] as const,
   players: (filters: object) => ['players', filters] as const,
   places: ['places'] as const,
   audit: (page: number) => ['audit', page] as const,
@@ -288,6 +291,113 @@ export function useSavePartialResult(nightId: number) {
   })
 }
 
+/** How often an open dashboard asks the API again, so several phones see each other's changes. */
+export const DASHBOARD_REFRESH_MS = 10_000
+
+const dashboardScope = (nightId: number) => `night-dashboard-${nightId}`
+
+/**
+ * A night's dashboard ("Painel do evento"), on a site that has it. While the night is open it is asked for again
+ * every few seconds while the screen is visible, but not while a change of this browser is on its way: its answer
+ * is newer.
+ */
+export function useNightDashboard(nightId: number, enabled = true) {
+  const changing = useIsMutating({ predicate: (m) => m.options.scope?.id === dashboardScope(nightId) }) > 0
+  return useQuery({
+    queryKey: keys.nightDashboard(nightId),
+    enabled,
+    // A finished night changes only when an admin corrects it: it is read again like any other screen.
+    refetchInterval: (query) => (changing || query.state.data?.status === 'finished' ? false : DASHBOARD_REFRESH_MS),
+    // A night with no dashboard (not open yet, or a Main Event) stays without one.
+    retry: (failures, error) => !(error instanceof ApiError) && failures < 1,
+    queryFn: async () =>
+      (await unwrap(api.GET('/v1/nights/{night}/dashboard', { params: { path: { night: nightId } } }))).data,
+  })
+}
+
+/** The dashboard read once, to start "Finalizar" from: kept out of the shared cache, like usePartialResultSeed. */
+export function useNightDashboardSeed(nightId: number, enabled = true) {
+  return useQuery({
+    queryKey: [...keys.nightDashboard(nightId), 'seed'],
+    enabled,
+    gcTime: 0,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    queryFn: async () =>
+      (await unwrap(api.GET('/v1/nights/{night}/dashboard', { params: { path: { night: nightId } } }))).data,
+  })
+}
+
+/** Sends one tap on the dashboard. Every change answers the whole dashboard. */
+async function sendDashboardChange(nightId: number, change: DashboardChange, latest: NightDashboard | undefined): Promise<NightDashboard> {
+  const night = { night: nightId }
+  // A rebuy added a moment ago has its id only in the API's last answer, at the same place in the player's list.
+  const rebuyId = (playerId: number, index: number, id: number) => {
+    const found = id || latest?.players.find((line) => line.player.id === playerId)?.rebuys[index]?.id
+    if (!found) throw new Error(t.components.connectionError)
+    return found
+  }
+  switch (change.type) {
+    case 'mark': {
+      const { type: _type, player, ...body } = change
+      return (await unwrap(api.PATCH('/v1/nights/{night}/dashboard/players/{player}', { params: { path: { ...night, player: player.id } }, body }))).data
+    }
+    case 'addRebuy':
+      return (await unwrap(api.POST('/v1/nights/{night}/dashboard/players/{player}/rebuys', { params: { path: { ...night, player: change.player.id } }, body: { count: change.count } }))).data
+    case 'markRebuy':
+      return (await unwrap(api.PATCH('/v1/nights/{night}/dashboard/rebuys/{rebuy}', { params: { path: { ...night, rebuy: rebuyId(change.player.id, change.index, change.id) } }, body: { paid: change.paid } }))).data
+    case 'removeRebuy':
+      return (await unwrap(api.DELETE('/v1/nights/{night}/dashboard/rebuys/{rebuy}', { params: { path: { ...night, rebuy: rebuyId(change.player.id, change.index, change.id) } } }))).data
+    case 'removePlayer':
+      return (await unwrap(api.DELETE('/v1/nights/{night}/dashboard/players/{player}', { params: { path: { ...night, player: change.player.id } } }))).data
+    case 'houseOwner':
+      return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/house-owner', { params: { path: night }, body: { player_id: change.player?.id ?? null } }))).data
+    case 'position':
+      return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/positions/{position}', { params: { path: { ...night, position: change.position } }, body: { player_id: change.player?.id ?? null } }))).data
+    case 'mainEventPot':
+      return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/main-event-pot', { params: { path: night }, body: { amount: change.amount } }))).data
+    case 'amounts':
+      return (await unwrap(api.PUT('/v1/nights/{night}/dashboard/amounts', { params: { path: night }, body: { ...(change.pot !== undefined && { pot: change.pot }), ...(change.time_chip !== undefined && { time_chip: change.time_chip }) } }))).data
+  }
+}
+
+/**
+ * Makes one change to a night's dashboard. Like an attendance answer: the screen updates at once and rolls back
+ * if the API refuses, and the changes of a night are sent one at a time, in order, so quick taps end as tapped.
+ */
+export function useChangeNightDashboard(nightId: number) {
+  const client = useQueryClient()
+  const key = keys.nightDashboard(nightId)
+  const isLast = () => client.isMutating({ predicate: (m) => m.options.scope?.id === dashboardScope(nightId) }) <= 1
+  // What the API answered last to a change of this browser.
+  const latest = useRef<NightDashboard | undefined>(undefined)
+  return useMutation({
+    scope: { id: dashboardScope(nightId) },
+    mutationFn: (change: DashboardChange) => sendDashboardChange(nightId, change, latest.current),
+    onMutate: async (change) => {
+      await client.cancelQueries({ queryKey: key, exact: true })
+      const previous = client.getQueryData<NightDashboard>(key)
+      if (previous) client.setQueryData<NightDashboard>(key, applyChange(previous, change))
+      return { previous }
+    },
+    onSuccess: (dashboard) => {
+      latest.current = dashboard
+      // Shown only after the last queued change, so an older answer does not briefly undo a newer tap.
+      if (isLast()) client.setQueryData<NightDashboard>(key, dashboard)
+    },
+    onError: (_error, _change, context) => {
+      if (context?.previous) client.setQueryData(key, context.previous)
+    },
+    onSettled: (_dashboard, error) => {
+      if (!isLast()) return
+      // A change may confirm a player or fill a position, which the night's page shows too.
+      client.invalidateQueries({ queryKey: keys.attendance(nightId) })
+      client.invalidateQueries({ queryKey: keys.partialResult(nightId) })
+      if (error) return client.invalidateQueries({ queryKey: key, exact: true })
+    },
+  })
+}
+
 export function useNight(id: number) {
   return useQuery({
     queryKey: keys.night(id),
@@ -499,7 +609,7 @@ export function useSavePlayerLogin() {
 export function useSaveSeason() {
   const client = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...body }: { id?: number; name?: string; starts_on?: string; default_place_id?: number | null; buy_in?: string | null; rebuy_value?: string | null; time_chip_value?: string | null; rebuys_allowed?: number; rebuy_charges_time_chip?: boolean; allows_extra_rebuys?: boolean; house_owner_buy_in?: string | null; is_open?: boolean; is_finished?: boolean; percentages?: { position: number; percent: number }[]; schedule_weekday?: number; schedule_time?: string; schedule_every_weeks?: number; rounds?: number }) =>
+    mutationFn: async ({ id, ...body }: { id?: number; name?: string; starts_on?: string; default_place_id?: number | null; buy_in?: string | null; rebuy_value?: string | null; time_chip_value?: string | null; rebuys_allowed?: number; rebuy_charges_time_chip?: boolean; allows_extra_rebuys?: boolean; house_owner_buy_in?: string | null; main_event_pot_percent?: number | null; is_open?: boolean; is_finished?: boolean; percentages?: { position: number; percent: number }[]; schedule_weekday?: number; schedule_time?: string; schedule_every_weeks?: number; rounds?: number }) =>
       id
         ? (await unwrap(api.PATCH('/v1/seasons/{season}', { params: { path: { season: id } }, body }))).data
         : (await unwrap(api.POST('/v1/seasons', { body: body as never }))).data,

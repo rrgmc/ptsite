@@ -24,8 +24,8 @@ test('"Configurações" shows the site\'s features and its version, to admins on
 
   // The demo site has every feature.
   const features = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Recursos' }) }).getByRole('listitem')
-  await expect(features).toHaveCount(5)
-  await expect(features.filter({ hasText: 'Ligado' })).toHaveCount(5)
+  await expect(features).toHaveCount(6)
+  await expect(features.filter({ hasText: 'Ligado' })).toHaveCount(6)
   await expect(features.filter({ hasText: 'Planejar datas' })).toContainText('O calendário que agenda de uma vez')
 
   // The same version as the footer, which the build was given.

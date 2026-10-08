@@ -420,6 +420,157 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/nights/{night}/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A night's dashboard: the participants with what they bought and paid, the pot and the time chip worked out
+         *     from it, and the open night's partial result. Made to be asked for again every few seconds
+         */
+        get: operations["nightDashboard.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/players/{player}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** "Remover do evento": take a participant with no marks and no rebuys off the night */
+        delete: operations["nightDashboard.removePlayer"];
+        options?: never;
+        head?: never;
+        /**
+         * Set a participant's marks; leave out the ones that stay. Any call makes the player a participant and, on
+         *     an open night, answers ALL IN for them: with no mark it only confirms the player
+         */
+        patch: operations["nightDashboard.markPlayer"];
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/players/{player}/rebuys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * "+ Rebuy": record one more rebuy of a player. Send the number of rebuys the player had on the screen: when
+         *     it is no longer that number, someone else recorded the same rebuy and nothing is added
+         */
+        post: operations["nightDashboard.addRebuy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/rebuys/{rebuy}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a rebuy recorded by mistake */
+        delete: operations["nightDashboard.removeRebuy"];
+        options?: never;
+        head?: never;
+        /** Mark a rebuy as paid or not paid */
+        patch: operations["nightDashboard.markRebuy"];
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/house-owner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** "Dono da casa": say who owns the house where the night is played, or null for nobody */
+        put: operations["nightDashboard.setHouseOwner"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/positions/{position}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put a player in one scoring position of the open night's partial result, or null to empty it */
+        put: operations["nightDashboard.setPosition"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/main-event-pot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set the Main Event pot of the open night by hand, or null for the season's share of the pot */
+        put: operations["nightDashboard.setMainEventPot"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nights/{night}/dashboard/amounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * "Manual": type the pot or the time chip of the open night, for a night that does not record every player's
+         *     payments; leave out the one that stays. Null takes a typed amount away. The dashboard still answers the
+         *     ones it works out
+         */
+        put: operations["nightDashboard.setAmounts"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/nights/{night}/partial-result": {
         parameters: {
             query?: never;
@@ -865,6 +1016,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AddRebuyRequest */
+        AddRebuyRequest: {
+            /** @description How many rebuys the player had on the screen when "+ Rebuy" was tapped. */
+            count: number;
+        };
         /** AnswerAttendanceRequest */
         AnswerAttendanceRequest: {
             /** @description "all_in" (coming) or "fold" (not coming). */
@@ -1046,6 +1202,105 @@ export interface components {
             password: string;
             /** @description Keep the login for 30 days. */
             remember?: boolean;
+        };
+        /** MarkNightPlayerRequest */
+        MarkNightPlayerRequest: {
+            /** @description Whether the player paid the buy-in. */
+            buy_in_paid?: boolean;
+            /** @description Whether the player arrived late and owes a time chip. False also unmarks it as paid. Refused on a site without the time chip. */
+            time_chip?: boolean;
+            /** @description Whether the player paid that time chip. True also marks it as owed. Refused on a site without the time chip. */
+            time_chip_paid?: boolean;
+        };
+        /** MarkRebuyRequest */
+        MarkRebuyRequest: {
+            /** @description Whether the rebuy was paid. */
+            paid: boolean;
+        };
+        /** NightDashboardResource */
+        NightDashboardResource: {
+            night_id: number;
+            /** @enum {string} */
+            status: "open" | "finished";
+            /** @description Whether this user may change this night's dashboard. The API still checks every request. */
+            can_edit: boolean;
+            /**
+             * @description What the night charges, as decimal strings: a price the season does not have is "0.00". `fixed`
+             *     says the prices were copied when the night was finished, so the season no longer changes them.
+             */
+            prices: {
+                buy_in: string;
+                house_owner_buy_in: string;
+                rebuy_value: string;
+                time_chip_value: string;
+                rebuys_allowed: number;
+                allows_extra_rebuys: boolean;
+                rebuy_charges_time_chip: boolean;
+                fixed: boolean;
+            };
+            house_owner: components["schemas"]["PlayerResource"] | null;
+            /**
+             * @description The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and
+             *     `pending` add up the buy-in, the rebuys and the time chips of the player.
+             */
+            players: {
+                player: components["schemas"]["PlayerResource"];
+                is_house_owner: boolean;
+                buy_in: string;
+                buy_in_paid: boolean;
+                time_chip: boolean;
+                time_chip_paid: boolean;
+                rebuys: {
+                    id: number;
+                    paid: boolean;
+                }[];
+                owed: string;
+                paid: string;
+                pending: string;
+            }[];
+            /** @description The positions of the open night's partial result filled so far. Empty once the night is finished. */
+            positions: {
+                position: number;
+                player: components["schemas"]["PlayerResource"];
+            }[];
+            /** @description The Main Event pot set by hand on the open night. Null: the suggested one is in use. */
+            main_event_pot: string | null;
+            /** @description The season's share of the pot (the typed one, when there is one), rounded to a whole unit. Null when the season sets none. */
+            suggested_main_event_pot: string | null;
+            /** @description The amounts worked out from the participants. `time_chip` is null on a site without the time chip. */
+            totals: {
+                pot: {
+                    owed: string;
+                    paid: string;
+                    pending: string;
+                };
+                time_chip: {
+                    owed: string;
+                    paid: string;
+                    pending: string;
+                } | null;
+                total: {
+                    owed: string;
+                    paid: string;
+                    pending: string;
+                };
+            };
+            /**
+             * @description The pot and the time chip set by hand on an open night ("Manual"), which stand in
+             *     for the ones in `totals`. Null for an amount that was not typed.
+             */
+            manual: {
+                pot: string | null;
+                time_chip: string | null;
+            };
+            /** @description The amounts a finished night was finished with. Null while the night is open. */
+            recorded: {
+                pot: string | null;
+                main_event_pot: string | null;
+                time_chip: string | null;
+            } | null;
+            /** @description When the server read this. */
+            read_at: string;
         };
         /** NightPartialResultResource */
         NightPartialResultResource: {
@@ -1353,7 +1608,7 @@ export interface components {
             starts_on: string;
             default_place_id?: number | null;
             description?: string | null;
-            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** @description What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             buy_in?: string | null;
             /** @description A rebuy's price, without the time chip it may also charge. Required when the season has rebuys. */
             rebuy_value?: string | null;
@@ -1363,10 +1618,12 @@ export interface components {
             rebuys_allowed?: number;
             /** @description Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
             rebuy_charges_time_chip?: boolean;
-            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** @description Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             allows_extra_rebuys?: boolean;
             /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             house_owner_buy_in?: string | null;
+            /** @description The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. Refused on a site without the Main Event pot. */
+            main_event_pot_percent?: number | null;
             /** @description How many nights ("rodadas") the season has; 26 by default. Scheduling more is allowed, with a warning. */
             rounds?: number;
             is_open?: boolean;
@@ -1408,7 +1665,7 @@ export interface components {
             name: string;
             starts_on: string;
             description: string | null;
-            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** @description What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             buy_in: string | null;
             /** @description A rebuy's price, without the time chip it may also charge. */
             rebuy_value: string | null;
@@ -1418,10 +1675,12 @@ export interface components {
             rebuys_allowed: number;
             /** @description Whether a rebuy also charges a time chip. */
             rebuy_charges_time_chip: boolean;
-            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** @description Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             allows_extra_rebuys: boolean;
             /** @description The smaller buy-in of the owner of the house where the night is played. */
             house_owner_buy_in: string | null;
+            /** @description The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. */
+            main_event_pot_percent: number | null;
             /** @description How many nights ("rodadas") the season has. */
             rounds: number;
             /** @description The season's nights that are not archived, in any state; compare with rounds. */
@@ -1455,6 +1714,28 @@ export interface components {
             /** @description Players left out who have the same total as the last one shown. */
             tied_not_shown: number;
             main_event_champion: components["schemas"]["PlayerResource"] | null;
+        };
+        /** SetHouseOwnerRequest */
+        SetHouseOwnerRequest: {
+            /** @description The owner of the house, or null when nobody is. */
+            player_id: number | null;
+        };
+        /** SetMainEventPotRequest */
+        SetMainEventPotRequest: {
+            /** @description The Main Event pot set by hand, as a decimal string such as "85.00", or null for the season's share of the pot. */
+            amount: string | null;
+        };
+        /** SetPartialAmountsRequest */
+        SetPartialAmountsRequest: {
+            /** @description The pot typed for the night, as a decimal string such as "840.00", or null for the one the dashboard works out. */
+            pot?: string | null;
+            /** @description The time chip typed for the night, as a decimal string, or null for the one the dashboard works out. Not kept on a site without the time chip. */
+            time_chip?: string | null;
+        };
+        /** SetPartialPositionRequest */
+        SetPartialPositionRequest: {
+            /** @description The player in this position, or null to empty it. */
+            player_id: number | null;
         };
         /** SimulateRequest */
         SimulateRequest: {
@@ -1600,7 +1881,7 @@ export interface components {
             starts_on?: string;
             default_place_id?: number | null;
             description?: string | null;
-            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** @description What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             buy_in?: string | null;
             /** @description A rebuy's price, without the time chip it may also charge. Required when the season has rebuys. */
             rebuy_value?: string | null;
@@ -1610,10 +1891,12 @@ export interface components {
             rebuys_allowed?: number;
             /** @description Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
             rebuy_charges_time_chip?: boolean;
-            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            /** @description Whether a player can rebuy past the allowed number. A player who does is not recorded in a scoring position of that night; the rebuy's money is part of the pot like any other. */
             allows_extra_rebuys?: boolean;
             /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             house_owner_buy_in?: string | null;
+            /** @description The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. Refused on a site without the Main Event pot. */
+            main_event_pot_percent?: number | null;
             /** @description How many nights ("rodadas") the season has; 26 by default. Scheduling more is allowed, with a warning. */
             rounds?: number;
             is_open?: boolean;
@@ -1642,6 +1925,8 @@ export interface components {
                 run_nights: boolean;
                 edit_played_nights: boolean;
                 save_partial_results: boolean;
+                /** @description Whether the user answers ALL IN or FOLD for other players. */
+                answer_for_others: boolean;
                 quick_add_players: boolean;
                 manage_players: boolean;
                 manage_seasons: boolean;
@@ -2490,6 +2775,323 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["NightResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "nightDashboard.removePlayer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+                /** @description The player ID */
+                player: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "nightDashboard.markPlayer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+                /** @description The player ID */
+                player: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MarkNightPlayerRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.addRebuy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+                /** @description The player ID */
+                player: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddRebuyRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.removeRebuy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+                /** @description The rebuy ID */
+                rebuy: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "nightDashboard.markRebuy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+                /** @description The rebuy ID */
+                rebuy: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkRebuyRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.setHouseOwner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetHouseOwnerRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.setPosition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+                position: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetPartialPositionRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.setMainEventPot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetMainEventPotRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "nightDashboard.setAmounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SetPartialAmountsRequest"];
+            };
+        };
+        responses: {
+            /** @description `NightDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightDashboardResource"];
                     };
                 };
             };

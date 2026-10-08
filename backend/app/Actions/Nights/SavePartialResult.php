@@ -16,7 +16,8 @@ use PTSite\Domain\Scoring\PercentageTable;
 
 /**
  * Saves an open night's partial result ("Resultado parcial"): the amounts and positions known so far. There is
- * one per night and a save replaces all of it, so the last save wins.
+ * one per night and a save replaces all of it, so the last save wins. On a site with the night dashboard, a pot
+ * and a time chip saved here are the ones typed by hand, which stand in for the ones the dashboard works out.
  *
  * Not audited, whoever saves: it is a shared draft that shows who saved it last, and finishing the night, which
  * is audited, deletes it.

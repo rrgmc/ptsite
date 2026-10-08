@@ -51,6 +51,18 @@ final readonly class Money
         return new self($this->cents - $other->cents);
     }
 
+    /** This amount, that many times. */
+    public function times(int $count): self
+    {
+        return new self($this->cents * $count);
+    }
+
+    /** This amount rounded half up to a whole unit: 63.50 becomes 64.00. */
+    public function roundedToUnit(): self
+    {
+        return new self(intdiv($this->cents + 50, 100) * 100);
+    }
+
     /** This amount times percent ÷ 100, rounded half up to the cent. */
     public function percent(int $percent): self
     {

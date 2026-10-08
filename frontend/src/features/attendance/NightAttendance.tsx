@@ -7,7 +7,7 @@ import { AttendancePanel } from './AttendancePanel'
 export function NightAttendance({ night }: { night: Night }) {
   const me = useMe()
   const attendance = useAttendance(night.id)
-  const canAnswerForOthers = Boolean(me.data?.abilities.run_nights)
+  const canAnswerForOthers = Boolean(me.data?.abilities.answer_for_others)
   const players = usePlayers()
   const answer = useAnswerAttendance(night.id)
 

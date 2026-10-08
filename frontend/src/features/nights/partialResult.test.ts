@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import type { PartialResult } from '@/api/client'
 import { overrideFeatures } from '@/lib/features'
-import { players } from '@/mocks/data'
-import { isEmptyPartial, seedFromPartial } from './partialResult'
+import { nightDashboard, players } from '@/mocks/data'
+import { isEmptyPartial, seedFromDashboard, seedFromPartial } from './partialResult'
 
 const percentages = [38, 23, 15, 11, 8, 5].map((percent, i) => ({ position: i + 1, percent }))
 const empty: PartialResult = { pot: null, main_event_pot: null, time_chip: null, positions: [], saved_by: null, saved_at: null }
@@ -44,5 +44,34 @@ describe('isEmptyPartial', () => {
 
     expect(isEmptyPartial({ ...empty, time_chip: '0.00' })).toBe(true)
     expect(isEmptyPartial({ ...empty, main_event_pot: '0.00' })).toBe(false)
+  })
+})
+
+describe('seedFromDashboard', () => {
+  it('fills the pot and the time chip that are owed, the suggested Main Event pot and the positions', () => {
+    const seed = seedFromDashboard(percentages, nightDashboard)
+
+    expect(seed.potText).toBe('425,00')
+    expect(seed.timeChipText).toBe('25,00')
+    expect(seed.mainEventPotText).toBe('85,00')
+    expect(seed.order).toEqual([null, null, null, null, null, players[3]])
+  })
+
+  it('prefers the pot and the time chip typed by hand to the ones worked out', () => {
+    const seed = seedFromDashboard(percentages, { ...nightDashboard, manual: { pot: '600.00', time_chip: '40.00' } })
+
+    expect(seed.potText).toBe('600,00')
+    expect(seed.timeChipText).toBe('40,00')
+  })
+
+  it('prefers a typed Main Event pot to the suggested one', () => {
+    expect(seedFromDashboard(percentages, { ...nightDashboard, main_event_pot: '90.00' }).mainEventPotText).toBe('90,00')
+  })
+
+  it('leaves empty what the dashboard does not have: no players yet, no time chip on the site, no share of the pot', () => {
+    const totals = { pot: { owed: '0.00', paid: '0.00', pending: '0.00' }, time_chip: null, total: { owed: '0.00', paid: '0.00', pending: '0.00' } }
+    const seed = seedFromDashboard(percentages, { ...nightDashboard, totals, suggested_main_event_pot: null, positions: [] })
+
+    expect(seed).toEqual({ potText: '', mainEventPotText: '', timeChipText: '', order: [null, null, null, null, null, null] })
   })
 })

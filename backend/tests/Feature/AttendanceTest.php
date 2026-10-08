@@ -14,6 +14,8 @@ use PTSite\App\Models\User;
 afterEach(fn () => Carbon::setTestNow());
 
 beforeEach(function () {
+    // These are the rules of a site without the night dashboard, which changes them (NightDashboardTest).
+    config(['ptsite.features' => ['nightDashboard' => false]]);
     $this->night = Night::factory()->create(['starts_at' => '2025-03-28 21:30:00', 'status' => 'open']);
     foreach (['ana' => 'Ana', 'breno' => 'Breno', 'carla' => 'Carla', 'dudu' => 'Dudu'] as $key => $nickname) {
         $this->{$key} = Player::factory()->create(['nickname' => $nickname]);

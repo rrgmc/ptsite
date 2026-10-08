@@ -10,7 +10,10 @@ backend/
     Shared/                 Money (whole cents), RuleViolation
     Scoring/                PercentageTable, PointsCalculator
     Nights/                 NightStatus, NightResult, NightRules (lifecycle and result rules), SchedulePattern,
-                            NightSuggester (next three regular weekdays)
+                            NightSuggester (next three regular weekdays); for the night dashboard: NightPrices,
+                            NightEntry, MoneyTotal, NightMoney (the pot and the time chip from what the players
+                            bought and paid), NightDashboardRules
+    Seasons/                SeasonMoney (a season's money settings, checked as a whole)
     Calendar/               Easter, HolidayRule, HolidayException, HolidayCalendar, HolidayPreset, HolidayPresets and
                             SaoPauloHolidays (the starting table), SeasonPlanner (a season's dates around holidays)
     Attendance/             AttendanceAnswer, AttendanceRules
@@ -22,6 +25,10 @@ backend/
                             ImportNight, RescheduleNight, CancelNight, UpdateNight (place, description, extra),
                             WriteNightResult, NightSnapshot, SavePartialResult, KnownPlayers,
                             FinishMainEventNight, ImportMainEventNight, WriteMainEventResult, MainEventNight
+    Nights/Dashboard/       the night dashboard, one change each: MarkNightPlayer, RemoveNightPlayer, AddRebuy,
+                            MarkRebuy, RemoveRebuy, SetHouseOwner, SetPartialPosition, SetPartialMainEventPot;
+                            NightEntries (what they share: who may, the night's lock, making a participant),
+                            LeaveNightDashboard, FixNightMoney (the step of finishing a night)
     Attendance/             AnswerAttendance
     Holidays/               SaveHoliday, SaveHolidayException, DeleteHolidayException
     Players/                QuickAddPlayer, SavePlayer, NicknameCheck
@@ -32,7 +39,7 @@ backend/
     Import/                 VerifyLeagueData (the `ptsite:verify` check)
   app/Queries/            reads that need the domain: SeasonStandings, SimulateRanking, SuggestNightDates,
                             PlanSeasonNights, SeasonCalendar, HolidayCalendarForYear, LeagueStatistics,
-                            StatisticsOfPlayer, FinishedNights, PendingPasswordReset
+                            StatisticsOfPlayer, FinishedNights, PendingPasswordReset, NightDashboard
   app/Mail/               messages the site sends, sent inside the request: PasswordResetMail
   resources/views/mail/   their text, as an HTML view and a plain text view
   app/Http/Controllers/Api  thin: validate (Form Request), call one action or query, return a resource
@@ -40,8 +47,8 @@ backend/
   app/Http/Resources/     JSON shape
   app/Models/             Eloquent: columns, relationships, casts, scopes only
   app/Policies/           who may do what (player, results keeper, admin)
-  app/Support/            AuditLogger, HolidayTable (holiday rows → domain calendar), PlayerPhotoMaker, DatabaseCreator,
-                            TablePrefix
+  app/Support/            AuditLogger, HolidayTable (holiday rows → domain calendar), NightLedger (a night's payment
+                            rows → its domain prices and participants), PlayerPhotoMaker, DatabaseCreator, TablePrefix
   app/Providers/          PTSiteServiceProvider: loads everything on this list into the host app
   app/Bootstrap.php       the middleware and error rendering a host app's bootstrap/app.php asks for
   app/Console/Commands/   ptsite:prepare-database, ptsite:verify
@@ -111,6 +118,13 @@ from `lang/pt_BR/rules.php`. The domain has no user-facing text.
 - **Stored for a while:** an open night's partial result (`night_partial_results` and
   `night_partial_result_positions`: the amounts and positions the players recorded so far, with no points).
   `SavePartialResult` replaces it on every save, and `FinishNight` deletes it.
+- **Stored: what the night dashboard records**, on a site that has it: a night's participants with their marks
+  (`night_players`), one row for each rebuy (`night_rebuys`), the house owner (`nights.house_owner_player_id`)
+  and, once the night is finished, the season's prices as they were (`night_prices`). A mark is a date, which
+  says when it was set. They are kept after the night is finished.
+- **Calculated on every request: a night's money on the dashboard** (`NightDashboard`, with `NightMoney`): the
+  pot, the time chip and what each player has pending are added up from those rows. A finished night's `pot`
+  and `time_chip` are still the stored amounts the keeper finished it with, and only they count for the points.
 - **Calculated on every request:** season standings (`SeasonStandings`, a sum of the stored points) and the
   simulator. Standings of one season take a few milliseconds. The statistics (`LeagueStatistics`, and
   `StatisticsOfPlayer` for one player) are calculated the same way.

@@ -161,6 +161,7 @@ class DemoLeagueSeeder extends Seeder
             'rebuy_charges_time_chip' => true,
             'allows_extra_rebuys' => true,
             'house_owner_buy_in' => '25.00',
+            'main_event_pot_percent' => 20,
             'is_open' => ! $finished,
             'is_finished' => $finished,
             'schedule_weekday' => 5,
