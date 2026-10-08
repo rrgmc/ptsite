@@ -42,6 +42,7 @@ export const admin: Messages['admin'] = {
     actions: {
       'night.scheduled': 'scheduled the night',
       'night.opened': 'opened the night',
+      'night.open_undone': 'undid the opening of the night',
       'night.finished': 'finished the night',
       'night.corrected': 'corrected the result of the night',
       'night.imported': 'imported the night',

@@ -46,7 +46,7 @@ public; the results are invented. Write nothing about them but public facts.
 - In short: a Laravel API-only backend (`backend/`), a React + TypeScript single-page app, mobile first
   (`frontend/`), one repository, and shared hosting.
 - The code covers: login, the password link by email ("Esqueci minha senha"), standings, results, running nights
-  (schedule, edit, open, finish, correct, quick add, partial result), attendance (ALL IN / FOLD), the season
+  (schedule, edit, open, undo an opening, finish, correct, quick add, partial result), attendance (ALL IN / FOLD), the season
   planner (a calendar) with its holiday table, the season calendar, extra nights, the Main Event, a season's money settings, the night dashboard, the simulator, the statistics, the players'
   pages with their statistics and memo, the admin section and the audit log.
 - The development data is an invented demo league (`backend/database/seeders/DemoLeagueSeeder.php`).
@@ -196,6 +196,7 @@ to map one to the other. The English texts of the screens are in `frontend/src/i
 | Arquivado | Archived player | Hidden everywhere; for mistakes and duplicates |
 | Administração | Admin section | Where admins manage seasons, players, places and accounts |
 | Abrir / Finalizar | Open / finish a night | Night lifecycle actions |
+| Desfazer abertura | Undo the opening of a night (`UndoOpenNight`) | Make a night opened by mistake scheduled again; admins only. Deletes what was recorded while it was open |
 | Resultado parcial | Partial result (`NightPartialResult`) | The amounts and positions known so far on an open night, filled by active players; the results form starts from it |
 | Remarcar / Cancelar | Reschedule / cancel a night | Move a scheduled night to another date and time, or archive it |
 | Editar evento | Edit a night (`UpdateNight`) | Change a night's place and description, at `/nights/<id>/edit`; admins only once it is open or finished |

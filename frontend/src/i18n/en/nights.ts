@@ -57,6 +57,10 @@ export const nights: Messages['nights'] = {
     cancelConfirmBody: 'The night leaves the calendar and the date becomes free. The attendance answers stay in the history.',
     openConfirmTitle: 'Open this night?',
     openConfirmBody: 'Only one night per season can be open.',
+    undoOpen: 'Undo opening',
+    undoOpenConfirmTitle: 'Undo the opening of this night?',
+    undoOpenConfirmBody: 'The night is scheduled again and its partial result is deleted. The attendance answers stay.',
+    undoOpenConfirmBodyDashboard: 'The night is scheduled again and everything recorded on its dashboard is deleted: players, payments, rebuys and positions. The attendance answers stay.',
   },
 
   // Reschedule form

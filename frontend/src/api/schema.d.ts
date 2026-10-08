@@ -400,6 +400,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/nights/{night}/undo-open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * "Desfazer abertura": make a night opened by mistake scheduled again. Deletes its partial result and what the
+         *     night dashboard recorded; the attendance answers stay. Admins
+         */
+        post: operations["night.undoOpen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/nights/{night}/finish": {
         parameters: {
             query?: never;
@@ -2725,6 +2745,33 @@ export interface operations {
         };
     };
     "night.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The night ID */
+                night: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `NightResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NightResource"] & Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "night.undoOpen": {
         parameters: {
             query?: never;
             header?: never;
