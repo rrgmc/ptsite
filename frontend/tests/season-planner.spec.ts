@@ -7,7 +7,7 @@ import { expectAccessible, login } from './helpers'
 
 async function openPlanner(page: Page, from: string, to: string) {
   await page.goto('admin')
-  await page.getByRole('row').filter({ hasText: 'E2E Planejamento' }).getByRole('link', { name: 'Planejar datas' }).click()
+  await page.getByRole('rowgroup').filter({ hasText: 'E2E Planejamento' }).getByRole('link', { name: 'Planejar datas' }).click()
   await expect(page.getByRole('heading', { name: 'Planejar datas · E2E Planejamento' })).toBeVisible()
   await page.getByLabel('De', { exact: true }).fill(from)
   await page.getByLabel('Até', { exact: true }).fill(to)
@@ -96,7 +96,7 @@ test('archiving a holiday asks first, and the archived holiday stays in the tabl
 test('with rounds left, the plan stops at the night that completes them', async ({ page }) => {
   await login(page, 'dev-admin')
   await page.goto('admin')
-  await page.getByRole('row').filter({ hasText: 'E2E Rodadas' }).getByRole('link', { name: 'Planejar datas' }).click()
+  await page.getByRole('rowgroup').filter({ hasText: 'E2E Rodadas' }).getByRole('link', { name: 'Planejar datas' }).click()
 
   await expect(page.getByText('Até a última rodada (26ª)')).toBeVisible()
   await expect(page.getByText('Rodadas: 26 de 26')).toBeVisible()
