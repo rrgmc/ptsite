@@ -15,7 +15,8 @@ submodule, and that holds the league's name, settings, data and deploy target. S
 
 ## Screenshots
 
-The demo site, with the invented demo league. Regenerate them with `npm run screenshots` in `frontend/` when a
+The demo site in English, with the invented demo league. The demo site itself is in Brazilian Portuguese, and
+so are the names in its data. Regenerate them with `npm run screenshots` in `frontend/` when a
 screen changes (it needs bash and PHP on the path). Native date and time fields follow each device's settings;
 the screenshot browser shows them in US format.
 

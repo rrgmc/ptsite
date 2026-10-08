@@ -1,7 +1,7 @@
 // Takes phone screenshots of the main screens into docs/screens, for design review.
 // README.md shows them, so run this after changing a screen. Use scripts/screenshots.sh, which builds the
-// frontend and runs this against a fresh database with the development seed (the demo league and the dev
-// logins). It schedules and finishes a night, so it needs a throwaway database.
+// frontend in English and runs this against a fresh database with the development seed (the demo league and
+// the dev logins). It schedules and finishes a night, so it needs a throwaway database.
 //   BASE_URL=http://127.0.0.1:8130/app/ node scripts/screenshots.mjs
 import { chromium, devices } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
@@ -9,12 +9,12 @@ import { fileURLToPath } from 'node:url'
 
 const out = fileURLToPath(new URL('../../docs/screens/', import.meta.url)) // also right on Windows
 mkdirSync(out, { recursive: true })
-// --lang makes native date and time fields use Brazilian formats, as on the league's phones.
-const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM_PATH, args: ['--lang=pt-BR'] })
+// --lang makes native date and time fields use the formats of the site's language.
+const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM_PATH, args: ['--lang=en-US'] })
 const context = await browser.newContext({
   ...devices['Pixel 7'],
   baseURL: process.env.BASE_URL ?? 'http://127.0.0.1:8130/app/',
-  locale: 'pt-BR',
+  locale: 'en-US',
   timezoneId: 'America/Sao_Paulo',
 })
 const page = await context.newPage()
@@ -43,8 +43,8 @@ async function networkIdle() {
 
 async function shot(name, fullPage = false) {
   await networkIdle()
-  // A chart's code loads on demand, with "Carregando gráfico…" in its place until then
-  await page.getByText(/^Carregando/).first().waitFor({ state: 'hidden' })
+  // A chart's code loads on demand, with "Loading chart…" in its place until then
+  await page.getByText(/^Loading/).first().waitFor({ state: 'hidden' })
   // The players' photos load lazily: load them all now, also those a full-page screenshot scrolls to.
   const broken = await page.evaluate(async () => {
     await Promise.all([...document.images].map((img) => {
@@ -62,10 +62,10 @@ async function shot(name, fullPage = false) {
 }
 async function login(username) {
   await page.goto('login')
-  await page.getByLabel('Usuário').fill(username)
-  await page.getByLabel('Senha').fill('password')
-  await page.getByRole('button', { name: 'Entrar' }).click()
-  await page.getByRole('heading', { name: 'Classificação' }).waitFor()
+  await page.getByLabel('Username').fill(username)
+  await page.getByLabel('Password').fill('password')
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await page.getByRole('heading', { name: 'Standings' }).waitFor()
 }
 async function pick(label, search) {
   await page.getByRole('button', { name: label }).click()
@@ -82,33 +82,33 @@ await shot('01-standings')
 
 // Back to the current season: a finished season takes no new night
 await page.goto('results')
-await page.getByRole('button', { name: '+ Agendar' }).waitFor()
+await page.getByRole('button', { name: '+ Schedule' }).waitFor()
 // Only one night can be open, and the backup's current season may already have one: finish it first
-const alreadyOpen = page.getByRole('link').filter({ hasText: 'Aberto' })
+const alreadyOpen = page.getByRole('link').filter({ hasText: 'Open' })
 if (await alreadyOpen.count()) {
   await alreadyOpen.first().click()
-  await page.getByRole('link', { name: /Finalizar/ }).click()
-  await page.getByLabel('Pote (R$)').fill('800')
-  await page.getByLabel('Pote ME (R$)').fill('160')
+  await page.getByRole('link', { name: /^Finish/ }).click()
+  await page.getByLabel('Pot (R$)', { exact: true }).fill('800')
+  await page.getByLabel('Main Event pot (R$)').fill('160')
   await page.getByLabel('Time chip (R$)').fill('0')
-  for (const [position, search] of [[1, 'moneymaker'], [2, 'brunson'], [3, 'jacobson'], [4, 'duhamel'], [5, 'cada'], [6, 'raymer']]) {
-    await pick(new RegExp(`^${position}º lugar`), search)
+  for (const [position, search] of [['1st', 'moneymaker'], ['2nd', 'brunson'], ['3rd', 'jacobson'], ['4th', 'duhamel'], ['5th', 'cada'], ['6th', 'raymer']]) {
+    await pick(new RegExp(`^${position} place`), search)
   }
-  await page.getByRole('button', { name: 'Finalizar evento' }).click()
-  await page.getByText('Finalizado', { exact: true }).waitFor()
+  await page.getByRole('button', { name: 'Finish night' }).click()
+  await page.getByText('Finished', { exact: true }).waitFor()
   await page.goto('results')
 }
-await page.getByRole('button', { name: '+ Agendar' }).click()
-await page.getByRole('radiogroup', { name: 'Sugestões' }).waitFor()
-await page.getByLabel('Data').fill('2023-03-10')
-await page.getByRole('button', { name: 'Agendar evento' }).click()
-await page.getByRole('heading', { name: 'Liga - 10/03/2023' }).waitFor()
-await page.getByRole('button', { name: 'Abrir evento' }).click()
-await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
-await page.getByText('Aberto', { exact: true }).waitFor()
+await page.getByRole('button', { name: '+ Schedule' }).click()
+await page.getByRole('radiogroup', { name: 'Suggestions' }).waitFor()
+await page.getByLabel('Date').fill('2023-03-10')
+await page.getByRole('button', { name: 'Schedule night' }).click()
+await page.getByRole('heading', { name: 'League - 03/10/2023' }).waitFor()
+await page.getByRole('button', { name: 'Open night' }).click()
+await page.getByRole('alertdialog').getByRole('button', { name: 'Open night' }).click()
+await page.getByText('Open', { exact: true }).waitFor()
 // Attendance, once the night is open: the keeper answers for three players who told them in person
 for (const [nickname, answer] of [['Jacobson', 'ALL IN'], ['Duhamel', 'ALL IN'], ['Moneymaker', 'FOLD']]) {
-  await page.getByRole('button', { name: /^Responder por outro jogador/ }).click()
+  await page.getByRole('button', { name: /^Answer for another player/ }).click()
   await page.getByRole('dialog').getByRole('searchbox').fill(nickname)
   await page.getByRole('dialog').getByRole('option', { name: nickname, exact: true }).click()
   await page.getByRole('dialog').waitFor({ state: 'detached' })
@@ -117,51 +117,51 @@ for (const [nickname, answer] of [['Jacobson', 'ALL IN'], ['Duhamel', 'ALL IN'],
 }
 await shot('02-attendance', true)
 
-// "Painel do evento": the payments of the open night, on a screen of its own with no menus
-await page.getByRole('link', { name: 'Abrir o painel' }).click()
-await page.getByRole('heading', { name: 'Painel do evento', level: 1 }).waitFor()
-const marksOf = (nickname) => page.getByRole('group', { name: `Pagamentos de ${nickname}` })
+// The night dashboard: the payments of the open night, on a screen of its own with no menus
+await page.getByRole('link', { name: 'Open the dashboard' }).click()
+await page.getByRole('heading', { name: 'Night dashboard', level: 1 }).waitFor()
+const marksOf = (nickname) => page.getByRole('group', { name: `Payments of ${nickname}` })
 await marksOf('Jacobson').getByRole('button', { name: 'Buy-in' }).click()
 await marksOf('Jacobson').getByRole('button', { name: '+ Rebuy' }).click()
 await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).waitFor()
-await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
-await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
-await page.getByText('Dono da casa: Duhamel').waitFor()
+await page.getByRole('button', { name: 'More actions for Duhamel' }).click()
+await page.getByRole('menuitem', { name: 'Is the house owner' }).click()
+await page.getByText('House owner: Duhamel').waitFor()
 await shot('03-night-dashboard')
-await page.getByRole('link', { name: 'Voltar ao site' }).click()
-await page.getByText('Aberto', { exact: true }).waitFor()
+await page.getByRole('link', { name: 'Back to the site' }).click()
+await page.getByText('Open', { exact: true }).waitFor()
 
-await page.getByRole('link', { name: /Finalizar/ }).click()
-await page.getByLabel('Pote (R$)').fill('845')
-await page.getByLabel('Pote ME (R$)').fill('170')
+await page.getByRole('link', { name: /^Finish/ }).click()
+await page.getByLabel('Pot (R$)', { exact: true }).fill('845')
+await page.getByLabel('Main Event pot (R$)').fill('170')
 await page.getByLabel('Time chip (R$)').fill('40')
-for (const [position, search] of [[1, 'jacobson'], [2, 'duhamel'], [3, 'cada'], [4, 'raymer'], [5, 'moneymaker'], [6, 'brunson']]) {
-  await pick(new RegExp(`^${position}º lugar`), search)
+for (const [position, search] of [['1st', 'jacobson'], ['2nd', 'duhamel'], ['3rd', 'cada'], ['4th', 'raymer'], ['5th', 'moneymaker'], ['6th', 'brunson']]) {
+  await pick(new RegExp(`^${position} place`), search)
 }
 await shot('04-result-form', true)
-await page.getByRole('button', { name: 'Finalizar evento' }).click()
-await page.getByText('Finalizado', { exact: true }).waitFor()
+await page.getByRole('button', { name: 'Finish night' }).click()
+await page.getByText('Finished', { exact: true }).waitFor()
 await shot('05-night-finished')
 
 await page.goto('seasons/10/simulator')
-await page.getByLabel('Pote imaginado (R$)').fill('840')
-for (const [position, search] of [[1, 'moneymaker'], [2, 'brunson'], [3, 'jacobson'], [4, 'duhamel'], [5, 'cada'], [6, 'raymer']]) {
-  await pick(new RegExp(`^${position}º lugar`), search)
+await page.getByLabel('Imagined pot (R$)').fill('840')
+for (const [position, search] of [['1st', 'moneymaker'], ['2nd', 'brunson'], ['3rd', 'jacobson'], ['4th', 'duhamel'], ['5th', 'cada'], ['6th', 'raymer']]) {
+  await pick(new RegExp(`^${position} place`), search)
 }
-await page.getByRole('button', { name: 'Simular' }).click()
-await page.getByRole('heading', { name: 'Classificação simulada' }).scrollIntoViewIfNeeded()
+await page.getByRole('button', { name: 'Simulate' }).click()
+await page.getByRole('heading', { name: 'Simulated standings' }).scrollIntoViewIfNeeded()
 await shot('06-simulator')
 
 // The season calendar of 2022: winners, and the Friday after Tiradentes left out
 await page.goto('seasons/2/calendar')
 // One screen of it, with April just under the header: the whole page is many screens long.
-await page.getByRole('region', { name: 'Abril de 2022' }).evaluate((month) => {
+await page.getByRole('region', { name: 'April 2022' }).evaluate((month) => {
   window.scrollTo(0, month.getBoundingClientRect().top + window.scrollY - 72)
 })
 await shot('07-calendar')
 
 // The Main Event of 2022: its players in order and the season's Main Event pot
 await page.goto('seasons/2/main-event')
-await page.getByRole('list', { name: /^Classificação: Main Event/ }).waitFor()
+await page.getByRole('list', { name: /^Result: Main Event/ }).waitFor()
 await shot('08-main-event', true)
 await browser.close()
