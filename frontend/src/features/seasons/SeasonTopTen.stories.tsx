@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router'
 import { players, standings, topTen } from '@/mocks/data'
 import { SeasonTopTen } from './SeasonTopTen'
 
-// The first ten of a season: one list on a phone, two columns from a tablet up.
+// The first ten of a season: one list, 1 to 10.
 const meta = {
   component: SeasonTopTen,
   parameters: { layout: 'padded' },

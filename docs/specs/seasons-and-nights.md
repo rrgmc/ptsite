@@ -37,9 +37,10 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 3e. A link to one season (`/seasons/7/results`) picks that season, then opens the screen. If the picked season no
    longer exists or was archived, the site goes back to the current season.
 3f. **"Temporadas"**, in the menu, shows every season, newest first, each with the **first ten of its standings**:
-   position, photo, nickname and points. On a wide screen the ten take two columns, 1 to 5 and 6 to 10. A
-   finished season shows its final standings and the current season its standings so far. When the tenth place
-   is shared, ten players are shown and the list says how many tied players did not fit ("e mais 2 empatados").
+   position, photo, nickname and points. On a wide screen two seasons stand side by side, each with its ten in
+   one list. A finished season shows its final standings and the current season its standings so far. When the
+   tenth place is shared, ten players are shown and the list says how many tied players did not fit ("e mais 2
+   empatados").
    A season with no finished night says so. **"Ver esta temporada"** makes a season the selected one and opens
    its standings; the selected season shows "✓ Selecionada" instead. Everyone logged in can open it.
 4. A night belongs to a season explicitly. A night's season cannot be worked out from its date, because
