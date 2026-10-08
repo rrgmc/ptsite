@@ -8,7 +8,8 @@ export interface TabBoxTab {
 }
 
 /**
- * A box with tabs: one of its parts shows at a time, picked by its title. The first one shows at first.
+ * A box with tabs over it, as the tabs of a folder: one of its parts shows at a time, picked by its title, and
+ * the title of the part on show is filled with the main color. The first one shows at first.
  * It may be narrower than its content (min-w-0), as a Card, and its titles scroll sideways when they do not fit.
  */
 export function TabBox({ label, tabs }: {
@@ -17,20 +18,25 @@ export function TabBox({ label, tabs }: {
   tabs: TabBoxTab[]
 }) {
   return (
-    <Tabs className="min-w-0 rounded-lg bg-surface shadow-card">
-      <TabList aria-label={label} className="flex overflow-x-auto border-b border-border px-2">
+    <Tabs className="min-w-0">
+      <TabList aria-label={label} className="flex gap-1 overflow-x-auto">
         {tabs.map((tab) => (
           <Tab
             key={tab.id}
             id={tab.id}
-            className="flex min-h-touch shrink-0 cursor-pointer items-center border-b-2 border-transparent px-3 font-display font-bold text-muted outline-none hover:text-text selected:border-primary selected:text-primary focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus"
+            className="flex min-h-9 shrink-0 grow cursor-pointer items-center justify-center rounded-t-lg bg-surface-sunken px-2.5 font-display text-base font-bold text-text outline-none hover:bg-border selected:bg-primary selected:text-on-primary focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus sm:grow-0 sm:px-6"
           >
             {tab.title}
           </Tab>
         ))}
       </TabList>
       {tabs.map((tab) => (
-        <TabPanel key={tab.id} id={tab.id} className="p-4 outline-none focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus">
+        // The line over the box joins it to the tab on show.
+        <TabPanel
+          key={tab.id}
+          id={tab.id}
+          className="rounded-b-lg border-t-3 border-primary bg-surface p-4 shadow-card outline-none focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus"
+        >
           {tab.content}
         </TabPanel>
       ))}
