@@ -11,6 +11,7 @@ import { PlayerEditPage, PlayersAdmin } from './PlayersAdmin'
 import { hasFeature } from '@/lib/features'
 import { SeasonPlanner } from './SeasonPlanner'
 import { SeasonEditPage, SeasonsAdmin } from './SeasonsAdmin'
+import { SettingsAdmin } from './SettingsAdmin'
 
 /** "Administração": loaded as a separate bundle, only for admins. The API checks permissions again. */
 export function AdminRoutes() {
@@ -31,6 +32,7 @@ export function AdminRoutes() {
         <NavLink to="/admin/places" className={tab}>{t.common.places}</NavLink>
         <NavLink to="/admin/holidays" className={tab}>{t.admin.holidays.tab}</NavLink>
         <NavLink to="/admin/audit-log" className={tab}>{t.admin.auditLog.tab}</NavLink>
+        <NavLink to="/admin/settings" className={tab}>{t.admin.settings.tab}</NavLink>
       </nav>
       <Routes>
         <Route index element={<SeasonsAdmin />} />
@@ -43,6 +45,7 @@ export function AdminRoutes() {
         <Route path="places" element={<PlacesAdmin />} />
         <Route path="places/:placeId" element={<PlaceEditPage />} />
         <Route path="audit-log" element={<AuditLogPage />} />
+        <Route path="settings" element={<SettingsAdmin />} />
       </Routes>
     </>
   )

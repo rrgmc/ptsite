@@ -64,7 +64,8 @@ frontend/
 | `/statistics`, `/statistics/all` | Statistics of the selected season, and of every season: top ten lists and two charts | players |
 | `/players`, `/players?view=detailed` | Players, as a list or with the memos | players |
 | `/players/:id`, `/players/:id/all` | A player's page: photo, names, memo, and the player's statistics of the selected season, or of every season. Contact details for the player and admins only | players |
-| `/admin`, `/admin/players`, `/admin/places`, `/admin/audit-log` | Seasons, players, places, audit log | admins |
+| `/admin`, `/admin/players`, `/admin/places`, `/admin/holidays`, `/admin/audit-log` | Seasons, players, places, holidays, audit log | admins |
+| `/admin/settings` | "Configurações": the site's features and its version, to read only | admins |
 | `/admin/seasons/:id/main-event` | The Main Event of one season, on a site that has it: the form that schedules it, or records it with its players; then the Main Event, with the ways to its night and its result. The only place where a Main Event is added | admins |
 | `/admin/seasons/new`, `/admin/seasons/:id`, `/admin/players/new`, `/admin/players/:id`, `/admin/places/new`, `/admin/places/:id` | The form of one season, player or place, on a page of its own | admins |
 
@@ -108,6 +109,8 @@ A site turns a part of the product off in `features` of its `site.json`
   link when the answer is no. Hiding is cosmetic: the API refuses the feature too.
 - **The demo site has every feature**, the Main Event and the house owner's buy-in too, which it turns on in `site/site.json`. So a test or a story shows the other way with `overrideFeatures` (a test)
   or the decorator `withFeatures` of `src/mocks/withFeatures.tsx` (a story).
+- **"Configurações" in "Administração" lists every flag** with whether the site has it (`SettingsAdmin`). Each
+  flag has a name and a description in `t.admin.settings.features`. It reads the bundle, as every screen does.
 - To add a flag, follow "Adding a feature flag" in [backend-layers.md](backend-layers.md).
 
 ## Texts
@@ -176,6 +179,7 @@ The address says which season: `/results` is the current season and `/seasons/7/
   and "Sair", on phones and on desktop.
 - **Phones:** the bottom tab bar holds the items marked `tab`, five at most. "Sair" is only in the menu.
 - **Desktop:** the top bar holds the items marked `top`.
+- **"Simulação" and "Main Event" are only in the menu.** The standings also link to the simulator.
 
 ## Footer
 
@@ -186,13 +190,17 @@ Every page ends with `SiteFooter` (`features/layout/SiteFooter.tsx`), which show
 The version is the constant `__APP_VERSION__`, set at build time in `vite.config.ts` and declared in
 `src/vite-env.d.ts`. Where it comes from: [deployment.md](deployment.md), "Releases".
 
+"Configurações" in "Administração" shows the same version. A site's build has two, joined as
+"v3.0.0+ptsite.v1.8.0", and `splitVersion()` (`src/lib/version.ts`) shows them on two lines: the site's and the
+core's.
+
 ## Desktop layout
 
 The same screens adapt from 640px wide (Tailwind's `sm`) upwards. No feature is desktop-only: a shortcut shown
 only on desktop also exists on another screen.
 
-- **Navigation:** the bottom tab bar on phones becomes links in the top bar, which also has "Temporadas",
-  "Administração" (admins) and "Sair".
+- **Navigation:** the bottom tab bar on phones becomes links in the top bar, which also has "Estatísticas",
+  "Temporadas", "Administração" (admins) and "Sair". "Meu perfil" is the last item before "Administração".
 - **Width:** content is centred with a maximum width of 1024px (`max-w-5xl`).
 - **Standings:** the table gains the "Pontuou" and "Vitórias" columns, and the last result and simulator link
   move to a side column (from 1024px, `lg`).

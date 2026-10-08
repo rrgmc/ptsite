@@ -29,7 +29,8 @@ Everyone who uses the site.
    "Finalizar" (finish), "Editar resultados" (edit results) and "Editar evento" (edit the place and description;
    on an open or finished night, admins only). Players don't see them.
 7. **"Administração"** is a section of the same site for managing lists (seasons, players, places, accounts).
-   Only admins see it in the menu. A **place can be archived**: it is no longer offered when a night or a season
+   Only admins see it in the menu. Its tab **"Configurações"** shows which features the site has and the site's
+   version. It changes nothing: a site's features are set when the site is built. A **place can be archived**: it is no longer offered when a night or a season
    picks its place, and the nights already at it keep it. Archiving asks for confirmation first. The archived
    place stays in the admin list, marked "arquivado", and can be restored there.
 8. **Every change made by a results keeper or admin is recorded**: who, when, what, and the values before and
