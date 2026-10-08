@@ -174,12 +174,12 @@ tasks:
       - npm test -- {{.CLI_ARGS}}
 
   test:e2e:
-    desc: 'Build, then run the end-to-end tests. One file: task test:e2e -- tests/admin.spec.ts'
+    desc: 'Build, then run the end-to-end tests, phone and desktop at once. One file: task test:e2e -- tests/admin.spec.ts'
     dir: frontend
     deps: [db:start]
     cmds:
       - npm run build
-      - npm run test:e2e -- {{.CLI_ARGS}}
+      - npm run test:e2e:parallel -- {{.CLI_ARGS}}
 
   test:storybook:
     desc: Build Storybook, then check that every story renders and passes axe

@@ -135,7 +135,9 @@ Details and examples are in `docs/architecture/backend-layers.md` (including the
 - **Screens** use components on React Aria and design tokens only (`frontend/src/tokens/tokens.css`), never raw
   colors or sizes. Design at phone width first. Add a Storybook story for every new component or screen state.
 - **Before pushing:** `vendor/bin/pint` and `vendor/bin/pest` in `backend/`; `npm run lint`, `npx tsc -b`,
-  `npm test` and `npm run build` in `frontend/`. Run the end-to-end tests for screen changes.
+  `npm test` and `npm run build` in `frontend/`. For a screen change, also run the end-to-end test files of the
+  screens you changed, not all of them: `task test:e2e -- tests/admin.spec.ts`. The whole set takes many minutes,
+  and CI runs it on the pull request, together with the Storybook tests.
 - **Task.** `Taskfile.yml` gives the common commands short names ([go-task](https://taskfile.dev)): `task check`
   runs the "before pushing" list, `task api` the two API commands above, and `task --list` shows the rest. When
   a command here changes, change its task too.
