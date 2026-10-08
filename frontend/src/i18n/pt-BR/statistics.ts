@@ -17,6 +17,10 @@ export const statistics = {
   placesCaption: 'Locais por número de eventos',
   // "Posições": a line per player and a column per scoring position
   positionTableCaption: 'Jogadores por vezes em cada posição',
+  /** In place of a zero: the player never finished in that position. */
+  never: '–',
+  /** Read by screen readers after the highest number of a column. */
+  highestOfPosition: '(o maior da posição)',
   showAll: ({ count }: { count: number }) => `Ver todos (${count})`,
   showFirst: ({ count }: { count: number }) => `Ver só os ${count} primeiros`,
   times: 'Vezes',

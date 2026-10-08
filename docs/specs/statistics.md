@@ -24,7 +24,8 @@ Everyone logged in: players, results keepers and admins.
    - **"Eventos Pontuando"**: players by the number of nights on which they scored.
    - **"Maiores Potes"**: nights by pot.
 3c. **"Posições"** is a table like a medal table: a line for each player who scored and a column for each
-   scoring position, with the times the player finished there. A position the player never reached shows 0.
+   scoring position, with the times the player finished there. A position the player never reached shows a
+   dash. The highest number of each position is marked, on every line that has it.
    The order is by most 1st places, then by most 2nd places, and so on. Players with the same number in every
    column share a position (rule 4). It shows the first 10 lines, and "Ver todos" shows every line.
 3a. **"Locais"** is a pie chart of the first 10 places by the number of nights. A night with no place is not
@@ -88,6 +89,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - **Nights scored, with a tie.** Ana 3 and Carla 3 share 1st; Breno, with 2, is 3rd.
 - **Finishing positions.** 1st: Ana 2, Breno 1. 2nd: Carla 2, Breno 1. 3rd: Ana 1 and Carla 1. The table is Ana
   (2, 0, 1), then Breno (1, 1, 0), then Carla (0, 2, 1): Ana has most 1st places, and Carla has none.
+- **The highest of each position.** In that table, Ana's 2 is marked under "1º", Carla's 2 under "2º", and under
+  "3º" both Ana's 1 and Carla's 1. Ana's 2nd place and Breno's 3rd place show a dash.
 - **The same positions.** Ana and Breno have one 1st and one 2nd place each, and Carla two 3rd places: Ana and
   Breno share 1st, and Carla is 3rd.
 - **Biggest pots.** Night 2 (R$ 400,00) is 1st; nights 1 and 3 (R$ 300,00) share 2nd. The total pot is R$ 1.000,00

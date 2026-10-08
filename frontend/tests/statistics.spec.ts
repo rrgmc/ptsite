@@ -24,6 +24,8 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(positions.getByRole('columnheader', { name: '1º' })).toBeVisible()
   await expect(positions.getByRole('columnheader', { name: '6º' })).toBeVisible()
   await expect(positions.getByRole('row')).toHaveCount(11)
+  // The leader of the table has the most 1st places, which is marked.
+  await expect(positions.getByRole('row').nth(1).getByRole('cell').nth(2)).toContainText('(o maior da posição)')
   await page.getByRole('button', { name: /^Ver todos \(\d+\)$/ }).click()
   await expect(positions.getByRole('row')).not.toHaveCount(11)
   await page.getByRole('button', { name: 'Ver só os 10 primeiros' }).click()

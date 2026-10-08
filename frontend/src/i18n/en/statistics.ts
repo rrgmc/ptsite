@@ -17,6 +17,8 @@ export const statistics: Messages['statistics'] = {
   noPlaces: 'No nights with a place.',
   placesCaption: 'Places by number of nights',
   positionTableCaption: 'Players by times in each position',
+  never: '–',
+  highestOfPosition: '(the highest of the position)',
   showAll: ({ count }) => `Show all (${count})`,
   showFirst: ({ count }) => `Show only the first ${count}`,
   times: 'Times',
