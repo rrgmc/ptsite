@@ -25,7 +25,8 @@ export function PositionTable({ rows }: { rows: Statistics['position_table'] }) 
 
   return (
     <>
-      <div className="overflow-x-auto">
+      {/* relative: the texts for screen readers are positioned, and must scroll with the table, not widen the page. */}
+      <div className="relative overflow-x-auto">
         {/* On a wide screen the table is only as wide as it needs, so the numbers stay near the names. */}
         <table className="w-full border-collapse text-sm sm:w-auto">
           <caption className="sr-only">{t.statistics.positionTableCaption}</caption>

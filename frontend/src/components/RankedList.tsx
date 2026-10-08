@@ -36,7 +36,8 @@ export function RankedList({ caption, labelHeader, valueHeader, rows, tiedNotSho
   compact?: boolean
 }) {
   return (
-    <div className="overflow-x-auto">
+    // relative: the texts for screen readers are positioned, and must scroll with the table, not widen the page.
+    <div className="relative overflow-x-auto">
       <table className={`w-full border-collapse ${compact ? 'text-sm' : ''}`}>
         <caption className="sr-only">{caption}</caption>
         <thead className={compact ? 'sr-only' : undefined}>

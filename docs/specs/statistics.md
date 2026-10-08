@@ -130,14 +130,16 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then "Pontos
   acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the same
   numbers as a table.
-- Under it, **boxes that fold**: pressing a box's title hides what is in it, and shows it again. Every box
-  starts open. The lists in them are compact: short lines, the player's small photo and no header line.
-  - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
-  - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
-    over the other, beside the list.
+- Under it, a box with **tabs**, drawn as the tabs of a folder: one tab shows at a time, and its title is filled
+  with the site's main color. "Posições" shows first. The tab on show is not in the address: opening the screen
+  again shows "Posições". The lists in the tabs are compact: short lines, the player's small photo and no
+  header line.
   - **"Posições"**: the table of rule 3c, with the columns "1º", "2º" and so on, and "Vitórias". On a wide
     screen the table is only as wide as its columns need, and "Vitórias" is at its right; on a phone "Vitórias"
     is under the table.
+  - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
+  - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
+    over the other, beside the list.
   - **"Main Event"**, in "Geral": "Títulos", "Pódios" and "Participações", side by side, two across on a phone.
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, below "Próximos eventos" and above the
