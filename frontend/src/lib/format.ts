@@ -72,6 +72,14 @@ export function nightTitle(iso: string, number?: number): string {
   return `${site.nightTitlePrefix}${number ? ` ${number}` : ''} - ${formatDate(iso)}`
 }
 
+/**
+ * The title of a night, from the night: "Main Event - 12/12/2026" for a Main Event night, and the title above for
+ * any other. Only a round has a number.
+ */
+export function titleOfNight(night: { starts_at: string; type?: 'regular' | 'main_event' }, number?: number): string {
+  return night.type === 'main_event' ? `${t.nights.mainEventTitlePrefix} - ${formatDate(night.starts_at)}` : nightTitle(night.starts_at, number)
+}
+
 /** 1 → "1º", or "1st" in English */
 export function ordinal(position: number): string {
   return t.common.ordinal({ position })

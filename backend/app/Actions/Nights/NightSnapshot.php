@@ -10,10 +10,12 @@ final class NightSnapshot
     /** @return array<string, mixed> */
     public static function of(Night $night): array
     {
-        $night->loadMissing('results');
+        $night->loadMissing(['results', 'mainEventPositions']);
 
         return [
             'status' => $night->status,
+            'type' => $night->type ?? 'regular',
+            'is_extra' => (bool) $night->is_extra,
             'starts_at' => $night->starts_at?->toIso8601String(),
             'place_id' => $night->place_id,
             'description' => $night->description,
@@ -24,6 +26,8 @@ final class NightSnapshot
             'results' => $night->results
                 ->map(fn ($line) => ['position' => $line->position, 'player_id' => $line->player_id, 'points' => $line->points])
                 ->values()->all(),
+            // A Main Event's result: its players, the 1st place first.
+            'main_event_player_ids' => $night->mainEventPositions->pluck('player_id')->all(),
         ];
     }
 }

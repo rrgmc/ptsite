@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, memo, memos, nightPlan, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
+import { attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightPlan, openMainEventNight, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
 
 const withArchived = (request: Request) => new URL(request.url).searchParams.get('archived') === '1'
 
@@ -66,7 +66,14 @@ export const handlers = [
   http.post('/api/v1/nights/:id/reschedule', async ({ request }) =>
     HttpResponse.json({ data: { ...openNight, status: 'scheduled', ...((await request.json()) as { starts_at: string }) } }),
   ),
-  http.get('/api/v1/nights/:id', ({ params }) => HttpResponse.json({ data: Number(params.id) === openNight.id ? openNight : finishedNight })),
+  http.get('/api/v1/nights/:id', ({ params }) =>
+    HttpResponse.json({ data: [openNight, mainEventNight, openMainEventNight].find((n) => n.id === Number(params.id)) ?? finishedNight }),
+  ),
+  http.post('/api/v1/nights/:id/main-event-result', async ({ request }) => {
+    const { player_ids } = (await request.json()) as { player_ids: number[] }
+    return HttpResponse.json({ data: { ...mainEventNight, main_event_positions: player_ids.map((id, i) => ({ position: i + 1, player: players.find((p) => p.id === id) ?? players[0] })) } })
+  }),
+  http.post('/api/v1/seasons/:id/main-event/import', () => HttpResponse.json({ data: mainEventNight }, { status: 201 })),
   http.get('/api/v1/players', () => HttpResponse.json({ data: players.map((p) => ({ ...p, memo: memos[p.id] ?? null })) })),
   // One handler per kind of image. MSW cannot read a pattern such as `:kind(thumbnail|photo)`: it throws on every
   // request, and then no story renders.

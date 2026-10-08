@@ -46,8 +46,11 @@ function describe(entry: CalendarEntry): string {
           : t.calendar.holidayNamed({ name: reason.holiday ?? '' }),
     })
   }
-  if (n.status === 'finished') return `🏆 ${n.winner ?? '—'} · ${formatMoney(n.pot)}`
+  const mark = n.type === 'main_event' ? t.nights.marks.mainEvent : n.is_extra ? t.nights.marks.extra : null
+  // A Main Event has a champion and no pot.
+  if (n.status === 'finished') return [mark, `🏆 ${n.winner ?? '—'}`, n.type === 'main_event' ? null : formatMoney(n.pot)].filter(Boolean).join(' · ')
   return [
+    mark,
     formatTime(entry.starts_at),
     n.status === 'open' ? t.calendar.open : null,
     n.place ?? t.calendar.placeToBeSet,
@@ -73,14 +76,19 @@ export function SeasonCalendar({ season, entries, holidays = [], today: now = to
   }
   for (const e of entries) {
     const day = dayOf(e.starts_at)
-    days[day] = e.night
-      ? {
-          tone: e.night.status === 'finished' ? 'finished' : 'night',
-          label: describe(e),
-          href: `/nights/${e.night.id}`,
-          highlight: e === next,
-        }
-      : { tone: 'skipped', label: describe(e) }
+    if (!e.night) {
+      days[day] = { tone: 'skipped', label: describe(e) }
+      continue
+    }
+    // A day can have an extra night beside another one. The day names both and opens the first; the notes under
+    // the month link to each.
+    const other = days[day]?.href ? days[day] : undefined
+    days[day] = {
+      tone: e.night.status === 'finished' && (!other || other.tone === 'finished') ? 'finished' : 'night',
+      label: other ? `${other.label} + ${describe(e)}` : describe(e),
+      href: other?.href ?? `/nights/${e.night.id}`,
+      highlight: e === next || other?.highlight,
+    }
   }
   const first = [season.starts_on, dayOf(entries[0].starts_at)].sort()[0]
   const last = dayOf(entries.at(-1)!.starts_at)
@@ -141,6 +149,7 @@ function JumpButton({ month, children }: { month: string; children: ReactNode })
 
 /** The month's nights, the Fridays with no night, and every holiday of the month, in words. */
 function calendarNotes(month: string, entries: CalendarEntry[], holidays: CalendarHoliday[]): MonthNote[] {
+  // One note per night, so a day with two nights has two.
   const notes = new Map<string, MonthNote>()
   for (const h of holidays) {
     if (!h.cancelled && h.date.startsWith(month)) {
@@ -150,7 +159,7 @@ function calendarNotes(month: string, entries: CalendarEntry[], holidays: Calend
   for (const e of entries) {
     const day = dayOf(e.starts_at)
     if (!day.startsWith(month)) continue
-    notes.set(day, e.night
+    notes.set(e.night ? `${day}-${e.night.id}` : day, e.night
       ? { date: day, tone: e.night.status === 'finished' ? 'finished' : 'night', text: describe(e), href: `/nights/${e.night.id}` }
       : { date: day, tone: 'skipped', text: describe(e) })
   }

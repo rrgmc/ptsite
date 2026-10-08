@@ -10,11 +10,13 @@ import { Badge, ErrorBox, Loading } from '@/components/Feedback'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { dayOf } from '@/lib/dates'
-import { formatTime, formatWeekday, nightTitle } from '@/lib/format'
+import { formatTime, formatWeekday, titleOfNight } from '@/lib/format'
 import { plainText } from '@/lib/plainText'
 import { canEditNight } from './canEditNight'
 import { NightAttendance } from '../attendance/NightAttendance'
+import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
 import { NightResultCard } from '../results/NightResultCard'
+import { NightMark } from './NightMark'
 import { NightPartialResult } from './PartialResultCard'
 
 const statusLabel = t.nights.status
@@ -37,13 +39,21 @@ export function NightPage() {
   const canRun = me.data?.abilities.run_nights
   const canEdit = canEditNight(n, me.data)
   const description = plainText(n.description)
+  // A Main Event night has a result of its own: the order of its players, with no pot.
+  const isMainEvent = n.type === 'main_event'
+  const resultPath = `/nights/${n.id}/${isMainEvent ? 'main-event-result' : 'result'}`
 
   return (
     <>
       <PageHeader
-        title={nightTitle(n.starts_at)}
+        title={titleOfNight(n)}
         subtitle={<span>{formatWeekday(n.starts_at)} · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>}
-        action={<Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{statusLabel[n.status]}</Badge>}
+        action={
+          <span className="flex flex-wrap items-center gap-2">
+            <NightMark night={n} />
+            <Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{statusLabel[n.status]}</Badge>
+          </span>
+        }
       />
 
       {description && <p className="mb-4 max-w-xl whitespace-pre-line">{description}</p>}
@@ -59,8 +69,8 @@ export function NightPage() {
               </>
             )}
             {n.archived && <p className="text-muted">{t.nights.nightCancelled}</p>}
-            {n.status === 'open' && <Link to={`/nights/${n.id}/result`} className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover">{t.nights.page.finishEnterResult}</Link>}
-            {n.status === 'finished' && <Link to={`/nights/${n.id}/result`} className={secondaryLink}>{t.nights.page.editResult}</Link>}
+            {n.status === 'open' && <Link to={resultPath} className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover">{t.nights.page.finishEnterResult}</Link>}
+            {n.status === 'finished' && <Link to={resultPath} className={secondaryLink}>{t.nights.page.editResult}</Link>}
             {canEdit && <Link to={`/nights/${n.id}/edit`} className={secondaryLink}>{t.nights.editNight}</Link>}
           </div>
           {open.error && <div className="mt-3"><ErrorBox error={open.error} /></div>}
@@ -72,7 +82,13 @@ export function NightPage() {
         <NightAttendance night={n} />
       </div>
 
-      {n.status === 'finished' ? (
+      {isMainEvent ? (
+        n.status === 'finished' ? (
+          <div className="max-w-md"><MainEventResultCard night={n} /></div>
+        ) : (
+          <Card><p className="text-muted">{t.mainEvent.resultPlaceholder}</p></Card>
+        )
+      ) : n.status === 'finished' ? (
         <div className="max-w-md"><NightResultCard night={n} /></div>
       ) : n.status === 'open' && !n.archived ? (
         <NightPartialResult night={n} />

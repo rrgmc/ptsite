@@ -14,7 +14,7 @@ use PTSite\Domain\Shared\RuleViolation;
 
 /**
  * "Remarcar": changes a scheduled night's date and time. The attendance answers are kept.
- * The new date cannot already have another night in the season.
+ * The new date of a round cannot already have another round of the season. An extra night may share its date.
  */
 final class RescheduleNight
 {
@@ -30,7 +30,7 @@ final class RescheduleNight
 
         return DB::transaction(function () use ($user, $night, $startsAt) {
             $day = CarbonImmutable::parse($startsAt)->toDateString();
-            $taken = Night::query()->notArchived()
+            $taken = ! $night->is_extra && Night::query()->notArchived()->rounds()
                 ->where('season_id', $night->season_id)
                 ->whereKeyNot($night->id)
                 ->whereDate('starts_at', $day)

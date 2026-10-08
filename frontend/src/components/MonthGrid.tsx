@@ -181,7 +181,7 @@ export function MonthNotes({ notes }: { notes: MonthNote[] }) {
   return (
     <ul className="mt-3 flex flex-col gap-1 border-t border-border/60 pt-2 text-sm">
       {sorted.map((note) => (
-        <li key={`${note.date}-${note.tone}`} className="flex items-baseline gap-2">
+        <li key={`${note.date}-${note.tone}-${note.href ?? ''}`} className="flex items-baseline gap-2">
           <span aria-hidden className={`inline-block size-2.5 shrink-0 rounded-full ${dots[note.tone]}`} />
           <span>
             {note.href ? (

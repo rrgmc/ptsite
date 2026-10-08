@@ -13,6 +13,14 @@ export const nights = {
   nightOrder: 'Classificação do evento',
   partialResult: 'Resultado parcial',
 
+  /** What marks a night that is not a round of the season. */
+  marks: {
+    mainEvent: 'Main Event',
+    extra: 'Extra',
+  },
+  /** The first words of a Main Event night's title: "Main Event - 12/12/2026". */
+  mainEventTitlePrefix: 'Main Event',
+
   status: {
     scheduled: 'Agendado',
     open: 'Aberto',
@@ -71,6 +79,8 @@ export const nights = {
     onlyAdminsEdit: 'Só administradores editam um evento aberto ou finalizado.',
     description: 'Descrição',
     descriptionHelp: 'Aparece na página do evento.',
+    extra: 'Evento extra',
+    extraHelp: 'Fica fora do calendário da temporada: não conta como rodada e pode ser no mesmo dia de outro evento. Os pontos valem como em qualquer evento.',
   },
 
   // The partial result card

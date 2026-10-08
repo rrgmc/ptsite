@@ -86,6 +86,49 @@ final class NightRules
         $this->assertPositionsFit($playerByPosition, $table, allowEmpty: false);
     }
 
+    /** A pot and points belong to a regular night; a Main Event night takes the order of its players. */
+    public function assertTakesPoints(NightType $type): void
+    {
+        if ($type !== NightType::Regular) {
+            throw new RuleViolation('night.result.main_event_night');
+        }
+    }
+
+    /** The order of the players belongs to a Main Event night. */
+    public function assertTakesMainEventOrder(NightType $type): void
+    {
+        if ($type !== NightType::MainEvent) {
+            throw new RuleViolation('night.main_event.regular_night');
+        }
+    }
+
+    /** A season has one Main Event night. A cancelled one does not count. */
+    public function assertNoOtherMainEvent(bool $seasonHasMainEvent): void
+    {
+        if ($seasonHasMainEvent) {
+            throw new RuleViolation('night.main_event.already_exists', 'type');
+        }
+    }
+
+    /**
+     * A Main Event's result: its players in finishing order, the 1st place at least, and nobody twice.
+     *
+     * @param  list<int>  $playerIds  the 1st place first
+     */
+    public function assertValidMainEventOrder(array $playerIds): void
+    {
+        if ($playerIds === []) {
+            throw new RuleViolation('night.main_event.first_place_required', 'player_ids');
+        }
+        $seen = [];
+        foreach (array_values($playerIds) as $index => $playerId) {
+            if (isset($seen[$playerId])) {
+                throw new RuleViolation('night.main_event.duplicate_player', "player_ids.{$index}", ['position' => $index + 1, 'other_position' => $seen[$playerId]]);
+            }
+            $seen[$playerId] = $index + 1;
+        }
+    }
+
     /** The partial result ("Resultado parcial") is only taken while the night is open. */
     public function assertCanSavePartialResult(NightStatus $status, bool $archived): void
     {

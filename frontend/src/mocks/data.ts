@@ -56,6 +56,8 @@ export const finishedNight: Night = {
   season_id: 1,
   starts_at: '2026-04-11T21:00:00-03:00',
   status: 'finished',
+  type: 'regular',
+  is_extra: false,
   description: null,
   pot: '300.00',
   main_event_pot: '60.00',
@@ -63,8 +65,29 @@ export const finishedNight: Night = {
   archived: false,
   place,
   results: points.map((p, i) => ({ position: i + 1, points: p, player: players[i] })),
+  main_event_positions: [],
   updated_at: '2026-04-11T23:59:00-03:00',
 }
+
+/** A parallel table on the day of a round: an extra night, which scores but is not a round. */
+export const extraNight: Night = { ...finishedNight, id: 12, is_extra: true, description: 'Mesa paralela', pot: '240.00', main_event_pot: '0.00', time_chip: '0.00' }
+
+/** A finished Main Event night: nine players in finishing order, with no pot and no points. */
+export const mainEventNight: Night = {
+  ...finishedNight,
+  id: 13,
+  starts_at: '2026-12-12T13:00:00-03:00',
+  type: 'main_event',
+  is_extra: true,
+  pot: null,
+  main_event_pot: null,
+  time_chip: null,
+  results: [],
+  main_event_positions: [2, 0, 7, 4, 1, 9, 3, 5, 6].map((index, i) => ({ position: i + 1, player: players[index] })),
+}
+
+/** The Main Event night before it is played: open, taking the answers. */
+export const openMainEventNight: Night = { ...mainEventNight, id: 14, status: 'open', main_event_positions: [] }
 
 export const openNight: Night = {
   ...finishedNight,
@@ -165,7 +188,7 @@ export const holidayCalendar2027: CalendarHoliday[] = [
 const night = (id: number, dayMonth: string, status: 'scheduled' | 'open' | 'finished', extra: Partial<NonNullable<CalendarEntry['night']>> = {}): CalendarEntry => ({
   kind: 'night',
   starts_at: friday(dayMonth),
-  night: { id, status, place: 'Casa do Breno', winner: null, pot: null, all_in_count: 0, my_answer: null, ...extra },
+  night: { id, status, type: 'regular', is_extra: false, place: 'Casa do Breno', winner: null, pot: null, all_in_count: 0, my_answer: null, ...extra },
   skip_reason: null,
 })
 const noNight = (dayMonth: string, kind: 'holiday' | 'bridge' | 'carnival', holiday: string): CalendarEntry => ({
@@ -326,10 +349,10 @@ export const topTen: Standing[] = ['1420.50', '1310.00', '1188.25', '960.00', '9
 
 /** "Temporadas": the current season so far, two finished seasons (one with a cut tie) and one with no result. */
 export const seasonsTopStandings: SeasonTopStandings[] = [
-  { season: seasons[0], rows: standings, tied_not_shown: 0 },
-  { season: seasons[1], rows: topTen, tied_not_shown: 2 },
-  { season: seasons[2], rows: [...topTen.slice(5), ...topTen.slice(0, 5)].map((row, i) => ({ ...row, rank: i + 1, points: topTen[i].points })), tied_not_shown: 0 },
-  { season: { ...seasons[3], nights_count: 0 }, rows: [], tied_not_shown: 0 },
+  { season: seasons[0], rows: standings, tied_not_shown: 0, main_event_champion: null },
+  { season: seasons[1], rows: topTen, tied_not_shown: 2, main_event_champion: players[2] },
+  { season: seasons[2], rows: [...topTen.slice(5), ...topTen.slice(0, 5)].map((row, i) => ({ ...row, rank: i + 1, points: topTen[i].points })), tied_not_shown: 0, main_event_champion: players[7] },
+  { season: { ...seasons[3], nights_count: 0 }, rows: [], tied_not_shown: 0, main_event_champion: null },
 ]
 
 export const playerStatistics: PlayerStatistics = {

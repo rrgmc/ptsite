@@ -79,15 +79,19 @@ class SeasonController extends Controller
         return StandingResource::collection($standings($season));
     }
 
-    /** The season's nights, oldest first, with results. Accepts status and updated_since filters. */
+    /**
+     * The season's nights, oldest first, with results: the rounds, the extra nights and the Main Event night.
+     * Accepts status and updated_since filters.
+     */
     public function nights(Request $request, Season $season): AnonymousResourceCollection
     {
         $nights = $season->nights()
             ->when(! $request->user()->isAdmin(), fn ($q) => $q->notArchived())
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
             ->when($request->query('updated_since'), fn ($q, $since) => $q->where('updated_at', '>', $since))
-            ->with(['place', 'results.player'])
+            ->with(NightResource::RELATIONS)
             ->orderBy('starts_at')
+            ->orderBy('id')
             ->get();
 
         return NightResource::collection($nights);
@@ -144,12 +148,15 @@ class SeasonController extends Controller
         return new SeasonResource($save($request->user(), $season, $request->seasonData())->load(['defaultPlace', 'percentages'])->loadCount(self::counts()));
     }
 
-    /** Finished nights (nights_count) and all nights that are not archived (nights_planned, against the rounds). */
+    /**
+     * Finished rounds (nights_count) and all rounds that are not archived (nights_planned, against the rounds).
+     * An extra night is not a round.
+     */
     private static function counts(): array
     {
         return [
-            'nights' => fn ($q) => $q->finished(),
-            'nights as nights_planned_count' => fn ($q) => $q->notArchived(),
+            'nights' => fn ($q) => $q->finished()->rounds(),
+            'nights as nights_planned_count' => fn ($q) => $q->notArchived()->rounds(),
         ];
     }
 }

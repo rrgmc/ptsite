@@ -9,6 +9,7 @@ export const layout = {
     players: 'Jogadores',
     statistics: 'Estatísticas',
     seasons: 'Temporadas',
+    mainEvent: 'Main Event',
     profile: 'Meu perfil',
     admin: 'Administração',
   },

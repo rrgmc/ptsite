@@ -802,10 +802,152 @@
                 }
             }
         },
+        "/v1/seasons/{season}/main-event/import": {
+            "post": {
+                "operationId": "mainEvent.import",
+                "summary": "Record a past Main Event in one step, saved as finished (\"Importar\"). Results keepers and admins. A\nfinished season takes it too",
+                "tags": [
+                    "MainEvent"
+                ],
+                "parameters": [
+                    {
+                        "name": "season",
+                        "in": "path",
+                        "required": true,
+                        "description": "The season ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ImportMainEventNightRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`NightResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/NightResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "place",
+                                                        "results",
+                                                        "main_event_positions"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/main-event-result": {
+            "post": {
+                "operationId": "mainEvent.finish",
+                "summary": "Enter or correct the result of a Main Event night (\"Finalizar\"). Results keepers and admins",
+                "tags": [
+                    "MainEvent"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FinishMainEventNightRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/NightResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "place",
+                                                        "results",
+                                                        "main_event_positions"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/seasons/{season}/nights": {
             "post": {
                 "operationId": "night.store",
-                "summary": "Schedule a night in a season (\"Adicionar\"). Results keepers and admins",
+                "summary": "Schedule a night in a season (\"Adicionar\"). Results keepers and admins. An extra night is not a round and may\nshare its date. A Main Event night is always extra, and a season takes one",
                 "tags": [
                     "Night"
                 ],
@@ -847,7 +989,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -873,7 +1016,7 @@
             },
             "get": {
                 "operationId": "season.nights",
-                "summary": "The season's nights, oldest first, with results. Accepts status and updated_since filters",
+                "summary": "The season's nights, oldest first, with results: the rounds, the extra nights and the Main Event night.\nAccepts status and updated_since filters",
                 "tags": [
                     "Season"
                 ],
@@ -921,7 +1064,8 @@
                                                         "type": "object",
                                                         "required": [
                                                             "place",
-                                                            "results"
+                                                            "results",
+                                                            "main_event_positions"
                                                         ]
                                                     }
                                                 ]
@@ -989,7 +1133,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -1110,7 +1255,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -1136,7 +1282,7 @@
             },
             "patch": {
                 "operationId": "night.update",
-                "summary": "\"Editar evento\": change a night's place or description. Results keepers and admins for a scheduled night;\nonly admins for an open or finished one",
+                "summary": "\"Editar evento\": change a night's place or description, or whether it is extra. Results keepers and admins\nfor a scheduled night; only admins for an open or finished one",
                 "tags": [
                     "Night"
                 ],
@@ -1177,7 +1323,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -1247,7 +1394,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -1307,7 +1455,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -1364,7 +1513,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -1389,7 +1539,7 @@
         "/v1/nights/{night}/finish": {
             "post": {
                 "operationId": "night.finish",
-                "summary": "Enter or correct a night's results (\"Finalizar\"). Points are calculated from the pot",
+                "summary": "Enter or correct a night's results (\"Finalizar\"). Points are calculated from the pot. A Main Event night is\nfinished with POST nights/{night}/main-event-result",
                 "tags": [
                     "Night"
                 ],
@@ -1431,7 +1581,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "place",
-                                                        "results"
+                                                        "results",
+                                                        "main_event_positions"
                                                     ]
                                                 }
                                             ]
@@ -3218,6 +3369,17 @@
                                     "finished"
                                 ]
                             },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "regular",
+                                    "main_event"
+                                ]
+                            },
+                            "is_extra": {
+                                "type": "boolean",
+                                "description": "Outside the season's calendar: not a round. Always true for a Main Event."
+                            },
                             "place": {
                                 "type": [
                                     "string",
@@ -3229,7 +3391,7 @@
                                     "string",
                                     "null"
                                 ],
-                                "description": "Nickname of the 1st place, for finished nights."
+                                "description": "Nickname of the 1st place, for finished nights. A Main Event has one too."
                             },
                             "pot": {
                                 "type": [
@@ -3256,6 +3418,8 @@
                         "required": [
                             "id",
                             "status",
+                            "type",
+                            "is_extra",
                             "place",
                             "winner",
                             "pot",
@@ -3400,6 +3564,22 @@
                     "device_name"
                 ],
                 "title": "CreateTokenRequest"
+            },
+            "FinishMainEventNightRequest": {
+                "type": "object",
+                "properties": {
+                    "player_ids": {
+                        "type": "array",
+                        "description": "Player ids in finishing order, the 1st place first. At least one, and nobody twice.",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "required": [
+                    "player_ids"
+                ],
+                "title": "FinishMainEventNightRequest"
             },
             "FinishNightRequest": {
                 "type": "object",
@@ -3567,6 +3747,40 @@
                 ],
                 "title": "HolidayScope"
             },
+            "ImportMainEventNightRequest": {
+                "type": "object",
+                "properties": {
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "place_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 2000
+                    },
+                    "player_ids": {
+                        "type": "array",
+                        "description": "Player ids in finishing order, the 1st place first. At least one, and nobody twice.",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "required": [
+                    "starts_at",
+                    "player_ids"
+                ],
+                "title": "ImportMainEventNightRequest"
+            },
             "ImportNightRequest": {
                 "type": "object",
                 "properties": {
@@ -3599,6 +3813,10 @@
                         ],
                         "description": "Required, unless the site has no time chip: then it is not kept.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "is_extra": {
+                        "type": "boolean",
+                        "description": "An extra night is outside the season's calendar: not a round, and it may share its date."
                     },
                     "positions": {
                         "type": "array",
@@ -3749,6 +3967,18 @@
                             "finished"
                         ]
                     },
+                    "type": {
+                        "type": "string",
+                        "description": "What the result is. regular: a pot and points. main_event: the order of the players, with no pot.",
+                        "enum": [
+                            "regular",
+                            "main_event"
+                        ]
+                    },
+                    "is_extra": {
+                        "type": "boolean",
+                        "description": "Outside the season's calendar: not a round, and it may share its date. Always true for a Main Event."
+                    },
                     "description": {
                         "type": [
                             "string",
@@ -3808,6 +4038,25 @@
                             ]
                         }
                     },
+                    "main_event_positions": {
+                        "type": "array",
+                        "description": "The result of a Main Event night: its players in finishing order. Empty on any other night.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "position": {
+                                    "type": "integer"
+                                },
+                                "player": {
+                                    "$ref": "#/components/schemas/PlayerResource"
+                                }
+                            },
+                            "required": [
+                                "position",
+                                "player"
+                            ]
+                        }
+                    },
                     "updated_at": {
                         "type": [
                             "string",
@@ -3820,6 +4069,8 @@
                     "season_id",
                     "starts_at",
                     "status",
+                    "type",
+                    "is_extra",
                     "description",
                     "pot",
                     "main_event_pot",
@@ -4859,6 +5110,18 @@
                             "null"
                         ],
                         "maxLength": 2000
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "regular when left out. main_event only on a site that has the Main Event; a season takes one.",
+                        "enum": [
+                            "regular",
+                            "main_event"
+                        ]
+                    },
+                    "is_extra": {
+                        "type": "boolean",
+                        "description": "An extra night is outside the season's calendar: not a round, and it may share its date."
                     }
                 },
                 "required": [
@@ -5017,12 +5280,24 @@
                     "tied_not_shown": {
                         "type": "integer",
                         "description": "Players left out who have the same total as the last one shown."
+                    },
+                    "main_event_champion": {
+                        "anyOf": [
+                            {
+                                "description": "The 1st place of the season's Main Event. Null before it is played, and on a site with no Main Event.",
+                                "$ref": "#/components/schemas/PlayerResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     }
                 },
                 "required": [
                     "season",
                     "rows",
-                    "tied_not_shown"
+                    "tied_not_shown",
+                    "main_event_champion"
                 ],
                 "title": "SeasonTopStandingsResource"
             },
@@ -5366,6 +5641,10 @@
                             "null"
                         ],
                         "maxLength": 2000
+                    },
+                    "is_extra": {
+                        "type": "boolean",
+                        "description": "Whether the night is outside the season's calendar. Not changed on a Main Event night."
                     }
                 },
                 "title": "UpdateNightRequest"

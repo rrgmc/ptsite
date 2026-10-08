@@ -5,6 +5,7 @@ namespace PTSite\Database\Seeders;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use PTSite\App\Actions\Nights\WriteMainEventResult;
 use PTSite\App\Actions\Nights\WriteNightResult;
 use PTSite\App\Enums\PlayerImageKind;
 use PTSite\App\Enums\Role;
@@ -60,7 +61,11 @@ class DemoLeagueSeeder extends Seeder
 
     private Randomizer $random;
 
-    public function __construct(private readonly WriteNightResult $writeResult, private readonly PlayerPhotoMaker $photos) {}
+    public function __construct(
+        private readonly WriteNightResult $writeResult,
+        private readonly WriteMainEventResult $writeMainEventResult,
+        private readonly PlayerPhotoMaker $photos,
+    ) {}
 
     public function run(): void
     {
@@ -139,7 +144,7 @@ class DemoLeagueSeeder extends Seeder
     }
 
     /**
-     * A season with all its nights finished, on Fridays.
+     * A season with all its nights finished, on Fridays. A finished season has its Main Event too.
      *
      * @param  list<int>  $players  the ids of those who play this season
      */
@@ -175,6 +180,37 @@ class DemoLeagueSeeder extends Seeder
             ]);
             $this->finish($night, $players);
             $played++;
+        }
+
+        if ($finished) {
+            $this->mainEvent($season, $day->next(CarbonImmutable::SATURDAY)->setTime(13, 0), $place, $players, parallelTable: $name === 'Liga 2019');
+        }
+    }
+
+    /**
+     * The Main Event of a finished season, on a Saturday after its last night: ten players in finishing order,
+     * with no pot and no points. One season also has an extra night on that day, a parallel table for the others.
+     * They draw from a randomizer of their own, so the results of the rounds stay the same.
+     *
+     * @param  list<int>  $players
+     */
+    private function mainEvent(Season $season, CarbonImmutable $day, Place $place, array $players, bool $parallelTable): void
+    {
+        $random = new Randomizer(new Mt19937($day->year));
+        $order = $random->shuffleArray($players);
+
+        $night = Night::query()->create([
+            'season_id' => $season->id, 'starts_at' => $day, 'place_id' => $place->id,
+            'status' => 'open', 'type' => 'main_event', 'is_extra' => true,
+        ]);
+        ($this->writeMainEventResult)($night, array_slice($order, 0, 10));
+
+        if ($parallelTable) {
+            $extra = Night::query()->create([
+                'season_id' => $season->id, 'starts_at' => $day, 'place_id' => $place->id,
+                'description' => 'Mesa paralela', 'status' => 'open', 'is_extra' => true,
+            ]);
+            ($this->writeResult)($extra, pot: '400.00', mainEventPot: '0.00', timeChip: '0.00', playerByPosition: array_combine(range(1, 6), array_slice($random->shuffleArray($players), 0, 6)));
         }
     }
 

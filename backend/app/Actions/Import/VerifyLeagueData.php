@@ -9,7 +9,7 @@ use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Shared\RuleViolation;
 
 /**
- * Re-checks every finished night against the rules: its points add up to its pot, and each line equals
+ * Re-checks every finished night that has a pot against the rules: its points add up to its pot, and each line equals
  * pot × percentage ÷ 100 for the season's table. Reports problems; changes nothing.
  */
 final class VerifyLeagueData
@@ -22,7 +22,7 @@ final class VerifyLeagueData
         $problems = [];
         $checked = 0;
 
-        Night::query()->finished()->with(['results', 'season.percentages'])->orderBy('starts_at')
+        Night::query()->finished()->scoring()->with(['results', 'season.percentages'])->orderBy('starts_at')
             ->each(function (Night $night) use (&$problems, &$checked) {
                 $checked++;
                 $label = "Night {$night->id} ({$night->starts_at->toDateString()}, {$night->season->name})";

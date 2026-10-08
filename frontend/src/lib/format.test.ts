@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatLongDate, formatMoney, fullNameIfDifferent, nightTitle, parseMoneyInput, shareOf } from './format'
+import { formatDate, formatLongDate, formatMoney, fullNameIfDifferent, nightTitle, parseMoneyInput, shareOf, titleOfNight } from './format'
 
 describe('format', () => {
   it('formats money in reais', () => {
@@ -15,6 +15,11 @@ describe('format', () => {
   it('titles nights by their date, with their number in the season when it is known', () => {
     expect(nightTitle('2026-03-14T21:00:00-03:00')).toBe('Liga - 14/03/2026')
     expect(nightTitle('2026-03-14T21:00:00-03:00', 3)).toBe('Liga 3 - 14/03/2026')
+  })
+
+  it('titles a Main Event night as the Main Event, and any other night as before', () => {
+    expect(titleOfNight({ starts_at: '2026-12-12T13:00:00-03:00', type: 'main_event' })).toBe('Main Event - 12/12/2026')
+    expect(titleOfNight({ starts_at: '2026-03-14T21:00:00-03:00', type: 'regular' }, 3)).toBe('Liga 3 - 14/03/2026')
   })
 
   it('parses Brazilian money input', () => {

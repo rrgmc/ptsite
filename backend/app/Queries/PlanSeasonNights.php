@@ -19,8 +19,9 @@ final class PlanSeasonNights
     /** @return list<PlannedDate> */
     public function __invoke(Season $season, CarbonImmutable $from, CarbonImmutable $to, ?int $count = null): array
     {
-        // Every night of the season counts: the plan carries on its rhythm and shows the ones in the range.
-        $nights = $season->nights()->notArchived()->pluck('id', 'starts_at')
+        // Every round of the season counts: the plan carries on its rhythm and shows the ones in the range.
+        // An extra night is outside the calendar.
+        $nights = $season->nights()->notArchived()->rounds()->pluck('id', 'starts_at')
             ->mapWithKeys(fn ($id, $startsAt) => [CarbonImmutable::parse($startsAt)->format('Y-m-d H:i:s') => $id]);
         // The year before counts too: 01/01 makes 02/01 an emenda.
         $years = range($from->year - 1, max($from->year, $to->year));

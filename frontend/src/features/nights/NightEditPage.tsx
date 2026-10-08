@@ -5,11 +5,12 @@ import { ApiError, type Night } from '@/api/client'
 import { useMe, useNight, usePlaces, useUpdateNight } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Card, PageHeader } from '@/components/Card'
+import { Checkbox } from '@/components/Checkbox'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextArea } from '@/components/TextArea'
 import { t } from '@/i18n'
-import { nightTitle } from '@/lib/format'
+import { titleOfNight } from '@/lib/format'
 import { plainText } from '@/lib/plainText'
 import { canEditNight } from './canEditNight'
 
@@ -18,8 +19,8 @@ const backLink = 'inline-flex min-h-touch items-center justify-center rounded-md
 const noPlace = 0
 
 /**
- * "Editar evento": a night's place and description, whatever its status. The date is changed in "Remarcar" and the
- * result in "Editar resultado".
+ * "Editar evento": a night's place and description, and whether it is extra, whatever its status. The date is
+ * changed in "Remarcar" and the result in "Editar resultado". A Main Event night is always extra.
  */
 export function NightEditPage() {
   const nightId = Number(useParams().nightId)
@@ -31,7 +32,7 @@ export function NightEditPage() {
   if (night.error || places.error) return <ErrorBox error={night.error ?? places.error} />
   const n = night.data!
 
-  const header = <PageHeader title={t.nights.editNight} subtitle={nightTitle(n.starts_at)} />
+  const header = <PageHeader title={t.nights.editNight} subtitle={titleOfNight(n)} />
   if (!canEditNight(n, me.data)) {
     return (
       <>
@@ -72,6 +73,7 @@ function NightEditForm({ night: n, options }: { night: Night; options: { id: num
   const [initialDescription] = useState(() => plainText(n.description))
   const [placeId, setPlaceId] = useState(initialPlaceId)
   const [description, setDescription] = useState(initialDescription)
+  const [isExtra, setExtra] = useState(n.is_extra)
   const error = update.error instanceof ApiError ? update.error : null
 
   return (
@@ -84,6 +86,7 @@ function NightEditForm({ night: n, options }: { night: Night; options: { id: num
           {
             ...(placeId !== initialPlaceId && { place_id: placeId === noPlace ? null : placeId }),
             ...(description.trim() !== initialDescription && { description: description.trim() || null }),
+            ...(isExtra !== n.is_extra && { is_extra: isExtra }),
           },
           { onSuccess: () => navigate(`/nights/${n.id}`) },
         )
@@ -106,6 +109,12 @@ function NightEditForm({ night: n, options }: { night: Night; options: { id: num
             maxLength={2000}
             errorMessage={error?.fieldError('description')}
           />
+          {n.type === 'regular' && (
+            <div>
+              <Checkbox isSelected={isExtra} onChange={setExtra}>{t.nights.edit.extra}</Checkbox>
+              <p className="text-sm text-muted">{t.nights.edit.extraHelp}</p>
+            </div>
+          )}
         </div>
       </Card>
 

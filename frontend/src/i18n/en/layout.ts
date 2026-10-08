@@ -9,6 +9,7 @@ export const layout: Messages['layout'] = {
     players: 'Players',
     statistics: 'Statistics',
     seasons: 'Seasons',
+    mainEvent: 'Main Event',
     profile: 'My profile',
     admin: 'Admin',
   },

@@ -12,6 +12,8 @@ class UpdateNightRequest extends FormRequest
         return [
             'place_id' => ['sometimes', 'nullable', 'integer', 'exists:places,id'],
             'description' => ['sometimes', 'nullable', 'string', 'max:2000'],
+            /** Whether the night is outside the season's calendar. Not changed on a Main Event night. */
+            'is_extra' => ['sometimes', 'boolean'],
         ];
     }
 }

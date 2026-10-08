@@ -5,6 +5,7 @@ import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { formatDate, formatMoney, formatWeekday } from '@/lib/format'
 import { t } from '@/i18n'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
+import { NightMark } from '../nights/NightMark'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { StandingsTable } from './StandingsTable'
 
@@ -17,7 +18,8 @@ export function StandingsPage() {
   if (error) return <ErrorBox error={error} />
   if (!season) return <Empty>{t.standings.noSeason}</Empty>
 
-  const finished = (nights.data ?? []).filter((n) => n.status === 'finished')
+  // The nights with a pot and points. A Main Event night has neither; an extra night is not a round.
+  const finished = (nights.data ?? []).filter((n) => n.status === 'finished' && n.type === 'regular')
   const next = (nights.data ?? []).find((n) => n.status === 'open') ?? (nights.data ?? []).find((n) => n.status === 'scheduled')
   const last = finished.at(-1)
 
@@ -26,7 +28,7 @@ export function StandingsPage() {
       <OpenNightAttendance />
       <PageHeader
         title={t.standings.title}
-        subtitle={t.standings.subtitle({ season: season.name, count: finished.length })}
+        subtitle={t.standings.subtitle({ season: season.name, count: finished.filter((n) => !n.is_extra).length })}
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_20rem]">
@@ -47,7 +49,7 @@ export function StandingsPage() {
           {next && (
             <Card title={next.status === 'open' ? t.standings.openNight : t.standings.nextNight}>
               <Link to={`/nights/${next.id}`} className="block rounded-md p-2 hover:bg-surface-sunken">
-                <span className="block font-semibold">{formatWeekday(next.starts_at)}</span>
+                <span className="flex flex-wrap items-center gap-2 font-semibold">{formatWeekday(next.starts_at)} <NightMark night={next} /></span>
                 <span className="text-muted">{next.place?.name ?? t.standings.placeToBeDefined}</span>
                 <NextNightAttendance nightId={next.id} isOpen={next.status === 'open'} />
               </Link>

@@ -27,9 +27,11 @@ final class SeasonCalendar
     {
         $nights = $season->nights()->notArchived()
             ->with(['place', 'results' => fn ($q) => $q->where('position', 1)->with('player')])
+            ->with(['mainEventPositions' => fn ($q) => $q->where('position', 1)->with('player')])
             ->with(['attendances' => fn ($q) => $q->where('player_id', $user->player_id ?? 0)])
             ->withCount(['attendances as all_in_count' => fn ($q) => $q->where('answer', 'all_in')])
             ->orderBy('starts_at')
+            ->orderBy('id')
             ->get();
 
         $entries = $nights->map(fn (Night $n) => new CalendarEntry(
@@ -38,13 +40,16 @@ final class SeasonCalendar
             nightId: $n->id,
             status: $n->status,
             place: $n->place?->name,
-            winner: $n->status === 'finished' ? $n->results->first()?->player?->nickname : null,
+            winner: $n->status === 'finished' ? ($n->results->first() ?? $n->mainEventPositions->first())?->player?->nickname : null,
             pot: $n->status === 'finished' ? $n->pot : null,
             allInCount: (int) $n->all_in_count,
             myAnswer: $n->attendances->first()?->answer,
+            type: $n->type,
+            isExtra: $n->is_extra,
         ))->all();
 
-        foreach ($this->leftOut($season, $nights->pluck('starts_at')->map(fn ($d) => CarbonImmutable::instance($d))->all()) as $n) {
+        // Only the rounds carry the season's rhythm: an extra night is outside the calendar.
+        foreach ($this->leftOut($season, $nights->where('is_extra', false)->pluck('starts_at')->map(fn ($d) => CarbonImmutable::instance($d))->all()) as $n) {
             $entries[] = new CalendarEntry(
                 kind: 'no_night',
                 startsAt: CarbonImmutable::instance($n->startsAt)->toIso8601String(),

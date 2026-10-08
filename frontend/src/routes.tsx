@@ -5,6 +5,8 @@ import { ResetPasswordPage } from './features/auth/ResetPasswordPage'
 import { CalendarPage } from './features/calendar/CalendarPage'
 import { AppLayout } from './features/layout/AppLayout'
 import { ErrorPage } from './features/layout/ErrorPage'
+import { MainEventPage } from './features/mainEvent/MainEventPage'
+import { MainEventResultFormPage } from './features/mainEvent/MainEventResultFormPage'
 import { NightPage } from './features/nights/NightPage'
 import { NightEditPage } from './features/nights/NightEditPage'
 import { PartialResultFormPage } from './features/nights/PartialResultFormPage'
@@ -17,6 +19,7 @@ import { SeasonPickerPage } from './features/seasons/SeasonPickerPage'
 import { SeasonsPage } from './features/seasons/SeasonsPage'
 import { SimulatorPage } from './features/simulator/SimulatorPage'
 import { StandingsPage } from './features/standings/StandingsPage'
+import { hasFeature } from './lib/features'
 import { setSelectedSeasonId } from './lib/selectedSeason'
 
 /** A link to one season (/seasons/7/results): picks that season, then opens the screen. */
@@ -29,6 +32,15 @@ const pickSeason = (screen: string) => ({ params }: LoaderFunctionArgs) => {
 /** The statistics screens load as a separate bundle, which holds the chart library. */
 const statistics = (page: 'StatisticsPage' | 'AllTimeStatisticsPage') => () =>
   import('./features/statistics/StatisticsPage').then((m) => ({ Component: m[page] }))
+
+/** The Main Event's screens, on a site that has it. */
+const mainEvent = hasFeature('mainEvent')
+  ? [
+      { path: 'main-event', element: <MainEventPage /> },
+      { path: 'seasons/:seasonId/main-event', loader: pickSeason('/main-event') },
+      { path: 'nights/:nightId/main-event-result', element: <MainEventResultFormPage /> },
+    ]
+  : []
 
 // URLs are in English, like the code; screens are in Brazilian Portuguese. The admin section and the statistics
 // load as separate bundles; a player's page loads its charts the same way.
@@ -58,6 +70,7 @@ export const router = createBrowserRouter(
         { path: 'nights/:nightId/edit', element: <NightEditPage /> },
         { path: 'nights/:nightId/result', element: <ResultFormPage /> },
         { path: 'nights/:nightId/partial-result', element: <PartialResultFormPage /> },
+        ...mainEvent,
         { path: 'players', element: <PlayersPage /> },
         { path: 'players/:playerId', element: <PlayerPage /> },
         { path: 'players/:playerId/all', element: <AllTimePlayerPage /> },

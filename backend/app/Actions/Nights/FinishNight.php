@@ -9,9 +9,11 @@ use PTSite\App\Models\User;
 use PTSite\App\Support\AuditLogger;
 use PTSite\Domain\Nights\NightRules;
 use PTSite\Domain\Nights\NightStatus;
+use PTSite\Domain\Nights\NightType;
 
 /**
- * "Finalizar": enters the results of an open night, or corrects the results of a finished one.
+ * "Finalizar": enters the results of an open night, or corrects the results of a finished one. A Main Event
+ * night is finished by FinishMainEventNight.
  */
 final class FinishNight
 {
@@ -25,6 +27,7 @@ final class FinishNight
     public function __invoke(User $user, Night $night, string $pot, ?string $mainEventPot, ?string $timeChip, array $playerByPosition): Night
     {
         Gate::forUser($user)->authorize('finish', $night);
+        $this->rules->assertTakesPoints(NightType::from($night->type));
         $wasFinished = $night->status === NightStatus::Finished->value;
         $this->rules->assertCanFinish(NightStatus::from($night->status));
 

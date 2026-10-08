@@ -50,6 +50,9 @@ class EndToEndSeeder extends Seeder
             // The planner with every round still to plan (season-planner.spec.ts).
             $this->season('E2E Rodadas', '2023-01-01', '21:30');
 
+            // The Main Event night and an extra night (main-event.spec.ts).
+            $this->season('E2E Main Event', '2017-01-01', '21:30');
+
             // A forgotten password (password-reset.spec.ts). The tests cannot read the email, so one account
             // already has a link with a known token. The other asks for a link.
             $reset = $this->login('e2e-reset');

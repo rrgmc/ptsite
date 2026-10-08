@@ -351,6 +351,8 @@ function useNightChanged() {
     client.invalidateQueries({ queryKey: keys.calendar(seasonId) })
     client.invalidateQueries({ queryKey: keys.season(seasonId) })
     client.invalidateQueries({ queryKey: keys.currentSeason })
+    // "Temporadas" shows the Main Event champion.
+    client.invalidateQueries({ queryKey: keys.seasonsTopStandings })
   }
 }
 
@@ -375,7 +377,7 @@ export function useFinishNight(nightId: number) {
 export function useScheduleNight(seasonId: number) {
   const changed = useNightChanged()
   return useMutation({
-    mutationFn: async (body: { starts_at: string; place_id?: number | null; description?: string | null }) =>
+    mutationFn: async (body: { starts_at: string; place_id?: number | null; description?: string | null; type?: 'regular' | 'main_event'; is_extra?: boolean }) =>
       (await unwrap(api.POST('/v1/seasons/{season}/nights', { params: { path: { season: seasonId } }, body }))).data,
     onSuccess: () => changed(seasonId),
   })
@@ -391,11 +393,31 @@ export function useRescheduleNight(nightId: number) {
   })
 }
 
-/** "Editar evento": a night's place and description. Only the fields sent are changed. */
+/** "Finalizar" for a Main Event night: its players in finishing order, the 1st place first. */
+export function useFinishMainEventNight(nightId: number) {
+  const changed = useNightChanged()
+  return useMutation({
+    mutationFn: async (body: { player_ids: number[] }) =>
+      (await unwrap(api.POST('/v1/nights/{night}/main-event-result', { params: { path: { night: nightId } }, body }))).data,
+    onSuccess: (night) => changed(night.season_id, night.id),
+  })
+}
+
+/** Records a Main Event that was already played, in one step. A finished season takes it too. */
+export function useImportMainEventNight(seasonId: number) {
+  const changed = useNightChanged()
+  return useMutation({
+    mutationFn: async (body: { starts_at: string; place_id?: number | null; description?: string | null; player_ids: number[] }) =>
+      (await unwrap(api.POST('/v1/seasons/{season}/main-event/import', { params: { path: { season: seasonId } }, body }))).data,
+    onSuccess: () => changed(seasonId),
+  })
+}
+
+/** "Editar evento": a night's place and description, and whether it is extra. Only the fields sent are changed. */
 export function useUpdateNight(nightId: number) {
   const changed = useNightChanged()
   return useMutation({
-    mutationFn: async (body: { place_id?: number | null; description?: string | null }) =>
+    mutationFn: async (body: { place_id?: number | null; description?: string | null; is_extra?: boolean }) =>
       (await unwrap(api.PATCH('/v1/nights/{night}', { params: { path: { night: nightId } }, body }))).data,
     onSuccess: (night) => changed(night.season_id, night.id),
   })
