@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -60,5 +60,23 @@ describe('PositionTable', () => {
     expect(first).toHaveTextContent('(o maior da posição)')
     expect(second).not.toHaveTextContent('(o maior da posição)')
     expect(first).toHaveTextContent('–')
+  })
+
+  it('keeps a line per player, and with many positions the first number starts the line under the nickname', () => {
+    const many = table(3).map((row) => ({ ...row, positions: Array.from({ length: 9 }, (_, i) => ({ position: i + 1, count: 1 })) }))
+    render(<MemoryRouter><PositionTable rows={many} /></MemoryRouter>)
+
+    const cells = within(screen.getAllByRole('row')[1]).getAllByRole('cell')
+    expect(cells).toHaveLength(11) // the position, the nickname and the nine scoring positions
+    expect(cells[2]).toHaveClass('col-start-2')
+    expect(cells[3]).not.toHaveClass('col-start-2')
+  })
+
+  it('keeps the numbers beside the nickname with few positions', () => {
+    view(3)
+
+    const cells = within(screen.getAllByRole('row')[1]).getAllByRole('cell')
+    expect(cells).toHaveLength(4)
+    expect(cells[2]).not.toHaveClass('col-start-2')
   })
 })

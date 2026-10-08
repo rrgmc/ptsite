@@ -129,7 +129,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 
 ## Screens
 
-- **"📊 Estatísticas"** in the menu, after "Jogadores". It is not on the phone's bottom bar, which is full.
+- **"📊 Estatísticas"** in the menu, after "Temporadas" and "Main Event". It is not on the phone's bottom bar,
+  which is full.
 - A switch **"Temporada" / "Geral"**. Each view has its own address, so it can be shared.
 - At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then "Pontos
   acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the same
@@ -141,6 +142,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   - **"Posições"**: the table of rule 3c, with the columns "1º", "2º" and so on, and "Vitórias". On a wide
     screen the table is only as wide as its columns need, and "Vitórias" is at its right; on a phone "Vitórias"
     is under the table.
+    On a phone, a table of more than four positions gives each player two lines: the nickname, then the
+    numbers under the positions.
   - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
   - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
     over the other, beside the list.

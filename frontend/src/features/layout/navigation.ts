@@ -25,9 +25,9 @@ export const navItems: NavItem[] = [
   { to: '/calendar', label: t.layout.nav.calendar, icon: '📅', tab: true, top: true },
   { to: '/simulator', label: t.layout.nav.simulator, icon: '🔮' },
   { to: '/players', label: t.layout.nav.players, icon: '👥', tab: true, top: true },
-  { to: '/statistics', label: t.layout.nav.statistics, icon: '📊', top: true },
-  { to: '/main-event', label: t.layout.nav.mainEvent, icon: '🏅', feature: 'mainEvent' },
   { to: '/seasons', label: t.layout.nav.seasons, icon: '🗂️', end: true, top: true },
+  { to: '/main-event', label: t.layout.nav.mainEvent, icon: '🏅', feature: 'mainEvent' },
+  { to: '/statistics', label: t.layout.nav.statistics, icon: '📊', top: true },
   { to: '/profile', label: t.layout.nav.profile, icon: '👤', tab: true, top: true },
   { to: '/admin', label: t.layout.nav.admin, icon: '⚙️', top: true, adminOnly: true },
 ]

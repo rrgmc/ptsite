@@ -67,3 +67,23 @@ export const Positions: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => <RouterStory path="/" url="/" element={<PositionTable rows={statistics.position_table} />} />,
 }
+
+/** "Posições" with nine scoring positions: on a phone the nickname is over the numbers, which share the width. */
+export const NinePositions: StoryObj = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <RouterStory
+      path="/"
+      url="/"
+      element={
+        <PositionTable
+          rows={statistics.position_table.map((row, i) => ({
+            ...row,
+            player: i === 1 ? { ...row.player, nickname: 'Um apelido comprido demais para caber' } : row.player,
+            positions: Array.from({ length: 9 }, (_, column) => ({ position: column + 1, count: Math.max(0, 47 - 5 * i - 4 * column) })),
+          }))}
+        />
+      }
+    />
+  ),
+}

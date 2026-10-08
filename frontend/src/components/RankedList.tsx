@@ -3,10 +3,13 @@ import { t } from '@/i18n'
 import { rankColor } from './rankColor'
 
 
-/** The position in a ranked table, with medal colors for the first three. Tied lines say so to screen readers. */
-export function RankCell({ rank, tied, compact = false }: { rank: number; tied: boolean; compact?: boolean }) {
+/**
+ * The position in a ranked table, with medal colors for the first three. Tied lines say so to screen readers.
+ * A table that is not drawn as one gives the role, to stay a table for screen readers.
+ */
+export function RankCell({ rank, tied, compact = false, role }: { rank: number; tied: boolean; compact?: boolean; role?: 'cell' }) {
   return (
-    <td className={`font-display font-extrabold tabular ${compact ? 'w-6 py-1 pr-1 text-sm' : 'py-3 px-1 sm:px-2 text-lg'} ${rankColor(rank)}`}>
+    <td role={role} className={`font-display font-extrabold tabular ${compact ? 'w-6 py-1 pr-1 text-sm' : 'py-3 px-1 sm:px-2 text-lg'} ${rankColor(rank)}`}>
       {rank}
       {tied && <span className="sr-only"> {t.components.rankedList.tied}</span>}
     </td>
