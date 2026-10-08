@@ -5,6 +5,7 @@ export const statistics: Messages['statistics'] = {
   noSeason: 'No seasons yet.',
   allSeasons: 'All seasons',
   noNights: 'No finished nights yet.',
+  tabs: 'Lists and charts',
 
   // Top ten lists
   totalPoints: 'Total Points',

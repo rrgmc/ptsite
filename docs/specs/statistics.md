@@ -127,17 +127,17 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 
 - **"📊 Estatísticas"** in the menu, after "Jogadores". It is not on the phone's bottom bar, which is full.
 - A switch **"Temporada" / "Geral"**. Each view has its own address, so it can be shared.
-- At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then the two charts,
-  then the lists. On a wide screen "Pontos acumulados" takes three quarters of the width and "Vitórias" one
-  quarter, with the same height; on a phone each takes the full width. Each chart has "Ver dados em tabela",
-  which shows the same numbers as a table.
-- Under the two charts, **boxes that fold**: pressing a box's title hides what is in it, and shows it again.
-  Every box starts open. The lists in them are compact: short lines, the player's small photo and no header
-  line.
+- At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then "Pontos
+  acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the same
+  numbers as a table.
+- Under it, **boxes that fold**: pressing a box's title hides what is in it, and shows it again. Every box
+  starts open. The lists in them are compact: short lines, the player's small photo and no header line.
   - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
   - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
     over the other, beside the list.
-  - **"Posições"**: the table of rule 3c, with the columns "1º", "2º" and so on.
+  - **"Posições"**: the table of rule 3c, with the columns "1º", "2º" and so on, and "Vitórias". On a wide
+    screen the table is only as wide as its columns need, and "Vitórias" is at its right; on a phone "Vitórias"
+    is under the table.
   - **"Main Event"**, in "Geral": "Títulos", "Pódios" and "Participações", side by side, two across on a phone.
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, below "Próximos eventos" and above the

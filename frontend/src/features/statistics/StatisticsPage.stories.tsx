@@ -6,14 +6,14 @@ import { PositionTable } from './PositionTable'
 import { PlacesChart, PointsProgressChart, PotsChart, WinsChart } from './StatisticsCharts'
 import { AllTimeStatisticsPage, StatisticsPage, StatisticsView } from './StatisticsPage'
 
-// "Estatísticas": the totals, the charts and the top ten lists in boxes that fold, for the selected season
+// "Estatísticas": the totals, the charts and the top ten lists in tabs, for the selected season
 // ("Temporada") or every season ("Geral").
 const meta = { title: 'Screens/Statistics', parameters: { layout: 'fullscreen' } } satisfies Meta
 export default meta
 
 export const Season: StoryObj = { render: () => <RouterStory path="/statistics" url="/statistics" element={<StatisticsPage />} /> }
 
-/** One step per season on the line charts, the season under each pot, "Outros" on the bar chart, and the Main Event lists. */
+/** One step per season on the line charts, the season under each pot, "Outros" under the bar chart, and the Main Event lists. */
 export const AllTime: StoryObj = { render: () => <RouterStory path="/statistics/all" url="/statistics/all" element={<AllTimeStatisticsPage />} /> }
 
 export const NoFinishedNight: StoryObj = {

@@ -4,6 +4,8 @@ export const statistics = {
   noSeason: 'Nenhuma temporada cadastrada.',
   allSeasons: 'Todas as temporadas',
   noNights: 'Nenhum evento finalizado ainda.',
+  /** For screen readers: what the tabs under the points chart are. */
+  tabs: 'Listas e gráficos',
 
   // Top ten lists
   totalPoints: 'Pontuação Total',
