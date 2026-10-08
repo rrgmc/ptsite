@@ -11,7 +11,7 @@ export function PositionCount({ count, highest }: { count: number; highest: numb
   }
   if (count === highest) {
     return (
-      <span className="inline-block min-w-7 rounded-md bg-primary px-1.5 font-extrabold text-on-primary">
+      <span className="inline-block min-w-6 rounded-md bg-primary px-1 sm:min-w-7 sm:px-1.5 font-extrabold text-on-primary">
         {count}<span className="sr-only"> {t.statistics.highestOfPosition}</span>
       </span>
     )

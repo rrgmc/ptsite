@@ -141,6 +141,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   - **"Posições"**: the table of rule 3c, with the columns "1º", "2º" and so on, and "Vitórias". On a wide
     screen the table is only as wide as its columns need, and "Vitórias" is at its right; on a phone "Vitórias"
     is under the table.
+    On a phone, a table of more than four positions gives each player two lines: the nickname, then the
+    numbers under the positions.
   - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
   - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
     over the other, beside the list.
