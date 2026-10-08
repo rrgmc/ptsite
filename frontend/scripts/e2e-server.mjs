@@ -5,7 +5,8 @@
 //
 // opcache's JIT is off, as `php artisan serve` starts it: on PHP 8.3 in CI the JIT crashed the server now and then
 // (a segmentation fault in zend_objects_store_del, from JIT-compiled code). JIT is also off by default on real
-// hosts. With E2E_GDB=1 (CI) the server runs under gdb, so a crash of PHP itself prints a backtrace to the log.
+// hosts. With E2E_GDB=1 (CI, when gdb installed in time) the server runs under gdb, so a crash of PHP itself
+// prints a backtrace to the log.
 //
 // Usage: node e2e-server.mjs --database <name, such as e2e_phone> --port <port> --router <script> --log <file>
 //   [--docroot <folder>]. Paths are relative to backend/; --router is relative to --docroot.
