@@ -14,6 +14,8 @@ export const FEATURE_DEFAULTS = {
   seasonPlanner: true,
   /** "Main Event": a night of its own type, finished with the order of its players and no points. Off unless a site turns it on. */
   mainEvent: false,
+  /** A season's smaller buy-in for the owner of the house where the night is played. Off unless a site turns it on. */
+  houseOwnerBuyIn: false,
 }
 
 export type FeatureName = keyof typeof FEATURE_DEFAULTS

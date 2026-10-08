@@ -5029,6 +5029,45 @@
                             "string",
                             "null"
                         ],
+                        "description": "What a player pays to enter a night. The season only records its money settings: no rule uses them.",
+                        "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "rebuy_value": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "A rebuy's price, without the time chip it may also charge. Required when the season has rebuys.",
+                        "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "time_chip_value": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The price of one time chip. Refused on a site without the time chip.",
+                        "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "rebuys_allowed": {
+                        "type": "integer",
+                        "description": "How many rebuys a player can make on a night; 0 means none.",
+                        "minimum": 0,
+                        "maximum": 20
+                    },
+                    "rebuy_charges_time_chip": {
+                        "type": "boolean",
+                        "description": "Whether a rebuy also charges a time chip. Refused on a site without the time chip."
+                    },
+                    "allows_extra_rebuys": {
+                        "type": "boolean",
+                        "description": "Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points."
+                    },
+                    "house_owner_buy_in": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "rounds": {
@@ -5171,7 +5210,41 @@
                         "type": [
                             "string",
                             "null"
-                        ]
+                        ],
+                        "description": "What a player pays to enter a night. The season only records its money settings: no rule uses them."
+                    },
+                    "rebuy_value": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "A rebuy's price, without the time chip it may also charge."
+                    },
+                    "time_chip_value": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The price of one time chip."
+                    },
+                    "rebuys_allowed": {
+                        "type": "integer",
+                        "description": "How many rebuys a player can make on a night; 0 means none."
+                    },
+                    "rebuy_charges_time_chip": {
+                        "type": "boolean",
+                        "description": "Whether a rebuy also charges a time chip."
+                    },
+                    "allows_extra_rebuys": {
+                        "type": "boolean",
+                        "description": "Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points."
+                    },
+                    "house_owner_buy_in": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The smaller buy-in of the owner of the house where the night is played."
                     },
                     "rounds": {
                         "type": "integer",
@@ -5255,6 +5328,12 @@
                     "starts_on",
                     "description",
                     "buy_in",
+                    "rebuy_value",
+                    "time_chip_value",
+                    "rebuys_allowed",
+                    "rebuy_charges_time_chip",
+                    "allows_extra_rebuys",
+                    "house_owner_buy_in",
                     "rounds",
                     "is_open",
                     "is_finished",
@@ -5751,6 +5830,45 @@
                             "string",
                             "null"
                         ],
+                        "description": "What a player pays to enter a night. The season only records its money settings: no rule uses them.",
+                        "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "rebuy_value": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "A rebuy's price, without the time chip it may also charge. Required when the season has rebuys.",
+                        "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "time_chip_value": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The price of one time chip. Refused on a site without the time chip.",
+                        "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "rebuys_allowed": {
+                        "type": "integer",
+                        "description": "How many rebuys a player can make on a night; 0 means none.",
+                        "minimum": 0,
+                        "maximum": 20
+                    },
+                    "rebuy_charges_time_chip": {
+                        "type": "boolean",
+                        "description": "Whether a rebuy also charges a time chip. Refused on a site without the time chip."
+                    },
+                    "allows_extra_rebuys": {
+                        "type": "boolean",
+                        "description": "Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points."
+                    },
+                    "house_owner_buy_in": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "rounds": {

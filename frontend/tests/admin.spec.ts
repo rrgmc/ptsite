@@ -39,6 +39,43 @@ test('a season and a place are edited on pages of their own, which return to the
   await expect(row).toContainText('Rua das Cartas, 7')
 })
 
+test('an admin sets what a night of a season costs, and the rebuy value shows only with rebuys', async ({ page }) => {
+  await login(page, 'dev-admin')
+  await page.goto('admin')
+  // The oldest season, so the current one stays as the other tests expect it.
+  await page.getByRole('button', { name: /^Editar / }).last().click()
+  const rebuyValue = page.getByLabel('Valor do rebuy (R$)')
+  const extraRebuys = page.getByRole('checkbox', { name: /Permitir rebuys além do limite/ })
+
+  await page.getByLabel('Rebuys permitidos').fill('0')
+  // The demo seasons allow extra rebuys. The checkbox itself is hidden under its drawing, so click its text.
+  await page.getByText(/Permitir rebuys além do limite/).click()
+  await expect(extraRebuys).not.toBeChecked()
+  await expect(rebuyValue).toHaveCount(0)
+  await expect(page.getByRole('checkbox', { name: 'O rebuy também paga o time chip' })).toHaveCount(0)
+
+  await page.getByLabel('Rebuys permitidos').fill('3')
+  await rebuyValue.fill('40')
+  await page.getByLabel('Buy-in (R$)', { exact: true }).fill('60')
+  await page.getByLabel('Valor do time chip (R$)').fill('7,50')
+  // The owner of the house cannot pay more than the others.
+  await page.getByLabel('Buy-in do dono da casa (R$)').fill('70')
+  await page.getByRole('button', { name: 'Salvar' }).click()
+  await expect(page.getByText('O buy-in do dono da casa não pode ser maior que o buy-in.')).toBeVisible()
+  await expectAccessible(page)
+
+  await page.getByLabel('Buy-in do dono da casa (R$)').fill('30')
+  await page.getByRole('button', { name: 'Salvar' }).click()
+  await expect(page.getByRole('button', { name: '+ Nova temporada' })).toBeVisible()
+
+  await page.getByRole('button', { name: /^Editar / }).last().click()
+  await expect(page.getByLabel('Buy-in (R$)', { exact: true })).toHaveValue('60,00')
+  await expect(page.getByLabel('Buy-in do dono da casa (R$)')).toHaveValue('30,00')
+  await expect(page.getByLabel('Valor do time chip (R$)')).toHaveValue('7,50')
+  await expect(page.getByLabel('Rebuys permitidos')).toHaveValue('3')
+  await expect(rebuyValue).toHaveValue('40,00')
+})
+
 test('archiving a place asks first, and the archived place stays in the list to be restored', async ({ page }) => {
   await login(page, 'dev-admin')
   await page.goto('admin/places')
