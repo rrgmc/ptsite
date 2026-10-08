@@ -240,7 +240,7 @@ export const ForgotPasswordSent: StoryObj = {
   render: forgotPassword,
   play: async (context) => {
     await askForLink(context)
-    await context.canvas.findByText('m•••@gmail.com')
+    await context.canvas.findByText('m•••@example.com')
   },
 }
 

@@ -32,7 +32,7 @@ function userWithPlayerEmail(string $username, ?string $email, array $attributes
 {
     $player = Player::factory()->create(['email' => $email]);
 
-    return User::factory()->create(['username' => $username, 'player_id' => $player->id, 'email' => 'antigo@gmail.com', ...$attributes]);
+    return User::factory()->create(['username' => $username, 'player_id' => $player->id, 'email' => 'antigo@example.com', ...$attributes]);
 }
 
 /** @return array<string, string> username => token, from the one message that was sent */
@@ -52,13 +52,13 @@ function sentTokens(): array
 }
 
 it('sends a link to the player\'s email when asked by username', function () {
-    $maria = userWithPlayerEmail('maria', 'maria@gmail.com');
+    $maria = userWithPlayerEmail('maria', 'maria@example.com');
 
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])
         ->assertOk()
-        ->assertJsonPath('data.email', 'm•••@gmail.com');
+        ->assertJsonPath('data.email', 'm•••@example.com');
 
-    Mail::assertSent(PasswordResetMail::class, fn (PasswordResetMail $mail) => $mail->hasTo('maria@gmail.com'));
+    Mail::assertSent(PasswordResetMail::class, fn (PasswordResetMail $mail) => $mail->hasTo('maria@example.com'));
     $token = sentTokens()['maria'];
     $reset = PasswordReset::query()->sole();
     expect($reset->user_id)->toBe($maria->id)
@@ -69,23 +69,23 @@ it('sends a link to the player\'s email when asked by username', function () {
     $log = AuditLog::query()->where('action', 'login.password_reset_requested')->sole();
     expect($log->user_id)->toBeNull()
         ->and($log->subject_id)->toBe($maria->id)
-        ->and($log->after)->toBe(['email' => 'm•••@gmail.com'])
+        ->and($log->after)->toBe(['email' => 'm•••@example.com'])
         ->and(json_encode($log->getAttributes()))->not->toContain($token);
 });
 
 it('finds the account by email, whatever its capitals', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
 
-    $this->postJson('/api/v1/password-resets', ['login' => 'Maria@GMAIL.com'])->assertOk();
+    $this->postJson('/api/v1/password-resets', ['login' => 'Maria@EXAMPLE.com'])->assertOk();
 
     expect(array_keys(sentTokens()))->toBe(['maria']);
 });
 
 it('sends one message with a link for each account that shares the email', function () {
-    $ana = userWithPlayerEmail('ana', 'casa@gmail.com');
-    $tito = userWithPlayerEmail('tito', 'casa@gmail.com');
+    $ana = userWithPlayerEmail('ana', 'casa@example.com');
+    $tito = userWithPlayerEmail('tito', 'casa@example.com');
 
-    $this->postJson('/api/v1/password-resets', ['login' => 'casa@gmail.com'])->assertOk();
+    $this->postJson('/api/v1/password-resets', ['login' => 'casa@example.com'])->assertOk();
 
     $tokens = sentTokens();
     expect(array_keys($tokens))->toBe(['ana', 'tito']);
@@ -98,23 +98,23 @@ it('sends one message with a link for each account that shares the email', funct
 });
 
 it('uses the player\'s email, not the one the account was imported with', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
 
-    $this->postJson('/api/v1/password-resets', ['login' => 'antigo@gmail.com'])
+    $this->postJson('/api/v1/password-resets', ['login' => 'antigo@example.com'])
         ->assertUnprocessable()
         ->assertJsonPath('rule', 'password_reset.unknown_account');
     Mail::assertNothingSent();
 });
 
 it('uses the account\'s own email when it has no player', function () {
-    User::factory()->admin()->create(['username' => 'tesoureiro', 'email' => 'tesoureiro@gmail.com']);
+    User::factory()->admin()->create(['username' => 'tesoureiro', 'email' => 'tesoureiro@example.com']);
 
-    $this->postJson('/api/v1/password-resets', ['login' => 'tesoureiro'])->assertOk()->assertJsonPath('data.email', 't•••@gmail.com');
-    Mail::assertSent(PasswordResetMail::class, fn (PasswordResetMail $mail) => $mail->hasTo('tesoureiro@gmail.com'));
+    $this->postJson('/api/v1/password-resets', ['login' => 'tesoureiro'])->assertOk()->assertJsonPath('data.email', 't•••@example.com');
+    Mail::assertSent(PasswordResetMail::class, fn (PasswordResetMail $mail) => $mail->hasTo('tesoureiro@example.com'));
 
     Mail::fake();
     PasswordReset::query()->delete();
-    $this->postJson('/api/v1/password-resets', ['login' => 'tesoureiro@gmail.com'])->assertOk();
+    $this->postJson('/api/v1/password-resets', ['login' => 'tesoureiro@example.com'])->assertOk();
     expect(array_keys(sentTokens()))->toBe(['tesoureiro']);
 });
 
@@ -146,7 +146,7 @@ it('sends nothing to the site\'s domain, an invented domain or a missing email',
 ]);
 
 it('sends nothing for a disabled account', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com', ['is_enabled' => false]);
+    userWithPlayerEmail('maria', 'maria@example.com', ['is_enabled' => false]);
 
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])
         ->assertUnprocessable()
@@ -155,10 +155,10 @@ it('sends nothing for a disabled account', function () {
 });
 
 it('refuses a second request within a minute and accepts one after it', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
 
-    $this->postJson('/api/v1/password-resets', ['login' => 'maria@gmail.com'])
+    $this->postJson('/api/v1/password-resets', ['login' => 'maria@example.com'])
         ->assertUnprocessable()
         ->assertJsonPath('rule', 'password_reset.too_soon');
     Mail::assertSentCount(1);
@@ -169,7 +169,7 @@ it('refuses a second request within a minute and accepts one after it', function
 });
 
 it('cancels the older link when a new one is asked for', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
     $old = sentTokens()['maria'];
 
@@ -197,7 +197,7 @@ it('keeps no link and no log entry when the mail server fails', function () {
         }
     });
     config(['mail.default' => 'failing', 'mail.mailers.failing' => ['transport' => 'failing']]);
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
 
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])
         ->assertUnprocessable()
@@ -209,7 +209,7 @@ it('keeps no link and no log entry when the mail server fails', function () {
 });
 
 it('shows the account behind a link', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
 
     $this->getJson('/api/v1/password-resets/'.sentTokens()['maria'])
@@ -219,7 +219,7 @@ it('shows the account behind a link', function () {
 });
 
 it('sets the new password, once, and ends every other login', function () {
-    $maria = userWithPlayerEmail('maria', 'maria@gmail.com');
+    $maria = userWithPlayerEmail('maria', 'maria@example.com');
     $maria->createToken('celular');
     $rememberToken = $maria->remember_token;
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
@@ -251,7 +251,7 @@ it('sets the new password, once, and ends every other login', function () {
 
 it('ends the account\'s website sessions when they are kept in the database', function () {
     config(['session.driver' => 'database']);
-    $maria = userWithPlayerEmail('maria', 'maria@gmail.com');
+    $maria = userWithPlayerEmail('maria', 'maria@example.com');
     $other = User::factory()->create();
     foreach ([$maria, $other] as $user) {
         DB::table('sessions')->insert(['id' => "session-{$user->id}", 'user_id' => $user->id, 'payload' => '', 'last_activity' => time()]);
@@ -264,7 +264,7 @@ it('ends the account\'s website sessions when they are kept in the database', fu
 });
 
 it('works for an account that still has only its imported password', function () {
-    $player = Player::factory()->create(['email' => 'velho@gmail.com']);
+    $player = Player::factory()->create(['email' => 'velho@example.com']);
     $user = User::factory()->legacy('senha-antiga')->create(['username' => 'velho', 'player_id' => $player->id]);
     $this->postJson('/api/v1/password-resets', ['login' => 'velho'])->assertOk();
 
@@ -277,7 +277,7 @@ it('works for an account that still has only its imported password', function ()
 });
 
 it('accepts a link for 60 minutes', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
     $token = sentTokens()['maria'];
 
@@ -297,7 +297,7 @@ it('accepts a link for 60 minutes', function () {
 it('refuses a link that never existed and a link of a disabled account', function () {
     $this->getJson('/api/v1/password-resets/nao-existe')->assertUnprocessable()->assertJsonPath('rule', 'password_reset.invalid_link');
 
-    $maria = userWithPlayerEmail('maria', 'maria@gmail.com');
+    $maria = userWithPlayerEmail('maria', 'maria@example.com');
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
     $maria->update(['is_enabled' => false]);
 
@@ -307,7 +307,7 @@ it('refuses a link that never existed and a link of a disabled account', functio
 });
 
 it('refuses a new password shorter than 8 characters and keeps the link', function () {
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
     $token = sentTokens()['maria'];
 
@@ -325,7 +325,7 @@ it('asks for the username or email', function () {
 
 it('writes the message in Brazilian Portuguese with a link to the app', function () {
     config(['app.url' => 'https://www.ligademo.example/']);
-    userWithPlayerEmail('maria', 'maria@gmail.com');
+    userWithPlayerEmail('maria', 'maria@example.com');
     $this->postJson('/api/v1/password-resets', ['login' => 'maria'])->assertOk();
     $token = sentTokens()['maria'];
     $url = "https://www.ligademo.example/app/reset-password?token={$token}";
