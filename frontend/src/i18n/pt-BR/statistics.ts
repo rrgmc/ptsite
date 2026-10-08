@@ -4,7 +4,8 @@ export const statistics = {
   noSeason: 'Nenhuma temporada cadastrada.',
   allSeasons: 'Todas as temporadas',
   noNights: 'Nenhum evento finalizado ainda.',
-  summary: ({ count, pot }: { count: number; pot: string }) => `${count} ${count === 1 ? 'evento' : 'eventos'} · Pote total ${pot}`,
+  /** For screen readers: what the tabs under the points chart are. */
+  tabs: 'Listas e gráficos',
 
   // Top ten lists
   totalPoints: 'Pontuação Total',
@@ -16,9 +17,24 @@ export const statistics = {
   places: 'Locais',
   noPlaces: 'Nenhum evento com local.',
   placesCaption: 'Locais por número de eventos',
-  positionTitle: ({ position }: { position: string }) => `Posição: ${position}`,
-  positionCaption: ({ position }: { position: string }) => `Jogadores por vezes em ${position} lugar`,
+  // "Posições": a line per player and a column per scoring position
+  positionTableCaption: 'Jogadores por vezes em cada posição',
+  /** In place of a zero: the player never finished in that position. */
+  never: '–',
+  /** Read by screen readers after the highest number of a column. */
+  highestOfPosition: '(o maior da posição)',
+  showAll: ({ count }: { count: number }) => `Ver todos (${count})`,
+  showFirst: ({ count }: { count: number }) => `Ver só os ${count} primeiros`,
   times: 'Vezes',
+
+  // The Main Events of every season, on a site that has the Main Event
+  mainEvent: 'Main Event',
+  mainEventTitles: 'Títulos',
+  mainEventTitlesCaption: 'Jogadores por títulos do Main Event',
+  mainEventPodiums: 'Pódios',
+  mainEventPodiumsCaption: 'Jogadores por vezes entre os três primeiros do Main Event',
+  mainEventAppearances: 'Participações',
+  mainEventAppearancesCaption: 'Jogadores por participações no Main Event',
 
   // Charts
   pointsProgress: 'Pontos acumulados',
@@ -35,6 +51,15 @@ export const statistics = {
   /** `top` is the player with most wins, when there is one. */
   winsDescription: ({ top }: { top?: { nickname: string; wins: number } }) =>
     `Gráfico de barras: vitórias por jogador.${top ? ` ${top.nickname} tem mais: ${top.wins}.` : ''} Os números estão na tabela abaixo.`,
+
+  potsPerNight: 'Pote por evento',
+  potsPerSeason: 'Pote por temporada',
+  /** `top` is the step with the biggest pot, when there is one; its `pot` is already written as money. */
+  potsDescription: ({ perSeason, top }: { perSeason: boolean; top?: { label: string; pot: string } }) =>
+    `Gráfico de linha: pote por ${perSeason ? 'temporada' : 'evento'}.${top ? ` O maior é ${top.pot}, em ${top.label}.` : ''} Os números estão na tabela abaixo.`,
+  /** `top` is the place with most nights, when there is one. */
+  placesDescription: ({ top }: { top?: { name: string; count: number } }) =>
+    `Gráfico de pizza: eventos por local.${top ? ` ${top.name} tem mais: ${top.count}.` : ''} Os números estão na tabela abaixo.`,
 
   // One player's charts
   positions: 'Posições',

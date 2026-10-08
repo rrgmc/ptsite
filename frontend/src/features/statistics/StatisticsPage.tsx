@@ -1,17 +1,22 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import type { RankedList as RankedListData, Statistics } from '@/api/client'
 import { useStatistics } from '@/api/queries'
-import { Card, PageHeader } from '@/components/Card'
+import { PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { PeriodSwitch } from '@/components/PeriodSwitch'
 import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { RankedList, type RankedRow } from '@/components/RankedList'
+import { StatTiles } from '@/components/StatTiles'
+import { TabBox, type TabBoxTab } from '@/components/TabBox'
 import { t } from '@/i18n'
-import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
+import { formatMoney, formatPoints, nightTitle } from '@/lib/format'
 import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
-import { PointsProgressChart, WinsChart } from './StatisticsCharts'
+import { amountRows } from '../nights/amounts'
+import { PositionTable } from './PositionTable'
+import { PlacesChart, PointsProgressChart, PotsChart, subtitle, WinsChart } from './StatisticsCharts'
 
 /** "Estatísticas" of the selected season (docs/specs/statistics.md). */
 export function StatisticsPage() {
@@ -46,95 +51,137 @@ function playerRows(list: RankedListData, value: (row: RankedListData['rows'][nu
     key: row.player!.id,
     rank: row.rank,
     label: (
-      <span className="flex items-center gap-3">
-        <PlayerThumbnail player={row.player!} />
-        <PlayerLink player={row.player!} className="min-w-0 font-semibold" />
+      <span className="flex items-center gap-2">
+        <PlayerThumbnail player={row.player!} size="xs" />
+        <PlayerLink player={row.player!} className="min-w-0 truncate font-semibold" />
       </span>
     ),
     value: value(row),
   }))
 }
 
-/** The numbers of one view: the summary line, the two charts and the top ten lists. */
+/** One list inside a tab that holds several, under its own small title. */
+function ListBlock({ title, children, className = '' }: { title: string; children: ReactNode; className?: string }) {
+  return (
+    <section className={`min-w-0 ${className}`}>
+      <h2 className={subtitle}>{title}</h2>
+      {children}
+    </section>
+  )
+}
+
+/** A top ten list of players by a count: nights scored, Main Events won. */
+function CountList({ title, caption, valueHeader, list }: { title: string; caption: string; valueHeader: string; list: RankedListData }) {
+  return (
+    <ListBlock title={title}>
+      <RankedList compact caption={caption} labelHeader={t.common.player} valueHeader={valueHeader} rows={playerRows(list, (row) => row.count ?? 0)} tiedNotShown={list.tied_not_shown} />
+    </ListBlock>
+  )
+}
+
+/** The numbers of one view: the totals, the points chart, and the lists and other charts in a box with tabs. */
 export function StatisticsView({ statistics }: { statistics: Statistics }) {
   const allTime = statistics.season_id === null
-  if (statistics.nights_count === 0) return <Empty>{t.statistics.noNights}</Empty>
+  // One season has one Main Event, which makes no list: the Main Event lists are of every season.
+  const mainEvent = allTime && statistics.main_event && statistics.main_event.count > 0 ? statistics.main_event : null
+  const hasNights = statistics.nights_count > 0
+  if (!hasNights && !mainEvent) return <Empty>{t.statistics.noNights}</Empty>
+
+  const tabs: TabBoxTab[] = []
+  if (hasNights) {
+    tabs.push(
+      {
+        id: 'positions',
+        title: t.statistics.positions,
+        content: (
+          // On a wide screen "Vitórias" is at the right of the table, in the width the table leaves.
+          <div className="flex flex-col gap-x-10 gap-y-6 lg:flex-row lg:items-start">
+            <div className="min-w-0"><PositionTable rows={statistics.position_table} /></div>
+            <WinsChart bare className="lg:flex-1" statistics={statistics} />
+          </div>
+        ),
+      },
+      {
+        id: 'players',
+        title: t.common.players,
+        content: (
+          <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+            <ListBlock title={t.statistics.totalPoints}>
+              <RankedList
+                compact
+                caption={t.statistics.totalPointsCaption}
+                labelHeader={t.common.player}
+                valueHeader={t.common.points}
+                rows={playerRows(statistics.total_points, (row) => formatPoints(row.amount ?? 0))}
+                tiedNotShown={statistics.total_points.tied_not_shown}
+              />
+            </ListBlock>
+            <CountList title={t.statistics.nightsScored} caption={t.statistics.nightsScoredCaption} valueHeader={t.common.nights} list={statistics.nights_scored} />
+          </div>
+        ),
+      },
+      {
+        id: 'nights',
+        title: t.common.nights,
+        content: (
+          // On a wide screen the two charts are one over the other, beside the list.
+          <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
+            <PotsChart className="md:col-span-2" progress={statistics.points_progress} perSeason={allTime} />
+            <ListBlock title={t.statistics.biggestPots} className="lg:row-span-2">
+              <RankedList
+                compact
+                caption={t.statistics.biggestPotsCaption}
+                labelHeader={t.common.night}
+                valueHeader={t.common.pot}
+                rows={statistics.biggest_pots.rows.map((row) => ({
+                  key: row.night!.id,
+                  rank: row.rank,
+                  label: (
+                    <>
+                      <Link to={`/nights/${row.night!.id}`} className="inline-block py-0.5 font-semibold text-primary underline">{nightTitle(row.night!.starts_at)}</Link>
+                      {allTime && <span className="block text-xs text-muted">{row.night!.season_name}</span>}
+                    </>
+                  ),
+                  value: formatMoney(row.amount),
+                }))}
+                tiedNotShown={statistics.biggest_pots.tied_not_shown}
+              />
+            </ListBlock>
+            {statistics.places.rows.length === 0 ? (
+              <ListBlock title={t.statistics.places} className="lg:col-span-2"><Empty>{t.statistics.noPlaces}</Empty></ListBlock>
+            ) : (
+              <PlacesChart className="lg:col-span-2" places={statistics.places} />
+            )}
+          </div>
+        ),
+      },
+    )
+  }
+  if (mainEvent) {
+    tabs.push({
+      id: 'main-event',
+      title: t.statistics.mainEvent,
+      content: (
+        <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-3">
+          <CountList title={t.statistics.mainEventTitles} caption={t.statistics.mainEventTitlesCaption} valueHeader={t.statistics.times} list={mainEvent.titles} />
+          <CountList title={t.statistics.mainEventPodiums} caption={t.statistics.mainEventPodiumsCaption} valueHeader={t.statistics.times} list={mainEvent.podiums} />
+          <CountList title={t.statistics.mainEventAppearances} caption={t.statistics.mainEventAppearancesCaption} valueHeader={t.statistics.times} list={mainEvent.appearances} />
+        </div>
+      ),
+    })
+  }
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-muted">
-        {t.statistics.summary({ count: statistics.nights_count, pot: formatMoney(statistics.pot_total) })}
-      </p>
-
-      {/* On a wide screen the line chart takes three quarters of the width. */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-        <div className="lg:col-span-3">
-          <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />
-        </div>
-        <WinsChart statistics={statistics} />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <Card title={t.statistics.totalPoints}>
-          <RankedList
-            caption={t.statistics.totalPointsCaption}
-            labelHeader={t.common.player}
-            valueHeader={t.common.points}
-            rows={playerRows(statistics.total_points, (row) => formatPoints(row.amount ?? 0))}
-            tiedNotShown={statistics.total_points.tied_not_shown}
-          />
-        </Card>
-        <Card title={t.statistics.nightsScored}>
-          <RankedList
-            caption={t.statistics.nightsScoredCaption}
-            labelHeader={t.common.player}
-            valueHeader={t.common.nights}
-            rows={playerRows(statistics.nights_scored, (row) => row.count ?? 0)}
-            tiedNotShown={statistics.nights_scored.tied_not_shown}
-          />
-        </Card>
-        <Card title={t.statistics.biggestPots}>
-          <RankedList
-            caption={t.statistics.biggestPotsCaption}
-            labelHeader={t.common.night}
-            valueHeader={t.common.pot}
-            rows={statistics.biggest_pots.rows.map((row) => ({
-              key: row.night!.id,
-              rank: row.rank,
-              label: (
-                <>
-                  <Link to={`/nights/${row.night!.id}`} className="font-semibold text-primary underline">{nightTitle(row.night!.starts_at)}</Link>
-                  {allTime && <span className="block text-xs text-muted">{row.night!.season_name}</span>}
-                </>
-              ),
-              value: formatMoney(row.amount),
-            }))}
-            tiedNotShown={statistics.biggest_pots.tied_not_shown}
-          />
-        </Card>
-        <Card title={t.statistics.places}>
-          {statistics.places.rows.length === 0 ? <Empty>{t.statistics.noPlaces}</Empty> : (
-            <RankedList
-              caption={t.statistics.placesCaption}
-              labelHeader={t.common.place}
-              valueHeader={t.common.nights}
-              rows={statistics.places.rows.map((row) => ({ key: row.place!.id, rank: row.rank, label: <span className="font-semibold wrap-anywhere">{row.place!.name}</span>, value: row.count ?? 0 }))}
-              tiedNotShown={statistics.places.tied_not_shown}
-            />
-          )}
-        </Card>
-        {statistics.positions.map((list) => (
-          <Card key={list.position} title={t.statistics.positionTitle({ position: ordinal(list.position!) })}>
-            <RankedList
-              caption={t.statistics.positionCaption({ position: ordinal(list.position!) })}
-              labelHeader={t.common.player}
-              valueHeader={t.statistics.times}
-              rows={playerRows(list, (row) => row.count ?? 0)}
-              tiedNotShown={list.tied_not_shown}
-            />
-          </Card>
-        ))}
-      </div>
+      <StatTiles
+        tiles={[
+          { label: t.common.nights, value: statistics.nights_count },
+          ...amountRows({ pot: statistics.pot_total, mainEventPot: statistics.main_event_pot_total, timeChip: statistics.time_chip_total })
+            .map(([label, amount]) => ({ label, value: formatMoney(amount) })),
+        ]}
+      />
+      {hasNights && <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />}
+      <TabBox label={t.statistics.tabs} tabs={tabs} />
     </div>
   )
 }

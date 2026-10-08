@@ -56,11 +56,47 @@ final class Statistics
             $this->ranking->top($places),
             $this->progress($nights, $leaders, $stepPerSeason),
             array_sum($positions[1] ?? []) - $winsShown,
+            $this->positionTable($positions),
         );
     }
 
     /**
-     * The running total of the given players after each night, or after each season.
+     * Every player who scored, with the times in each scoring position, ordered as a medal table: most 1st
+     * places first, then most 2nd places, and so on. Players with the same counts share a rank, and the next
+     * rank skips, as in {@see Ranking}.
+     *
+     * @param  array<int, array<int, int>>  $positions  by scoring position, the times of each player (by id)
+     * @return list<PositionTableRow>
+     */
+    public function positionTable(array $positions): array
+    {
+        ksort($positions);
+        $counts = [];
+        foreach ($positions as $players) {
+            foreach (array_keys($players) as $playerId) {
+                $counts[$playerId] ??= array_map(fn (array $times) => $times[$playerId] ?? 0, $positions);
+            }
+        }
+        // Arrays of the same size compare value by value, in order: the 1st places decide first.
+        uksort($counts, fn (int $a, int $b): int => array_values($counts[$b]) <=> array_values($counts[$a]) ?: $a <=> $b);
+
+        $rows = [];
+        $rank = 0;
+        $previous = null;
+        foreach ($counts as $playerId => $playerCounts) {
+            if ($playerCounts !== $previous) {
+                $rank = count($rows) + 1;
+            }
+            $previous = $playerCounts;
+            $rows[] = new PositionTableRow($rank, $playerId, $playerCounts);
+        }
+
+        return $rows;
+    }
+
+    /**
+     * The running total of the given players after each night, or after each season, and the pot of each of
+     * those steps.
      *
      * @param  list<NightRecord>  $nights  oldest first
      * @param  list<int>  $leaders  player ids
@@ -68,9 +104,11 @@ final class Statistics
     public function progress(array $nights, array $leaders, bool $stepPerSeason): PointsProgress
     {
         $running = array_fill_keys($leaders, 0);
-        $steps = [];
+        $steps = $pots = [];
         $totals = array_fill_keys($leaders, []);
+        $pot = Money::zero();
         foreach ($nights as $index => $night) {
+            $pot = $pot->plus($night->pot);
             foreach ($night->lines as $line) {
                 if (isset($running[$line->playerId])) {
                     $running[$line->playerId] += $line->points->cents;
@@ -81,11 +119,13 @@ final class Statistics
                 continue;
             }
             $steps[] = $stepPerSeason ? $night->seasonId : $night->nightId;
+            $pots[] = $pot;
+            $pot = Money::zero();
             foreach ($leaders as $playerId) {
                 $totals[$playerId][] = Money::cents($running[$playerId]);
             }
         }
 
-        return new PointsProgress($steps, $totals);
+        return new PointsProgress($steps, $totals, $pots);
     }
 }

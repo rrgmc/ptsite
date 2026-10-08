@@ -11,6 +11,8 @@ final readonly class StatisticsReport
      * @param  list<RankedList>  $positions  one list of players per finishing position
      * @param  list<array{night_id: ?int, starts_at: ?string, season_id: int, season_name: string}>  $progressSteps
      * @param  list<array{player: Player, points: list<string>}>  $progressSeries
+     * @param  list<string>  $progressPots  the pot of each step, as decimal strings
+     * @param  list<array{rank: int, player: Player, positions: list<array{position: int, count: int}>}>  $positionTable
      */
     public function __construct(
         /** Null for every season. */
@@ -27,6 +29,10 @@ final readonly class StatisticsReport
         public RankedList $places,
         public array $progressSteps,
         public array $progressSeries,
+        public array $progressPots,
         public int $winsNotShown,
+        public array $positionTable,
+        /** Null on a site with no Main Event. */
+        public ?MainEventStatisticsReport $mainEvent,
     ) {}
 }

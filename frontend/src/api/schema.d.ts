@@ -1223,6 +1223,17 @@ export interface components {
             /** @description Keep the login for 30 days. */
             remember?: boolean;
         };
+        /** MainEventStatisticsResource */
+        MainEventStatisticsResource: {
+            /** @description How many finished Main Events count. */
+            count: number;
+            /** @description Players by Main Events won (`count`). */
+            titles: components["schemas"]["RankedListResource"];
+            /** @description Players by times in the first three of a Main Event (`count`). */
+            podiums: components["schemas"]["RankedListResource"];
+            /** @description Players by Main Events played (`count`). */
+            appearances: components["schemas"]["RankedListResource"];
+        };
         /** MarkNightPlayerRequest */
         MarkNightPlayerRequest: {
             /** @description Whether the player paid the buy-in. */
@@ -1831,9 +1842,24 @@ export interface components {
                     player: components["schemas"]["PlayerResource"];
                     points: string[];
                 }[];
+                /** @description The pot of each step, as decimal strings: of the night, or of the season's nights added up. */
+                pots: string[];
             };
             /** @description First places of the players who are not in the first "Posição" list ("Outros"). */
             wins_not_shown: number;
+            /**
+             * @description Every player who scored, with the times in each scoring position (zeros included), ordered as a
+             *     medal table: most 1st places first, then most 2nd places, and so on. Equal lines share a `rank`.
+             */
+            position_table: {
+                rank: number;
+                player: components["schemas"]["PlayerResource"];
+                positions: {
+                    position: number;
+                    count: number;
+                }[];
+            }[];
+            main_event: components["schemas"]["MainEventStatisticsResource"] | null;
         };
         /** SuggestedNightResource */
         SuggestedNightResource: {

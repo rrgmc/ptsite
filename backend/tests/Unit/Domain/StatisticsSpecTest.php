@@ -7,6 +7,7 @@
 
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
+use PTSite\Domain\Statistics\MainEventStatistics;
 use PTSite\Domain\Statistics\NightRecord;
 use PTSite\Domain\Statistics\PlayerStatistics;
 use PTSite\Domain\Statistics\Statistics;
@@ -15,6 +16,7 @@ use PTSite\Domain\Statistics\TopList;
 const S_ANA = 1;
 const S_BRENO = 2;
 const S_CARLA = 3;
+const S_DUDU = 9;
 
 /** @param list<int> $order player ids, first place first */
 function statsNight(int $id, int $season, string $pot, ?int $place, array $order): NightRecord
@@ -76,6 +78,23 @@ it('counts how often each player finished in each position', function () {
         ->and(rows($positions[3]))->toBe([[1, S_ANA, 1], [1, S_CARLA, 1]]);
 });
 
+it('orders the players as a medal table, by 1st places, then 2nd places, and so on', function () {
+    $table = (new Statistics)->summarise(everySeason())->positionTable;
+
+    expect(array_map(fn ($row) => [$row->rank, $row->playerId, $row->counts], $table))->toBe([
+        [1, S_ANA, [1 => 2, 2 => 0, 3 => 1]],
+        [2, S_BRENO, [1 => 1, 2 => 1, 3 => 0]],
+        [3, S_CARLA, [1 => 0, 2 => 2, 3 => 1]],
+    ]);
+});
+
+it('gives players with the same counts the same line in the medal table', function () {
+    // Ana and Breno: one 1st and one 2nd place each. Carla: two 3rd places.
+    $table = (new Statistics)->positionTable([1 => [S_ANA => 1, S_BRENO => 1], 2 => [S_BRENO => 1, S_ANA => 1], 3 => [S_CARLA => 2]]);
+
+    expect(array_map(fn ($row) => [$row->rank, $row->playerId], $table))->toBe([[1, S_ANA], [1, S_BRENO], [3, S_CARLA]]);
+});
+
 it('lists the biggest pots, and counts the nights and adds up their three amounts', function () {
     $summary = (new Statistics)->summarise(everySeason());
 
@@ -99,7 +118,8 @@ it('follows the leaders night by night in a season', function () {
 
     expect($progress->steps)->toBe([1, 2])
         ->and(array_map(fn ($totals) => array_map(fn (Money $m) => $m->toDecimal(), $totals), $progress->totals))
-        ->toBe([S_BRENO => ['69.00', '221.00'], S_ANA => ['114.00', '174.00'], S_CARLA => ['45.00', '137.00']]);
+        ->toBe([S_BRENO => ['69.00', '221.00'], S_ANA => ['114.00', '174.00'], S_CARLA => ['45.00', '137.00']])
+        ->and(array_map(fn (Money $m) => $m->toDecimal(), $progress->pots))->toBe(['300.00', '400.00']);
 });
 
 it('follows the leaders season by season over every season', function () {
@@ -107,7 +127,8 @@ it('follows the leaders season by season over every season', function () {
 
     expect($progress->steps)->toBe([1, 2])
         ->and(array_map(fn ($totals) => array_map(fn (Money $m) => $m->toDecimal(), $totals), $progress->totals))
-        ->toBe([S_ANA => ['174.00', '288.00'], S_BRENO => ['221.00', '221.00'], S_CARLA => ['137.00', '206.00']]);
+        ->toBe([S_ANA => ['174.00', '288.00'], S_BRENO => ['221.00', '221.00'], S_CARLA => ['137.00', '206.00']])
+        ->and(array_map(fn (Money $m) => $m->toDecimal(), $progress->pots))->toBe(['700.00', '300.00']);
 });
 
 it('cuts a list at ten and says how many tied lines it left out', function () {
@@ -191,4 +212,28 @@ it('has empty lists when no night is finished', function () {
         ->and($summary->positions)->toBe([])
         ->and($summary->progress->steps)->toBe([])
         ->and($summary->winsNotShown)->toBe(0);
+});
+
+it('counts the titles, the podiums and the appearances of the Main Events', function () {
+    // Season A's Main Event: Ana, Breno, Carla, Dudu. Season B's: Breno, Ana, Dudu.
+    $summary = (new MainEventStatistics)->summarise([[S_ANA, S_BRENO, S_CARLA, S_DUDU], [S_BRENO, S_ANA, S_DUDU]]);
+
+    expect($summary->count)->toBe(2)
+        ->and(rows($summary->titles))->toBe([[1, S_ANA, 1], [1, S_BRENO, 1]])
+        ->and(rows($summary->podiums))->toBe([[1, S_ANA, 2], [1, S_BRENO, 2], [3, S_CARLA, 1], [3, S_DUDU, 1]])
+        ->and(rows($summary->appearances))->toBe([[1, S_ANA, 2], [1, S_BRENO, 2], [1, S_DUDU, 2], [4, S_CARLA, 1]]);
+});
+
+it('counts a Main Event of which only the champion is known', function () {
+    $summary = (new MainEventStatistics)->summarise([[S_CARLA]]);
+
+    expect(rows($summary->titles))->toBe([[1, S_CARLA, 1]])
+        ->and(rows($summary->podiums))->toBe([[1, S_CARLA, 1]])
+        ->and(rows($summary->appearances))->toBe([[1, S_CARLA, 1]]);
+});
+
+it('has empty Main Event lists when no Main Event is finished', function () {
+    $summary = (new MainEventStatistics)->summarise([]);
+
+    expect($summary->count)->toBe(0)->and($summary->titles->rows)->toBe([])->and($summary->appearances->rows)->toBe([]);
 });

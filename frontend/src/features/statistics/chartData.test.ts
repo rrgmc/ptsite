@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { playerStatistics, playerStatisticsAllTime, statistics, statisticsAllTime } from '@/mocks/data'
-import { playerProgressData, positionsData, progressData, winsData } from './chartData'
+import { placesData, playerProgressData, positionsData, potsData, progressData, SERIES_COLORS, winsData } from './chartData'
 
 describe('progressData', () => {
   it('has one point per night in a season, labelled by date', () => {
@@ -34,6 +34,34 @@ describe('winsData', () => {
 
   it('is empty when nobody won yet', () => {
     expect(winsData({ ...statistics, positions: [] })).toEqual([])
+  })
+})
+
+describe('potsData', () => {
+  it('has the pot of each night in a season, and of each season over every season', () => {
+    expect(potsData(statistics.points_progress)[0]).toEqual({ label: '03/04/2026', pot: 840 })
+    expect(potsData(statisticsAllTime.points_progress)).toEqual([
+      { label: 'Liga 2024', pot: 27300 },
+      { label: 'Liga 2025', pot: 29875 },
+      { label: 'Liga 2026', pot: 4145 },
+    ])
+  })
+})
+
+describe('placesData', () => {
+  it('gives each place a slice with its own color, most nights first', () => {
+    expect(placesData(statistics.places, 'Outros')).toEqual([
+      { key: 1, name: 'Casa do Carlão', count: 3, fill: SERIES_COLORS[0] },
+      { key: 2, name: 'Bar do Zé', count: 2, fill: SERIES_COLORS[1] },
+    ])
+  })
+
+  it('adds up the places after the seventh as one last slice', () => {
+    const rows = Array.from({ length: 10 }, (_, i) => ({ rank: i + 1, player: null, night: null, place: { id: i + 1, name: `Local ${i + 1}` }, count: 10 - i, amount: null }))
+    const slices = placesData({ ...statistics.places, rows }, 'Outros')
+    expect(slices).toHaveLength(8)
+    expect(slices[6]).toMatchObject({ key: 7, count: 4, fill: SERIES_COLORS[6] })
+    expect(slices[7]).toEqual({ key: 'others', name: 'Outros', count: 6, fill: 'var(--color-muted)' })
   })
 })
 
