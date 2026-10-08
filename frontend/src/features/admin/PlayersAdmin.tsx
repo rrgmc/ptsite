@@ -14,6 +14,7 @@ import { PlayerImagesEditor } from '@/features/players/PlayerImagesEditor'
 import { t } from '@/i18n'
 import { fullNameIfDifferent } from '@/lib/format'
 import { roleLabels } from '@/lib/roles'
+import { useSeasonPath } from '@/lib/seasonPath'
 import { PlayerLoginForm } from './PlayerLoginForm'
 import { site } from '@/lib/site'
 
@@ -129,6 +130,7 @@ export function PlayerEditPage() {
 
 function PlayerForm({ player, onDone }: { player: PlayerDetail | null; onDone: () => void }) {
   const save = useSavePlayer()
+  const to = useSeasonPath()
   const [nickname, setNickname] = useState(player?.nickname ?? '')
   const [name, setName] = useState(player?.name ?? '')
   const [email, setEmail] = useState(player?.email ?? '')
@@ -140,7 +142,7 @@ function PlayerForm({ player, onDone }: { player: PlayerDetail | null; onDone: (
   return (
     <Card
       title={player ? t.admin.editItem({ name: player.nickname }) : t.admin.players.newTitle}
-      action={player && <Link to={`/players/${player.id}`} className="inline-flex min-h-touch items-center font-semibold text-primary underline">{t.admin.players.viewPage}</Link>}
+      action={player && <Link to={to(`/players/${player.id}`)} className="inline-flex min-h-touch items-center font-semibold text-primary underline">{t.admin.players.viewPage}</Link>}
     >
       <Form
         className="flex flex-col gap-3"

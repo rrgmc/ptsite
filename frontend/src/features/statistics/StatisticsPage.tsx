@@ -9,6 +9,7 @@ import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { RankedList, type RankedRow } from '@/components/RankedList'
 import { t } from '@/i18n'
 import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
+import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { PointsProgressChart, WinsChart } from './StatisticsCharts'
 
@@ -30,10 +31,11 @@ export function AllTimeStatisticsPage() {
 }
 
 function StatisticsScreen({ subtitle, allTime, query }: { subtitle: string; allTime: boolean; query: ReturnType<typeof useStatistics> }) {
+  const to = useSeasonPath()
   return (
     <>
       <PageHeader title={t.statistics.title} subtitle={subtitle} />
-      <PeriodSwitch seasonTo="/statistics" allTimeTo="/statistics/all" allTime={allTime} />
+      <PeriodSwitch seasonTo={to('/statistics')} allTimeTo="/statistics/all" allTime={allTime} />
       {query.isPending ? <Loading /> : query.error ? <ErrorBox error={query.error} /> : <StatisticsView statistics={query.data!} />}
     </>
   )

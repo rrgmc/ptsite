@@ -70,7 +70,8 @@ test('an admin adds the Main Event of a season in "Administração", and its nig
   await expectAccessible(page)
 
   // "Main Event" shows it for the season, with the season's Main Event pot
-  await page.goto('main-event')
+  // The season's own address: "main-event" alone is the current season's.
+  await page.goto(seasonResults.replace(/results$/, 'main-event'))
   await expect(page.getByRole('heading', { name: 'Main Event', level: 1 })).toBeVisible()
   await expect(page.getByRole('list', { name: /^Classificação: Main Event/ }).getByRole('listitem')).toHaveCount(2)
   await expect(page.getByRole('heading', { name: 'Pote ME da temporada' })).toBeVisible()
@@ -97,16 +98,19 @@ test('a player sees the Main Event of a finished season and its champion in "Tem
   // "Classificação" of a season with a finished Main Event: its first three, above the table
   await page.goto('')
   await pickSeason(page, 'Liga 2025')
+  // The season's own address: the addresses with no season in them are the current season's.
+  await expect(page).toHaveURL(/\/seasons\/\d+$/)
+  const seasonStandings = page.url()
   const podium = page.getByRole('list', { name: /^Classificação: Main Event/ })
   await expect(podium.getByRole('listitem')).toHaveText([/1º/, /2º/, /3º/])
   await expectAccessible(page)
 
   // "Resultados" of a finished season has no "Próximos eventos"
-  await page.goto('results')
+  await page.goto(`${seasonStandings}/results`)
   await expect(page.getByRole('heading', { name: 'Resultados', level: 1 })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Próximos eventos' })).toHaveCount(0)
 
-  await page.goto('')
+  await page.goto(seasonStandings)
   await page.getByRole('link', { name: 'Ver Main Event' }).click()
   await expect(page).toHaveURL(/\/main-event$/)
   await expect(page.getByRole('list', { name: /^Classificação: Main Event/ }).getByRole('listitem')).toHaveCount(10)

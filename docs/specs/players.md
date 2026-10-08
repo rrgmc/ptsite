@@ -65,6 +65,9 @@ seconds, at the table, on a phone.
     list links to it.
     - It shows the photo or thumbnail, the nickname, the full name, the memo (rule 12) and the player's
       statistics ([statistics.md](statistics.md), rules 8 to 12).
+    - It is a season screen ([seasons-and-nights.md](seasons-and-nights.md), rule 3a): `/players/<id>` shows the
+      current season's statistics and `/seasons/<season>/players/<id>` another season's. A nickname on a season
+      screen links to the page for that season.
     - The email and the birthday are shown only to the player and to admins, as in rule 10.
     - An inactive player's page says "Inativo". It shows the same history.
     - An admin sees "Editar", which opens the player in "Administração". The player themself sees "Meu perfil".
