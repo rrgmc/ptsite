@@ -14,8 +14,9 @@ const feature = (name: string) => within(screen.getByText(name).closest('li')!)
 it('lists every feature with whether the site has it', () => {
   restore = overrideFeatures({ timeChip: false })
   render(<SettingsAdmin />)
-  expect(screen.getAllByRole('listitem')).toHaveLength(5)
+  expect(screen.getAllByRole('listitem')).toHaveLength(6)
   expect(feature('Pote ME').getByText('Ligado')).toBeDefined()
+  expect(feature('Painel do evento').getByText('Ligado')).toBeDefined()
   expect(feature('Time chip').getByText('Desligado')).toBeDefined()
 })
 
