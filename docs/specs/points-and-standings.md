@@ -21,6 +21,11 @@ Everyone sees points and standings. Nobody enters points by hand: they are alway
 4. A player's **season total** is the sum of their points from every **finished** night in the season.
 5. **Standings** ("Classificação") rank players from the highest total to the lowest. Players who have not
    scored yet don't appear.
+5a. Between the player and the points, the standings table has **a column for each scoring position** ("1º",
+   "2º" and so on), with the times the player finished there in the season. A position the player never
+   reached shows a dash, and the highest number of each position is marked, as in "Posições" of the statistics
+   ([statistics.md](statistics.md), rule 3c). The order is still by points. A phone has no room for these
+   columns: under each nickname it says the nights scored and the wins.
 6. Standings are **never stored**. They are calculated from the results each time, so a correction changes
    them at once.
 7. The **ranking simulator** ("Simulação") takes an imagined pot and finishing order for the next night, and
@@ -45,7 +50,8 @@ Names and figures are invented. All examples use the percentage table **38, 23, 
 
 - **A R$ 845 pot:** 1st 321.10, 2nd 194.35, 3rd 126.75, 4th 92.95, 5th 67.60, 6th 42.25. Total 845.00.
 - **Standings.** Ana scored 114.00 on night 1 and 45.00 on night 2. Breno scored 69.00 and 114.00. After
-  two nights: Breno 183.00, Ana 159.00.
+  two nights: Breno 183.00, Ana 159.00. Breno's line shows 1 under "1º", 1 under "2º" and a dash under "3º";
+  Ana's shows 1, a dash and 1.
 - **Correction.** Night 2 is corrected so that Ana finished 1st and Breno 3rd. Ana now has 228.00 and Breno
   114.00. The standings change without any other step.
 - **Simulator.** After the correction, a simulated R$ 400 pot where Breno finishes 1st (152.00) and Ana

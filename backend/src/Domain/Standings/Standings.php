@@ -20,12 +20,15 @@ final class Standings
      */
     public function rank(iterable $lines): array
     {
-        /** @var array<int, array{points: Money, nights: int, wins: int}> $totals */
+        /** @var array<int, array{points: Money, nights: int, wins: int, positions: array<int, int>}> $totals */
         $totals = [];
+        $lastPosition = 0;
         foreach ($lines as $line) {
-            $total = $totals[$line->playerId] ?? ['points' => Money::zero(), 'nights' => 0, 'wins' => 0];
+            $total = $totals[$line->playerId] ?? ['points' => Money::zero(), 'nights' => 0, 'wins' => 0, 'positions' => []];
             $total['points'] = $total['points']->plus($line->points);
             $total['nights']++;
+            $total['positions'][$line->position] = ($total['positions'][$line->position] ?? 0) + 1;
+            $lastPosition = max($lastPosition, $line->position);
             if ($line->position === 1) {
                 $total['wins']++;
             }
@@ -45,7 +48,12 @@ final class Standings
                 $rank = $index + 1;
             }
             $previous = $points;
-            $rows[] = new StandingRow($rank, $playerId, $points, $totals[$playerId]['nights'], $totals[$playerId]['wins']);
+            // Every row has every scoring position of these nights, in order, with 0 where the player never finished.
+            $positions = [];
+            for ($position = 1; $position <= $lastPosition; $position++) {
+                $positions[$position] = $totals[$playerId]['positions'][$position] ?? 0;
+            }
+            $rows[] = new StandingRow($rank, $playerId, $points, $totals[$playerId]['nights'], $totals[$playerId]['wins'], $positions);
         }
 
         return $rows;

@@ -29,6 +29,7 @@ final class SeasonStandings
             $row->points->toDecimal(),
             $row->nightsScored,
             $row->wins,
+            StandingEntry::positions($row),
         ), $rows);
     }
 

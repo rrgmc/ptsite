@@ -8,8 +8,6 @@ export const standings: Messages['standings'] = {
   tableCaption: ({ season }) => `Standings of the season ${season}`,
 
   // Table
-  scored: 'Scored',
-  wins: 'Wins',
   nightsCount: ({ count }) => `${count} ${count === 1 ? 'night' : 'nights'}`,
   winsCount: ({ count }) => `${count} ${count === 1 ? 'win' : 'wins'}`,
 

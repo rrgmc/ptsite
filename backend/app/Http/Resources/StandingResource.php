@@ -18,6 +18,13 @@ class StandingResource extends JsonResource
             'points' => $this->points,
             'nights_scored' => $this->nightsScored,
             'wins' => $this->wins,
+            /**
+             * How often the player finished in each scoring position, first place first. Positions never reached
+             * have count 0.
+             *
+             * @var list<array{position: int, count: int}>
+             */
+            'positions' => $this->positions,
         ];
     }
 }

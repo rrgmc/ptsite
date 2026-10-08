@@ -3,6 +3,7 @@ import type { Statistics } from '@/api/client'
 import { Button } from '@/components/Button'
 import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
+import { highestCounts, PositionCount } from '@/components/PositionCount'
 import { RankCell } from '@/components/RankedList'
 import { t } from '@/i18n'
 import { ordinal } from '@/lib/format'
@@ -23,7 +24,7 @@ export function PositionTable({ rows }: { rows: Statistics['position_table'] }) 
   const positions = rows[0]?.positions.map((p) => p.position) ?? []
   const shown = rows.slice(0, all ? MOST : FIRST)
   // The highest number of each column, among every line: also the ones not shown.
-  const highest = positions.map((_, column) => Math.max(...rows.map((row) => row.positions[column].count)))
+  const highest = highestCounts(rows)
 
   return (
     <>
@@ -55,16 +56,7 @@ export function PositionTable({ rows }: { rows: Statistics['position_table'] }) 
                 </td>
                 {row.positions.map((p, column) => (
                   <td key={p.position} className="px-1 py-1 text-center tabular">
-                    {p.count === 0 ? (
-                      <span className="text-muted"><span aria-hidden="true">{t.statistics.never}</span><span className="sr-only">0</span></span>
-                    ) : p.count === highest[column] ? (
-                      // Marked by its box and its weight, and said to screen readers: not by color alone.
-                      <span className="inline-block min-w-7 rounded-md bg-primary px-1.5 font-extrabold text-on-primary">
-                        {p.count}<span className="sr-only"> {t.statistics.highestOfPosition}</span>
-                      </span>
-                    ) : (
-                      <span className="font-medium">{p.count}</span>
-                    )}
+                    <PositionCount count={p.count} highest={highest[column]} />
                   </td>
                 ))}
               </tr>

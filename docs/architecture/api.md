@@ -28,7 +28,7 @@
 | `GET /seasons/current` | logged in | Newest open, unfinished season (404 if none) |
 | `GET /seasons/top-standings` | logged in | Every season that is not archived, newest first, each with the first ten of its standings: `season`, `rows` (as in the standings; empty before the first finished night), `tied_not_shown` (players left out who have the same total as the last one shown) and `main_event_champion` (the 1st place of its finished Main Event; null without one, and on a site with no Main Event) |
 | `GET /seasons/{id}` | logged in | One season with its percentage table |
-| `GET /seasons/{id}/standings` | logged in | Standings: `rank` (shared on ties), `player`, `points`, `nights_scored`, `wins` |
+| `GET /seasons/{id}/standings` | logged in | Standings: `rank` (shared on ties), `player`, `points`, `nights_scored`, `wins` and `positions` (a `count` for every scoring position, zeros included) |
 | `GET /seasons/{id}/nights` | logged in | Nights oldest first, with results: the rounds, the extra nights and the Main Event night. `status`, `updated_since` |
 | `GET /seasons/{id}/night-suggestions` | logged in | Suggested dates for a new night: the next three regular weekdays at the regular time (`starts_at`), leaving out dates that already have a round |
 | `GET /seasons/{id}/night-plan` | admin | The season planner: the regular nights from `from` to `to` (Y-m-d; with `count`, stopping at that many planned nights), carrying on the season's rhythm, each with `starts_at`, `included`, `taken` (with `night_id`: every existing round in the range, on any day; an extra night is not shown) and `skip_reason` (`kind`: `holiday`, `bridge` or `carnival`; `holiday`). Saves nothing. 404 on a site with no season planner |

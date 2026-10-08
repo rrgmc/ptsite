@@ -6623,6 +6623,25 @@
                     },
                     "wins": {
                         "type": "integer"
+                    },
+                    "positions": {
+                        "type": "array",
+                        "description": "How often the player finished in each scoring position, first place first. Positions never reached\nhave count 0.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "position": {
+                                    "type": "integer"
+                                },
+                                "count": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "position",
+                                "count"
+                            ]
+                        }
                     }
                 },
                 "required": [
@@ -6630,7 +6649,8 @@
                     "player",
                     "points",
                     "nights_scored",
-                    "wins"
+                    "wins",
+                    "positions"
                 ],
                 "title": "StandingResource"
             },
