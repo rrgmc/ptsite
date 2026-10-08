@@ -224,7 +224,10 @@ it('leaves the Main Event out of the rounds, the standings and the statistics', 
     $this->getJson("/api/v1/seasons/{$this->season->id}/standings")->assertOk()
         ->assertJsonCount(6, 'data')
         ->assertJsonPath('data.0.player.id', $this->players[0]->id)
-        ->assertJsonPath('data.0.points', '114.00');
+        ->assertJsonPath('data.0.points', '114.00')
+        ->assertJsonPath('data.0.positions.0', ['position' => 1, 'count' => 1])
+        ->assertJsonPath('data.0.positions.5', ['position' => 6, 'count' => 0])
+        ->assertJsonCount(6, 'data.0.positions');
     $this->getJson("/api/v1/statistics?season={$this->season->id}")->assertOk()
         ->assertJsonPath('data.nights_count', 1)
         ->assertJsonPath('data.pot_total', '300.00')

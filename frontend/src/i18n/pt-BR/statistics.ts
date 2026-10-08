@@ -23,8 +23,8 @@ export const statistics = {
   never: '–',
   /** Read by screen readers after the highest number of a column. */
   highestOfPosition: '(o maior da posição)',
-  showAll: ({ count }: { count: number }) => `Ver todos (${count})`,
-  showFirst: ({ count }: { count: number }) => `Ver só os ${count} primeiros`,
+  /** The button under the table: it shows more lines, thirty at most, and then the first ten again. */
+  showFirst: ({ count }: { count: number }) => `Ver os ${count} primeiros`,
   times: 'Vezes',
 
   // The Main Events of every season, on a site that has the Main Event

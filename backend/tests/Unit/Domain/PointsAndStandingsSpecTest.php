@@ -63,6 +63,16 @@ it('ranks players by total points after two nights', function () {
         ->toBe([[1, BRENO, '183.00'], [2, ANA, '159.00']]);
 });
 
+it('counts each player\'s times in every scoring position, zeros included', function () {
+    $rows = (new Standings)->rank([
+        line(ANA, '114.00', 1), line(BRENO, '69.00', 2),
+        line(ANA, '45.00', 3), line(BRENO, '114.00', 1),
+    ]);
+
+    expect(array_map(fn ($r) => [$r->playerId, $r->positions], $rows))
+        ->toBe([[BRENO, [1 => 1, 2 => 1, 3 => 0]], [ANA, [1 => 1, 2 => 0, 3 => 1]]]);
+});
+
 it('changes the standings when a night is corrected', function () {
     $rows = (new Standings)->rank([
         line(ANA, '114.00', 1), line(BRENO, '69.00', 2),

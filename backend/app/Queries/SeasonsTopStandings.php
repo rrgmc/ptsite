@@ -59,6 +59,7 @@ final class SeasonsTopStandings
                 $row->points->toDecimal(),
                 $row->nightsScored,
                 $row->wins,
+                StandingEntry::positions($row),
             ), $tops[$key]->rows),
             $tops[$key]->tiedNotShown,
             $champions[$season->id] ?? null,

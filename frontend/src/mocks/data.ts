@@ -173,13 +173,16 @@ export const finishedNightDashboard: NightDashboard = {
   recorded: { pot: '430.00', main_event_pot: '85.00', time_chip: '25.00' },
 }
 
+/** A standing row's times in each scoring position, the 1st place first. */
+const timesIn = (...counts: number[]) => counts.map((count, i) => ({ position: i + 1, count }))
+
 export const standings: Standing[] = [
-  { rank: 1, player: players[1], points: '183.00', nights_scored: 2, wins: 1 },
-  { rank: 2, player: players[0], points: '159.00', nights_scored: 2, wins: 1 },
-  { rank: 3, player: players[2], points: '90.00', nights_scored: 2, wins: 0 },
-  { rank: 3, player: players[3], points: '90.00', nights_scored: 2, wins: 0 },
-  { rank: 5, player: players[4], points: '48.00', nights_scored: 1, wins: 0 },
-  { rank: 6, player: players[5], points: '15.00', nights_scored: 1, wins: 0 },
+  { rank: 1, player: players[1], points: '183.00', nights_scored: 2, wins: 1, positions: timesIn(1, 1, 0, 0, 0, 0) },
+  { rank: 2, player: players[0], points: '159.00', nights_scored: 2, wins: 1, positions: timesIn(1, 0, 1, 0, 0, 0) },
+  { rank: 3, player: players[2], points: '90.00', nights_scored: 2, wins: 0, positions: timesIn(0, 1, 0, 0, 1, 0) },
+  { rank: 3, player: players[3], points: '90.00', nights_scored: 2, wins: 0, positions: timesIn(0, 0, 1, 1, 0, 0) },
+  { rank: 5, player: players[4], points: '48.00', nights_scored: 1, wins: 0, positions: timesIn(0, 0, 0, 1, 0, 0) },
+  { rank: 6, player: players[5], points: '15.00', nights_scored: 1, wins: 0, positions: timesIn(0, 0, 0, 0, 0, 1) },
 ]
 
 export const keeper: User = {
@@ -433,6 +436,7 @@ export const topTen: Standing[] = ['1420.50', '1310.00', '1188.25', '960.00', '9
   points,
   nights_scored: 20 - i,
   wins: Math.max(0, 5 - i),
+  positions: timesIn(Math.max(0, 5 - i), 4, 3, 3, 3, 2 + (i % 3)),
 }))
 
 /** "Temporadas": the current season so far, two finished seasons (one with a cut tie) and one with no result. */

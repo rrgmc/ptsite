@@ -20,8 +20,7 @@ export const statistics: Messages['statistics'] = {
   positionTableCaption: 'Players by times in each position',
   never: '–',
   highestOfPosition: '(the highest of the position)',
-  showAll: ({ count }) => `Show all (${count})`,
-  showFirst: ({ count }) => `Show only the first ${count}`,
+  showFirst: ({ count }) => `Show the first ${count}`,
   times: 'Times',
 
   // The Main Events of every season, on a site that has the Main Event

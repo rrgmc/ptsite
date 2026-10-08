@@ -3,25 +3,28 @@ import type { Statistics } from '@/api/client'
 import { Button } from '@/components/Button'
 import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
+import { highestCounts, PositionCount } from '@/components/PositionCount'
 import { RankCell } from '@/components/RankedList'
 import { t } from '@/i18n'
 import { ordinal } from '@/lib/format'
 
-/** How many lines show before "Ver todos". */
+/** How many lines show at first. */
 const FIRST = 10
+/** How many lines show at most, on request: a league with many players would make the table too long. */
+const MOST = 30
 
 /**
  * "Posições" as a medal table: a line per player and a column per scoring position, with the times the player
  * finished there. The API orders it: most 1st places first, then most 2nd places, and so on.
- * It shows the first ten lines, and the rest on request. The highest number of each column is marked, and a
+ * It shows the first ten lines, and on request up to thirty. The highest number of each column is marked, and a
  * position the player never reached shows a dash.
  */
 export function PositionTable({ rows }: { rows: Statistics['position_table'] }) {
   const [all, setAll] = useState(false)
   const positions = rows[0]?.positions.map((p) => p.position) ?? []
-  const shown = all ? rows : rows.slice(0, FIRST)
-  // The highest number of each column, among every line and not only the ones shown.
-  const highest = positions.map((_, column) => Math.max(...rows.map((row) => row.positions[column].count)))
+  const shown = rows.slice(0, all ? MOST : FIRST)
+  // The highest number of each column, among every line: also the ones not shown.
+  const highest = highestCounts(rows)
 
   return (
     <>
@@ -53,16 +56,7 @@ export function PositionTable({ rows }: { rows: Statistics['position_table'] }) 
                 </td>
                 {row.positions.map((p, column) => (
                   <td key={p.position} className="px-1 py-1 text-center tabular">
-                    {p.count === 0 ? (
-                      <span className="text-muted"><span aria-hidden="true">{t.statistics.never}</span><span className="sr-only">0</span></span>
-                    ) : p.count === highest[column] ? (
-                      // Marked by its box and its weight, and said to screen readers: not by color alone.
-                      <span className="inline-block min-w-7 rounded-md bg-primary px-1.5 font-extrabold text-on-primary">
-                        {p.count}<span className="sr-only"> {t.statistics.highestOfPosition}</span>
-                      </span>
-                    ) : (
-                      <span className="font-medium">{p.count}</span>
-                    )}
+                    <PositionCount count={p.count} highest={highest[column]} />
                   </td>
                 ))}
               </tr>
@@ -72,7 +66,7 @@ export function PositionTable({ rows }: { rows: Statistics['position_table'] }) 
       </div>
       {rows.length > FIRST && (
         <Button variant="ghost" className="mt-2" aria-expanded={all} onPress={() => setAll(!all)}>
-          {all ? t.statistics.showFirst({ count: FIRST }) : t.statistics.showAll({ count: rows.length })}
+          {t.statistics.showFirst({ count: all ? FIRST : Math.min(rows.length, MOST) })}
         </Button>
       )}
     </>

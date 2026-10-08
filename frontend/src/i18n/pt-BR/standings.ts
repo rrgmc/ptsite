@@ -7,8 +7,6 @@ export const standings = {
   tableCaption: ({ season }: { season: string }) => `Classificação da temporada ${season}`,
 
   // Table
-  scored: 'Pontuou',
-  wins: 'Vitórias',
   nightsCount: ({ count }: { count: number }) => `${count} ${count === 1 ? 'evento' : 'eventos'}`,
   winsCount: ({ count }: { count: number }) => `${count} ${count === 1 ? 'vitória' : 'vitórias'}`,
 

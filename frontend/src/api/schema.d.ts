@@ -1851,6 +1851,14 @@ export interface components {
             points: string;
             nights_scored: number;
             wins: number;
+            /**
+             * @description How often the player finished in each scoring position, first place first. Positions never reached
+             *     have count 0.
+             */
+            positions: {
+                position: number;
+                count: number;
+            }[];
         };
         /** StatisticsResource */
         StatisticsResource: {

@@ -62,7 +62,7 @@ export const ManyPlaces: StoryObj = {
   ),
 }
 
-/** "Posições": twelve players, the first ten shown, with "Ver todos" for the rest. */
+/** "Posições": twelve players, the first ten shown, with a button for the rest. */
 export const Positions: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => <RouterStory path="/" url="/" element={<PositionTable rows={statistics.position_table} />} />,

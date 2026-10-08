@@ -47,65 +47,71 @@ export function ResultsPage() {
   const toCome = season.is_finished ? [] : all.filter((n) => n.status !== 'finished')
   const upcoming = toCome.slice(0, UPCOMING)
   const canRun = me.data?.abilities.run_nights && !season.is_finished
+  const showUpcoming = upcoming.length > 0 || canRun
+  // A season with no finished night has no totals and no chart.
+  const totals = statistics.data && statistics.data.nights_count > 0 ? statistics.data : undefined
 
   return (
     <>
       <OpenNightAttendance />
       <PageHeader title={t.results.title} subtitle={season.name} />
 
-      {(upcoming.length > 0 || canRun) && (
-        <Card title={t.results.upcoming} className="mb-4" action={canRun && !scheduling && <Button variant="secondary" onPress={() => setScheduling(true)}>{t.results.schedule}</Button>}>
-          {scheduling && (season.nights_planned ?? 0) >= season.rounds && (
-            <p role="alert" className="mb-3 rounded-md bg-warning-soft p-2 text-sm text-warning">
-              {t.results.overPlanned({ planned: season.nights_planned ?? 0, rounds: season.rounds })}
-            </p>
+      {/* On a wide screen the totals are at the left of the next nights, with a quarter of the width. On a phone they are under them. */}
+      {(showUpcoming || totals) && (
+        <div className={`mb-4 grid grid-cols-1 gap-4 ${showUpcoming && totals ? 'lg:grid-cols-[1fr_3fr]' : ''}`}>
+          {showUpcoming && (
+            <Card title={t.results.upcoming} action={canRun && !scheduling && <Button variant="secondary" onPress={() => setScheduling(true)}>{t.results.schedule}</Button>}>
+              {scheduling && (season.nights_planned ?? 0) >= season.rounds && (
+                <p role="alert" className="mb-3 rounded-md bg-warning-soft p-2 text-sm text-warning">
+                  {t.results.overPlanned({ planned: season.nights_planned ?? 0, rounds: season.rounds })}
+                </p>
+              )}
+              {scheduling && <ScheduleForm seasonId={season.id} defaultPlaceId={season.default_place?.id} defaultTime={season.schedule.time} onDone={(id) => { setScheduling(false); if (id) navigate(`/nights/${id}`) }} />}
+              <ul className="flex flex-col gap-1">
+                {upcoming.map((n) => (
+                  <li key={n.id}>
+                    <Link to={`/nights/${n.id}`} className="flex min-h-touch flex-wrap items-center justify-between gap-x-2 rounded-md px-2 py-1 hover:bg-surface-sunken">
+                      <span>
+                        <span className="font-semibold">{formatWeekday(n.starts_at)}</span>
+                        <span className="text-muted"> · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>
+                      </span>
+                      <span className="flex flex-wrap items-center gap-2">
+                        <NightMark night={n} />
+                        <Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{n.status === 'open' ? t.nights.status.open : t.nights.status.scheduled}</Badge>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+                {upcoming.length === 0 && !scheduling && <li className="text-muted">{t.results.noUpcoming}</li>}
+              </ul>
+              {toCome.length > upcoming.length && (
+                <Link to={to('/calendar')} className="mt-1 inline-flex min-h-touch items-center px-2 text-sm font-semibold text-primary">{t.results.seeCalendar}</Link>
+              )}
+            </Card>
           )}
-          {scheduling && <ScheduleForm seasonId={season.id} defaultPlaceId={season.default_place?.id} defaultTime={season.schedule.time} onDone={(id) => { setScheduling(false); if (id) navigate(`/nights/${id}`) }} />}
-          <ul className="flex flex-col gap-1">
-            {upcoming.map((n) => (
-              <li key={n.id}>
-                <Link to={`/nights/${n.id}`} className="flex min-h-touch flex-wrap items-center justify-between gap-x-2 rounded-md px-2 py-1 hover:bg-surface-sunken">
-                  <span>
-                    <span className="font-semibold">{formatWeekday(n.starts_at)}</span>
-                    <span className="text-muted"> · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>
-                  </span>
-                  <span className="flex flex-wrap items-center gap-2">
-                    <NightMark night={n} />
-                    <Badge tone={n.status === 'open' ? 'primary' : 'neutral'}>{n.status === 'open' ? t.nights.status.open : t.nights.status.scheduled}</Badge>
-                  </span>
-                </Link>
-              </li>
-            ))}
-            {upcoming.length === 0 && !scheduling && <li className="text-muted">{t.results.noUpcoming}</li>}
-          </ul>
-          {toCome.length > upcoming.length && (
-            <Link to={to('/calendar')} className="mt-1 inline-flex min-h-touch items-center px-2 text-sm font-semibold text-primary">{t.results.seeCalendar}</Link>
+          {totals && (
+            <Card title={t.results.seasonTotals} className="lg:order-first">
+              {/* Alone, the box has the full width: its amounts are then side by side, each beside its name. */}
+              <dl className={showUpcoming ? '' : 'flex flex-wrap gap-x-10'}>
+                {amountRows({ pot: totals.pot_total, mainEventPot: totals.main_event_pot_total, timeChip: totals.time_chip_total }).map(([label, amount]) => (
+                  // With very large text the amount goes under its name instead of widening the page.
+                  <div key={label} className="flex flex-wrap items-center justify-between gap-x-3 py-0.5">
+                    <dt className="font-semibold">{label}</dt>
+                    <dd className="tabular">{formatMoney(amount)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Card>
           )}
-        </Card>
+        </div>
       )}
 
-      {statistics.data && statistics.data.nights_count > 0 && (
-        <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-[3fr_1fr] lg:items-start">
-          {/* min-w-0 lets the chart shrink with its column. */}
-          <div className="min-w-0">
-            <Suspense fallback={<Loading label={t.results.loadingChart} />}>
-              <PointsProgressChart progress={statistics.data.points_progress} perSeason={false} />
-            </Suspense>
-          </div>
-          <Card title={t.results.seasonTotals}>
-            <dl>
-              {amountRows({
-                pot: statistics.data.pot_total,
-                mainEventPot: statistics.data.main_event_pot_total,
-                timeChip: statistics.data.time_chip_total,
-              }).map(([label, amount]) => (
-                <div key={label} className="flex items-center justify-between py-0.5">
-                  <dt className="font-semibold">{label}</dt>
-                  <dd className="tabular">{formatMoney(amount)}</dd>
-                </div>
-              ))}
-            </dl>
-          </Card>
+      {totals && (
+        // min-w-0 lets the chart shrink with the page.
+        <div className="mb-4 min-w-0">
+          <Suspense fallback={<Loading label={t.results.loadingChart} />}>
+            <PointsProgressChart progress={totals.points_progress} perSeason={false} />
+          </Suspense>
         </div>
       )}
 
