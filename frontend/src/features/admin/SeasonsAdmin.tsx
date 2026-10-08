@@ -10,10 +10,9 @@ import { Badge, ErrorBox, Loading } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
-import { formatDate, ordinal, parseMoneyInput } from '@/lib/format'
+import { formatDate, moneyText, ordinal, parseMoneyInput } from '@/lib/format'
 import { hasFeature } from '@/lib/features'
 import { currencySymbol } from '@/lib/site'
-import { moneyText } from '@/features/nights/partialResult'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 
 const STANDARD = [38, 23, 15, 11, 8, 5]
