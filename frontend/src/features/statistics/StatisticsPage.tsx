@@ -91,6 +91,17 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
   if (hasNights) {
     tabs.push(
       {
+        id: 'positions',
+        title: t.statistics.positions,
+        content: (
+          // On a wide screen "Vitórias" is at the right of the table, in the width the table leaves.
+          <div className="flex flex-col gap-x-10 gap-y-6 lg:flex-row lg:items-start">
+            <div className="min-w-0"><PositionTable rows={statistics.position_table} /></div>
+            <WinsChart bare className="lg:flex-1" statistics={statistics} />
+          </div>
+        ),
+      },
+      {
         id: 'players',
         title: t.common.players,
         content: (
@@ -141,17 +152,6 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
             ) : (
               <PlacesChart className="lg:col-span-2" places={statistics.places} />
             )}
-          </div>
-        ),
-      },
-      {
-        id: 'positions',
-        title: t.statistics.positions,
-        content: (
-          // On a wide screen "Vitórias" is at the right of the table, in the width the table leaves.
-          <div className="flex flex-col gap-x-10 gap-y-6 lg:flex-row lg:items-start">
-            <div className="min-w-0"><PositionTable rows={statistics.position_table} /></div>
-            <WinsChart bare className="lg:flex-1" statistics={statistics} />
           </div>
         ),
       },
