@@ -17,7 +17,7 @@ Everyone logged in: players, results keepers and admins.
    and charts.
 2. Only **finished nights** count. Archived nights do not count, and "Geral" also leaves out archived seasons.
    A Main Event night has no pot and no points, so it does not count ([main-event.md](main-event.md)). An extra
-   night counts like any other.
+   night counts like any other. The Main Events have lists of their own (rule 13).
    Inactive players count: the lists are the league's history.
 3. Each list shows the **first 10**, highest first:
    - **"Pontuação Total"**: players by total points.
@@ -34,8 +34,8 @@ Everyone logged in: players, results keepers and admins.
 6. **"Vitórias"** is a bar chart of the "Posição: 1º" list, with the first places of everyone else added up as
    "Outros".
 7. The view also shows how many nights it counts and their total pot. The Main Event pots and the time chips of
-   those nights are added up too; "Resultados" shows the three totals of the season. A site with no Main Event
-   pot or no time chip does not show that total.
+   those nights are added up too; "Resultados" shows the same three totals of the season. A site with no Main
+   Event pot or no time chip does not show that total.
 8. **A player's statistics** are on the player's page ([players.md](players.md), rule 11). They have the same two
    views, "Temporada" and "Geral", and count the same nights (rule 2).
 9. The player's **numbers**:
@@ -51,6 +51,16 @@ Everyone logged in: players, results keepers and admins.
 12. The player's **charts**: **"Pontos acumulados"**, a line of the player's running total, with one step per
     night in "Temporada" and one per season in "Geral"; and **"Posições"**, a bar for each scoring position. The
     line stays flat on a night or season in which the player did not score.
+
+13. **The Main Event lists**, in "Geral" only, on a site with the Main Event ([main-event.md](main-event.md)).
+    They count the finished Main Events of the seasons that are not archived. Each shows the first 10, with
+    ties as in rule 4:
+    - **"Main Event: Títulos"**: players by Main Events won.
+    - **"Main Event: Pódios"**: players by times in the first three of a Main Event.
+    - **"Main Event: Participações"**: players by Main Events played. A Main Event of which only some players
+      were recorded counts those players only.
+
+    "Temporada" has no such list: a season has one Main Event, and the "Main Event" screen shows it.
 
 The site stores only the scoring positions of a night, not everyone who played. So a player's page cannot say
 how many nights they played, only on how many they scored.
@@ -80,6 +90,11 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   288,00; Breno 221,00 then 221,00; Carla 137,00 then 206,00.
 - **The cut at ten.** Twelve players won one night each: "Posição: 1º" shows ten, all in 1st, and "e mais 2
   empatados"; "Vitórias" shows ten bars and "Outros: 2".
+- **The Main Events.** Season A's Main Event ends Ana, Breno, Carla, Dudu, and season B's ends Breno, Ana,
+  Dudu. Titles: Ana 1 and Breno 1 share 1st. Podiums: Ana 2 and Breno 2 share 1st; Carla 1 and Dudu 1 share
+  3rd. Appearances: Ana 2, Breno 2 and Dudu 2 share 1st; Carla, with 1, is 4th.
+- **Only the champion.** An old Main Event recorded with Carla alone gives her one title, one podium and one
+  appearance.
 - **A player, every season.** Ana is 1st with 288,00, scored on 3 nights and won 2. Her positions: 1st 2, 2nd 0,
   3rd 1.
 - **A player, one season.** In season A, Ana is 2nd with 174,00, scored on 2 nights and won 1.
@@ -95,9 +110,13 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 
 - **"📊 Estatísticas"** in the menu, after "Jogadores". It is not on the phone's bottom bar, which is full.
 - A switch **"Temporada" / "Geral"**. Each view has its own address, so it can be shared.
-- The line "N eventos · Pote total R$ …", the two charts, then the lists. On a wide screen "Pontos acumulados"
-  takes three quarters of the width and "Vitórias" one quarter; on a phone each takes the full width. Each chart has "Ver dados em tabela",
+- At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then the two charts,
+  then the lists. On a wide screen "Pontos acumulados" takes three quarters of the width and "Vitórias" one
+  quarter, with the same height; on a phone each takes the full width. Each chart has "Ver dados em tabela",
   which shows the same numbers as a table.
+- The lists are three across on a wide screen, two on a tablet and one on a phone, in this order: "Pontuação
+  Total", "Eventos Pontuando", "Maiores Potes" and "Locais"; then the "Posição" lists; then, in "Geral", the
+  Main Event lists. On a wide screen "Locais" is under "Maiores Potes", in the same column.
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, below "Próximos eventos" and above the
   finished nights. The box "Totais da temporada" adds up the season's three amounts: "Pote Total", "Pote ME" and

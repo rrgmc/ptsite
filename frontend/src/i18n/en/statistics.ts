@@ -5,7 +5,6 @@ export const statistics: Messages['statistics'] = {
   noSeason: 'No seasons yet.',
   allSeasons: 'All seasons',
   noNights: 'No finished nights yet.',
-  summary: ({ count, pot }) => `${count} ${count === 1 ? 'night' : 'nights'} · Total pot ${pot}`,
 
   // Top ten lists
   totalPoints: 'Total Points',
@@ -20,6 +19,14 @@ export const statistics: Messages['statistics'] = {
   positionTitle: ({ position }) => `Position: ${position}`,
   positionCaption: ({ position }) => `Players by times finishing ${position}`,
   times: 'Times',
+
+  // The Main Events of every season, on a site that has the Main Event
+  mainEventTitles: 'Main Event: Titles',
+  mainEventTitlesCaption: 'Players by Main Events won',
+  mainEventPodiums: 'Main Event: Podiums',
+  mainEventPodiumsCaption: 'Players by times in the first three of a Main Event',
+  mainEventAppearances: 'Main Event: Appearances',
+  mainEventAppearancesCaption: 'Players by Main Events played',
 
   // Charts
   pointsProgress: 'Accumulated points',

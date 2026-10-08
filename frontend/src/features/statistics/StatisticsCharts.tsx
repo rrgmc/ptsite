@@ -10,13 +10,14 @@ import { cell, head, highestFirst, tick, tooltip } from './chartStyle'
  * A chart with its title, a short description for screen readers, and the same numbers as a table
  * ("Ver dados em tabela"), so nothing is told by color or by sight alone.
  */
-export function Figure({ title, description, legend, table, children }: { title: string; description: string; legend?: ReactNode; table: ReactNode; children: ReactNode }) {
+export function Figure({ title, description, legend, table, children, className = '' }: { title: string; description: string; legend?: ReactNode; table: ReactNode; children: ReactNode; className?: string }) {
   return (
     // min-w-0: in a grid, the box may be narrower than its data table, which then scrolls inside it.
-    <figure className="min-w-0 rounded-lg bg-surface p-4 shadow-card">
+    // A column, so that in a box stretched by its row the chart takes the height left over.
+    <figure className={`flex min-w-0 flex-col rounded-lg bg-surface p-4 shadow-card ${className}`}>
       <figcaption className="mb-3 font-display text-lg font-bold">{title}</figcaption>
       {legend}
-      <div role="img" aria-label={description}>{children}</div>
+      <div role="img" aria-label={description} className="flex flex-1 flex-col">{children}</div>
       <details className="mt-3 text-sm">
         <summary className="cursor-pointer font-semibold text-primary">{t.statistics.viewTable}</summary>
         <div className="mt-2 overflow-x-auto">{table}</div>
@@ -26,11 +27,12 @@ export function Figure({ title, description, legend, table, children }: { title:
 }
 
 /** "Pontos acumulados": the running total of the eight players with most points. */
-export function PointsProgressChart({ progress, perSeason }: { progress: Statistics['points_progress']; perSeason: boolean }) {
+export function PointsProgressChart({ progress, perSeason, className }: { progress: Statistics['points_progress']; perSeason: boolean; className?: string }) {
   const { series, points } = progressData(progress)
   const leader = series[0]?.nickname
   return (
     <Figure
+      className={className}
       title={t.statistics.pointsProgress}
       description={t.statistics.pointsProgressDescription({ count: series.length, perSeason, leader })}
       legend={
@@ -63,8 +65,9 @@ export function PointsProgressChart({ progress, perSeason }: { progress: Statist
         </table>
       }
     >
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+      {/* At least 16rem high, and taller in a box that its row stretched. The chart is laid over this box, so its own height never sets the box's. */}
+      <div className="relative min-h-64 flex-1">
+        <ResponsiveContainer width="100%" height="100%" className="absolute inset-0">
           <LineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
             <CartesianGrid stroke="var(--color-border)" vertical={false} />
             <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />

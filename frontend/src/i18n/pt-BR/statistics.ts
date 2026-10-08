@@ -4,7 +4,6 @@ export const statistics = {
   noSeason: 'Nenhuma temporada cadastrada.',
   allSeasons: 'Todas as temporadas',
   noNights: 'Nenhum evento finalizado ainda.',
-  summary: ({ count, pot }: { count: number; pot: string }) => `${count} ${count === 1 ? 'evento' : 'eventos'} · Pote total ${pot}`,
 
   // Top ten lists
   totalPoints: 'Pontuação Total',
@@ -19,6 +18,14 @@ export const statistics = {
   positionTitle: ({ position }: { position: string }) => `Posição: ${position}`,
   positionCaption: ({ position }: { position: string }) => `Jogadores por vezes em ${position} lugar`,
   times: 'Vezes',
+
+  // The Main Events of every season, on a site that has the Main Event
+  mainEventTitles: 'Main Event: Títulos',
+  mainEventTitlesCaption: 'Jogadores por títulos do Main Event',
+  mainEventPodiums: 'Main Event: Pódios',
+  mainEventPodiumsCaption: 'Jogadores por vezes entre os três primeiros do Main Event',
+  mainEventAppearances: 'Main Event: Participações',
+  mainEventAppearancesCaption: 'Jogadores por participações no Main Event',
 
   // Charts
   pointsProgress: 'Pontos acumulados',
