@@ -27,12 +27,23 @@ test('the calendar marks today', async ({ page }) => {
   await page.getByRole('link', { name: /Calendário/ }).first().click()
   await pickSeason(page, 'Liga 2022')
 
+  // Today is in the season, so the page shows April and May only, with a link to the complete calendar.
+  await expect(page.getByRole('region', { name: 'Abril de 2022' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Maio de 2022' })).toBeVisible()
+  await expect(page.getByRole('region')).toHaveCount(2)
+  await expect(page.getByRole('button', { name: 'Ir para hoje' })).toHaveCount(0)
+  await page.getByRole('link', { name: 'Ver o calendário completo' }).click()
+  await expect(page).toHaveURL(/\/calendar\?view=all$/)
+  await expect(page.getByRole('region', { name: 'Março de 2022' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Ver só este mês e o próximo' })).toBeVisible()
+
   const today = page.locator('[aria-current="date"]')
   await expect(today).toHaveCount(1)
   await expect(page.getByRole('region', { name: 'Abril de 2022' }).locator('[aria-current="date"]')).toContainText('15/04/2022')
   await expect(today).toContainText('(hoje)')
   await expect(page.getByRole('list', { name: 'Legenda' })).toContainText('Hoje')
-  // The calendar opens at the top. Nothing is coming in a finished season, so the button goes to today's month.
+  // The complete calendar starts before April. Nothing is coming in a finished season, so the button goes to
+  // today's month.
   await expect(page.getByRole('heading', { name: 'Calendário', level: 1 })).toBeInViewport()
   await page.getByRole('button', { name: 'Ir para hoje' }).click()
   const april = page.getByRole('heading', { name: 'Abril de 2022' })

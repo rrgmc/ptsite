@@ -30,14 +30,19 @@ Everyone logged in: players, results keepers and admins.
    date and name, whether or not they fall on a night. A Friday that is itself the holiday gets one line.
 4. The calendar runs from the season start to the later of its last night and the end of the start year. A finished
    season stops at its last night.
+4a. The page shows **this month and the next one** only. **"Ver o calendário completo"** shows every month from the
+   season start, at an address of its own (`?view=all`), and there **"Ver só este mês e o próximo"** goes back. A
+   season that does not include today shows every month and neither link. Neither link is shown when the two
+   months are the whole season.
 5. **The next night** is highlighted and shown at the top. The calendar opens at the top of the page, like every
-   other screen. **"Ver no calendário"**, under the next night, goes to its month.
+   other screen. **"Ver no calendário"**, under the next night, goes to its month, when that month is on the page.
 5a. **Today** is a square on the grid, where every other day is round, and the legend shows "Hoje". On a day
    with nothing else, the square is filled blue, a color no kind of day uses. On a night or a holiday, it keeps that day's colors and has a
    blue ring (a light one on a filled day). So today never looks like the next night, which is round with an outline. The
    month of today has a slightly different background color from the other months. When
    no night is coming, **"Ir para hoje"** goes to today's month. A season that does not include today shows none of
-   these. Neither button is shown when its month is the first one, which is already at the top.
+   these. Neither button is shown when its month is the first one on the page, which is already at the top. So
+   "Ir para hoje" is shown on the complete calendar only.
 6. Archived nights are not shown.
 7. Each night opens the night page.
 
@@ -55,15 +60,18 @@ A season starting on 01/01/2027, Fridays every other week, with the `sao-paulo` 
 - **Today.** On 10/03/2027, a Wednesday with no night, 10/03 is the blue square and the next night, 12/03, keeps its
   highlight. On 12/03 the same day is a square with the highlight. On both days March has the different background and the other
   months do not.
-- **Today in a finished season.** On 20/02/2027, with every night finished, the calendar opens at the top and
-  "Ir para hoje" goes to February.
+- **This month and the next.** On 20/02/2027 the page shows February and March, with "Ver o calendário completo".
+  The complete calendar shows January to April, with "Ver só este mês e o próximo". On 01/04/2027 the page shows
+  April only. On 08/10/2026, before the season, it shows January to April and no link.
+- **Today in a finished season.** On 20/02/2027, with every night finished, the complete calendar opens at the top
+  and "Ir para hoje" goes to February. The page with two months starts at February and has no such button.
 - **A season in 2022.** With 24 nights, April lists Thursday 21/04 (Feriado: Tiradentes) and Friday 22/04 (Sem
   evento · Emenda: Tiradentes).
 
 ## Screens
 
 - Tab **"📅 Calendário"**, after "Resultados".
-- A legend (with "Hoje" when today is on a grid), then one grid per month (Sunday first, as in Brazilian calendars). Under each grid, the month's nights,
+- A legend (with "Hoje" when today is on a grid), the link to the complete calendar or back, then one grid per month (Sunday first, as in Brazilian calendars). Under each grid, the month's nights,
   "Sem evento" days and holidays in words, each with a dot in its grid color.
 
 ## Open questions

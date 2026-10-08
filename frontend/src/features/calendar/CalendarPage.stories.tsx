@@ -19,7 +19,7 @@ export const FinishedSeason: StoryObj = {
   ),
 }
 
-/** Today (10/03/2027) is ringed and in the legend, and March is tinted; the next night, 12/03, keeps its outline. "Ver no calendário" goes to March. */
+/** Today (10/03/2027) is ringed and in the legend, and March is tinted; the next night, 12/03, keeps its outline. Only March and April are shown, with a link to the complete calendar. */
 export const Today: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => (
@@ -29,12 +29,22 @@ export const Today: StoryObj = {
   ),
 }
 
-/** Nothing is coming: "Ir para hoje" goes to today's month (February). */
+/** The complete calendar, from January: "Ver no calendário" goes to March, and a link goes back to the two months. */
+export const WholeSeason: StoryObj = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <RouterStory path="/" url="/" element={
+      <SeasonCalendar season={{ ...season, starts_on: '2027-01-01' }} entries={seasonCalendar} holidays={holidayCalendar2027} today="2027-03-10" showAll />
+    } />
+  ),
+}
+
+/** Nothing is coming: on the complete calendar, "Ir para hoje" goes to today's month (February). */
 export const TodayWithNoNextNight: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => (
     <RouterStory path="/" url="/" element={
-      <SeasonCalendar season={{ ...season, starts_on: '2027-01-01' }} entries={seasonCalendar.filter((e) => !e.night || e.night.status === 'finished')} holidays={holidayCalendar2027} today="2027-02-20" />
+      <SeasonCalendar season={{ ...season, starts_on: '2027-01-01' }} entries={seasonCalendar.filter((e) => !e.night || e.night.status === 'finished')} holidays={holidayCalendar2027} today="2027-02-20" showAll />
     } />
   ),
 }
