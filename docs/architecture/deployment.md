@@ -19,6 +19,15 @@ The tests of one pull request take about 4 minutes, in nine jobs and one that su
 | Started by hand (`gh workflow run ci.yml`, or "Run workflow" on GitHub) | The `package` job only |
 | A version tag (`vX.Y.Z`) is pushed | [`release.yml`](../../.github/workflows/release.yml), about 3 minutes. See "Releases" |
 
+Every job names its runner image, `ubuntu-26.04`, and not `ubuntu-latest`. GitHub moves `ubuntu-latest` to a
+new image over several weeks, and during those weeks a job could run on either. A new image arrives here by a
+pull request that changes the name, so the checks run on it first.
+
+The jobs install as little as they can from Ubuntu's package mirror, which is sometimes very slow. The browser
+for the tests comes without `--with-deps`: the image already has its libraries, and the option only adds
+fonts. `gdb`, which prints a backtrace when PHP itself crashes, gets at most a minute to install, and the
+end-to-end tests run without it when that is not enough.
+
 The backend job also runs `php deploy/check-forbidden.php`. It names no word itself: without a list it refuses
 only an image that `deploy/forbidden-allow.txt` does not name. A site runs the same script on the core with its
 own list of names (`--list`), in its own CI.

@@ -38,11 +38,18 @@ const tones: Record<DayTone, string> = {
   plain: 'text-text',
 }
 
-/** The ring around today. It is a shadow, so it sits with a tone's border, the next night's outline and the focus outline. */
-const todayRing = (tone: DayTone, disabled: boolean) =>
-  `font-extrabold inset-ring-2 ${disabled ? 'inset-ring-muted' : tone === 'planned' || tone === 'finished' ? 'inset-ring-on-primary' : 'inset-ring-text'}`
+/**
+ * How today looks: a square among the round days, so its shape tells it from the next night's outline.
+ * A plain day is filled with the color of today. A day with a tone keeps its colors and gets a ring, which is a shadow, so it sits
+ * with the tone's border, the next night's outline and the focus outline.
+ */
+const todayMark = (tone: DayTone, disabled: boolean) => {
+  if (disabled) return 'rounded-sm font-extrabold inset-ring-2 inset-ring-muted'
+  if (tone === 'plain') return 'rounded-sm font-extrabold bg-today text-inverse'
+  return `rounded-sm font-extrabold inset-ring-2 ${tone === 'planned' || tone === 'finished' ? 'inset-ring-on-primary' : 'inset-ring-today'}`
+}
 
-/** One month as a grid of days, Sunday first. Days can link to a night or be ticked and unticked. Today is ringed, and its month has a tinted background. */
+/** One month as a grid of days, Sunday first. Days can link to a night or be ticked and unticked. Today is a square, and its month has a tinted background. */
 export function MonthGrid({
   month,
   days,
@@ -101,10 +108,10 @@ function Day({ date, day, disabled, isToday }: { date: string; day?: GridDay; di
   const description = `${formatLongDate(date)}${day?.label ? `: ${day.label}` : ''}${isToday ? ` ${t.components.monthGrid.todayNote}` : ''}`
   const base = [
     // Cells shrink with the screen (7 per row even at 320 px) and stay round.
-    'mx-auto flex aspect-square w-full max-w-11 items-center justify-center rounded-full text-sm',
-    disabled ? 'text-muted' : tones[tone],
+    'mx-auto flex aspect-square w-full max-w-11 items-center justify-center text-sm',
+    disabled ? 'text-muted' : isToday && tone === 'plain' ? '' : tones[tone],
     day?.highlight ? 'outline-3 outline-offset-1 outline-accent' : '',
-    isToday ? todayRing(tone, disabled) : '',
+    isToday ? todayMark(tone, disabled) : 'rounded-full',
   ].join(' ')
 
   if (!disabled && day?.href) {
@@ -146,7 +153,7 @@ export function GridLegend({ items, today = false }: { items: { tone: DayTone; l
       ))}
       {today && (
         <li className="flex items-center gap-2">
-          <span aria-hidden className={`inline-flex size-6 items-center justify-center rounded-full text-xs ${tones.plain} ${todayRing('plain', false)}`}>9</span>
+          <span aria-hidden className={`inline-flex size-6 items-center justify-center text-xs ${todayMark('plain', false)}`}>9</span>
           {t.common.today}
         </li>
       )}

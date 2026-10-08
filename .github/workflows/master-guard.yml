@@ -16,7 +16,7 @@ permissions:
 jobs:
   through-a-pull-request:
     name: The commit came through a pull request
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Find the merged pull request of this commit
         run: |

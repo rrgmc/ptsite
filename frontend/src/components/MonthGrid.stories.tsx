@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { RouterStory } from '@/mocks/RouterStory'
 import { type GridDay, GridLegend, MonthGrid } from './MonthGrid'
 
-// One month of the calendar and of the planner. These stories show the ring around today on every kind of day, and the tinted box of today's month.
+// One month of the calendar and of the planner. These stories show the square of today on every kind of day, and the tinted box of today's month.
 const meta = { title: 'Components/MonthGrid', parameters: { layout: 'padded' } } satisfies Meta
 export default meta
 
@@ -34,5 +34,5 @@ export const TodayOnAnUntickedDay: StoryObj = { render: () => <Grid today="2027-
 export const TodayOnAHoliday: StoryObj = { render: () => <Grid today="2027-03-25" /> }
 export const TodayOnADayLeftOut: StoryObj = { render: () => <Grid today="2027-03-26" /> }
 export const TodayOutsideTheRange: StoryObj = { render: () => <Grid today="2027-03-01" /> }
-/** Today is in another month: nothing is ringed and the box is not tinted. */
+/** Today is in another month: no day is a square and the box is not tinted. */
 export const TodayInAnotherMonth: StoryObj = { render: () => <Grid today="2027-04-10" /> }
