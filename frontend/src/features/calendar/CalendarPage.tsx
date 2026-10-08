@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Button } from 'react-aria-components'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import type { CalendarEntry, CalendarHoliday, Season } from '@/api/client'
 import { useHolidayCalendars, useSeasonCalendar } from '@/api/queries'
 import { PageHeader } from '@/components/Card'
@@ -9,6 +9,7 @@ import { type GridDay, GridLegend, MonthGrid, type MonthNote, MonthNotes } from 
 import { t } from '@/i18n'
 import { dayOf, monthsBetween, today, yearsBetween } from '@/lib/dates'
 import { formatMoney, formatTime, formatWeekday } from '@/lib/format'
+import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 
 /** "Calendário": the season's nights on month calendars, for everyone. */
@@ -17,6 +18,7 @@ export function CalendarPage() {
   const calendar = useSeasonCalendar(season?.id)
   const last = calendar.data?.at(-1)?.starts_at
   const holidays = useHolidayCalendars(season && last ? yearsBetween(season.starts_on, dayOf(last)) : [])
+  const [params] = useSearchParams()
 
   if (isPending) return <Loading />
   if (error) return <ErrorBox error={error} />
@@ -26,7 +28,7 @@ export function CalendarPage() {
     <>
       <PageHeader title={t.calendar.title} subtitle={season.name} />
       {calendar.isPending || holidays.isPending ? <Loading /> : calendar.error ? <ErrorBox error={calendar.error} /> : (
-        <SeasonCalendar season={season} entries={calendar.data!} holidays={holidays.data} />
+        <SeasonCalendar season={season} entries={calendar.data!} holidays={holidays.data} showAll={params.get('view') === 'all'} />
       )}
     </>
   )
@@ -59,13 +61,16 @@ function describe(entry: CalendarEntry): string {
   ].filter(Boolean).join(' · ')
 }
 
-export function SeasonCalendar({ season, entries, holidays = [], today: now = today() }: {
+export function SeasonCalendar({ season, entries, holidays = [], showAll = false, today: now = today() }: {
   season: Season
   entries: CalendarEntry[]
   holidays?: CalendarHoliday[]
+  /** Every month of the season, not only this month and the next. */
+  showAll?: boolean
   /** "2027-03-05". Today in São Paulo unless given (stories and tests). */
   today?: string
 }) {
+  const to = useSeasonPath()
   const next = entries.find((e) => e.night && e.night.status !== 'finished' && dayOf(e.starts_at) >= now)
 
   if (entries.length === 0) return <Empty>{t.calendar.noNights}</Empty>
@@ -93,10 +98,16 @@ export function SeasonCalendar({ season, entries, holidays = [], today: now = to
   const first = [season.starts_on, dayOf(entries[0].starts_at)].sort()[0]
   const last = dayOf(entries.at(-1)!.starts_at)
   const months = monthsBetween(first, last)
+  // The page shows this month and the next one. A season that does not include today has no such months, so it
+  // shows them all.
+  const at = months.indexOf(now.slice(0, 7))
+  const current = at < 0 ? months : months.slice(at, at + 2)
+  const canNarrow = current.length < months.length
+  const shown = showAll ? months : current
   // The page opens at the top. A button goes to the next night's month, or to today's when nothing is coming.
   // The first month is already at the top, and a month not shown is no target.
   const jumpTo = (next ? dayOf(next.starts_at) : now).slice(0, 7)
-  const canJump = months.indexOf(jumpTo) > 0
+  const canJump = shown.indexOf(jumpTo) > 0
 
   return (
     <div className="flex flex-col gap-4">
@@ -111,14 +122,19 @@ export function SeasonCalendar({ season, entries, holidays = [], today: now = to
         </div>
       )}
       {!next && canJump && <JumpButton month={jumpTo}>{t.calendar.goToToday}</JumpButton>}
-      <GridLegend today={months.includes(now.slice(0, 7))} items={[
+      <GridLegend today={shown.includes(now.slice(0, 7))} items={[
         { tone: 'night', label: t.calendar.legend.night },
         { tone: 'finished', label: t.calendar.legend.finished },
         { tone: 'skipped', label: t.calendar.legend.skipped },
         { tone: 'holiday', label: t.calendar.legend.holiday },
       ]} />
+      {canNarrow && (
+        <Link to={showAll ? to('/calendar') : `${to('/calendar')}?view=all`} className="self-start font-semibold text-primary underline">
+          {showAll ? t.calendar.viewCurrent : t.calendar.viewAll}
+        </Link>
+      )}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {months.map((month) => (
+        {shown.map((month) => (
           <MonthGrid key={month} month={month} days={days} today={now} isDisabled={(d) => d < season.starts_on}>
             <MonthNotes notes={calendarNotes(month, entries, holidays)} />
           </MonthGrid>

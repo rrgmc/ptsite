@@ -85,7 +85,7 @@ export function ResultsPage() {
                 {upcoming.length === 0 && !scheduling && <li className="text-muted">{t.results.noUpcoming}</li>}
               </ul>
               {toCome.length > upcoming.length && (
-                <Link to={to('/calendar')} className="mt-1 inline-flex min-h-touch items-center px-2 text-sm font-semibold text-primary">{t.results.seeCalendar}</Link>
+                <Link to={`${to('/calendar')}?view=all`} className="mt-1 inline-flex min-h-touch items-center px-2 text-sm font-semibold text-primary">{t.results.seeCalendar}</Link>
               )}
             </Card>
           )}
