@@ -1,23 +1,18 @@
-// Takes screenshots of the main screens into docs/screens/<mobile|desktop>, for design review.
+// Takes phone screenshots of the main screens into docs/screens, for design review.
 // README.md shows them, so run this after changing a screen. Use scripts/screenshots.sh, which builds the
-// frontend and runs this once per device against a fresh database with the development seed (the demo league and
-// the dev logins). It schedules and finishes a night, so it needs a throwaway database.
-//   DEVICE=mobile|desktop BASE_URL=http://127.0.0.1:8130/app/ node scripts/screenshots.mjs
+// frontend and runs this against a fresh database with the development seed (the demo league and the dev
+// logins). It schedules and finishes a night, so it needs a throwaway database.
+//   BASE_URL=http://127.0.0.1:8130/app/ node scripts/screenshots.mjs
 import { chromium, devices } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
-const device = process.env.DEVICE ?? 'mobile'
-const viewports = {
-  mobile: devices['Pixel 7'],
-  desktop: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
-}
-const out = fileURLToPath(new URL(`../../docs/screens/${device}/`, import.meta.url)) // also right on Windows
+const out = fileURLToPath(new URL('../../docs/screens/', import.meta.url)) // also right on Windows
 mkdirSync(out, { recursive: true })
 // --lang makes native date and time fields use Brazilian formats, as on the league's phones.
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM_PATH, args: ['--lang=pt-BR'] })
 const context = await browser.newContext({
-  ...viewports[device],
+  ...devices['Pixel 7'],
   baseURL: process.env.BASE_URL ?? 'http://127.0.0.1:8130/app/',
   locale: 'pt-BR',
   timezoneId: 'America/Sao_Paulo',
@@ -58,7 +53,7 @@ async function shot(name, fullPage = false) {
     }))
     return [...document.images].filter((img) => img.naturalWidth === 0).map((img) => img.src)
   })
-  if (broken.length) console.warn(`screenshots: ${name} (${device}) has images that did not load: ${broken.join(', ')}`)
+  if (broken.length) console.warn(`screenshots: ${name} has images that did not load: ${broken.join(', ')}`)
   await networkIdle()
   // The pointer stays where the last click was, which can be over a chart: move it away, or a tooltip shows
   await page.mouse.move(0, 0)
@@ -79,30 +74,14 @@ async function pick(label, search) {
   await page.getByRole('dialog').waitFor({ state: 'detached' })
 }
 
-await page.goto('login')
-await shot('01-login')
 await login('dev-keeper')
-// "Temporadas": every season with the first ten of its standings
-await page.goto('seasons')
-await page.getByRole('heading', { name: 'Temporadas' }).waitFor()
-await shot('16-seasons')
-// "Escolher temporada": picking 2022 opens that season's own address, with a notice that it is not the current one
-await page.getByRole('link', { name: /^Temporada:/ }).click()
-await page.getByRole('heading', { name: 'Escolher temporada' }).waitFor()
-await shot('18-season-picker')
-await page.getByRole('row').filter({ has: page.getByText('Liga 2022', { exact: true }) }).getByRole('button').click()
+// The standings of 2022, a finished season. Liga 2022 is the second season the demo league seeds.
+await page.goto('seasons/2')
 await page.getByRole('table').waitFor()
-await shot('02-standings-2022')
-await page.getByRole('link', { name: 'Ver todos' }).click()
-await page.getByRole('heading', { name: 'Resultados' }).waitFor()
-await shot('03-results-2022')
-await page.getByRole('button', { name: 'Menu' }).click()
-await page.getByRole('dialog', { name: 'Menu' }).waitFor()
-await shot('17-menu')
-await page.keyboard.press('Escape')
+await shot('01-standings')
 
 // Back to the current season: a finished season takes no new night
-await page.getByRole('button', { name: 'Voltar para a atual' }).click()
+await page.goto('results')
 await page.getByRole('button', { name: '+ Agendar' }).waitFor()
 // Only one night can be open, and the backup's current season may already have one: finish it first
 const alreadyOpen = page.getByRole('link').filter({ hasText: 'Aberto' })
@@ -121,12 +100,10 @@ if (await alreadyOpen.count()) {
 }
 await page.getByRole('button', { name: '+ Agendar' }).click()
 await page.getByRole('radiogroup', { name: 'Sugestões' }).waitFor()
-await shot('04-schedule-night') // the regular suggestion is chosen; the date is still editable
 await page.getByLabel('Data').fill('2023-03-10')
 await page.getByRole('button', { name: 'Agendar evento' }).click()
 await page.getByRole('heading', { name: 'Liga - 10/03/2023' }).waitFor()
 await page.getByRole('button', { name: 'Abrir evento' }).click()
-await shot('06-open-confirm')
 await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
 await page.getByText('Aberto', { exact: true }).waitFor()
 // Attendance, once the night is open: the keeper answers for three players who told them in person
@@ -138,7 +115,7 @@ for (const [nickname, answer] of [['Jacobson', 'ALL IN'], ['Duhamel', 'ALL IN'],
   await page.getByRole('button', { name: answer, exact: true }).click()
   await page.getByRole('listitem').filter({ hasText: nickname }).first().waitFor()
 }
-await shot('05-attendance', true)
+await shot('02-attendance', true)
 
 // "Painel do evento": the payments of the open night, on a screen of its own with no menus
 await page.getByRole('link', { name: 'Abrir o painel' }).click()
@@ -150,7 +127,7 @@ await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).waitFor()
 await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
 await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
 await page.getByText('Dono da casa: Duhamel').waitFor()
-await shot('24-night-dashboard')
+await shot('03-night-dashboard')
 await page.getByRole('link', { name: 'Voltar ao site' }).click()
 await page.getByText('Aberto', { exact: true }).waitFor()
 
@@ -158,20 +135,13 @@ await page.getByRole('link', { name: /Finalizar/ }).click()
 await page.getByLabel('Pote (R$)').fill('845')
 await page.getByLabel('Pote ME (R$)').fill('170')
 await page.getByLabel('Time chip (R$)').fill('40')
-await pick(/^1º lugar/, 'jacobson')
-await pick(/^2º lugar/, 'duhamel')
-await pick(/^3º lugar/, 'cada')
-await page.getByRole('button', { name: /^4º lugar/ }).click()
-await page.getByRole('dialog').getByRole('searchbox').fill('Estreante')
-await shot('07-player-picker-quick-add')
-await page.getByRole('option', { name: /Adicionar/ }).click()
-await page.getByRole('dialog').waitFor({ state: 'detached' })
-await pick(/^5º lugar/, 'moneymaker')
-await pick(/^6º lugar/, 'brunson')
-await shot('08-result-form', true)
+for (const [position, search] of [[1, 'jacobson'], [2, 'duhamel'], [3, 'cada'], [4, 'raymer'], [5, 'moneymaker'], [6, 'brunson']]) {
+  await pick(new RegExp(`^${position}º lugar`), search)
+}
+await shot('04-result-form', true)
 await page.getByRole('button', { name: 'Finalizar evento' }).click()
 await page.getByText('Finalizado', { exact: true }).waitFor()
-await shot('09-night-finished')
+await shot('05-night-finished')
 
 await page.goto('seasons/10/simulator')
 await page.getByLabel('Pote imaginado (R$)').fill('840')
@@ -180,59 +150,18 @@ for (const [position, search] of [[1, 'moneymaker'], [2, 'brunson'], [3, 'jacobs
 }
 await page.getByRole('button', { name: 'Simular' }).click()
 await page.getByRole('heading', { name: 'Classificação simulada' }).scrollIntoViewIfNeeded()
-await shot('10-simulator')
-
-// On a phone "Sair" is in the menu
-if (!(await page.getByRole('button', { name: 'Sair' }).isVisible())) await page.getByRole('button', { name: 'Menu' }).click()
-await page.getByRole('button', { name: 'Sair' }).click()
-await page.getByLabel('Usuário').waitFor()
-await login('dev-admin')
-await page.goto('admin')
-await page.getByRole('heading', { name: 'Administração' }).waitFor()
-await shot('11-admin-seasons')
-await page.goto('admin/audit-log')
-await page.getByText('finalizou o evento').first().waitFor()
-await shot('12-admin-audit-log')
-
-// The season planner for the first half of 2027: Carnival, Sexta-feira Santa and the Corpus Christi emenda are out
-await page.goto('admin')
-await page.getByRole('link', { name: 'Planejar datas' }).first().click() // the newest season that is not finished
-await page.getByLabel('De', { exact: true }).fill('2027-01-04')
-await page.getByLabel('Até', { exact: true }).fill('2027-06-30')
-await page.getByText('Emenda: Corpus Christi').waitFor()
-await shot('13-admin-season-planner', true)
-await page.goto('admin/holidays?year=2027')
-await page.getByRole('heading', { name: 'Feriados de 2027' }).waitFor()
-await page.getByText('Sexta-feira Santa').first().waitFor()
-await shot('14-admin-holidays')
-await page.goto('admin/settings')
-await page.getByRole('heading', { name: 'Recursos' }).waitFor()
-await shot('23-admin-settings')
+await shot('06-simulator')
 
 // The season calendar of 2022: winners, and the Friday after Tiradentes left out
-// Liga 2022 is the second season the demo league seeds.
 await page.goto('seasons/2/calendar')
-await page.getByRole('region', { name: 'Abril de 2022' }).waitFor()
-await shot('15-calendar', true)
+// One screen of it, with April just under the header: the whole page is many screens long.
+await page.getByRole('region', { name: 'Abril de 2022' }).evaluate((month) => {
+  window.scrollTo(0, month.getBoundingClientRect().top + window.scrollY - 72)
+})
+await shot('07-calendar')
 
-// The Main Event of 2022: its players in order and the season's Main Event pot. Then its result form, as an admin
-// correcting it: one player per position.
+// The Main Event of 2022: its players in order and the season's Main Event pot
 await page.goto('seasons/2/main-event')
 await page.getByRole('list', { name: /^Classificação: Main Event/ }).waitFor()
-await shot('19-main-event', true)
-// "Classificação" of that season: the first three of its Main Event above the table
-await page.goto('seasons/2')
-await page.getByRole('link', { name: 'Ver Main Event' }).waitFor()
-await shot('22-standings-main-event', true)
-await page.goto('seasons/2/main-event')
-await page.getByRole('list', { name: /^Classificação: Main Event/ }).waitFor()
-await page.getByRole('heading', { level: 2 }).getByRole('link').first().click()
-await page.getByRole('link', { name: 'Editar resultado' }).click()
-await page.getByRole('heading', { name: 'Editar classificação' }).waitFor()
-await shot('20-main-event-result-form', true)
-// "Administração": a season's Main Event is added and found from the season's link
-await page.goto('admin')
-await page.getByRole('link', { name: 'Main Event: Liga 2026-2027' }).click()
-await page.getByRole('form', { name: 'Adicionar Main Event' }).waitFor()
-await shot('21-admin-main-event', true)
+await shot('08-main-event', true)
 await browser.close()

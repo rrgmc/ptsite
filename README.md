@@ -19,55 +19,14 @@ The demo site, with the invented demo league. Regenerate them with `npm run scre
 screen changes (it needs bash and PHP on the path). Native date and time fields follow each device's settings;
 the screenshot browser shows them in US format.
 
-### Mobile
-
 |  |  |  |
 |---|---|---|
-| <img src="docs/screens/mobile/01-login.png" width="240" alt="Login"> | <img src="docs/screens/mobile/02-standings-2022.png" width="240" alt="Standings of a finished season"> | <img src="docs/screens/mobile/03-results-2022.png" width="240" alt="Results"> |
-| Login | Standings of a finished season | Results |
-| <img src="docs/screens/mobile/04-schedule-night.png" width="240" alt="Scheduling a night, with suggestions"> | <img src="docs/screens/mobile/05-attendance.png" width="240" alt="Attendance: ALL IN / FOLD"> | <img src="docs/screens/mobile/06-open-confirm.png" width="240" alt="Opening a night"> |
-| Scheduling a night, with suggestions | Attendance: ALL IN / FOLD | Opening a night |
-| <img src="docs/screens/mobile/07-player-picker-quick-add.png" width="240" alt="Picking a player, and adding a new one"> | <img src="docs/screens/mobile/08-result-form.png" width="240" alt="Entering a result"> | <img src="docs/screens/mobile/09-night-finished.png" width="240" alt="A finished night"> |
-| Picking a player, and adding a new one | Entering a result | A finished night |
-| <img src="docs/screens/mobile/10-simulator.png" width="240" alt="Simulator"> | <img src="docs/screens/mobile/11-admin-seasons.png" width="240" alt="Admin: seasons"> | <img src="docs/screens/mobile/12-admin-audit-log.png" width="240" alt="Admin: changes"> |
-| Simulator | Admin: seasons | Admin: changes |
-| <img src="docs/screens/mobile/13-admin-season-planner.png" width="240" alt="Planning a season's dates"> | <img src="docs/screens/mobile/14-admin-holidays.png" width="240" alt="Admin: holidays"> | <img src="docs/screens/mobile/15-calendar.png" width="240" alt="Season calendar"> |
-| Planning a season's dates | Admin: holidays | Season calendar |
-| <img src="docs/screens/mobile/16-seasons.png" width="240" alt="Seasons, with the first ten of each"> | <img src="docs/screens/mobile/17-menu.png" width="240" alt="Menu"> | <img src="docs/screens/mobile/18-season-picker.png" width="240" alt="Choosing the season on screen"> |
-| Seasons, with the first ten of each | Menu | Choosing the season on screen |
-| <img src="docs/screens/mobile/19-main-event.png" width="240" alt="The Main Event of a season"> | <img src="docs/screens/mobile/20-main-event-result-form.png" width="240" alt="Entering the result of a Main Event"> | <img src="docs/screens/mobile/21-admin-main-event.png" width="240" alt="Admin: adding a season's Main Event"> |
-| The Main Event of a season | Entering the result of a Main Event | Admin: adding a season's Main Event |
-| <img src="docs/screens/mobile/23-admin-settings.png" width="240" alt="Admin: the site's features and version"> | <img src="docs/screens/mobile/24-night-dashboard.png" width="240" alt="The night dashboard: who paid what on an open night"> |  |
-| Admin: the site's features and version | The night dashboard: who paid what |  |
-
-### Desktop
-
-|  |  |
-|---|---|
-| <img src="docs/screens/desktop/01-login.png" width="400" alt="Login"> | <img src="docs/screens/desktop/02-standings-2022.png" width="400" alt="Standings of a finished season"> |
-| Login | Standings of a finished season |
-| <img src="docs/screens/desktop/03-results-2022.png" width="400" alt="Results"> | <img src="docs/screens/desktop/04-schedule-night.png" width="400" alt="Scheduling a night, with suggestions"> |
-| Results | Scheduling a night, with suggestions |
-| <img src="docs/screens/desktop/05-attendance.png" width="400" alt="Attendance: ALL IN / FOLD"> | <img src="docs/screens/desktop/06-open-confirm.png" width="400" alt="Opening a night"> |
-| Attendance: ALL IN / FOLD | Opening a night |
-| <img src="docs/screens/desktop/07-player-picker-quick-add.png" width="400" alt="Picking a player, and adding a new one"> | <img src="docs/screens/desktop/08-result-form.png" width="400" alt="Entering a result"> |
-| Picking a player, and adding a new one | Entering a result |
-| <img src="docs/screens/desktop/09-night-finished.png" width="400" alt="A finished night"> | <img src="docs/screens/desktop/10-simulator.png" width="400" alt="Simulator"> |
-| A finished night | Simulator |
-| <img src="docs/screens/desktop/11-admin-seasons.png" width="400" alt="Admin: seasons"> | <img src="docs/screens/desktop/12-admin-audit-log.png" width="400" alt="Admin: changes"> |
-| Admin: seasons | Admin: changes |
-| <img src="docs/screens/desktop/13-admin-season-planner.png" width="400" alt="Planning a season's dates"> | <img src="docs/screens/desktop/14-admin-holidays.png" width="400" alt="Admin: holidays"> |
-| Planning a season's dates | Admin: holidays |
-| <img src="docs/screens/desktop/15-calendar.png" width="400" alt="Season calendar"> | <img src="docs/screens/desktop/16-seasons.png" width="400" alt="Seasons, with the first ten of each"> |
-| Season calendar | Seasons, with the first ten of each |
-| <img src="docs/screens/desktop/17-menu.png" width="400" alt="Menu"> | <img src="docs/screens/desktop/18-season-picker.png" width="400" alt="Choosing the season on screen"> |
-| Menu | Choosing the season on screen |
-| <img src="docs/screens/desktop/19-main-event.png" width="400" alt="The Main Event of a season"> | <img src="docs/screens/desktop/20-main-event-result-form.png" width="400" alt="Entering the result of a Main Event"> |
-| The Main Event of a season | Entering the result of a Main Event |
-| <img src="docs/screens/desktop/21-admin-main-event.png" width="400" alt="Admin: adding a season's Main Event"> | <img src="docs/screens/desktop/22-standings-main-event.png" width="400" alt="Standings with the first three of the Main Event"> |
-| Admin: adding a season's Main Event | Standings with the first three of the Main Event |
-| <img src="docs/screens/desktop/23-admin-settings.png" width="400" alt="Admin: the site's features and version"> | <img src="docs/screens/desktop/24-night-dashboard.png" width="400" alt="The night dashboard: who paid what on an open night"> |
-| Admin: the site's features and version | The night dashboard: who paid what |
+| <img src="docs/screens/01-standings.png" width="240" alt="Standings of a finished season"> | <img src="docs/screens/02-attendance.png" width="240" alt="Attendance: ALL IN / FOLD"> | <img src="docs/screens/03-night-dashboard.png" width="240" alt="The night dashboard: who paid what"> |
+| Standings of a finished season | Attendance: ALL IN / FOLD | The night dashboard: who paid what |
+| <img src="docs/screens/04-result-form.png" width="240" alt="Entering a result"> | <img src="docs/screens/05-night-finished.png" width="240" alt="A finished night"> | <img src="docs/screens/06-simulator.png" width="240" alt="Simulator"> |
+| Entering a result | A finished night | Simulator |
+| <img src="docs/screens/07-calendar.png" width="240" alt="Season calendar"> | <img src="docs/screens/08-main-event.png" width="240" alt="The Main Event of a season"> |  |
+| Season calendar | The Main Event of a season |  |
 
 ## What is here
 

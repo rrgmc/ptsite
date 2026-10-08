@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Regenerates docs/screens/{mobile,desktop} (shown in README.md).
-# Builds the frontend, then for each device starts Laravel on a fresh MySQL database with the development seed,
+# Regenerates the phone screenshots in docs/screens (shown in README.md).
+# Builds the frontend, then starts Laravel on a fresh MySQL database with the development seed,
 # runs scripts/screenshots.mjs, and stops the server. MySQL must be running (`task db:up`).
 # Set PW_CHROMIUM_PATH if Chromium is preinstalled elsewhere.
 set -euo pipefail
@@ -32,15 +32,11 @@ stop_server() {
   wait "$SERVER" 2>/dev/null || true
 }
 
-for device in mobile desktop; do
-  (cd "$BACKEND" && php artisan migrate:fresh --seed --force -q)
-  (cd "$BACKEND" && LOGIN_THROTTLE=1000 exec $SETSID php artisan serve --port="$PORT" >/dev/null 2>&1) &
-  SERVER=$!
-  trap stop_server EXIT
-  for _ in $(seq 1 30); do curl -sf "http://127.0.0.1:$PORT/up" >/dev/null && break; sleep 0.5; done
+(cd "$BACKEND" && php artisan migrate:fresh --seed --force -q)
+(cd "$BACKEND" && LOGIN_THROTTLE=1000 exec $SETSID php artisan serve --port="$PORT" >/dev/null 2>&1) &
+SERVER=$!
+trap stop_server EXIT
+for _ in $(seq 1 30); do curl -sf "http://127.0.0.1:$PORT/up" >/dev/null && break; sleep 0.5; done
 
-  DEVICE=$device BASE_URL="http://127.0.0.1:$PORT/app/" node scripts/screenshots.mjs
-  echo "screenshots: $device done"
-
-  stop_server
-done
+BASE_URL="http://127.0.0.1:$PORT/app/" node scripts/screenshots.mjs
+echo "screenshots: done"
