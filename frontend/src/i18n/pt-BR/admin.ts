@@ -1,6 +1,7 @@
+import type { FeatureName } from '../../site/features'
 import { plural } from '../plural'
 
-// The admin section: seasons, players, places, holidays, accounts and the audit log.
+// The admin section: seasons, players, places, holidays, accounts, the audit log and the settings.
 export const admin = {
   // The section
   title: 'Administração',
@@ -115,6 +116,32 @@ export const admin = {
       since: ({ rule, first }: { rule: string; first: number }) => `${rule}, desde ${first}`,
       until: ({ rule, last }: { rule: string; last: number }) => `${rule}, até ${last}`,
     },
+  },
+
+  // Settings: what the site was built with, to read only
+  settings: {
+    /** The tab of the admin menu. */
+    tab: 'Configurações',
+    featuresTitle: 'Recursos',
+    featuresIntro: 'As partes do site que esta liga usa. Elas são definidas na configuração do site e não mudam por aqui.',
+    on: 'Ligado',
+    off: 'Desligado',
+    /** Every feature a site can turn off (site/README.md, "Features"). */
+    features: {
+      mainEventPot: { name: 'Pote ME', description: 'O dinheiro que cada evento separa para o Main Event.' },
+      timeChip: { name: 'Time chip', description: 'O dinheiro que cada evento separa para a festa do ano.' },
+      seasonPlanner: { name: 'Planejar datas', description: 'O calendário que agenda de uma vez os eventos habituais de uma temporada.' },
+      mainEvent: {
+        name: 'Main Event',
+        description: 'O jogo final da temporada: um evento de tipo próprio, com a ordem de chegada dos jogadores, sem pote e sem pontos.',
+      },
+      houseOwnerBuyIn: { name: 'Buy-in do dono da casa', description: 'O buy-in menor de uma temporada para o dono da casa onde o evento acontece.' },
+    } satisfies Record<FeatureName, { name: string; description: string }>,
+    versionTitle: 'Versão',
+    /** The only version of a build of the core itself. */
+    version: 'Versão',
+    siteVersion: 'Versão do site',
+    coreVersion: 'Versão do PTSite',
   },
 
   // Places

@@ -60,7 +60,7 @@ A season starting on 01/01/2027, Fridays every other week, with the `sao-paulo` 
 
 ## Screens
 
-- Tab **"📅 Calendário"**, between "Resultados" and "Simulação".
+- Tab **"📅 Calendário"**, after "Resultados".
 - A legend (with "Hoje" when today is on a grid), then one grid per month (Sunday first, as in Brazilian calendars). Under each grid, the month's nights,
   "Sem evento" days and holidays in words, each with a dot in its grid color.
 

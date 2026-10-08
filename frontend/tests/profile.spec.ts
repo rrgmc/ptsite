@@ -6,7 +6,7 @@ const picture = 'tests/fixtures/photo.png'
 
 test('a player edits their own details and photos in "Meu perfil"', async ({ page }) => {
   await login(page, 'dev-player')
-  await page.getByRole('button', { name: 'Menu' }).click()
+  // "Meu perfil" is on the top bar, and on the bottom bar on a phone.
   await page.getByRole('link', { name: 'Meu perfil' }).click()
   await expect(page.getByRole('heading', { name: 'Meu perfil' })).toBeVisible()
   const nickname = await page.getByLabel('Apelido').inputValue()

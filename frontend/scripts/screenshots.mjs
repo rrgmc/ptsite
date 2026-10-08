@@ -191,6 +191,9 @@ await page.goto('admin/holidays?year=2027')
 await page.getByRole('heading', { name: 'Feriados de 2027' }).waitFor()
 await page.getByText('Sexta-feira Santa').first().waitFor()
 await shot('14-admin-holidays')
+await page.goto('admin/settings')
+await page.getByRole('heading', { name: 'Recursos' }).waitFor()
+await shot('23-admin-settings')
 
 // The season calendar of 2022: winners, and the Friday after Tiradentes left out
 // Liga 2022 is the second season the demo league seeds.
@@ -204,7 +207,7 @@ await page.goto('seasons/2/main-event')
 await page.getByRole('list', { name: /^Classificação: Main Event/ }).waitFor()
 await shot('19-main-event', true)
 // "Classificação" of that season: the first three of its Main Event above the table
-await page.goto('./')
+await page.goto('seasons/2')
 await page.getByRole('link', { name: 'Ver Main Event' }).waitFor()
 await shot('22-standings-main-event', true)
 await page.goto('seasons/2/main-event')

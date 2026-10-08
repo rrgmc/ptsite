@@ -16,6 +16,32 @@ test('an admin sees the admin section, and a wrong percentage table is refused',
   await expect(page.getByRole('alert')).toContainText('As porcentagens devem somar 100%. Total atual: 102%.')
 })
 
+test('"Configurações" shows the site\'s features and its version, to admins only', async ({ page }) => {
+  await login(page, 'dev-admin')
+  await page.goto('admin')
+  await page.getByRole('link', { name: 'Configurações' }).click()
+  await expect(page).toHaveURL(/admin\/settings$/)
+
+  // The demo site has every feature.
+  const features = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Recursos' }) }).getByRole('listitem')
+  await expect(features).toHaveCount(5)
+  await expect(features.filter({ hasText: 'Ligado' })).toHaveCount(5)
+  await expect(features.filter({ hasText: 'Planejar datas' })).toContainText('O calendário que agenda de uma vez')
+
+  // The same version as the footer, which the build was given.
+  const version = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Versão' }) }).getByRole('definition')
+  await expect(version).toHaveText(/\S/)
+  await expect(page.getByRole('contentinfo')).toContainText((await version.textContent())!)
+  await expectAccessible(page)
+
+  await logout(page)
+  await login(page, 'dev-keeper')
+  await page.goto('admin/settings')
+  await expect(page.getByRole('alert')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Recursos' })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Configurações' })).toHaveCount(0)
+})
+
 test('a season and a place are edited on pages of their own, which return to the list', async ({ page }) => {
   await login(page, 'dev-admin')
   await page.goto('admin')
