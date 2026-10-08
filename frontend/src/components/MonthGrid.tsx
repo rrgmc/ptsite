@@ -40,13 +40,13 @@ const tones: Record<DayTone, string> = {
 
 /**
  * How today looks: a square among the round days, so its shape tells it from the next night's outline.
- * A plain day is filled dark. A day with a tone keeps its colors and gets a ring, which is a shadow, so it sits
+ * A plain day is filled with the color of today. A day with a tone keeps its colors and gets a ring, which is a shadow, so it sits
  * with the tone's border, the next night's outline and the focus outline.
  */
 const todayMark = (tone: DayTone, disabled: boolean) => {
   if (disabled) return 'rounded-sm font-extrabold inset-ring-2 inset-ring-muted'
-  if (tone === 'plain') return 'rounded-sm font-extrabold bg-text text-inverse'
-  return `rounded-sm font-extrabold inset-ring-2 ${tone === 'planned' || tone === 'finished' ? 'inset-ring-on-primary' : 'inset-ring-text'}`
+  if (tone === 'plain') return 'rounded-sm font-extrabold bg-today text-inverse'
+  return `rounded-sm font-extrabold inset-ring-2 ${tone === 'planned' || tone === 'finished' ? 'inset-ring-on-primary' : 'inset-ring-today'}`
 }
 
 /** One month as a grid of days, Sunday first. Days can link to a night or be ticked and unticked. Today is a square, and its month has a tinted background. */

@@ -15,6 +15,7 @@
   --color-surface: #ffffff;
   --color-surface-sunken: #ebe9e3;
   --color-surface-current: #f2f7f3; /* the current month's box on a calendar */
+  --color-today: #1d4ed8; /* today on a calendar: a color no kind of day uses */
   --color-surface-stripe: #f8f7f4; /* every second row of a data table */
   --color-border: #d6d3cb;
   --color-text: #1c1b19;
