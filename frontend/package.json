@@ -16,7 +16,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
     "test:storybook": "playwright test -c playwright.storybook.config.ts",
-    "screenshots": "bash scripts/screenshots.sh",
+    "screenshots": "node scripts/bash.mjs scripts/screenshots.sh",
     "icons": "node scripts/make-icons.mjs"
   },
   "dependencies": {
