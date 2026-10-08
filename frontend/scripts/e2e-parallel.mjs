@@ -4,6 +4,7 @@
 // CI uses it to spend fewer minutes: a job is billed by how long it runs.
 //
 // Arguments go to both processes: node scripts/e2e-parallel.mjs tests/admin.spec.ts
+// CI splits the test files over two jobs with one: --shard=1/2 and --shard=2/2.
 import { spawn } from 'node:child_process'
 
 const sizes = ['phone', 'desktop']
