@@ -9,14 +9,13 @@ so the site is built on a developer's machine or in CI and uploaded as a zip.
 
 ## Build (CI)
 
-The tests of one pull request take about 6 minutes, in seven jobs.
-[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs each thing once, and nothing it does not need:
+The tests of one pull request take about 4 minutes, in nine jobs and one that sums them up.
+[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs each thing once:
 
 | When | What runs |
 |---|---|
-| A pull request | The tests: backend, frontend, Storybook in two jobs, end to end in two jobs |
+| A pull request | The tests: backend, frontend, Storybook in two jobs, end to end in four jobs |
 | A push to `master`, which is a merged pull request | Nothing. The pull request already ran the tests |
-| A change that touches only `docs/` or `.md` files | Nothing |
 | Started by hand (`gh workflow run ci.yml`, or "Run workflow" on GitHub) | The `package` job only |
 | A version tag (`vX.Y.Z`) is pushed | [`release.yml`](../../.github/workflows/release.yml), about 3 minutes. See "Releases" |
 
@@ -24,8 +23,11 @@ The backend job also runs `php deploy/check-forbidden.php`. It names no word its
 only an image that `deploy/forbidden-allow.txt` does not name. A site runs the same script on the core with its
 own list of names (`--list`), in its own CI.
 
-The tests on a pull request run on its merge with `master` as it was then. If `master` moved since, bring the
-branch up to date before merging, so that the tests cover what `master` will hold.
+The tests on a pull request run on its merge with `master` as it was then. The ruleset on `master` requires
+the job "Checks passed", which passes only when every other job did, and a branch that is up to date. So if
+`master` moved since, the pull request cannot merge until its branch is brought up to date
+(`gh pr update-branch`) and the tests ran again: they cover what `master` will hold. A change that touches only
+docs runs the tests too, because a required check that never ran would keep it from merging.
 
 CI never uploads to a site. The `package` job, "Build the deploy package (not uploaded)", only stores a zip. It
 runs only when started by hand, because deploys normally use `task deploy`, which builds the same package on

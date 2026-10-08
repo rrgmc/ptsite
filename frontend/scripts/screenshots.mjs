@@ -150,7 +150,7 @@ await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).waitFor()
 await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
 await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
 await page.getByText('Dono da casa: Duhamel').waitFor()
-await shot('23-night-dashboard')
+await shot('24-night-dashboard')
 await page.getByRole('link', { name: 'Voltar ao site' }).click()
 await page.getByText('Aberto', { exact: true }).waitFor()
 
@@ -205,6 +205,9 @@ await page.goto('admin/holidays?year=2027')
 await page.getByRole('heading', { name: 'Feriados de 2027' }).waitFor()
 await page.getByText('Sexta-feira Santa').first().waitFor()
 await shot('14-admin-holidays')
+await page.goto('admin/settings')
+await page.getByRole('heading', { name: 'Recursos' }).waitFor()
+await shot('23-admin-settings')
 
 // The season calendar of 2022: winners, and the Friday after Tiradentes left out
 // Liga 2022 is the second season the demo league seeds.

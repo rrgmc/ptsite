@@ -1,14 +1,15 @@
 name: CI
 
-# CI runs each thing once, and nothing it does not need (docs/architecture/deployment.md, "Build (CI)"):
+# CI runs each thing once (docs/architecture/deployment.md, "Build (CI)"):
 #
 # - A pull request runs the tests. `master` only changes through pull requests, so nothing runs again there.
-# - A change that touches only docs runs nothing.
+# - The ruleset on `master` requires the job "Checks passed" and a branch that is up to date, so the tests
+#   cover what `master` will hold. Every pull request runs them, a change to docs too: a required check that
+#   never ran would keep the pull request from merging.
 # - The deploy package is built only when someone starts this workflow by hand (the "Run workflow" button, or
 #   `gh workflow run ci.yml`). Nobody uses CI's package for now: `task deploy` builds its own.
 on:
   pull_request:
-    paths-ignore: ['docs/**', '**/*.md']
   workflow_dispatch:
 
 # A pull request from a fork runs this workflow too. It only reads the code.
@@ -144,11 +145,11 @@ jobs:
       - run: npm run build
 
   storybook:
-    name: Storybook ${{ matrix.shard }}/2 (every story renders and passes axe)
+    name: Storybook ${{ matrix.shard }}/${{ strategy.job-total }} (every story renders and passes axe)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    # Two jobs, each with half of the stories, as for the end-to-end tests below: the runner's two cores are the
-    # limit, so only a second runner makes this faster.
+    # Two jobs, each with half of the stories. A job is about half setup already, and the end-to-end jobs below
+    # take longer, so more jobs here would not shorten a run.
     strategy:
       fail-fast: false
       matrix:
@@ -166,18 +167,19 @@ jobs:
       - run: npm ci && npx playwright install --with-deps chromium
       - run: npm run build-storybook
       - name: Every story renders and passes axe
-        run: npm run test:storybook -- --shard=${{ matrix.shard }}/2
+        run: npm run test:storybook -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
   e2e:
-    name: End-to-end ${{ matrix.shard }}/2 (phone and desktop, axe)
+    name: End-to-end ${{ matrix.shard }}/${{ strategy.job-total }} (phone and desktop, axe)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    # Two jobs, each with half of the test files: the tests are the slowest part of CI, and this halves the wait.
-    # When one half fails the other still finishes, so one run shows every failing test.
+    # Four jobs, each with a quarter of the test files: the tests are the slowest part of CI. Each job spends
+    # about a minute and a half on setup, so more jobs than this gain little. When one job fails the others
+    # still finish, so one run shows every failing test.
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4]
     services:
       mysql:
         image: mysql:5.7
@@ -212,7 +214,7 @@ jobs:
         run: php -i | grep -E '^opcache\.(enable|enable_cli|jit|jit_buffer_size) '
       # One job runs both sizes at once, so it takes less time.
       - name: End-to-end tests, phone and desktop side by side
-        run: npm run test:e2e:parallel -- --shard=${{ matrix.shard }}/2
+        run: npm run test:e2e:parallel -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
         working-directory: frontend
         env:
           E2E_GDB: '1'
@@ -227,6 +229,24 @@ jobs:
           path: |
             frontend/test-results
             backend/storage/logs/*.log
+
+  # The one check the ruleset on `master` requires. It stands for all the jobs above, so adding, renaming or
+  # splitting one of them does not change the ruleset.
+  checks-passed:
+    name: Checks passed
+    if: always() && github.event_name == 'pull_request'
+    needs: [backend, example-site, frontend, storybook, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed
+        run: |
+          echo "$RESULTS"
+          if echo "$RESULTS" | grep -qE 'failure|cancelled|skipped'; then
+            echo "::error::A job failed, was cancelled or did not run."
+            exit 1
+          fi
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
 
   package:
     name: Build the deploy package (not uploaded)

@@ -202,7 +202,9 @@ flags are listed in [`site/README.md`](../../site/README.md), "Features".
 3. Ask `Features::enabled()` where the rule is: inject `Features` into the action or pass it to the domain class.
    A Form Request asks through the trait `HasFeatures`. A route of the feature's own takes
    `->middleware(RequireFeature::for(Feature::X))`, which answers 404.
-4. In the screens, ask `hasFeature('x')` of `src/lib/features.ts`.
+4. In the screens, ask `hasFeature('x')` of `src/lib/features.ts`. Give the flag a name and a description in
+   `settings.features` of `src/i18n/pt-BR/admin.ts` and `src/i18n/en/admin.ts`: "Configurações" lists it. The
+   types fail while a flag has none.
 5. Test both ways. A backend test turns a flag off with `config(['ptsite.features' => ['x' => false]])`. A
    frontend test or story uses `overrideFeatures` or the decorator `withFeatures`.
 6. Add the flag to the table in `site/README.md` and to the questions of [`new-site.md`](../new-site.md), and

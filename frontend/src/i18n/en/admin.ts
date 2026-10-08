@@ -113,6 +113,33 @@ export const admin: Messages['admin'] = {
     },
   },
 
+  // Settings: what the site was built with, to read only
+  settings: {
+    tab: 'Settings',
+    featuresTitle: 'Features',
+    featuresIntro: "The parts of the site this league uses. They are set in the site's settings and cannot be changed here.",
+    on: 'On',
+    off: 'Off',
+    features: {
+      mainEventPot: { name: 'Main Event pot', description: 'The money a night sets aside for the Main Event.' },
+      timeChip: { name: 'Time chip', description: 'The money a night sets aside for the year party.' },
+      seasonPlanner: { name: 'Plan dates', description: "The calendar that schedules a season's regular nights at once." },
+      mainEvent: {
+        name: 'Main Event',
+        description: "A season's final game: a night of its own type, with the finishing order of its players, no pot and no points.",
+      },
+      houseOwnerBuyIn: { name: "House owner's buy-in", description: "A season's smaller buy-in for the owner of the house where the night is played." },
+      nightDashboard: {
+        name: 'Night dashboard',
+        description: "The screen for a phone that records who paid the buy-in, the rebuys and the time chips of a night, and works out its pot.",
+      },
+    },
+    versionTitle: 'Version',
+    version: 'Version',
+    siteVersion: 'Site version',
+    coreVersion: 'PTSite version',
+  },
+
   // Places
   places: {
     newPlace: '+ New place',
