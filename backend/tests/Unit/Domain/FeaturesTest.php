@@ -15,14 +15,14 @@ it('gives each feature its default when the site names none', function () {
     }
 });
 
-it('has every feature by default but the Main Event, which a site turns on', function () {
-    expect(Feature::MainEvent->default())->toBeFalse()
-        ->and((new Features(['mainEvent' => true]))->enabled(Feature::MainEvent))->toBeTrue();
+it('has every feature by default but the Main Event and the house owner\'s buy-in, which a site turns on', function () {
+    $off = [Feature::MainEvent, Feature::HouseOwnerBuyIn];
 
     foreach (Feature::cases() as $feature) {
-        if ($feature !== Feature::MainEvent) {
-            expect($feature->default())->toBeTrue();
-        }
+        expect($feature->default())->toBe(! in_array($feature, $off, true));
+    }
+    foreach ($off as $feature) {
+        expect((new Features([$feature->value => true]))->enabled($feature))->toBeTrue();
     }
 });
 
