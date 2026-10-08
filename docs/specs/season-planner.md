@@ -115,7 +115,7 @@ it.
 - **Planejar datas** is a **calendar**: "De" and "Até" fields ("Até" shows the last round, with the hint "Até a
   última rodada (26ª)", or "Fim do ano" when no rounds are left), the "Rodadas" counter and a legend, then one month grid per month. Ticked days are filled; regular
   nights left out are shaded; nights already scheduled are outlined and open the night; **holidays have their own
-  color**, so they are easy to see when choosing dates; **today has a ring around it** and its month a slightly different background, as on the
+  color**, so they are easy to see when choosing dates; **today is a square** and its month a slightly different background, as on the
   [season calendar](season-calendar.md) (rule 5a). Under each month, every holiday, every night left out and
   every night already scheduled is listed by date. Tapping a day ticks or unticks it. **"Agendar N eventos"** stays in view on
   a phone.
