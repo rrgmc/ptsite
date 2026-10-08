@@ -10,6 +10,7 @@ import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { formatMoney, formatWeekday, formatTime } from '@/lib/format'
+import { useSeasonPath } from '@/lib/seasonPath'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
 import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
 import { amountRows } from '../nights/amounts'
@@ -28,6 +29,7 @@ const UPCOMING = 2
 
 export function ResultsPage() {
   const { season, isPending, error } = useSelectedSeason()
+  const to = useSeasonPath()
   const nights = useSeasonNights(season?.id)
   const statistics = useStatistics(season?.id)
   const me = useMe()
@@ -77,7 +79,7 @@ export function ResultsPage() {
             {upcoming.length === 0 && !scheduling && <li className="text-muted">{t.results.noUpcoming}</li>}
           </ul>
           {toCome.length > upcoming.length && (
-            <Link to="/calendar" className="mt-1 inline-flex min-h-touch items-center px-2 text-sm font-semibold text-primary">{t.results.seeCalendar}</Link>
+            <Link to={to('/calendar')} className="mt-1 inline-flex min-h-touch items-center px-2 text-sm font-semibold text-primary">{t.results.seeCalendar}</Link>
           )}
         </Card>
       )}

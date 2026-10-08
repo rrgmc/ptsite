@@ -13,7 +13,7 @@ Everyone logged in: players, results keepers and admins.
 
 ## Rules
 
-1. The **"Calendário"** tab shows the selected season (the current one unless another is picked in "Escolher temporada",
+1. The **"Calendário"** tab shows the selected season (the current one unless the address names another,
    see [seasons-and-nights.md](seasons-and-nights.md) rule 3a), as month calendars.
 2. It shows the season's **nights**: finished ones with the **winner** (1st place) and the **pot**; scheduled and
    open ones with the time and the place. An open night also shows how many players answered **ALL IN** and

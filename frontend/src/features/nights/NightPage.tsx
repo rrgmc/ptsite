@@ -14,6 +14,7 @@ import { formatTime, formatWeekday, titleOfNight } from '@/lib/format'
 import { plainText } from '@/lib/plainText'
 import { canEditNight } from './canEditNight'
 import { NightAttendance } from '../attendance/NightAttendance'
+import { usePathOfSeason } from '../layout/useSelectedSeason'
 import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
 import { NightResultCard } from '../results/NightResultCard'
 import { NightMark } from './NightMark'
@@ -29,6 +30,7 @@ export function NightPage() {
   const open = useOpenNight()
   const cancel = useCancelNight(nightId)
   const navigate = useNavigate()
+  const pathOfSeason = usePathOfSeason()
   const [confirming, setConfirming] = useState(false)
   const [rescheduling, setRescheduling] = useState(false)
   const [cancelling, setCancelling] = useState(false)
@@ -104,7 +106,7 @@ export function NightPage() {
         cancelLabel={t.common.back}
         confirmVariant="danger"
         isPending={cancel.isPending}
-        onConfirm={() => cancel.mutate(undefined, { onSuccess: () => navigate('/results'), onSettled: () => setCancelling(false) })}
+        onConfirm={() => cancel.mutate(undefined, { onSuccess: () => navigate(pathOfSeason(n.season_id, '/results')), onSettled: () => setCancelling(false) })}
       >
         {t.nights.page.cancelConfirmBody}
         {cancel.error instanceof ApiError ? ` ${cancel.error.body.message}` : ''}

@@ -4,6 +4,7 @@ import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { t } from '@/i18n'
 import { ordinal, titleOfNight } from '@/lib/format'
+import { useSeasonPath } from '@/lib/seasonPath'
 
 const medals = ['🥇', '🥈', '🥉']
 
@@ -13,11 +14,12 @@ const medals = ['🥇', '🥈', '🥉']
  */
 export function MainEventPodium({ night }: { night: Night }) {
   const podium = (night.main_event_positions ?? []).slice(0, medals.length)
+  const to = useSeasonPath()
   return (
     <section className="min-w-0 rounded-lg border-2 border-primary bg-primary-soft p-3 sm:p-4">
       <header className="mb-3 flex flex-wrap items-center justify-between gap-x-3">
         <h2 className="font-display text-lg font-bold"><span aria-hidden="true">🏆 </span>{t.mainEvent.title}</h2>
-        <Link to="/main-event" className="inline-flex min-h-touch items-center text-sm font-semibold text-primary underline">{t.mainEvent.seeMainEvent}</Link>
+        <Link to={to('/main-event')} className="inline-flex min-h-touch items-center text-sm font-semibold text-primary underline">{t.mainEvent.seeMainEvent}</Link>
       </header>
       <ol aria-label={t.mainEvent.resultCaption({ night: titleOfNight(night) })} className="grid grid-cols-3 gap-2">
         {podium.map((line, i) => (

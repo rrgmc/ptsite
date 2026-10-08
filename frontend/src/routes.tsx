@@ -1,4 +1,4 @@
-import { createBrowserRouter, type LoaderFunctionArgs, redirect } from 'react-router'
+import { createBrowserRouter, type RouteObject } from 'react-router'
 import { ForgotPasswordPage } from './features/auth/ForgotPasswordPage'
 import { LoginPage } from './features/auth/LoginPage'
 import { ResetPasswordPage } from './features/auth/ResetPasswordPage'
@@ -20,27 +20,27 @@ import { SeasonsPage } from './features/seasons/SeasonsPage'
 import { SimulatorPage } from './features/simulator/SimulatorPage'
 import { StandingsPage } from './features/standings/StandingsPage'
 import { hasFeature } from './lib/features'
-import { setSelectedSeasonId } from './lib/selectedSeason'
-
-/** A link to one season (/seasons/7/results): picks that season, then opens the screen. */
-const pickSeason = (screen: string) => ({ params }: LoaderFunctionArgs) => {
-  const id = Number(params.seasonId)
-  if (id > 0) setSelectedSeasonId(id)
-  return redirect(screen)
-}
 
 /** The statistics screens load as a separate bundle, which holds the chart library. */
 const statistics = (page: 'StatisticsPage' | 'AllTimeStatisticsPage') => () =>
   import('./features/statistics/StatisticsPage').then((m) => ({ Component: m[page] }))
 
-/** The Main Event's screens, on a site that has it. */
-const mainEvent = hasFeature('mainEvent')
-  ? [
-      { path: 'main-event', element: <MainEventPage /> },
-      { path: 'seasons/:seasonId/main-event', loader: pickSeason('/main-event') },
-      { path: 'nights/:nightId/main-event-result', element: <MainEventResultFormPage /> },
-    ]
-  : []
+/**
+ * The screens that show one season. They stand at the root for the current season (/results) and under a season's
+ * id for any season (/seasons/7/results): the same screens at both. src/lib/seasonPath.ts lists their paths too.
+ */
+const seasonScreens = (): RouteObject[] => [
+  { index: true, element: <StandingsPage /> },
+  { path: 'results', element: <ResultsPage /> },
+  { path: 'calendar', element: <CalendarPage /> },
+  { path: 'simulator', element: <SimulatorPage /> },
+  { path: 'statistics', lazy: statistics('StatisticsPage') },
+  { path: 'players/:playerId', element: <PlayerPage /> },
+  ...(hasFeature('mainEvent') ? [{ path: 'main-event', element: <MainEventPage /> }] : []),
+]
+
+/** The Main Event's result form, on a site that has it. */
+const mainEvent = hasFeature('mainEvent') ? [{ path: 'nights/:nightId/main-event-result', element: <MainEventResultFormPage /> }] : []
 
 // URLs are in English, like the code; screens are in Brazilian Portuguese. The admin section and the statistics
 // load as separate bundles; a player's page loads its charts the same way.
@@ -53,26 +53,17 @@ export const router = createBrowserRouter(
       element: <AppLayout />,
       errorElement: <ErrorPage />,
       children: [
-        { index: true, element: <StandingsPage /> },
-        { path: 'results', element: <ResultsPage /> },
-        { path: 'calendar', element: <CalendarPage /> },
-        { path: 'simulator', element: <SimulatorPage /> },
-        { path: 'statistics', lazy: statistics('StatisticsPage') },
+        ...seasonScreens(),
+        { path: 'seasons/:seasonId', children: seasonScreens() },
         { path: 'statistics/all', lazy: statistics('AllTimeStatisticsPage') },
         { path: 'seasons', element: <SeasonsPage /> },
         { path: 'seasons/select', element: <SeasonPickerPage /> },
-        { path: 'seasons/:seasonId', loader: pickSeason('/') },
-        { path: 'seasons/:seasonId/results', loader: pickSeason('/results') },
-        { path: 'seasons/:seasonId/calendar', loader: pickSeason('/calendar') },
-        { path: 'seasons/:seasonId/simulator', loader: pickSeason('/simulator') },
-        { path: 'seasons/:seasonId/statistics', loader: pickSeason('/statistics') },
         { path: 'nights/:nightId', element: <NightPage /> },
         { path: 'nights/:nightId/edit', element: <NightEditPage /> },
         { path: 'nights/:nightId/result', element: <ResultFormPage /> },
         { path: 'nights/:nightId/partial-result', element: <PartialResultFormPage /> },
         ...mainEvent,
         { path: 'players', element: <PlayersPage /> },
-        { path: 'players/:playerId', element: <PlayerPage /> },
         { path: 'players/:playerId/all', element: <AllTimePlayerPage /> },
         { path: 'profile', element: <ProfilePage /> },
         { path: 'admin/*', lazy: () => import('./features/admin/AdminRoutes').then((m) => ({ Component: m.AdminRoutes })) },

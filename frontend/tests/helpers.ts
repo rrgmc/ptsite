@@ -28,7 +28,7 @@ export function seasonNotice(page: Page) {
   return page.getByRole('complementary', { name: 'Temporada selecionada' })
 }
 
-/** Picks a season in "Escolher temporada", opened from the header. The site returns to the season screen it was on. */
+/** Picks a season in "Escolher temporada", opened from the header. The site opens the season screen it was on, at that season's address. */
 export async function pickSeason(page: Page, name: string) {
   await seasonLink(page).click()
   await page.getByRole('row').filter({ has: page.getByText(name, { exact: true }) }).getByRole('button').click()
