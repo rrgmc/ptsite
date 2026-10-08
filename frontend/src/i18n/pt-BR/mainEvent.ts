@@ -9,16 +9,8 @@ export const mainEvent = {
   notScheduled: 'O Main Event desta temporada ainda não foi marcado.',
   notPlayed: 'O Main Event ainda não foi jogado.',
   seeNight: 'Ver o evento',
-  scheduleHelp: 'Para marcar o Main Event, agende um evento do tipo Main Event em Resultados.',
-  goToResults: 'Ir para Resultados',
-  recordPast: 'Registrar um Main Event já jogado',
-
-  // Recording a past Main Event
-  importForm: {
-    label: 'Registrar Main Event já jogado',
-    time: 'Hora',
-    submit: 'Registrar Main Event',
-  },
+  /** For an admin: the way to the season's Main Event in "Administração". */
+  manage: 'Editar Main Event',
 
   // The result
   resultTitle: 'Classificação do Main Event',

@@ -35,6 +35,7 @@ docs/screens/desktop/17-menu.png
 docs/screens/desktop/18-season-picker.png
 docs/screens/desktop/19-main-event.png
 docs/screens/desktop/20-main-event-result-form.png
+docs/screens/desktop/21-admin-main-event.png
 docs/screens/mobile/01-login.png
 docs/screens/mobile/02-standings-2022.png
 docs/screens/mobile/03-results-2022.png
@@ -55,3 +56,4 @@ docs/screens/mobile/17-menu.png
 docs/screens/mobile/18-season-picker.png
 docs/screens/mobile/19-main-event.png
 docs/screens/mobile/20-main-event-result-form.png
+docs/screens/mobile/21-admin-main-event.png

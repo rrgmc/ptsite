@@ -159,6 +159,23 @@ export const admin: Messages['admin'] = {
   },
 
   // Seasons
+  mainEvent: {
+    title: ({ season }) => `Main Event · ${season}`,
+    linkLabel: ({ season }) => `Main Event: ${season}`,
+    formLabel: 'Add the Main Event',
+    intro: "This season has no Main Event yet. Enter its date and time: the Main Event does not follow the season's regular day and time.",
+    time: 'Time',
+    orderTitle: 'Result (if it was already played)',
+    orderHelp: 'Leave it empty to schedule the Main Event. If it was already played, enter the players in finishing order, the champion first: it is recorded as finished.',
+    schedule: 'Schedule the Main Event',
+    record: 'Record the Main Event',
+    nightHelp: "The date, the place, the description and cancelling are on the night's page.",
+    seeNight: 'See the night',
+    finish: 'Finish: enter the result',
+    editResult: 'Edit the result',
+    notOpenYet: 'Open the night to enter the result.',
+  },
+
   seasons: {
     newSeason: '+ New season',
     summary: ({ start, planned, rounds, finished, percents, weekday, time, every }) =>
@@ -167,6 +184,7 @@ export const admin: Messages['admin'] = {
     open: 'Open',
     closed: 'Closed',
     planDates: 'Plan dates',
+    mainEvent: 'Main Event',
     back: '‹ Seasons',
     notFound: 'Season not found.',
     newTitle: 'New season',

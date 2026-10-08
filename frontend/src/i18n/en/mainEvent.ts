@@ -10,16 +10,7 @@ export const mainEvent: Messages['mainEvent'] = {
   notScheduled: 'The Main Event of this season is not scheduled yet.',
   notPlayed: 'The Main Event has not been played yet.',
   seeNight: 'See the night',
-  scheduleHelp: 'To schedule the Main Event, schedule a night of the type Main Event in Results.',
-  goToResults: 'Go to Results',
-  recordPast: 'Record a Main Event already played',
-
-  // Recording a past Main Event
-  importForm: {
-    label: 'Record a Main Event already played',
-    time: 'Time',
-    submit: 'Record the Main Event',
-  },
+  manage: 'Edit the Main Event',
 
   // The result
   resultTitle: 'Main Event result',

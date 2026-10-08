@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { expectAccessible, login, pickSeason } from './helpers'
+import { expectAccessible, login, logout, pickSeason } from './helpers'
 
 // docs/specs/main-event.md. The first test uses the E2E Main Event test season
 // (backend/database/seeders/EndToEndSeeder.php); the second reads the demo league, which has a Main Event in each
@@ -11,28 +11,35 @@ async function pickPlayer(page: Page, position: string, nickname: string) {
   await page.getByRole('dialog').getByRole('option', { name: nickname, exact: true }).click()
 }
 
-async function chooseKind(page: Page, kind: string) {
-  await page.getByRole('button', { name: /Tipo/ }).click()
-  await page.getByRole('option', { name: kind, exact: true }).click()
-}
-
-test('a results keeper schedules, opens and finishes the Main Event, then adds an extra night on its day', async ({ page }) => {
+test('an admin adds the Main Event of a season in "Administração", and its night is run like any other', async ({ page }) => {
   test.slow()
-  await login(page, 'dev-keeper')
+  await login(page, 'dev-admin')
   await page.goto('results')
   await pickSeason(page, 'E2E Main Event')
   await expect(page).toHaveURL(/\/results$/)
   const seasonResults = page.url()
 
-  // Schedule: a night of the type Main Event
+  // "Resultados" schedules a round or an extra night, never the Main Event
   await page.getByRole('button', { name: '+ Agendar' }).click()
-  await page.getByLabel('Data').fill('2017-12-09')
-  await chooseKind(page, 'Main Event')
-  await expect(page.getByText('O Main Event não tem pote nem pontos', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: /Tipo/ }).click()
+  await expect(page.getByRole('option')).toHaveText(['Rodada da temporada', 'Evento extra'])
+  await page.keyboard.press('Escape')
+
+  // "Administração": the season's Main Event. Its date and time start empty.
+  await page.goto('admin')
+  await page.getByRole('link', { name: 'Main Event: E2E Main Event' }).click()
+  const form = page.getByRole('form', { name: 'Adicionar Main Event' })
+  await expect(form.getByLabel('Hora')).toHaveValue('')
+  await expect(form.getByRole('button', { name: 'Agendar Main Event' })).toBeDisabled()
+  await form.getByLabel('Data').fill('2017-12-09')
+  await form.getByLabel('Hora').fill('13:00')
   await expectAccessible(page)
-  await page.getByRole('button', { name: 'Agendar evento' }).click()
-  await expect(page).toHaveURL(/\/nights\/\d+$/)
+  await form.getByRole('button', { name: 'Agendar Main Event' }).click()
+  await expect(page.getByText('Abra o evento para lançar a classificação.')).toBeVisible()
+  await expectAccessible(page)
+  await page.getByRole('link', { name: 'Ver o evento' }).click()
   await expect(page.getByRole('heading', { name: 'Main Event - 09/12/2017', level: 1 })).toBeVisible()
+  await expect(page.getByText(/Sábado, 09\/12 · 13:00/)).toBeVisible()
 
   // Open: it takes the answers like any night, and has no partial result
   await page.getByRole('button', { name: 'Abrir evento' }).click()
@@ -69,12 +76,11 @@ test('a results keeper schedules, opens and finishes the Main Event, then adds a
   await expect(page.getByRole('heading', { name: 'Pote ME da temporada' })).toBeVisible()
   await expectAccessible(page)
 
-  // The season has its Main Event: the next night is a round or an extra night, here on the same day
+  // An extra night on the same day, scheduled in "Resultados"
   await page.goto(seasonResults)
   await page.getByRole('button', { name: '+ Agendar' }).click()
   await page.getByLabel('Data').fill('2017-12-09')
   await page.getByRole('button', { name: /Tipo/ }).click()
-  await expect(page.getByRole('option', { name: 'Main Event', exact: true })).toHaveCount(0)
   await page.getByRole('option', { name: 'Evento extra', exact: true }).click()
   await page.getByRole('button', { name: 'Agendar evento' }).click()
   await expect(page.getByRole('heading', { name: 'Liga - 09/12/2017', level: 1 })).toBeVisible()
@@ -92,24 +98,36 @@ test('a player sees the Main Event of a finished season and its champion in "Tem
   await pickSeason(page, 'Liga 2025')
   await expect(page).toHaveURL(/\/main-event$/)
   await expect(page.getByRole('list', { name: /^Classificação: Main Event/ }).getByRole('listitem')).toHaveCount(10)
-  // A player records nothing.
-  await expect(page.getByRole('button', { name: 'Registrar um Main Event já jogado' })).toHaveCount(0)
+  // Only an admin has the way to edit it.
+  await expect(page.getByRole('link', { name: 'Editar Main Event' })).toHaveCount(0)
   await expectAccessible(page)
 })
 
-test('a results keeper records a Main Event that was already played', async ({ page }) => {
-  await login(page, 'dev-keeper')
-  await page.goto('main-event')
-  await pickSeason(page, 'E2E Rodadas')
-  await expect(page.getByText('O Main Event desta temporada ainda não foi marcado.')).toBeVisible()
+test('an admin records a Main Event that was already played, and a results keeper cannot add one', async ({ page }) => {
+  await login(page, 'dev-admin')
+  await page.goto('admin')
+  await page.getByRole('link', { name: 'Main Event: E2E Rodadas' }).click()
 
-  await page.getByRole('button', { name: 'Registrar um Main Event já jogado' }).click()
-  const form = page.getByRole('form', { name: 'Registrar Main Event já jogado' })
+  const form = page.getByRole('form', { name: 'Adicionar Main Event' })
   await form.getByLabel('Data').fill('2023-12-09')
+  await form.getByLabel('Hora').fill('13:00')
+  // With a player, the Main Event is recorded as finished.
   await pickPlayer(page, '1º', 'Duhamel')
   await expectAccessible(page)
   await form.getByRole('button', { name: 'Registrar Main Event' }).click()
 
   await expect(page.getByRole('list', { name: 'Classificação: Main Event - 09/12/2023' }).getByRole('listitem')).toHaveText([/1º.*Duhamel/])
   await expect(page.getByText('Finalizado', { exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Editar classificação' })).toBeVisible()
+
+  // "Main Event" shows it, with the way back here for an admin only
+  await page.goto('main-event')
+  await pickSeason(page, 'E2E Rodadas')
+  await expect(page.getByRole('link', { name: 'Editar Main Event' })).toBeVisible()
+  await logout(page)
+  await login(page, 'dev-keeper')
+  await page.goto('main-event')
+  await pickSeason(page, 'E2E Rodadas')
+  await expect(page.getByRole('list', { name: /^Classificação: Main Event/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Editar Main Event' })).toHaveCount(0)
 })

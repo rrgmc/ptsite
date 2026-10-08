@@ -16,16 +16,20 @@ A site has the Main Event only if it turns it on (`mainEvent` in `features`, see
 
 ## Who
 
-- **Results keepers and admins** schedule, open and finish the Main Event night, as they do any night.
+- **Admins** add a season's Main Event, in "Administração".
+- **Results keepers and admins** open and finish the Main Event night, as they do any night.
 - **Everyone logged in** sees it.
 
 ## Rules
 
-1. A night has a **type**: regular, or **Main Event**. The type is chosen when the night is scheduled ("Tipo")
-   and does not change afterwards.
+1. A night has a **type**: regular, or **Main Event**. The type does not change afterwards.
+1a. **Only an admin adds a season's Main Event**, and only in "Administração": each season in the list has a
+   link "Main Event". "Resultados" schedules regular nights only. The form asks the date, the time and the
+   place. **The date and the time start empty**: a Main Event does not follow the season's regular day and
+   time, and it gets no suggested dates.
 2. **A season has at most one Main Event night.** It belongs to the season it is the Main Event of, whenever it
    is played. A cancelled one does not count, so another can be scheduled.
-3. A Main Event night is scheduled, moved, cancelled, edited and opened **like any other night**, by the same
+3. Once added, a Main Event night is moved, cancelled, edited and opened **like any other night**, by the same
    people (rules 7, 8, 16, 17 and 17a of [seasons-and-nights.md](seasons-and-nights.md)). While it is open it
    takes attendance answers ([attendance.md](attendance.md)). Its title is "Main Event - 12/12/2026".
 4. A Main Event night is **always extra** (rules 25 to 29 of [seasons-and-nights.md](seasons-and-nights.md)): it
@@ -37,13 +41,16 @@ A site has the Main Event only if it turns it on (`mainEvent` in `features`, see
    left out of the standings, the simulator, the statistics and the players' statistics.
 7. A finished Main Event night can be **corrected** at any time, by whoever can finish it, also after its season
    is finished. The change is recorded in the audit log.
-8. **A Main Event that was already played** is recorded in one step: its date, its place and its players in
-   order. It is saved as finished. A finished season takes it too, since a Main Event is often played after the
-   season's last round.
+8. **A Main Event that was already played** is recorded in one step, by an admin, on the same form: with its
+   players in order it is saved as finished; with none it is scheduled. A finished season takes a recorded one
+   too, since a Main Event is often played after the season's last round.
+8a. The season's link "Main Event" in "Administração" then shows the Main Event: its day, its place and its
+   players, with the way to its night and to its result.
 9. **"Main Event"**, in the menu, shows the Main Event of the selected season: the day, time and place of its
    night, and its players in order once it is finished. Before that it says that the Main Event was not played
    yet, or not scheduled yet. On a site with the Main Event pot, it also shows the **season's Main Event pot**:
-   the Main Event pots of the season's finished nights, added up.
+   the Main Event pots of the season's finished nights, added up. An admin also sees "Editar Main Event", which
+   leads to the season's Main Event in "Administração".
 10. **"Temporadas"** shows the **Main Event champion** of each season that has a finished Main Event.
 11. On "Resultados", the calendar, the next night's card and the attendance banner, a Main Event night is marked
     **"Main Event"**. On "Resultados" its card lists the players in order, with no amounts and no number.
@@ -63,6 +70,11 @@ A site has the Main Event only if it turns it on (`mainEvent` in `features`, see
   está na 2ª posição."
 - **A pot on a Main Event night.** Finishing a Main Event night with a pot and scoring positions is refused:
   "Este evento é um Main Event: informe a ordem dos jogadores, sem pote."
+- **A results keeper.** Maria, a results keeper, schedules a night in "Resultados": the types are "Rodada da
+  temporada" and "Evento extra". She cannot add a Main Event. An admin adds it; Maria then opens it and enters
+  its result.
+- **A Saturday afternoon.** The season plays on Fridays at 21:30. Its Main Event is added for Saturday
+  12/12/2026 at 13:00: the form suggested no date and no time.
 - **A second Main Event.** A season already has a Main Event night. Scheduling another is refused: "Esta
   temporada já tem um Main Event."
 - **Played after the season.** Liga 2025 is finished. Its Main Event, played months later, is recorded in one

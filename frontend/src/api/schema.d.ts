@@ -241,8 +241,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Record a past Main Event in one step, saved as finished ("Importar"). Results keepers and admins. A
-         *     finished season takes it too
+         * Record a past Main Event in one step, saved as finished ("Importar"). Admins. A finished season takes it
+         *     too
          */
         post: operations["mainEvent.import"];
         delete?: never;
@@ -283,7 +283,7 @@ export interface paths {
         put?: never;
         /**
          * Schedule a night in a season ("Adicionar"). Results keepers and admins. An extra night is not a round and may
-         *     share its date. A Main Event night is always extra, and a season takes one
+         *     share its date. A Main Event night is always extra, a season takes one, and only an admin schedules it
          */
         post: operations["night.store"];
         delete?: never;
@@ -1376,7 +1376,8 @@ export interface components {
             place_id?: number | null;
             description?: string | null;
             /**
-             * @description regular when left out. main_event only on a site that has the Main Event; a season takes one.
+             * @description regular when left out. main_event only on a site that has the Main Event, and from an admin; a season
+             *     takes one.
              * @enum {string}
              */
             type?: "regular" | "main_event";

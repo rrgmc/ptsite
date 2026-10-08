@@ -14,7 +14,8 @@ use PTSite\Domain\Shared\RuleViolation;
 
 /**
  * "Importar" for a Main Event: records one that already happened, in one step, saved as finished. A finished
- * season takes it too, since a Main Event is often played after its season ends.
+ * season takes it too, since a Main Event is often played after its season ends. Only who manages the season
+ * adds its Main Event: an admin.
  */
 final class ImportMainEventNight
 {
@@ -27,7 +28,7 @@ final class ImportMainEventNight
     /** @param list<int> $playerIds the 1st place first */
     public function __invoke(User $user, Season $season, string $startsAt, ?int $placeId, ?string $description, array $playerIds): Night
     {
-        Gate::forUser($user)->authorize('create', Night::class);
+        Gate::forUser($user)->authorize('update', $season);
         if ($season->isArchived()) {
             throw new RuleViolation('season.not_open');
         }
