@@ -205,6 +205,7 @@ return [
         'rebuy_charges_time_chip' => 'time chip on a rebuy',
         'allows_extra_rebuys' => 'rebuys past the limit',
         'house_owner_buy_in' => 'house owner\'s buy-in',
+        'main_event_pot_percent' => 'Main Event pot share',
         'default_place_id' => 'default place',
         'login' => 'username or email',
         'percentages' => 'percentage table',

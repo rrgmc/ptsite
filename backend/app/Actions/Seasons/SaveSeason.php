@@ -25,7 +25,8 @@ final class SaveSeason
     /**
      * @param array{name?: string, starts_on?: string, default_place_id?: ?int, description?: ?string,
      *              buy_in?: ?string, rebuy_value?: ?string, time_chip_value?: ?string, rebuys_allowed?: int,
-     *              rebuy_charges_time_chip?: bool, allows_extra_rebuys?: bool, house_owner_buy_in?: ?string, is_open?: bool, is_finished?: bool, schedule_weekday?: int, schedule_time?: string,
+     *              rebuy_charges_time_chip?: bool, allows_extra_rebuys?: bool, house_owner_buy_in?: ?string,
+     *              main_event_pot_percent?: ?int, is_open?: bool, is_finished?: bool, schedule_weekday?: int, schedule_time?: string,
      *              schedule_every_weeks?: int, rounds?: int, percentages?: array<int, int>} $data
      */
     public function __invoke(User $user, ?Season $season, array $data): Season
@@ -58,7 +59,7 @@ final class SaveSeason
             }
             $before = $season->exists ? $this->snapshot($season) : null;
 
-            $season->fill(array_intersect_key($data, array_flip(['name', 'starts_on', 'default_place_id', 'description', 'buy_in', 'rebuy_value', 'time_chip_value', 'rebuys_allowed', 'rebuy_charges_time_chip', 'allows_extra_rebuys', 'house_owner_buy_in', 'is_open', 'is_finished', 'schedule_weekday', 'schedule_time', 'schedule_every_weeks', 'rounds'])));
+            $season->fill(array_intersect_key($data, array_flip(['name', 'starts_on', 'default_place_id', 'description', 'buy_in', 'rebuy_value', 'time_chip_value', 'rebuys_allowed', 'rebuy_charges_time_chip', 'allows_extra_rebuys', 'house_owner_buy_in', 'main_event_pot_percent', 'is_open', 'is_finished', 'schedule_weekday', 'schedule_time', 'schedule_every_weeks', 'rounds'])));
             $season->save();
 
             if ($table !== null) {
@@ -94,6 +95,7 @@ final class SaveSeason
             rebuyChargesTimeChip: (bool) $value('rebuy_charges_time_chip'),
             allowsExtraRebuys: (bool) $value('allows_extra_rebuys'),
             houseOwnerBuyIn: $this->features->enabled(Feature::HouseOwnerBuyIn) ? $money('house_owner_buy_in') : null,
+            mainEventPotPercent: $value('main_event_pot_percent') === null ? null : (int) $value('main_event_pot_percent'),
         );
     }
 
@@ -111,6 +113,7 @@ final class SaveSeason
             'rebuy_charges_time_chip' => $season->rebuy_charges_time_chip,
             'allows_extra_rebuys' => $season->allows_extra_rebuys,
             'house_owner_buy_in' => $season->house_owner_buy_in,
+            'main_event_pot_percent' => $season->main_event_pot_percent,
             'rounds' => $season->rounds,
             'is_open' => $season->is_open,
             'is_finished' => $season->is_finished,

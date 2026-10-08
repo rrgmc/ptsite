@@ -254,6 +254,32 @@ it('refuses the house owner\'s buy-in on a site without it', function () {
     $this->patchJson("/api/v1/seasons/{$season->id}", ['buy_in' => '40.00'])->assertOk();
 });
 
+it('saves the share of the pot suggested as the Main Event pot', function () {
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $season = Season::factory()->create();
+
+    $this->getJson("/api/v1/seasons/{$season->id}")->assertJsonPath('data.main_event_pot_percent', null);
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['main_event_pot_percent' => 20])
+        ->assertOk()
+        ->assertJsonPath('data.main_event_pot_percent', 20);
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['main_event_pot_percent' => 101])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['main_event_pot_percent']);
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['main_event_pot_percent' => null])
+        ->assertOk()
+        ->assertJsonPath('data.main_event_pot_percent', null);
+});
+
+it('refuses the share of the pot on a site without the Main Event pot', function () {
+    config(['ptsite.features' => ['mainEventPot' => false]]);
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $season = Season::factory()->create();
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['main_event_pot_percent' => 20])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.main_event_pot_percent.0', 'Este site não usa o campo pote ME: % do pote.');
+});
+
 it('refuses the time chip settings on a site without the time chip', function () {
     config(['ptsite.features' => ['timeChip' => false]]);
     Sanctum::actingAs(User::factory()->admin()->create());

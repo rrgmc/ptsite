@@ -1353,7 +1353,7 @@ export interface components {
             starts_on: string;
             default_place_id?: number | null;
             description?: string | null;
-            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** @description What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             buy_in?: string | null;
             /** @description A rebuy's price, without the time chip it may also charge. Required when the season has rebuys. */
             rebuy_value?: string | null;
@@ -1367,6 +1367,8 @@ export interface components {
             allows_extra_rebuys?: boolean;
             /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             house_owner_buy_in?: string | null;
+            /** @description The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. Refused on a site without the Main Event pot. */
+            main_event_pot_percent?: number | null;
             /** @description How many nights ("rodadas") the season has; 26 by default. Scheduling more is allowed, with a warning. */
             rounds?: number;
             is_open?: boolean;
@@ -1408,7 +1410,7 @@ export interface components {
             name: string;
             starts_on: string;
             description: string | null;
-            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** @description What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             buy_in: string | null;
             /** @description A rebuy's price, without the time chip it may also charge. */
             rebuy_value: string | null;
@@ -1422,6 +1424,8 @@ export interface components {
             allows_extra_rebuys: boolean;
             /** @description The smaller buy-in of the owner of the house where the night is played. */
             house_owner_buy_in: string | null;
+            /** @description The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. */
+            main_event_pot_percent: string;
             /** @description How many nights ("rodadas") the season has. */
             rounds: number;
             /** @description The season's nights that are not archived, in any state; compare with rounds. */
@@ -1600,7 +1604,7 @@ export interface components {
             starts_on?: string;
             default_place_id?: number | null;
             description?: string | null;
-            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
+            /** @description What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings. */
             buy_in?: string | null;
             /** @description A rebuy's price, without the time chip it may also charge. Required when the season has rebuys. */
             rebuy_value?: string | null;
@@ -1614,6 +1618,8 @@ export interface components {
             allows_extra_rebuys?: boolean;
             /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
             house_owner_buy_in?: string | null;
+            /** @description The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. Refused on a site without the Main Event pot. */
+            main_event_pot_percent?: number | null;
             /** @description How many nights ("rodadas") the season has; 26 by default. Scheduling more is allowed, with a warning. */
             rounds?: number;
             is_open?: boolean;

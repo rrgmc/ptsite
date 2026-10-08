@@ -50,6 +50,7 @@ return [
     'season.money.rebuy_value_required' => 'Enter the rebuy value, or leave the season with no rebuys.',
     'season.money.house_owner_without_buy_in' => 'Enter the buy-in before the house owner\'s buy-in.',
     'season.money.house_owner_above_buy_in' => 'The house owner\'s buy-in cannot be above the buy-in.',
+    'season.money.main_event_pot_percent' => 'Enter from 0 to 100% of the pot.',
     'player.nickname_taken' => 'There is already a player with this nickname.',
     'player.photo.unreadable' => 'This image could not be read. Send another photo, as JPEG, PNG or WebP.',
     'account.username_taken' => 'There is already a login with this username.',

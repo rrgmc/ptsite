@@ -50,6 +50,7 @@ return [
     'season.money.rebuy_value_required' => 'Informe o valor do rebuy, ou deixe a temporada sem rebuys.',
     'season.money.house_owner_without_buy_in' => 'Informe o buy-in antes do buy-in do dono da casa.',
     'season.money.house_owner_above_buy_in' => 'O buy-in do dono da casa não pode ser maior que o buy-in.',
+    'season.money.main_event_pot_percent' => 'Informe de 0 a 100% do pote.',
     'player.nickname_taken' => 'Já existe um jogador com este apelido.',
     'player.photo.unreadable' => 'Não foi possível ler esta imagem. Envie outra foto em JPEG, PNG ou WebP.',
     'account.username_taken' => 'Já existe um acesso com este usuário.',

@@ -5029,7 +5029,7 @@
                             "string",
                             "null"
                         ],
-                        "description": "What a player pays to enter a night. The season only records its money settings: no rule uses them.",
+                        "description": "What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "rebuy_value": {
@@ -5069,6 +5069,15 @@
                         ],
                         "description": "The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "main_event_pot_percent": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. Refused on a site without the Main Event pot.",
+                        "minimum": 0,
+                        "maximum": 100
                     },
                     "rounds": {
                         "type": "integer",
@@ -5211,7 +5220,7 @@
                             "string",
                             "null"
                         ],
-                        "description": "What a player pays to enter a night. The season only records its money settings: no rule uses them."
+                        "description": "What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings."
                     },
                     "rebuy_value": {
                         "type": [
@@ -5245,6 +5254,10 @@
                             "null"
                         ],
                         "description": "The smaller buy-in of the owner of the house where the night is played."
+                    },
+                    "main_event_pot_percent": {
+                        "type": "string",
+                        "description": "The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent."
                     },
                     "rounds": {
                         "type": "integer",
@@ -5334,6 +5347,7 @@
                     "rebuy_charges_time_chip",
                     "allows_extra_rebuys",
                     "house_owner_buy_in",
+                    "main_event_pot_percent",
                     "rounds",
                     "is_open",
                     "is_finished",
@@ -5830,7 +5844,7 @@
                             "string",
                             "null"
                         ],
-                        "description": "What a player pays to enter a night. The season only records its money settings: no rule uses them.",
+                        "description": "What a player pays to enter a night. On a site with the night dashboard, a night's money is worked out from the season's money settings.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
                     },
                     "rebuy_value": {
@@ -5870,6 +5884,15 @@
                         ],
                         "description": "The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature.",
                         "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    },
+                    "main_event_pot_percent": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. Refused on a site without the Main Event pot.",
+                        "minimum": 0,
+                        "maximum": 100
                     },
                     "rounds": {
                         "type": "integer",

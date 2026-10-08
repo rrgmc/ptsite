@@ -51,6 +51,7 @@ return [
         'rebuy_charges_time_chip' => 'time chip no rebuy',
         'allows_extra_rebuys' => 'rebuys além do limite',
         'house_owner_buy_in' => 'buy-in do dono da casa',
+        'main_event_pot_percent' => 'pote ME: % do pote',
         'default_place_id' => 'local padrão',
         'description' => 'descrição',
         'email' => 'e-mail',
