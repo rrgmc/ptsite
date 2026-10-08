@@ -15,16 +15,18 @@ export const statistics = {
   places: 'Locais',
   noPlaces: 'Nenhum evento com local.',
   placesCaption: 'Locais por número de eventos',
-  positionTitle: ({ position }: { position: string }) => `Posição: ${position}`,
+  /** The title of one list inside "Posições". */
+  positionTitle: ({ position }: { position: string }) => `${position} lugar`,
   positionCaption: ({ position }: { position: string }) => `Jogadores por vezes em ${position} lugar`,
   times: 'Vezes',
 
   // The Main Events of every season, on a site that has the Main Event
-  mainEventTitles: 'Main Event: Títulos',
+  mainEvent: 'Main Event',
+  mainEventTitles: 'Títulos',
   mainEventTitlesCaption: 'Jogadores por títulos do Main Event',
-  mainEventPodiums: 'Main Event: Pódios',
+  mainEventPodiums: 'Pódios',
   mainEventPodiumsCaption: 'Jogadores por vezes entre os três primeiros do Main Event',
-  mainEventAppearances: 'Main Event: Participações',
+  mainEventAppearances: 'Participações',
   mainEventAppearancesCaption: 'Jogadores por participações no Main Event',
 
   // Charts
@@ -42,6 +44,15 @@ export const statistics = {
   /** `top` is the player with most wins, when there is one. */
   winsDescription: ({ top }: { top?: { nickname: string; wins: number } }) =>
     `Gráfico de barras: vitórias por jogador.${top ? ` ${top.nickname} tem mais: ${top.wins}.` : ''} Os números estão na tabela abaixo.`,
+
+  potsPerNight: 'Pote por evento',
+  potsPerSeason: 'Pote por temporada',
+  /** `top` is the step with the biggest pot, when there is one; its `pot` is already written as money. */
+  potsDescription: ({ perSeason, top }: { perSeason: boolean; top?: { label: string; pot: string } }) =>
+    `Gráfico de linha: pote por ${perSeason ? 'temporada' : 'evento'}.${top ? ` O maior é ${top.pot}, em ${top.label}.` : ''} Os números estão na tabela abaixo.`,
+  /** `top` is the place with most nights, when there is one. */
+  placesDescription: ({ top }: { top?: { name: string; count: number } }) =>
+    `Gráfico de pizza: eventos por local.${top ? ` ${top.name} tem mais: ${top.count}.` : ''} Os números estão na tabela abaixo.`,
 
   // One player's charts
   positions: 'Posições',

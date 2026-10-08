@@ -10,9 +10,11 @@ final readonly class PointsProgress
     /**
      * @param  list<int>  $steps  night ids or season ids, oldest first
      * @param  array<int, list<Money>>  $totals  by player id, the total after each step; leaders first
+     * @param  list<Money>  $pots  the pot of each step: of the night, or of the season's nights added up
      */
     public function __construct(
         public array $steps,
         public array $totals,
+        public array $pots,
     ) {}
 }

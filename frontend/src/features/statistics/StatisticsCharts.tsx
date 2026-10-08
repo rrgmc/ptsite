@@ -1,21 +1,25 @@
 import type { ReactNode } from 'react'
-import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { Statistics } from '@/api/client'
 import { t } from '@/i18n'
-import { formatPoints, formatWhole } from '@/lib/format'
-import { progressData, SERIES_COLORS, winsData } from './chartData'
+import { formatMoney, formatPoints, formatWhole } from '@/lib/format'
+import { placesData, potsData, progressData, SERIES_COLORS, winsData } from './chartData'
 import { cell, head, highestFirst, tick, tooltip } from './chartStyle'
+
+/** The title of one list or chart inside a box that holds several. */
+export const subtitle = 'mb-2 text-xs font-bold uppercase text-muted'
 
 /**
  * A chart with its title, a short description for screen readers, and the same numbers as a table
  * ("Ver dados em tabela"), so nothing is told by color or by sight alone.
+ * A bare one has no box of its own, for a chart inside a box that holds other things too.
  */
-export function Figure({ title, description, legend, table, children, className = '' }: { title: string; description: string; legend?: ReactNode; table: ReactNode; children: ReactNode; className?: string }) {
+export function Figure({ title, description, legend, table, children, className = '', bare = false }: { title: string; description: string; legend?: ReactNode; table: ReactNode; children: ReactNode; className?: string; bare?: boolean }) {
   return (
     // min-w-0: in a grid, the box may be narrower than its data table, which then scrolls inside it.
     // A column, so that in a box stretched by its row the chart takes the height left over.
-    <figure className={`flex min-w-0 flex-col rounded-lg bg-surface p-4 shadow-card ${className}`}>
-      <figcaption className="mb-3 font-display text-lg font-bold">{title}</figcaption>
+    <figure className={`flex min-w-0 flex-col ${bare ? '' : 'rounded-lg bg-surface p-4 shadow-card'} ${className}`}>
+      <figcaption className={bare ? subtitle : 'mb-3 font-display text-lg font-bold'}>{title}</figcaption>
       {legend}
       <div role="img" aria-label={description} className="flex flex-1 flex-col">{children}</div>
       <details className="mt-3 text-sm">
@@ -27,7 +31,7 @@ export function Figure({ title, description, legend, table, children, className 
 }
 
 /** "Pontos acumulados": the running total of the eight players with most points. */
-export function PointsProgressChart({ progress, perSeason, className }: { progress: Statistics['points_progress']; perSeason: boolean; className?: string }) {
+export function PointsProgressChart({ progress, perSeason, className }: { progress: Pick<Statistics['points_progress'], 'steps' | 'series'>; perSeason: boolean; className?: string }) {
   const { series, points } = progressData(progress)
   const leader = series[0]?.nickname
   return (
@@ -141,6 +145,115 @@ export function WinsChart({ statistics }: { statistics: Statistics }) {
         </ResponsiveContainer>
       </div>
       {others > 0 && <p className="mt-2 text-sm text-muted">{t.statistics.othersCount({ count: others })}</p>}
+    </Figure>
+  )
+}
+
+/** "Pote por evento": the pot of each night, or of each season over every season. */
+export function PotsChart({ progress, perSeason, className }: { progress: Pick<Statistics['points_progress'], 'steps' | 'pots'>; perSeason: boolean; className?: string }) {
+  const points = potsData(progress)
+  const top = points.reduce<(typeof points)[number] | undefined>((best, point) => (point.pot > (best?.pot ?? 0) ? point : best), undefined)
+  const title = perSeason ? t.statistics.potsPerSeason : t.statistics.potsPerNight
+  return (
+    <Figure
+      bare
+      className={className}
+      title={title}
+      description={t.statistics.potsDescription({ perSeason, top: top && { label: top.label, pot: formatMoney(String(top.pot)) } })}
+      table={
+        <table className="w-full border-collapse">
+          <caption className="sr-only">{title}</caption>
+          <thead>
+            <tr>
+              <th scope="col" className={`${head} text-left`}>{perSeason ? t.common.season : t.common.night}</th>
+              <th scope="col" className={head}>{t.common.pot}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {points.map((point) => (
+              <tr key={point.label} className="even:bg-surface-stripe">
+                <th scope="row" className={`${cell} text-left font-semibold`}>{point.label}</th>
+                <td className={cell}>{formatMoney(String(point.pot))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      }
+    >
+      <div className="relative min-h-48 flex-1">
+        <ResponsiveContainer width="100%" height="100%" className="absolute inset-0">
+          <LineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
+            <CartesianGrid stroke="var(--color-border)" vertical={false} />
+            <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />
+            <YAxis tick={tick} tickLine={false} axisLine={false} width={48} tickFormatter={formatWhole} />
+            <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} formatter={(value) => [formatMoney(String(value)), t.common.pot]} />
+            <Line
+              dataKey="pot"
+              name={t.common.pot}
+              type="linear"
+              stroke={SERIES_COLORS[0]}
+              strokeWidth={2}
+              dot={points.length <= 12 ? { r: 4, fill: SERIES_COLORS[0], stroke: 'var(--color-surface)', strokeWidth: 2 } : false}
+              activeDot={{ r: 5, stroke: 'var(--color-surface)', strokeWidth: 2 }}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Figure>
+  )
+}
+
+/** "Locais": the share of the nights played at each place. */
+export function PlacesChart({ places, className }: { places: Statistics['places']; className?: string }) {
+  const slices = placesData(places, t.statistics.others)
+  return (
+    <Figure
+      bare
+      className={className}
+      title={t.statistics.places}
+      description={t.statistics.placesDescription({ top: slices[0] })}
+      table={
+        <table className="w-full border-collapse">
+          <caption className="sr-only">{t.statistics.placesCaption}</caption>
+          <thead>
+            <tr>
+              <th scope="col" className={`${head} text-left`}>{t.common.place}</th>
+              <th scope="col" className={head}>{t.common.nights}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {places.rows.map((row) => (
+              <tr key={row.place!.id} className="even:bg-surface-stripe">
+                <th scope="row" className={`${cell} text-left font-semibold wrap-anywhere`}>{row.place!.name}</th>
+                <td className={cell}>{row.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      }
+    >
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="aspect-square w-40 max-w-full shrink-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart accessibilityLayer={false}>
+              <Tooltip {...tooltip} />
+              {/* Starts at the top and goes clockwise, biggest first. The stroke is the gap between two slices. */}
+              <Pie data={slices} dataKey="count" nameKey="name" startAngle={90} endAngle={-270} outerRadius="100%" stroke="var(--color-surface)" strokeWidth={2} isAnimationActive={false} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Every slice is named here with its number, so none is told by its color alone. */}
+        <ul aria-label={t.statistics.legend} className="flex min-w-0 max-w-xs flex-1 basis-40 flex-col gap-1 text-sm">
+          {slices.map((slice) => (
+            <li key={slice.key} className="flex items-center gap-2">
+              <span aria-hidden className="inline-block h-3 w-3 shrink-0 rounded-sm" style={{ background: slice.fill }} />
+              <span className="min-w-0 flex-1 wrap-anywhere">{slice.name}</span>
+              <span className="font-bold tabular">{slice.count}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Figure>
   )
 }

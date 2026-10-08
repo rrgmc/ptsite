@@ -6682,11 +6682,19 @@
                                         "points"
                                     ]
                                 }
+                            },
+                            "pots": {
+                                "type": "array",
+                                "description": "The pot of each step, as decimal strings: of the night, or of the season's nights added up.",
+                                "items": {
+                                    "type": "string"
+                                }
                             }
                         },
                         "required": [
                             "steps",
-                            "series"
+                            "series",
+                            "pots"
                         ]
                     },
                     "wins_not_shown": {

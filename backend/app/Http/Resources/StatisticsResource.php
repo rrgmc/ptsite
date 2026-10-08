@@ -48,6 +48,12 @@ class StatisticsResource extends JsonResource
                     'player' => new PlayerResource($series['player']),
                     'points' => $series['points'],
                 ], $this->progressSeries),
+                /**
+                 * The pot of each step, as decimal strings: of the night, or of the season's nights added up.
+                 *
+                 * @var list<string>
+                 */
+                'pots' => $this->progressPots,
             ],
             /** First places of the players who are not in the first "Posição" list ("Outros"). */
             'wins_not_shown' => $this->winsNotShown,

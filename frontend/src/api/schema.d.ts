@@ -1822,6 +1822,8 @@ export interface components {
                     player: components["schemas"]["PlayerResource"];
                     points: string[];
                 }[];
+                /** @description The pot of each step, as decimal strings: of the night, or of the season's nights added up. */
+                pots: string[];
             };
             /** @description First places of the players who are not in the first "Posição" list ("Outros"). */
             wins_not_shown: number;

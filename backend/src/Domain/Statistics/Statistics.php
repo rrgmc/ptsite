@@ -60,7 +60,8 @@ final class Statistics
     }
 
     /**
-     * The running total of the given players after each night, or after each season.
+     * The running total of the given players after each night, or after each season, and the pot of each of
+     * those steps.
      *
      * @param  list<NightRecord>  $nights  oldest first
      * @param  list<int>  $leaders  player ids
@@ -68,9 +69,11 @@ final class Statistics
     public function progress(array $nights, array $leaders, bool $stepPerSeason): PointsProgress
     {
         $running = array_fill_keys($leaders, 0);
-        $steps = [];
+        $steps = $pots = [];
         $totals = array_fill_keys($leaders, []);
+        $pot = Money::zero();
         foreach ($nights as $index => $night) {
+            $pot = $pot->plus($night->pot);
             foreach ($night->lines as $line) {
                 if (isset($running[$line->playerId])) {
                     $running[$line->playerId] += $line->points->cents;
@@ -81,11 +84,13 @@ final class Statistics
                 continue;
             }
             $steps[] = $stepPerSeason ? $night->seasonId : $night->nightId;
+            $pots[] = $pot;
+            $pot = Money::zero();
             foreach ($leaders as $playerId) {
                 $totals[$playerId][] = Money::cents($running[$playerId]);
             }
         }
 
-        return new PointsProgress($steps, $totals);
+        return new PointsProgress($steps, $totals, $pots);
     }
 }

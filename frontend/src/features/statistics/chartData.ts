@@ -27,7 +27,7 @@ export interface ProgressData {
 }
 
 /** The running totals as chart points: a step is a night ("06/03/2026") or, over every season, a season. */
-export function progressData(progress: Statistics['points_progress']): ProgressData {
+export function progressData(progress: Pick<Statistics['points_progress'], 'steps' | 'series'>): ProgressData {
   const series = progress.series.slice(0, SERIES_COLORS.length).map((s, i) => ({
     key: `p${s.player.id}`,
     nickname: s.player.nickname,
@@ -65,6 +65,40 @@ export interface PositionBar {
 /** How often one player finished in each scoring position, as bars, first place first. */
 export function positionsData(positions: PlayerStatistics['positions']): PositionBar[] {
   return positions.map((p) => ({ label: ordinal(p.position), count: p.count }))
+}
+
+export interface PotPoint {
+  label: string
+  pot: number
+}
+
+/** The pot of each step as chart points, labelled as in {@link progressData}. */
+export function potsData(progress: Pick<Statistics['points_progress'], 'steps' | 'pots'>): PotPoint[] {
+  return progress.steps.map((step, i) => ({
+    label: step.starts_at ? formatDate(step.starts_at) : step.season_name,
+    pot: Number(progress.pots[i]),
+  }))
+}
+
+export interface PlaceSlice {
+  key: number | 'others'
+  name: string
+  count: number
+  /** The slice's color: recharts reads it from here. */
+  fill: string
+}
+
+/**
+ * "Locais" as the slices of a pie, most nights first. A pie has eight colors: with more places, the ones
+ * after the seventh are added up as one last slice, named by `others`, in the muted color.
+ */
+export function placesData(places: Statistics['places'], others: string): PlaceSlice[] {
+  const rows = places.rows.map((row) => ({ key: row.place!.id, name: row.place!.name, count: row.count ?? 0 }))
+  if (rows.length <= SERIES_COLORS.length) return rows.map((row, i) => ({ ...row, fill: SERIES_COLORS[i] }))
+
+  const shown = rows.slice(0, SERIES_COLORS.length - 1)
+  const rest = rows.slice(shown.length).reduce((sum, row) => sum + row.count, 0)
+  return [...shown.map((row, i) => ({ ...row, fill: SERIES_COLORS[i] })), { key: 'others', name: others, count: rest, fill: 'var(--color-muted)' }]
 }
 
 export interface WinsBar {

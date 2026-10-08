@@ -101,7 +101,8 @@ it('follows the leaders night by night in a season', function () {
 
     expect($progress->steps)->toBe([1, 2])
         ->and(array_map(fn ($totals) => array_map(fn (Money $m) => $m->toDecimal(), $totals), $progress->totals))
-        ->toBe([S_BRENO => ['69.00', '221.00'], S_ANA => ['114.00', '174.00'], S_CARLA => ['45.00', '137.00']]);
+        ->toBe([S_BRENO => ['69.00', '221.00'], S_ANA => ['114.00', '174.00'], S_CARLA => ['45.00', '137.00']])
+        ->and(array_map(fn (Money $m) => $m->toDecimal(), $progress->pots))->toBe(['300.00', '400.00']);
 });
 
 it('follows the leaders season by season over every season', function () {
@@ -109,7 +110,8 @@ it('follows the leaders season by season over every season', function () {
 
     expect($progress->steps)->toBe([1, 2])
         ->and(array_map(fn ($totals) => array_map(fn (Money $m) => $m->toDecimal(), $totals), $progress->totals))
-        ->toBe([S_ANA => ['174.00', '288.00'], S_BRENO => ['221.00', '221.00'], S_CARLA => ['137.00', '206.00']]);
+        ->toBe([S_ANA => ['174.00', '288.00'], S_BRENO => ['221.00', '221.00'], S_CARLA => ['137.00', '206.00']])
+        ->and(array_map(fn (Money $m) => $m->toDecimal(), $progress->pots))->toBe(['700.00', '300.00']);
 });
 
 it('cuts a list at ten and says how many tied lines it left out', function () {

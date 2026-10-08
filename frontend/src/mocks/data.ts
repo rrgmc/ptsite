@@ -326,6 +326,7 @@ export const statistics: Statistics = {
       { player: players[5], points: ['0.00', '0.00', '121.50', '121.50', '248.00'] },
       { player: players[6], points: ['42.00', '42.00', '42.00', '190.20', '190.20'] },
     ],
+    pots: ['840.00', '755.00', '810.00', '900.00', '840.00'],
   },
   wins_not_shown: 0,
   // The season's own Main Event. The screen lists the Main Events only over every season.
@@ -365,6 +366,7 @@ export const statisticsAllTime: Statistics = {
       { player: players[5], points: ['1980.75', '2890.00', '3138.00'] },
       { player: players[6], points: ['1400.00', '1400.00', '1590.20'] },
     ],
+    pots: ['27300.00', '29875.00', '4145.00'],
   },
   wins_not_shown: 8,
   // Three Main Events, with ties in every list.
@@ -387,7 +389,7 @@ export const statisticsEmpty: Statistics = {
   positions: [],
   biggest_pots: playerList([], 'amount'),
   places: playerList([], 'count'),
-  points_progress: { steps: [], series: [] },
+  points_progress: { steps: [], series: [], pots: [] },
   wins_not_shown: 0,
   main_event: null,
 }

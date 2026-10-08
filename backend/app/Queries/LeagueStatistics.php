@@ -78,6 +78,7 @@ final class LeagueStatistics
                 array_keys($summary->progress->totals),
                 array_values($summary->progress->totals),
             ),
+            array_map(fn (Money $pot) => $pot->toDecimal(), $summary->progress->pots),
             $summary->winsNotShown,
             $mainEvent ? new MainEventStatisticsReport(
                 $mainEvent->count,

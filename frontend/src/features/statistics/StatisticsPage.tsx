@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import type { RankedList as RankedListData, Statistics } from '@/api/client'
 import { useStatistics } from '@/api/queries'
-import { Card, PageHeader } from '@/components/Card'
+import { PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
+import { FoldPanel } from '@/components/FoldPanel'
 import { PeriodSwitch } from '@/components/PeriodSwitch'
 import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
@@ -13,7 +15,7 @@ import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
 import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { amountRows } from '../nights/amounts'
-import { PointsProgressChart, WinsChart } from './StatisticsCharts'
+import { PlacesChart, PointsProgressChart, PotsChart, subtitle, WinsChart } from './StatisticsCharts'
 
 /** "Estatísticas" of the selected season (docs/specs/statistics.md). */
 export function StatisticsPage() {
@@ -48,28 +50,35 @@ function playerRows(list: RankedListData, value: (row: RankedListData['rows'][nu
     key: row.player!.id,
     rank: row.rank,
     label: (
-      <span className="flex items-center gap-3">
-        <PlayerThumbnail player={row.player!} />
-        <PlayerLink player={row.player!} className="min-w-0 font-semibold" />
+      <span className="flex items-center gap-2">
+        <PlayerThumbnail player={row.player!} size="xs" />
+        <PlayerLink player={row.player!} className="min-w-0 truncate font-semibold" />
       </span>
     ),
     value: value(row),
   }))
 }
 
-/** A top ten list of players by a count: nights scored, times in a position, Main Events won. */
-function CountCard({ title, caption, valueHeader, list }: { title: string; caption: string; valueHeader: string; list: RankedListData }) {
+/** One list inside a box that holds several, under its own small title. */
+function ListBlock({ title, children, className = '' }: { title: string; children: ReactNode; className?: string }) {
   return (
-    <Card title={title}>
-      <RankedList caption={caption} labelHeader={t.common.player} valueHeader={valueHeader} rows={playerRows(list, (row) => row.count ?? 0)} tiedNotShown={list.tied_not_shown} />
-    </Card>
+    <section className={`min-w-0 ${className}`}>
+      <h3 className={subtitle}>{title}</h3>
+      {children}
+    </section>
   )
 }
 
-/** The lists stand one under the other on a phone, two across on a tablet and three across on a wide screen. */
-const lists = 'grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'
+/** A top ten list of players by a count: nights scored, times in a position, Main Events won. */
+function CountList({ title, caption, valueHeader, list }: { title: string; caption: string; valueHeader: string; list: RankedListData }) {
+  return (
+    <ListBlock title={title}>
+      <RankedList compact caption={caption} labelHeader={t.common.player} valueHeader={valueHeader} rows={playerRows(list, (row) => row.count ?? 0)} tiedNotShown={list.tied_not_shown} />
+    </ListBlock>
+  )
+}
 
-/** The numbers of one view: the totals, the two charts and the top ten lists. */
+/** The numbers of one view: the totals, the two leading charts and the lists, grouped in boxes that fold. */
 export function StatisticsView({ statistics }: { statistics: Statistics }) {
   const allTime = statistics.season_id === null
   // One season has one Main Event, which makes no list: the Main Event lists are of every season.
@@ -94,21 +103,29 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
             <WinsChart statistics={statistics} />
           </div>
 
-          <div className={lists}>
-            <Card title={t.statistics.totalPoints}>
-              <RankedList
-                caption={t.statistics.totalPointsCaption}
-                labelHeader={t.common.player}
-                valueHeader={t.common.points}
-                rows={playerRows(statistics.total_points, (row) => formatPoints(row.amount ?? 0))}
-                tiedNotShown={statistics.total_points.tied_not_shown}
-              />
-            </Card>
-            <CountCard title={t.statistics.nightsScored} caption={t.statistics.nightsScoredCaption} valueHeader={t.common.nights} list={statistics.nights_scored} />
-            {/* The two lists about nights share a column on a wide screen, and a row of their own on a tablet. "Locais" is often short, and takes the height left. */}
-            <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-2 xl:col-span-1 xl:flex xl:flex-col">
-              <Card title={t.statistics.biggestPots}>
+          <FoldPanel title={t.common.players}>
+            <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+              <ListBlock title={t.statistics.totalPoints}>
                 <RankedList
+                  compact
+                  caption={t.statistics.totalPointsCaption}
+                  labelHeader={t.common.player}
+                  valueHeader={t.common.points}
+                  rows={playerRows(statistics.total_points, (row) => formatPoints(row.amount ?? 0))}
+                  tiedNotShown={statistics.total_points.tied_not_shown}
+                />
+              </ListBlock>
+              <CountList title={t.statistics.nightsScored} caption={t.statistics.nightsScoredCaption} valueHeader={t.common.nights} list={statistics.nights_scored} />
+            </div>
+          </FoldPanel>
+
+          <FoldPanel title={t.common.nights}>
+            {/* On a wide screen the two charts are one over the other, beside the list. */}
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
+              <PotsChart className="md:col-span-2" progress={statistics.points_progress} perSeason={allTime} />
+              <ListBlock title={t.statistics.biggestPots} className="lg:row-span-2">
+                <RankedList
+                  compact
                   caption={t.statistics.biggestPotsCaption}
                   labelHeader={t.common.night}
                   valueHeader={t.common.pot}
@@ -117,7 +134,7 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
                     rank: row.rank,
                     label: (
                       <>
-                        <Link to={`/nights/${row.night!.id}`} className="font-semibold text-primary underline">{nightTitle(row.night!.starts_at)}</Link>
+                        <Link to={`/nights/${row.night!.id}`} className="inline-block py-0.5 font-semibold text-primary underline">{nightTitle(row.night!.starts_at)}</Link>
                         {allTime && <span className="block text-xs text-muted">{row.night!.season_name}</span>}
                       </>
                     ),
@@ -125,42 +142,40 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
                   }))}
                   tiedNotShown={statistics.biggest_pots.tied_not_shown}
                 />
-              </Card>
-              <Card title={t.statistics.places} className="xl:flex-1">
-                {statistics.places.rows.length === 0 ? <Empty>{t.statistics.noPlaces}</Empty> : (
-                  <RankedList
-                    caption={t.statistics.placesCaption}
-                    labelHeader={t.common.place}
-                    valueHeader={t.common.nights}
-                    rows={statistics.places.rows.map((row) => ({ key: row.place!.id, rank: row.rank, label: <span className="font-semibold wrap-anywhere">{row.place!.name}</span>, value: row.count ?? 0 }))}
-                    tiedNotShown={statistics.places.tied_not_shown}
-                  />
-                )}
-              </Card>
+              </ListBlock>
+              {statistics.places.rows.length === 0 ? (
+                <ListBlock title={t.statistics.places} className="lg:col-span-2"><Empty>{t.statistics.noPlaces}</Empty></ListBlock>
+              ) : (
+                <PlacesChart className="lg:col-span-2" places={statistics.places} />
+              )}
             </div>
-          </div>
+          </FoldPanel>
 
-          <div className={lists}>
-            {statistics.positions.map((list) => (
-              <CountCard
-                key={list.position}
-                title={t.statistics.positionTitle({ position: ordinal(list.position!) })}
-                caption={t.statistics.positionCaption({ position: ordinal(list.position!) })}
-                valueHeader={t.statistics.times}
-                list={list}
-              />
-            ))}
-          </div>
+          <FoldPanel title={t.statistics.positions}>
+            {/* Every position at once on a wide screen, and two across on a phone. */}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-3 lg:grid-cols-6">
+              {statistics.positions.map((list) => (
+                <CountList
+                  key={list.position}
+                  title={t.statistics.positionTitle({ position: ordinal(list.position!) })}
+                  caption={t.statistics.positionCaption({ position: ordinal(list.position!) })}
+                  valueHeader={t.statistics.times}
+                  list={list}
+                />
+              ))}
+            </div>
+          </FoldPanel>
         </>
       )}
 
       {mainEvent && (
-        // These lists differ much in length, so each box is only as tall as its list.
-        <div className={`${lists} items-start`}>
-          <CountCard title={t.statistics.mainEventTitles} caption={t.statistics.mainEventTitlesCaption} valueHeader={t.statistics.times} list={mainEvent.titles} />
-          <CountCard title={t.statistics.mainEventPodiums} caption={t.statistics.mainEventPodiumsCaption} valueHeader={t.statistics.times} list={mainEvent.podiums} />
-          <CountCard title={t.statistics.mainEventAppearances} caption={t.statistics.mainEventAppearancesCaption} valueHeader={t.statistics.times} list={mainEvent.appearances} />
-        </div>
+        <FoldPanel title={t.statistics.mainEvent}>
+          <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-3">
+            <CountList title={t.statistics.mainEventTitles} caption={t.statistics.mainEventTitlesCaption} valueHeader={t.statistics.times} list={mainEvent.titles} />
+            <CountList title={t.statistics.mainEventPodiums} caption={t.statistics.mainEventPodiumsCaption} valueHeader={t.statistics.times} list={mainEvent.podiums} />
+            <CountList title={t.statistics.mainEventAppearances} caption={t.statistics.mainEventAppearancesCaption} valueHeader={t.statistics.times} list={mainEvent.appearances} />
+          </div>
+        </FoldPanel>
       )}
     </div>
   )
