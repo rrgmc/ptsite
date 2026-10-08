@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { NightDashboard } from '@/api/client'
 import { nightDashboard, players } from '@/mocks/data'
-import { amountsInUse, applyChange, hasPayments, recalculated } from './dashboardMoney'
+import { amountsInUse, applyChange, hasPayments, nextPayment, recalculated } from './dashboardMoney'
 
 // The same rules as the API, so that a tap shows at once what the API will answer
 // (docs/specs/night-dashboard.md, the example "A night": Ana, Breno, Carlão, Dudu and Estela, at Estela's house).
@@ -65,7 +65,7 @@ describe('applyChange', () => {
   it('adds a rebuy that is not paid, with the time chip it charges', () => {
     const after = applyChange(nightDashboard, { type: 'addRebuy', player: ana, count: 1 })
 
-    expect(line(after, ana.id).rebuys).toEqual([{ id: 1, paid: true }, { id: 0, paid: false }])
+    expect(line(after, ana.id).rebuys).toEqual([{ id: 1, paid: true, non_cash: false }, { id: 0, paid: false, non_cash: false }])
     expect(after.totals.pot.pending).toBe('200.00')
     expect(after.totals.time_chip?.pending).toBe('10.00')
   })
@@ -110,12 +110,64 @@ describe('applyChange', () => {
   })
 })
 
+describe('payments not in cash', () => {
+  // Ana paid her rebuy by bank transfer, and Breno his buy-in.
+  const transfers = () =>
+    applyChange(applyChange(nightDashboard, { type: 'markRebuy', player: ana, index: 0, id: 1, paid: true, non_cash: true }), { type: 'mark', player: breno, buy_in_paid: true, buy_in_non_cash: true })
+
+  it('goes from not paid to paid in cash, to paid not in cash, and back', () => {
+    expect(nextPayment(false, false)).toEqual({ paid: true, nonCash: false })
+    expect(nextPayment(true, false)).toEqual({ paid: true, nonCash: true })
+    expect(nextPayment(true, true)).toEqual({ paid: false, nonCash: false })
+  })
+
+  it('has everything in cash until a payment says otherwise', () => {
+    expect(nightDashboard.received).toEqual({ cash: '295.00', non_cash: '0.00', non_cash_marked: '0.00', non_cash_adjustment: null })
+  })
+
+  it('splits what was paid, and leaves the pot and the time chip as they were', () => {
+    const after = transfers()
+
+    expect(after.received).toEqual({ cash: '190.00', non_cash: '105.00', non_cash_marked: '105.00', non_cash_adjustment: null })
+    expect(after.players.map((l) => l.non_cash)).toEqual(['55.00', '50.00', '0.00', '0.00', '0.00'])
+    expect(after.totals).toEqual(nightDashboard.totals)
+  })
+
+  it('counts a time chip as paid the way the buy-in was', () => {
+    const transfer = applyChange(nightDashboard, { type: 'mark', player: carlao, buy_in_paid: true, buy_in_non_cash: true })
+    expect(transfer.received.non_cash).toBe('55.00')
+
+    const cash = applyChange(transfer, { type: 'mark', player: carlao, buy_in_paid: true, buy_in_non_cash: false })
+    expect(cash.received.non_cash).toBe('0.00')
+  })
+
+  it('marks a payment that was not in cash as paid, and one that is not paid as paid in no way', () => {
+    const paid = applyChange(nightDashboard, { type: 'mark', player: dudu, buy_in_non_cash: true })
+    expect(line(paid, dudu.id)).toMatchObject({ buy_in_paid: true, buy_in_non_cash: true })
+    const unpaid = applyChange(paid, { type: 'mark', player: dudu, buy_in_paid: false })
+    expect(line(unpaid, dudu.id)).toMatchObject({ buy_in_paid: false, buy_in_non_cash: false })
+
+    const rebuy = applyChange(nightDashboard, { type: 'markRebuy', player: breno, index: 2, id: 4, paid: false, non_cash: true })
+    expect(line(rebuy, breno.id).rebuys[2]).toEqual({ id: 4, paid: true, non_cash: true })
+    const again = applyChange(rebuy, { type: 'markRebuy', player: breno, index: 2, id: 4, paid: false })
+    expect(line(again, breno.id).rebuys[2]).toEqual({ id: 4, paid: false, non_cash: false })
+  })
+
+  it('adds an amount typed by hand, also a negative one', () => {
+    const marked = applyChange(nightDashboard, { type: 'mark', player: breno, buy_in_paid: true, buy_in_non_cash: true })
+
+    expect(applyChange(marked, { type: 'nonCashAdjustment', amount: '-5.00' }).received).toEqual({ cash: '250.00', non_cash: '45.00', non_cash_marked: '50.00', non_cash_adjustment: '-5.00' })
+    expect(applyChange(marked, { type: 'nonCashAdjustment', amount: '20.00' }).received).toMatchObject({ cash: '225.00', non_cash: '70.00' })
+    expect(applyChange(applyChange(marked, { type: 'nonCashAdjustment', amount: '20.00' }), { type: 'nonCashAdjustment', amount: null }).received).toEqual(marked.received)
+  })
+})
+
 describe('hasPayments', () => {
   it('is true with a mark or a rebuy, so the player cannot be removed', () => {
     expect(hasPayments(line(nightDashboard, dudu.id))).toBe(false)
     expect(hasPayments(line(nightDashboard, estela.id))).toBe(true)
     expect(hasPayments(line(nightDashboard, carlao.id))).toBe(true)
-    expect(hasPayments({ ...line(nightDashboard, dudu.id), rebuys: [{ id: 9, paid: false }] })).toBe(true)
+    expect(hasPayments({ ...line(nightDashboard, dudu.id), rebuys: [{ id: 9, paid: false, non_cash: false }] })).toBe(true)
   })
 })
 

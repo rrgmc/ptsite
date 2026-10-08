@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router'
-import { recalculated } from './dashboardMoney'
+import { applyChange, recalculated } from './dashboardMoney'
 import { finishedNightDashboard, finishedNight, nightDashboard, openNight, players, season } from '@/mocks/data'
 import { withFeatures } from '@/mocks/withFeatures'
 import { NightDashboardView } from './NightDashboardView'
@@ -29,6 +29,20 @@ export const ReadOnly: Story = { args: { dashboard: { ...nightDashboard, can_edi
 /** A night that does not record every payment: the pot and the Main Event pot are marked "Manual", and the time chip is still worked out. */
 export const AmountsSetByHand: Story = { args: { dashboard: { ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '100.00', suggested_main_event_pot: '120.00' } } }
 
+/**
+ * Ana paid her rebuy by bank transfer and Breno his buy-in: their marks have a sign of their own, and the foot of
+ * the screen says how much of what was paid is in cash. An adjustment of R$ 5,00 less is in use.
+ */
+export const PaidNotInCash: Story = {
+  args: {
+    dashboard: [
+      { type: 'markRebuy', player: players[0], index: 0, id: 1, paid: true, non_cash: true } as const,
+      { type: 'mark', player: players[1], buy_in_non_cash: true } as const,
+      { type: 'nonCashAdjustment', amount: '-5.00' } as const,
+    ].reduce(applyChange, nightDashboard),
+  },
+}
+
 /** The API refused the last tap. */
 export const ChangeRefused: Story = { args: { error: 'O limite é de 2 rebuys por jogador.' } }
 
@@ -49,7 +63,7 @@ export const LongNicknameAndManyRebuys: Story = {
       ...nightDashboard,
       players: nightDashboard.players.map((line, i) =>
         i === 1
-          ? { ...line, player: { ...line.player, nickname: 'Breno Augusto dos Santos Albuquerque de Oliveira' }, time_chip: true, rebuys: Array.from({ length: 7 }, (_, n) => ({ id: n + 10, paid: n < 4 })) }
+          ? { ...line, player: { ...line.player, nickname: 'Breno Augusto dos Santos Albuquerque de Oliveira' }, time_chip: true, rebuys: Array.from({ length: 7 }, (_, n) => ({ id: n + 10, paid: n < 4, non_cash: n === 1 })) }
           : line,
       ),
     }),

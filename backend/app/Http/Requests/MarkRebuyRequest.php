@@ -11,6 +11,8 @@ class MarkRebuyRequest extends FormRequest
         return [
             /** Whether the rebuy was paid. */
             'paid' => ['required', 'boolean'],
+            /** Whether the rebuy was paid, but not in cash. True also marks it as paid. Left out, a paid rebuy stays as it was. */
+            'non_cash' => ['sometimes', 'boolean'],
         ];
     }
 }

@@ -138,6 +138,10 @@ const marksOf = (nickname) => page.getByRole('group', { name: `Payments of ${nic
 await marksOf('Jacobson').getByRole('button', { name: 'Buy-in' }).click()
 await marksOf('Jacobson').getByRole('button', { name: '+ Rebuy' }).click()
 await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).waitFor()
+// The rebuy was paid, but not in cash: two taps
+await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
+await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
+await marksOf('Jacobson').getByRole('button', { name: 'Rebuy 1 (not in cash)' }).waitFor()
 await page.getByRole('button', { name: 'More actions for Duhamel' }).click()
 await page.getByRole('menuitem', { name: 'Is the house owner' }).click()
 await page.getByText('House owner: Duhamel').waitFor()

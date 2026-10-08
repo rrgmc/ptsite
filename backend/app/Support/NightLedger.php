@@ -61,6 +61,7 @@ final class NightLedger
     {
         $rebuysByPlayer ??= $this->rebuysByPlayer($night);
         $rebuysPaid = fn (int $playerId) => ($rebuysByPlayer[$playerId] ?? collect())->map(fn (NightRebuy $r) => $r->paid_at !== null)->values()->all();
+        $rebuysNonCash = fn (int $playerId) => ($rebuysByPlayer[$playerId] ?? collect())->map(fn (NightRebuy $r) => (bool) $r->non_cash)->values()->all();
         $timeChip = $this->features->enabled(Feature::TimeChip);
 
         $entries = [];
@@ -72,6 +73,8 @@ final class NightLedger
                 $timeChip && $row->time_chip_at !== null,
                 $timeChip && $row->time_chip_paid_at !== null,
                 $rebuysPaid($row->player_id),
+                (bool) $row->buy_in_non_cash,
+                $rebuysNonCash($row->player_id),
             );
         }
         if ($night->status === NightStatus::Open->value) {

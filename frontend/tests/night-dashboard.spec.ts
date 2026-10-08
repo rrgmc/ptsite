@@ -49,6 +49,16 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(totals(page)).toContainText('Time chipR$ 5,00Pago R$ 0,00Falta R$ 5,00')
   await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
   await expect(totals(page)).toContainText('TotalR$ 105,00Pago R$ 105,00Falta R$ 0,00')
+  await expect(totals(page)).not.toContainText('Em dinheiro')
+  // One tap more says the rebuy was paid, but not in cash, with the time chip it pays: the foot of the screen
+  // then says how much of what was paid is in hand
+  await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
+  await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1 (fora do dinheiro)' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(totals(page)).toContainText('Em dinheiro R$ 50,00')
+  await expect(totals(page)).toContainText('Fora do dinheiro R$ 55,00')
+  await expect(page.getByRole('listitem').filter({ hasText: 'Jacobson' })).toContainText('Tudo pago (⇄ R$ 55,00)')
+  await expect(page.getByText('Pago fora do dinheiro (transferência, Pix)')).toBeVisible()
+  await expect(totals(page)).toContainText('TotalR$ 105,00Pago R$ 105,00Falta R$ 0,00')
 
   // The owner of the house pays the smaller buy-in
   await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('duha')
@@ -71,9 +81,22 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(totals(page)).toContainText('Pote(Manual)R$ 300,00Calculado R$ 125,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('60,00')
   await expectAccessible(page)
+  // Unmarking it changes nothing until it is saved: a tap by mistake costs nothing
   await page.getByText('Manual', { exact: true }).first().click()
+  await expect(page.getByLabel('Pote (R$)')).toBeDisabled()
+  await expect(page.getByLabel('Pote (R$)')).toHaveValue('300,00')
+  await expect(totals(page)).toContainText('Pote(Manual)R$ 300,00')
+  await page.getByRole('button', { name: 'Salvar' }).click()
   await expect(totals(page)).toContainText('PoteR$ 125,00Pago R$ 100,00Falta R$ 25,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
+  // An adjustment of what was not in cash, for anything out of the ordinary, takes a negative amount
+  // …in a field that shows only once its mark is ticked
+  await expect(page.getByLabel('Ajuste fora do dinheiro (R$)')).toHaveCount(0)
+  await page.getByText('Ajustar o valor fora do dinheiro', { exact: true }).click()
+  await page.getByLabel('Ajuste fora do dinheiro (R$)').fill('-5')
+  await page.getByRole('button', { name: 'Salvar' }).click()
+  await expect(totals(page)).toContainText('Em dinheiro R$ 55,00')
+  await expect(totals(page)).toContainText('Fora do dinheiro R$ 50,00')
 
   // A position is saved when its player is picked, with the points it earns from the pot so far
   await page.getByRole('button', { name: /^6º lugar/ }).click()

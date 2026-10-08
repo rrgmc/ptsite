@@ -9,17 +9,17 @@ use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
 
 /**
- * Sets a participant's marks on the night dashboard: the buy-in paid, the time chip owed and the time chip
- * paid. With no mark it only makes the player a participant ("ALL IN").
+ * Sets a participant's marks on the night dashboard: the buy-in paid, whether it was paid in cash, the time chip
+ * owed and the time chip paid. With no mark it only makes the player a participant ("ALL IN").
  */
 final class MarkNightPlayer
 {
     public function __construct(private readonly NightEntries $entries, private readonly Features $features) {}
 
     /** Null leaves a mark as it is. */
-    public function __invoke(User $user, Night $night, Player $player, ?bool $buyInPaid = null, ?bool $timeChip = null, ?bool $timeChipPaid = null): Night
+    public function __invoke(User $user, Night $night, Player $player, ?bool $buyInPaid = null, ?bool $timeChip = null, ?bool $timeChipPaid = null, ?bool $buyInNonCash = null): Night
     {
-        return $this->entries->change($user, $night, $player, function (Night $night) use ($user, $player, $buyInPaid, $timeChip, $timeChipPaid) {
+        return $this->entries->change($user, $night, $player, function (Night $night) use ($user, $player, $buyInPaid, $timeChip, $timeChipPaid, $buyInNonCash) {
             $row = $this->entries->participant($user, $night, $player);
             if (! $this->features->enabled(Feature::TimeChip)) {
                 $timeChip = $timeChipPaid = null;
@@ -30,6 +30,10 @@ final class MarkNightPlayer
             } elseif ($timeChipPaid === true) {
                 $timeChip = true;
             }
+            // A buy-in paid not in cash is paid.
+            if ($buyInNonCash === true) {
+                $buyInPaid = true;
+            }
 
             $marks = ['buy_in_paid_at' => $buyInPaid, 'time_chip_at' => $timeChip, 'time_chip_paid_at' => $timeChipPaid];
             foreach ($marks as $column => $set) {
@@ -38,6 +42,8 @@ final class MarkNightPlayer
                     $row->{$column} = $set ? ($row->{$column} ?? now()) : null;
                 }
             }
+            // A buy-in that is not paid was not paid in any way.
+            $row->buy_in_non_cash = $row->buy_in_paid_at !== null && ($buyInNonCash ?? $row->buy_in_non_cash);
             if ($row->isDirty()) {
                 $row->updated_by_user_id = $user->id;
                 $row->save();

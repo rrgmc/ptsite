@@ -9,6 +9,7 @@ use PTSite\App\Actions\Nights\Dashboard\MarkRebuy;
 use PTSite\App\Actions\Nights\Dashboard\RemoveNightPlayer;
 use PTSite\App\Actions\Nights\Dashboard\RemoveRebuy;
 use PTSite\App\Actions\Nights\Dashboard\SetHouseOwner;
+use PTSite\App\Actions\Nights\Dashboard\SetNonCashAdjustment;
 use PTSite\App\Actions\Nights\Dashboard\SetPartialAmounts;
 use PTSite\App\Actions\Nights\Dashboard\SetPartialMainEventPot;
 use PTSite\App\Actions\Nights\Dashboard\SetPartialPosition;
@@ -18,6 +19,7 @@ use PTSite\App\Http\Requests\MarkNightPlayerRequest;
 use PTSite\App\Http\Requests\MarkRebuyRequest;
 use PTSite\App\Http\Requests\SetHouseOwnerRequest;
 use PTSite\App\Http\Requests\SetMainEventPotRequest;
+use PTSite\App\Http\Requests\SetNonCashAdjustmentRequest;
 use PTSite\App\Http\Requests\SetPartialAmountsRequest;
 use PTSite\App\Http\Requests\SetPartialPositionRequest;
 use PTSite\App\Http\Resources\NightDashboardResource;
@@ -53,7 +55,7 @@ class NightDashboardController extends Controller
     {
         $set = fn (string $key) => $request->has($key) ? $request->boolean($key) : null;
 
-        return $this->resource($request, $mark($request->user(), $night, $player, $set('buy_in_paid'), $set('time_chip'), $set('time_chip_paid')));
+        return $this->resource($request, $mark($request->user(), $night, $player, $set('buy_in_paid'), $set('time_chip'), $set('time_chip_paid'), $set('buy_in_non_cash')));
     }
 
     /** "Remover do evento": take a participant with no marks and no rebuys off the night. */
@@ -71,10 +73,10 @@ class NightDashboardController extends Controller
         return $this->resource($request, $add($request->user(), $night, $player, $request->integer('count')));
     }
 
-    /** Mark a rebuy as paid or not paid. */
+    /** Mark a rebuy as paid or not paid, and whether it was paid in cash. */
     public function markRebuy(MarkRebuyRequest $request, Night $night, NightRebuy $rebuy, MarkRebuy $mark): NightDashboardResource
     {
-        return $this->resource($request, $mark($request->user(), $night, $rebuy, $request->boolean('paid')));
+        return $this->resource($request, $mark($request->user(), $night, $rebuy, $request->boolean('paid'), $request->has('non_cash') ? $request->boolean('non_cash') : null));
     }
 
     /** Remove a rebuy recorded by mistake. */
@@ -113,6 +115,15 @@ class NightDashboardController extends Controller
     public function setAmounts(SetPartialAmountsRequest $request, Night $night, SetPartialAmounts $set): NightDashboardResource
     {
         return $this->resource($request, $set($request->user(), $night, $request->validated()));
+    }
+
+    /**
+     * "Ajuste fora do dinheiro": type an amount that is added to what was paid not in cash, for anything out of
+     * the ordinary. It may be negative. Null takes it away.
+     */
+    public function setNonCashAdjustment(SetNonCashAdjustmentRequest $request, Night $night, SetNonCashAdjustment $set): NightDashboardResource
+    {
+        return $this->resource($request, $set($request->user(), $night, $request->validated('amount')));
     }
 
     private function resource(Request $request, Night $night): NightDashboardResource

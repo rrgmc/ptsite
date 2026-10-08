@@ -99,6 +99,14 @@ export function parseMoneyInput(text: string): string | null {
   return Number(cleaned).toFixed(2)
 }
 
+/** As parseMoneyInput, for an amount that may be negative: "-5,00" → "-5.00". */
+export function parseSignedMoneyInput(text: string): string | null {
+  const trimmed = text.trim()
+  const isNegative = /^[-−]/.test(trimmed)
+  const amount = parseMoneyInput(isNegative ? trimmed.slice(1) : trimmed)
+  return amount !== null && isNegative && Number(amount) !== 0 ? `-${amount}` : amount
+}
+
 /**
  * An API decimal string as typed in a money field, in the site's language: "840.00" → "840,00" in pt-BR. Nothing
  * when the amount is not known. parseMoneyInput reads it back.

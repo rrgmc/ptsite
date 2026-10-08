@@ -10,6 +10,8 @@ final readonly class NightEntry
     /**
      * @param  bool  $timeChip  the player arrived late and owes a time chip
      * @param  list<bool>  $rebuysPaid  one item per rebuy, oldest first: whether it was paid
+     * @param  bool  $buyInNonCash  the buy-in was paid, but not in cash
+     * @param  list<bool>  $rebuysNonCash  one item per rebuy, as in $rebuysPaid: whether it was paid, but not in cash
      */
     public function __construct(
         public int $playerId,
@@ -18,6 +20,8 @@ final readonly class NightEntry
         public bool $timeChip = false,
         public bool $timeChipPaid = false,
         public array $rebuysPaid = [],
+        public bool $buyInNonCash = false,
+        public array $rebuysNonCash = [],
     ) {}
 
     /** Whether anything was recorded beyond taking part: a mark or a rebuy. */

@@ -50,16 +50,22 @@ final class NightDashboard
                     'is_house_owner' => $entry->isHouseOwner,
                     'buy_in' => $money->buyInOf($entry)->toDecimal(),
                     'buy_in_paid' => $entry->buyInPaid,
+                    'buy_in_non_cash' => $entry->buyInPaid && $entry->buyInNonCash,
                     'time_chip' => $entry->timeChip,
                     'time_chip_paid' => $entry->timeChipPaid,
                     'rebuys' => ($rebuys[$entry->playerId] ?? collect())
-                        ->map(fn (NightRebuy $rebuy) => ['id' => $rebuy->id, 'paid' => $rebuy->paid_at !== null])->values()->all(),
+                        ->map(fn (NightRebuy $rebuy) => ['id' => $rebuy->id, 'paid' => $rebuy->paid_at !== null, 'non_cash' => $rebuy->paid_at !== null && $rebuy->non_cash])->values()->all(),
                     ...$this->amounts($owes),
+                    'non_cash' => $money->nonCashOf($entry)->toDecimal(),
                 ];
             })->all();
 
         $pot = $money->pot($entries);
         $timeChip = $money->timeChip($entries);
+        $total = $pot->plus($timeChip);
+        $nonCashMarked = $money->nonCash($entries);
+        $nonCashAdjustment = $night->non_cash_adjustment === null ? null : Money::fromDecimal((string) $night->non_cash_adjustment);
+        $nonCash = $nonCashMarked->plus($nonCashAdjustment ?? Money::zero());
         $open = $night->status === NightStatus::Open->value;
         $partial = $open ? $night->partialResult()->with('positions.player')->first() : null;
         // A pot typed by hand stands in for the one worked out, also for the Main Event pot it suggests.
@@ -87,7 +93,13 @@ final class NightDashboard
             suggestedMainEventPot: $open ? $money->suggestedMainEventPot($potInUse)?->toDecimal() : null,
             pot: $this->amounts($pot),
             timeChip: $this->features->enabled(Feature::TimeChip) ? $this->amounts($timeChip) : null,
-            total: $this->amounts($pot->plus($timeChip)),
+            total: $this->amounts($total),
+            received: [
+                'cash' => $total->paid->minus($nonCash)->toDecimal(),
+                'non_cash' => $nonCash->toDecimal(),
+                'non_cash_marked' => $nonCashMarked->toDecimal(),
+                'non_cash_adjustment' => $nonCashAdjustment?->toDecimal(),
+            ],
             manual: ['pot' => $manualPot, 'time_chip' => $this->features->enabled(Feature::TimeChip) ? $partial?->time_chip : null],
             recorded: $open ? null : ['pot' => $night->pot, 'main_event_pot' => $night->main_event_pot, 'time_chip' => $night->time_chip],
             readAt: now()->toIso8601String(),
