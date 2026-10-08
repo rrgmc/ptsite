@@ -15,7 +15,7 @@ function passwordResetRules(): PasswordResetRules
 
 it('sends a link to a real address, whatever its capitals', function (string $email) {
     expect(passwordResetRules()->isUsableAddress($email))->toBeTrue();
-})->with(['maria@gmail.com', 'Maria@GMAIL.com']);
+})->with(['maria@example.com', 'Maria@EXAMPLE.com']);
 
 it('never sends a link to the site\'s domain, an invented domain or a missing address', function (?string $email) {
     expect(passwordResetRules()->isUsableAddress($email))->toBeFalse()
@@ -52,5 +52,5 @@ it('refuses a link that was used or never existed', function () {
 });
 
 it('hides most of the name of the address it shows', function () {
-    expect(passwordResetRules()->mask('maria@gmail.com'))->toBe('m•••@gmail.com');
+    expect(passwordResetRules()->mask('maria@example.com'))->toBe('m•••@example.com');
 });

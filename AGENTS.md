@@ -72,13 +72,13 @@ Do not re-argue a Proposed decision without a new reason. To change one, write a
   admins. Push your branch, open the PR with `gh pr create`, and merge it with
   `gh pr merge --merge --delete-branch --subject "Merge <what changed> into master"`.
 - The `pre-push` hook in `.githooks/` refuses a push to `master`. `task setup` turns it on, and
-  `task hooks:install` does only that. Never skip it with `git push --no-verify`. GitHub itself does not block
-  the push: branch protection is not available for a private repository on a free account. The workflow
-  `master-guard.yml` reports one instead: it fails on a commit that reached `master` without a pull request.
+  `task hooks:install` does only that. Never skip it with `git push --no-verify`. On GitHub, a ruleset on
+  `master` refuses a push that is not a merged pull request. The workflow `master-guard.yml` is a second check:
+  it fails on a commit that reached `master` without a pull request.
 - **CI tests a change once, on its pull request.** Wait for the checks to pass before merging: `master` does not
   run them again. If `master` moved after the checks ran, bring the branch
-  up to date first. A change that touches only `docs/` or `.md` files runs no checks. CI minutes are limited
-  (GitHub's free plan), so push a branch when it is ready, not after every commit. Details:
+  up to date first. A change that touches only `docs/` or `.md` files runs no checks. A run takes several
+  minutes on shared runners, so push a branch when it is ready, not after every commit. Details:
   `docs/architecture/deployment.md` ("Build (CI)").
 - **A release is a git tag on `master`, and the tag is the version.** No file holds the version number, so a
   release makes no commit: `task release -- 2.1.0` pushes the tag only, and a workflow builds the package and the

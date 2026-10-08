@@ -23,7 +23,7 @@ class PasswordResetController extends Controller
     public function store(RequestPasswordResetRequest $request, RequestPasswordReset $send): JsonResponse
     {
         return response()->json(['data' => [
-            /** The address the link went to, with most of its name hidden: "m•••@gmail.com". */
+            /** The address the link went to, with most of its name hidden: "m•••@example.com". */
             'email' => $send($request->validated('login')),
         ]]);
     }

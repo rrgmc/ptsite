@@ -59,7 +59,7 @@ final class PasswordResetRules
         }
     }
 
-    /** The address as shown after sending: "maria@gmail.com" becomes "m•••@gmail.com". */
+    /** The address as shown after sending: "maria@example.com" becomes "m•••@example.com". */
     public function mask(string $email): string
     {
         $at = strrpos($email, '@');
