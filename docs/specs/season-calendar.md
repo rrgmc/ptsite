@@ -30,10 +30,10 @@ Everyone logged in: players, results keepers and admins.
    date and name, whether or not they fall on a night. A Friday that is itself the holiday gets one line.
 4. The calendar runs from the season start to the later of its last night and the end of the start year. A finished
    season stops at its last night.
-4a. The page shows **this month and the next one** only. **"Ver o calendário completo"** shows every month from the
-   season start, at an address of its own (`?view=all`), and there **"Ver só este mês e o próximo"** goes back. A
-   season that does not include today shows every month and neither link. Neither link is shown when the two
-   months are the whole season.
+4a. The page shows the months **from this one to the last**. **"Ver o calendário completo"** shows every month from
+   the season start, at an address of its own (`?view=all`), and there **"Ver a partir deste mês"** goes back. A
+   season that does not include today shows every month and neither link. Neither link is shown in the season's
+   first month, where the page is already the whole season.
 5. **The next night** is highlighted and shown at the top. The calendar opens at the top of the page, like every
    other screen. **"Ver no calendário"**, under the next night, goes to its month, when that month is on the page.
 5a. **Today** is a square on the grid, where every other day is round, and the legend shows "Hoje". On a day
@@ -60,11 +60,12 @@ A season starting on 01/01/2027, Fridays every other week, with the `sao-paulo` 
 - **Today.** On 10/03/2027, a Wednesday with no night, 10/03 is the blue square and the next night, 12/03, keeps its
   highlight. On 12/03 the same day is a square with the highlight. On both days March has the different background and the other
   months do not.
-- **This month and the next.** On 20/02/2027 the page shows February and March, with "Ver o calendário completo".
-  The complete calendar shows January to April, with "Ver só este mês e o próximo". On 01/04/2027 the page shows
-  April only. On 08/10/2026, before the season, it shows January to April and no link.
+- **From this month on.** On 20/02/2027 the page shows February to April, with "Ver o calendário completo".
+  The complete calendar shows January to April, with "Ver a partir deste mês". On 01/04/2027 the page shows
+  April only. On 10/01/2027 it shows January to April and no link. On 08/10/2026, before the season, it shows
+  January to April and no link.
 - **Today in a finished season.** On 20/02/2027, with every night finished, the complete calendar opens at the top
-  and "Ir para hoje" goes to February. The page with two months starts at February and has no such button.
+  and "Ir para hoje" goes to February. The page from this month on starts at February and has no such button.
 - **A season in 2022.** With 24 nights, April lists Thursday 21/04 (Feriado: Tiradentes) and Friday 22/04 (Sem
   evento · Emenda: Tiradentes).
 
