@@ -70,8 +70,6 @@ export const admin = {
       'season.updated': 'alterou a temporada',
       'place.created': 'criou o local',
       'place.updated': 'alterou o local',
-      'v1.imported': 'importou os dados do site anterior',
-      'v1.player_images_imported': 'importou as fotos dos jogadores do site anterior',
     } as Record<string, string>,
   },
 
