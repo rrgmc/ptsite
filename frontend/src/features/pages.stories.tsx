@@ -9,10 +9,12 @@ import { PlaceEditPage, PlacesAdmin } from './admin/PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './admin/PlayersAdmin'
 import { SeasonEditPage, SeasonsAdmin } from './admin/SeasonsAdmin'
 import { ForgotPasswordPage } from './auth/ForgotPasswordPage'
+import { NightDashboardPage } from './dashboard/NightDashboardPage'
 import { LoginPage } from './auth/LoginPage'
 import { ResetPasswordPage } from './auth/ResetPasswordPage'
 import { ProfilePage } from './profile/ProfilePage'
 import { AppLayout } from './layout/AppLayout'
+import { BareLayout } from './layout/BareLayout'
 import { MainEventPage } from './mainEvent/MainEventPage'
 import { MainEventResultFormPage } from './mainEvent/MainEventResultFormPage'
 import { NightEditPage } from './nights/NightEditPage'
@@ -152,13 +154,48 @@ export const LayoutWithAnotherSeason: StoryObj = {
   render: () => <RouterStory path="/seasons/:seasonId" url="/seasons/2" element={<StandingsPage />} layout={<AppLayout />} />,
 }
 
+// The partial result as a site without the night dashboard has it: with the dashboard, the dashboard holds it.
+const withoutDashboard = [withFeatures({ nightDashboard: false })]
+
 /** An open night before anyone filled the partial result. */
-export const OpenNight: StoryObj = { render: () => <RouterStory path="/nights/:nightId" url="/nights/11" element={<NightPage />} /> }
+export const OpenNight: StoryObj = {
+  decorators: withoutDashboard,
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/11" element={<NightPage />} />,
+}
+
+/** An open night on a site with the night dashboard: its amounts so far, and the way to the dashboard. */
+export const OpenNightWithDashboard: StoryObj = {
+  decorators: [withFeatures({ nightDashboard: true })],
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/11" element={<NightPage />} />,
+}
+
+/** "Painel do evento": a screen of its own, with no header and no menus, made for a phone at the table. */
+export const NightDashboard: StoryObj = {
+  render: () => <RouterStory path="/nights/:nightId/dashboard" url="/nights/11/dashboard" element={<NightDashboardPage />} layout={<BareLayout />} />,
+}
+
+/** A night that has no dashboard, because it was not opened yet. */
+export const NightDashboardNotOpen: StoryObj = {
+  parameters: {
+    msw: [
+      http.get('/api/v1/nights/:id/dashboard', () => HttpResponse.json({ message: 'O painel começa quando o evento for aberto.', rule: 'night.dashboard.not_open', errors: {} }, { status: 409 })),
+      ...handlers,
+    ],
+  },
+  render: () => <RouterStory path="/nights/:nightId/dashboard" url="/nights/11/dashboard" element={<NightDashboardPage />} layout={<BareLayout />} />,
+}
+
+/** "Finalizar" on a site with the night dashboard: the form starts from its amounts and positions, and says what is pending. */
+export const ResultFormFromDashboard: StoryObj = {
+  decorators: [withFeatures({ nightDashboard: true })],
+  render: () => <RouterStory path="/nights/:nightId/result" url="/nights/11/result" element={<ResultFormPage />} />,
+}
 
 const withPartialResult = [http.get('/api/v1/nights/:id/partial-result', () => HttpResponse.json({ data: partialResult })), ...handlers]
 
 /** An open night with what the players recorded so far. */
 export const OpenNightWithPartialResult: StoryObj = {
+  decorators: withoutDashboard,
   parameters: { msw: withPartialResult },
   render: () => <RouterStory path="/nights/:nightId" url="/nights/11" element={<NightPage />} />,
 }
@@ -177,12 +214,14 @@ export const PartialResultFormNotAllowed: StoryObj = {
 
 /** "Finalizar" on a night with a partial result: the form starts filled and says where the values came from. */
 export const ResultFormFromPartialResult: StoryObj = {
+  decorators: withoutDashboard,
   parameters: { msw: withPartialResult },
   render: () => <RouterStory path="/nights/:nightId/result" url="/nights/11/result" element={<ResultFormPage />} />,
 }
 
 /** The key phone screen: entering a night's result at the table. Submitting shows a rule error from the mock. */
 export const ResultForm: StoryObj = {
+  decorators: withoutDashboard,
   render: () => <RouterStory path="/nights/:nightId/result" url="/nights/11/result" element={<ResultFormPage />} />,
 }
 

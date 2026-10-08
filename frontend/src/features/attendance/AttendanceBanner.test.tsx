@@ -2,17 +2,18 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { openNight } from '@/mocks/data'
+import { overrideFeatures } from '@/lib/features'
+import { openMainEventNight, openNight } from '@/mocks/data'
 import { type Answer } from './AttendancePanel'
 import { AttendanceBanner } from './AttendanceBanner'
 
 // The banner above "Classificação" and "Resultados" (docs/specs/attendance.md, rule 8 and the "Banner" example).
 
-function banner(answer: Answer | null, error?: string) {
+function banner(answer: Answer | null, error?: string, night = openNight) {
   const onAnswer = vi.fn()
   render(
     <MemoryRouter>
-      <AttendanceBanner night={openNight} answer={answer} onAnswer={onAnswer} error={error} />
+      <AttendanceBanner night={night} answer={answer} onAnswer={onAnswer} error={error} />
     </MemoryRouter>,
   )
   return onAnswer
@@ -46,5 +47,22 @@ describe('AttendanceBanner', () => {
   it('shows the message when the API refuses the answer', () => {
     banner(null, 'As confirmações deste evento estão encerradas.')
     expect(screen.getByRole('alert')).toHaveTextContent('As confirmações deste evento estão encerradas.')
+  })
+
+  it('leads to the night dashboard of a regular night, on a site that has it', () => {
+    const restore = overrideFeatures({ nightDashboard: true })
+    banner('all_in')
+    expect(screen.getByRole('link', { name: 'Painel do evento' })).toHaveAttribute('href', '/nights/11/dashboard')
+    cleanup()
+
+    banner('all_in', undefined, openMainEventNight)
+    expect(screen.queryByRole('link', { name: 'Painel do evento' })).not.toBeInTheDocument()
+    restore()
+    cleanup()
+
+    const off = overrideFeatures({ nightDashboard: false })
+    banner('all_in')
+    expect(screen.queryByRole('link', { name: 'Painel do evento' })).not.toBeInTheDocument()
+    off()
   })
 })

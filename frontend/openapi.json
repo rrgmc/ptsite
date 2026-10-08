@@ -6136,7 +6136,10 @@
                         "description": "The smaller buy-in of the owner of the house where the night is played."
                     },
                     "main_event_pot_percent": {
-                        "type": "string",
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
                         "description": "The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent."
                     },
                     "rounds": {

@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { Link, useNavigate, useParams } from 'react-router'
-import { ApiError, type Night, type PartialResult, type Player, type Season } from '@/api/client'
-import { useAttendance, useFinishNight, useMe, useNight, usePartialResultSeed, usePlayers, useSeason } from '@/api/queries'
+import { ApiError, type Night, type Player, type Season } from '@/api/client'
+import { useAttendance, useFinishNight, useMe, useNight, useNightDashboardSeed, usePartialResultSeed, usePlayers, useSeason } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Card, PageHeader } from '@/components/Card'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
-import { formatTime, nightTitle, parseMoneyInput } from '@/lib/format'
+import { formatMoney, formatTime, nightTitle, parseMoneyInput } from '@/lib/format'
 import { FinishingOrderFields } from './FinishingOrderFields'
-import { isEmptyPartial, moneyText, type ResultSeed, seedFromPartial } from './partialResult'
+import { isEmptyPartial, moneyText, type ResultSeed, seedFromDashboard, seedFromPartial } from './partialResult'
 import { hasFeature } from '@/lib/features'
 import { currencySymbol } from '@/lib/site'
 
@@ -20,32 +20,54 @@ const invalidMoney = t.nights.invalidMoney
  * "Finalizar": enter or correct a night's result, designed for a phone at the table.
  * Points are previewed as the pot and order are entered (the Main Event pot and the time chip do not count); the API calculates and checks them again.
  * A site with no Main Event pot or no time chip has no field for it, and sends none.
+ * An open night starts from its partial result or, on a site with the night dashboard, from the dashboard.
  */
 export function ResultFormPage() {
   const nightId = Number(useParams().nightId)
   const night = useNight(nightId)
   const season = useSeason(night.data?.season_id ?? 0)
   const players = usePlayers()
-  // An open night starts from its partial result, read before the form is shown.
+  // An open night starts from what was recorded while it ran, read before the form is shown.
   const isOpen = night.data?.status === 'open'
-  const partial = usePartialResultSeed(nightId, isOpen)
+  const usesDashboard = hasFeature('nightDashboard')
+  const partial = usePartialResultSeed(nightId, isOpen && !usesDashboard)
+  const dashboard = useNightDashboardSeed(nightId, isOpen && usesDashboard)
+  const recorded = usesDashboard ? dashboard : partial
 
-  if (night.isPending || season.isPending || players.isPending || (isOpen && partial.isPending)) return <Loading />
+  if (night.isPending || season.isPending || players.isPending || (isOpen && recorded.isPending)) return <Loading />
   if (night.error || season.error) return <ErrorBox error={night.error ?? season.error} />
 
+  const percentages = season.data!.percentages ?? []
+  let start: { seed: ResultSeed; notes: string[] } | null = null
+  if (isOpen && dashboard.data) {
+    const pending = dashboard.data.totals.total.pending
+    start = {
+      seed: seedFromDashboard(percentages, dashboard.data),
+      notes: [t.dashboard.filledFromDashboard, ...(Number(pending) > 0 ? [t.dashboard.stillPending({ amount: formatMoney(pending) })] : [])],
+    }
+  } else if (isOpen && partial.data && !isEmptyPartial(partial.data)) {
+    start = {
+      seed: seedFromPartial(percentages, partial.data),
+      notes: [t.nights.resultForm.filledFromPartial({ name: partial.data.saved_by?.name ?? t.nights.someone, time: formatTime(partial.data.saved_at!) })],
+    }
+  }
+
   // Keyed so the form starts again from the saved result if the night changes.
-  return (
-    <ResultForm
-      key={night.data!.id}
-      night={night.data!}
-      season={season.data!}
-      players={players.data ?? []}
-      partial={isOpen && partial.data && !isEmptyPartial(partial.data) ? partial.data : null}
-    />
-  )
+  return <ResultForm key={night.data!.id} night={night.data!} season={season.data!} players={players.data ?? []} startFrom={start} />
 }
 
-function ResultForm({ night: n, season, players, partial }: { night: Night; season: Season; players: Player[]; partial: PartialResult | null }) {
+function ResultForm({
+  night: n,
+  season,
+  players,
+  startFrom,
+}: {
+  night: Night
+  season: Season
+  players: Player[]
+  /** What an open night's form starts from, with the sentences that say so. Null: the night's saved result. */
+  startFrom: { seed: ResultSeed; notes: string[] } | null
+}) {
   const me = useMe()
   const finish = useFinishNight(n.id)
   const attendance = useAttendance(n.id)
@@ -54,10 +76,10 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
   const navigate = useNavigate()
   const percentages = season.percentages ?? []
 
-  // Start from the partial result of an open night, or from the saved result when correcting a finished one.
+  // Start from what an open night recorded, or from the saved result when correcting a finished one.
   const [start] = useState<ResultSeed>(() =>
-    partial
-      ? seedFromPartial(percentages, partial)
+    startFrom
+      ? startFrom.seed
       : {
           potText: moneyText(n.pot),
           mainEventPotText: moneyText(n.main_event_pot),
@@ -104,11 +126,7 @@ function ResultForm({ night: n, season, players, partial }: { night: Night; seas
           submit()
         }}
       >
-        {partial && (
-          <p role="status" className="rounded-md bg-primary-soft p-3">
-            {t.nights.resultForm.filledFromPartial({ name: partial.saved_by?.name ?? t.nights.someone, time: formatTime(partial.saved_at!) })}
-          </p>
-        )}
+        {startFrom && <p role="status" className="rounded-md bg-primary-soft p-3">{startFrom.notes.join(' ')}</p>}
 
         <Card>
           <div className="flex flex-col gap-3">

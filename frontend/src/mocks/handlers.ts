@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightPlan, openMainEventNight, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
+import { attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightDashboard, nightPlan, openMainEventNight, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
 
 const withArchived = (request: Request) => new URL(request.url).searchParams.get('archived') === '1'
 
@@ -58,6 +58,9 @@ export const handlers = [
       },
     })
   }),
+  // The night dashboard: every change answers the whole dashboard, here always the same one.
+  http.get('/api/v1/nights/:id/dashboard', () => HttpResponse.json({ data: nightDashboard })),
+  http.all('/api/v1/nights/:id/dashboard/*', () => HttpResponse.json({ data: nightDashboard })),
   http.patch('/api/v1/nights/:id', async ({ params, request }) => {
     const { place_id, ...body } = (await request.json()) as { place_id?: number | null; description?: string | null }
     const night = Number(params.id) === openNight.id ? openNight : finishedNight

@@ -1651,7 +1651,7 @@ export interface components {
             /** @description The smaller buy-in of the owner of the house where the night is played. */
             house_owner_buy_in: string | null;
             /** @description The share of a night's pot that the night dashboard suggests as its Main Event pot, in whole percent. */
-            main_event_pot_percent: string;
+            main_event_pot_percent: number | null;
             /** @description How many nights ("rodadas") the season has. */
             rounds: number;
             /** @description The season's nights that are not archived, in any state; compare with rounds. */

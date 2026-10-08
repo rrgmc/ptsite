@@ -135,12 +135,15 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
   const [allowsExtraRebuys, setAllowsExtraRebuys] = useState(season?.allows_extra_rebuys ?? false)
   const [rebuyValue, setRebuyValue] = useState(moneyText(season?.rebuy_value))
   const [rebuyChargesTimeChip, setRebuyChargesTimeChip] = useState(season?.rebuy_charges_time_chip ?? false)
+  const [mainEventPotPercent, setMainEventPotPercent] = useState(season?.main_event_pot_percent == null ? '' : String(season.main_event_pot_percent))
   const total = percents.reduce((sum, p) => sum + (Number(p) || 0), 0)
   const error = save.error instanceof ApiError ? save.error : null
   // A season has rebuys when some are allowed, or when extra ones are. Without them, their fields are hidden.
   const hasRebuys = Number(rebuysAllowed) > 0 || allowsExtraRebuys
   const timeChip = hasFeature('timeChip')
   const houseOwner = hasFeature('houseOwnerBuyIn')
+  // The share is only used by the night dashboard, to suggest a night's Main Event pot.
+  const potShare = hasFeature('mainEventPot') && hasFeature('nightDashboard')
   /** An empty amount is none; a wrong one is undefined, and stops the form. */
   const amount = (text: string) => (text.trim() === '' ? null : (parseMoneyInput(text) ?? undefined))
   const amounts = {
@@ -169,6 +172,7 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
               allows_extra_rebuys: allowsExtraRebuys,
               // An amount or a switch this site does not have is not sent: the API refuses it.
               ...(timeChip && { rebuy_charges_time_chip: hasRebuys && rebuyChargesTimeChip }),
+              ...(potShare && { main_event_pot_percent: mainEventPotPercent.trim() === '' ? null : Number(mainEventPotPercent) }),
               is_finished: isFinished,
               is_open: !isFinished,
               percentages: percents.map((p, i) => ({ position: i + 1, percent: Number(p) || 0 })),
@@ -240,6 +244,18 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
                 />
               )}
             </div>
+            {potShare && (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <TextField
+                  label={t.admin.seasons.money.mainEventPotPercent}
+                  description={t.admin.seasons.money.mainEventPotPercentHelp}
+                  inputMode="numeric"
+                  value={mainEventPotPercent}
+                  onChange={setMainEventPotPercent}
+                  errorMessage={error?.fieldError('main_event_pot_percent')}
+                />
+              </div>
+            )}
             <Checkbox isSelected={allowsExtraRebuys} onChange={setAllowsExtraRebuys}>{t.admin.seasons.money.allowsExtraRebuys}</Checkbox>
             {hasRebuys && timeChip && <Checkbox isSelected={rebuyChargesTimeChip} onChange={setRebuyChargesTimeChip}>{t.admin.seasons.money.rebuyChargesTimeChip}</Checkbox>}
           </div>

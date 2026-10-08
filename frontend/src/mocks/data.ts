@@ -1,4 +1,5 @@
-import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, PartialResult, Player, PlayerStatistics, PlannedDate, RankedList, Season, SeasonTopStandings, Standing, Statistics, User } from '@/api/client'
+import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, NightDashboard, PartialResult, Player, PlayerStatistics, PlannedDate, RankedList, Season, SeasonTopStandings, Standing, Statistics, User } from '@/api/client'
+import { recalculated } from '@/features/dashboard/dashboardMoney'
 
 // Invented data for Storybook and component tests. The development database has the demo league (backend/database/seeders/DemoLeagueSeeder.php).
 
@@ -35,6 +36,7 @@ export const season: Season = {
   rebuy_charges_time_chip: true,
   allows_extra_rebuys: true,
   house_owner_buy_in: '25.00',
+  main_event_pot_percent: 20,
   rounds: 26,
   nights_planned: 2,
   is_open: true,
@@ -118,6 +120,55 @@ export const partialResult: PartialResult = {
   saved_at: '2026-04-18T22:40:00-03:00',
 }
 
+const noAmounts = { owed: '0.00', paid: '0.00', pending: '0.00' }
+const dashboardLine = (player: Player, marks: Partial<NightDashboard['players'][number]> = {}): NightDashboard['players'][number] => ({
+  player,
+  is_house_owner: false,
+  buy_in: '0.00',
+  buy_in_paid: false,
+  time_chip: false,
+  time_chip_paid: false,
+  rebuys: [],
+  ...noAmounts,
+  ...marks,
+})
+
+/**
+ * The open night's dashboard: the night of the example in docs/specs/night-dashboard.md, at Estela's house. The
+ * amounts are worked out from the players, as the API does.
+ */
+export const nightDashboard: NightDashboard = recalculated({
+  night_id: 11,
+  status: 'open',
+  can_edit: true,
+  prices: { buy_in: '50.00', house_owner_buy_in: '25.00', rebuy_value: '50.00', time_chip_value: '5.00', rebuys_allowed: 2, allows_extra_rebuys: true, rebuy_charges_time_chip: true, fixed: false },
+  house_owner: players[4],
+  players: [
+    dashboardLine(players[0], { buy_in_paid: true, rebuys: [{ id: 1, paid: true }] }),
+    dashboardLine(players[1], { buy_in_paid: true, rebuys: [{ id: 2, paid: true }, { id: 3, paid: true }, { id: 4, paid: false }] }),
+    dashboardLine(players[2], { time_chip: true, time_chip_paid: true }),
+    dashboardLine(players[3]),
+    dashboardLine(players[4], { buy_in_paid: true }),
+  ],
+  positions: [{ position: 6, player: players[3] }],
+  main_event_pot: null,
+  suggested_main_event_pot: '85.00',
+  totals: { pot: noAmounts, time_chip: noAmounts, total: noAmounts },
+  recorded: null,
+  read_at: '2026-04-18T22:41:00-03:00',
+})
+
+/** The same night once it is finished: the keeper rounded the pot, and Breno's last rebuy is still not paid. */
+export const finishedNightDashboard: NightDashboard = {
+  ...nightDashboard,
+  status: 'finished',
+  can_edit: false,
+  prices: { ...nightDashboard.prices, fixed: true },
+  positions: [],
+  suggested_main_event_pot: null,
+  recorded: { pot: '430.00', main_event_pot: '85.00', time_chip: '25.00' },
+}
+
 export const standings: Standing[] = [
   { rank: 1, player: players[1], points: '183.00', nights_scored: 2, wins: 1 },
   { rank: 2, player: players[0], points: '159.00', nights_scored: 2, wins: 1 },
@@ -137,6 +188,7 @@ export const keeper: User = {
     run_nights: true,
     edit_played_nights: false,
     save_partial_results: true,
+    answer_for_others: true,
     quick_add_players: true,
     manage_players: false,
     manage_seasons: false,

@@ -3,7 +3,9 @@ import { ForgotPasswordPage } from './features/auth/ForgotPasswordPage'
 import { LoginPage } from './features/auth/LoginPage'
 import { ResetPasswordPage } from './features/auth/ResetPasswordPage'
 import { CalendarPage } from './features/calendar/CalendarPage'
+import { NightDashboardPage, ToNightDashboard } from './features/dashboard/NightDashboardPage'
 import { AppLayout } from './features/layout/AppLayout'
+import { BareLayout } from './features/layout/BareLayout'
 import { ErrorPage } from './features/layout/ErrorPage'
 import { MainEventPage } from './features/mainEvent/MainEventPage'
 import { MainEventResultFormPage } from './features/mainEvent/MainEventResultFormPage'
@@ -42,6 +44,14 @@ const seasonScreens = (): RouteObject[] => [
 /** The Main Event's result form, on a site that has it. */
 const mainEvent = hasFeature('mainEvent') ? [{ path: 'nights/:nightId/main-event-result', element: <MainEventResultFormPage /> }] : []
 
+/**
+ * The night dashboard, on a site that has it: a screen of its own, outside the site's header and menus. It holds
+ * the partial result too, so the partial result's form leads to it.
+ */
+const nightDashboard: RouteObject[] = hasFeature('nightDashboard')
+  ? [{ element: <BareLayout />, errorElement: <ErrorPage />, children: [{ path: 'nights/:nightId/dashboard', element: <NightDashboardPage /> }] }]
+  : []
+
 // URLs are in English, like the code; screens are in Brazilian Portuguese. The admin section and the statistics
 // load as separate bundles; a player's page loads its charts the same way.
 export const router = createBrowserRouter(
@@ -61,7 +71,7 @@ export const router = createBrowserRouter(
         { path: 'nights/:nightId', element: <NightPage /> },
         { path: 'nights/:nightId/edit', element: <NightEditPage /> },
         { path: 'nights/:nightId/result', element: <ResultFormPage /> },
-        { path: 'nights/:nightId/partial-result', element: <PartialResultFormPage /> },
+        { path: 'nights/:nightId/partial-result', element: hasFeature('nightDashboard') ? <ToNightDashboard /> : <PartialResultFormPage /> },
         ...mainEvent,
         { path: 'players', element: <PlayersPage /> },
         { path: 'players/:playerId/all', element: <AllTimePlayerPage /> },
@@ -69,6 +79,7 @@ export const router = createBrowserRouter(
         { path: 'admin/*', lazy: () => import('./features/admin/AdminRoutes').then((m) => ({ Component: m.AdminRoutes })) },
       ],
     },
+    ...nightDashboard,
   ],
   { basename: import.meta.env.BASE_URL.replace(/\/$/, '') },
 )
