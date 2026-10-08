@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use PTSite\App\Models\Concerns\Archivable;
 use PTSite\Database\Factories\NightFactory;
 
-#[Fillable(['season_id', 'starts_at', 'place_id', 'description', 'status', 'type', 'is_extra', 'pot', 'main_event_pot', 'time_chip'])]
+#[Fillable(['season_id', 'starts_at', 'place_id', 'house_owner_player_id', 'description', 'status', 'type', 'is_extra', 'pot', 'main_event_pot', 'time_chip'])]
 class Night extends Model
 {
     /** @use HasFactory<NightFactory> */
@@ -86,5 +86,41 @@ class Night extends Model
     public function partialResult(): HasOne
     {
         return $this->hasOne(NightPartialResult::class);
+    }
+
+    /**
+     * The owner of the house where the night is played, picked on the night dashboard.
+     *
+     * @return BelongsTo<Player, $this>
+     */
+    public function houseOwner(): BelongsTo
+    {
+        return $this->belongsTo(Player::class, 'house_owner_player_id');
+    }
+
+    /**
+     * The participants the night dashboard has a record of.
+     *
+     * @return HasMany<NightPlayer, $this>
+     */
+    public function entries(): HasMany
+    {
+        return $this->hasMany(NightPlayer::class);
+    }
+
+    /** @return HasMany<NightRebuy, $this> */
+    public function rebuys(): HasMany
+    {
+        return $this->hasMany(NightRebuy::class)->orderBy('id');
+    }
+
+    /**
+     * The prices the night was finished with. An open night has none: it charges the season's.
+     *
+     * @return HasOne<NightPrice, $this>
+     */
+    public function prices(): HasOne
+    {
+        return $this->hasOne(NightPrice::class);
     }
 }

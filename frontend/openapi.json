@@ -1607,6 +1607,549 @@
                 }
             }
         },
+        "/v1/nights/{night}/dashboard": {
+            "get": {
+                "operationId": "nightDashboard.show",
+                "summary": "A night's dashboard: the participants with what they bought and paid, the pot and the time chip worked out\nfrom it, and the open night's partial result. Made to be asked for again every few seconds",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/dashboard/players/{player}": {
+            "patch": {
+                "operationId": "nightDashboard.markPlayer",
+                "summary": "Set a participant's marks; leave out the ones that stay. Any call makes the player a participant and, on\nan open night, answers ALL IN for them: with no mark it only confirms the player",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "player",
+                        "in": "path",
+                        "required": true,
+                        "description": "The player ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MarkNightPlayerRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "nightDashboard.removePlayer",
+                "summary": "\"Remover do evento\": take a participant with no marks and no rebuys off the night",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "player",
+                        "in": "path",
+                        "required": true,
+                        "description": "The player ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/dashboard/players/{player}/rebuys": {
+            "post": {
+                "operationId": "nightDashboard.addRebuy",
+                "summary": "\"+ Rebuy\": record one more rebuy of a player. Send the number of rebuys the player had on the screen: when\nit is no longer that number, someone else recorded the same rebuy and nothing is added",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "player",
+                        "in": "path",
+                        "required": true,
+                        "description": "The player ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddRebuyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/dashboard/rebuys/{rebuy}": {
+            "patch": {
+                "operationId": "nightDashboard.markRebuy",
+                "summary": "Mark a rebuy as paid or not paid",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "rebuy",
+                        "in": "path",
+                        "required": true,
+                        "description": "The rebuy ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MarkRebuyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "nightDashboard.removeRebuy",
+                "summary": "Remove a rebuy recorded by mistake",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "rebuy",
+                        "in": "path",
+                        "required": true,
+                        "description": "The rebuy ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/dashboard/house-owner": {
+            "put": {
+                "operationId": "nightDashboard.setHouseOwner",
+                "summary": "\"Dono da casa\": say who owns the house where the night is played, or null for nobody",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SetHouseOwnerRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/dashboard/positions/{position}": {
+            "put": {
+                "operationId": "nightDashboard.setPosition",
+                "summary": "Put a player in one scoring position of the open night's partial result, or null to empty it",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "position",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SetPartialPositionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/nights/{night}/dashboard/main-event-pot": {
+            "put": {
+                "operationId": "nightDashboard.setMainEventPot",
+                "summary": "Set the Main Event pot of the open night's partial result",
+                "tags": [
+                    "NightDashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SetMainEventPotRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NightDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NightDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/nights/{night}/partial-result": {
             "get": {
                 "operationId": "partialResult.show",
@@ -3206,6 +3749,21 @@
             }
         },
         "schemas": {
+            "AddRebuyRequest": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "description": "How many rebuys the player had on the screen when \"+ Rebuy\" was tapped.",
+                        "minimum": 0,
+                        "maximum": 50
+                    }
+                },
+                "required": [
+                    "count"
+                ],
+                "title": "AddRebuyRequest"
+            },
             "AnswerAttendanceRequest": {
                 "type": "object",
                 "properties": {
@@ -3870,6 +4428,328 @@
                     "password"
                 ],
                 "title": "LoginRequest"
+            },
+            "MarkNightPlayerRequest": {
+                "type": "object",
+                "properties": {
+                    "buy_in_paid": {
+                        "type": "boolean",
+                        "description": "Whether the player paid the buy-in."
+                    },
+                    "time_chip": {
+                        "type": "boolean",
+                        "description": "Whether the player arrived late and owes a time chip. False also unmarks it as paid. Refused on a site without the time chip."
+                    },
+                    "time_chip_paid": {
+                        "type": "boolean",
+                        "description": "Whether the player paid that time chip. True also marks it as owed. Refused on a site without the time chip."
+                    }
+                },
+                "title": "MarkNightPlayerRequest"
+            },
+            "MarkRebuyRequest": {
+                "type": "object",
+                "properties": {
+                    "paid": {
+                        "type": "boolean",
+                        "description": "Whether the rebuy was paid."
+                    }
+                },
+                "required": [
+                    "paid"
+                ],
+                "title": "MarkRebuyRequest"
+            },
+            "NightDashboardResource": {
+                "type": "object",
+                "properties": {
+                    "night_id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "open",
+                            "finished"
+                        ]
+                    },
+                    "can_edit": {
+                        "type": "boolean",
+                        "description": "Whether this user may change this night's dashboard. The API still checks every request."
+                    },
+                    "prices": {
+                        "type": "object",
+                        "description": "What the night charges, as decimal strings: a price the season does not have is \"0.00\". `fixed`\nsays the prices were copied when the night was finished, so the season no longer changes them.",
+                        "properties": {
+                            "buy_in": {
+                                "type": "string"
+                            },
+                            "house_owner_buy_in": {
+                                "type": "string"
+                            },
+                            "rebuy_value": {
+                                "type": "string"
+                            },
+                            "time_chip_value": {
+                                "type": "string"
+                            },
+                            "rebuys_allowed": {
+                                "type": "integer"
+                            },
+                            "allows_extra_rebuys": {
+                                "type": "boolean"
+                            },
+                            "rebuy_charges_time_chip": {
+                                "type": "boolean"
+                            },
+                            "fixed": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "buy_in",
+                            "house_owner_buy_in",
+                            "rebuy_value",
+                            "time_chip_value",
+                            "rebuys_allowed",
+                            "allows_extra_rebuys",
+                            "rebuy_charges_time_chip",
+                            "fixed"
+                        ]
+                    },
+                    "house_owner": {
+                        "anyOf": [
+                            {
+                                "description": "The owner of the house where the night is played.",
+                                "$ref": "#/components/schemas/PlayerResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "players": {
+                        "type": "array",
+                        "description": "The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and\n`pending` add up the buy-in, the rebuys and the time chips of the player.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "player": {
+                                    "$ref": "#/components/schemas/PlayerResource"
+                                },
+                                "is_house_owner": {
+                                    "type": "boolean"
+                                },
+                                "buy_in": {
+                                    "type": "string"
+                                },
+                                "buy_in_paid": {
+                                    "type": "boolean"
+                                },
+                                "time_chip": {
+                                    "type": "boolean"
+                                },
+                                "time_chip_paid": {
+                                    "type": "boolean"
+                                },
+                                "rebuys": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "paid": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "paid"
+                                        ]
+                                    }
+                                },
+                                "owed": {
+                                    "type": "string"
+                                },
+                                "paid": {
+                                    "type": "string"
+                                },
+                                "pending": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "player",
+                                "is_house_owner",
+                                "buy_in",
+                                "buy_in_paid",
+                                "time_chip",
+                                "time_chip_paid",
+                                "rebuys",
+                                "owed",
+                                "paid",
+                                "pending"
+                            ]
+                        }
+                    },
+                    "positions": {
+                        "type": "array",
+                        "description": "The positions of the open night's partial result filled so far. Empty once the night is finished.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "position": {
+                                    "type": "integer"
+                                },
+                                "player": {
+                                    "$ref": "#/components/schemas/PlayerResource"
+                                }
+                            },
+                            "required": [
+                                "position",
+                                "player"
+                            ]
+                        }
+                    },
+                    "main_event_pot": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The Main Event pot typed so far on the open night."
+                    },
+                    "suggested_main_event_pot": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The season's share of the pot, rounded to a whole unit. Null when the season sets none."
+                    },
+                    "totals": {
+                        "type": "object",
+                        "description": "The amounts worked out from the participants. `time_chip` is null on a site without the time chip.",
+                        "properties": {
+                            "pot": {
+                                "type": "object",
+                                "properties": {
+                                    "owed": {
+                                        "type": "string"
+                                    },
+                                    "paid": {
+                                        "type": "string"
+                                    },
+                                    "pending": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "owed",
+                                    "paid",
+                                    "pending"
+                                ]
+                            },
+                            "time_chip": {
+                                "type": [
+                                    "object",
+                                    "null"
+                                ],
+                                "properties": {
+                                    "owed": {
+                                        "type": "string"
+                                    },
+                                    "paid": {
+                                        "type": "string"
+                                    },
+                                    "pending": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "owed",
+                                    "paid",
+                                    "pending"
+                                ]
+                            },
+                            "total": {
+                                "type": "object",
+                                "properties": {
+                                    "owed": {
+                                        "type": "string"
+                                    },
+                                    "paid": {
+                                        "type": "string"
+                                    },
+                                    "pending": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "owed",
+                                    "paid",
+                                    "pending"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "pot",
+                            "time_chip",
+                            "total"
+                        ]
+                    },
+                    "recorded": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "The amounts a finished night was finished with. Null while the night is open.",
+                        "properties": {
+                            "pot": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "main_event_pot": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "time_chip": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "pot",
+                            "main_event_pot",
+                            "time_chip"
+                        ]
+                    },
+                    "read_at": {
+                        "type": "string",
+                        "description": "When the server read this."
+                    }
+                },
+                "required": [
+                    "night_id",
+                    "status",
+                    "can_edit",
+                    "prices",
+                    "house_owner",
+                    "players",
+                    "positions",
+                    "main_event_pot",
+                    "suggested_main_event_pot",
+                    "totals",
+                    "recorded",
+                    "read_at"
+                ],
+                "title": "NightDashboardResource"
             },
             "NightPartialResultResource": {
                 "type": "object",
@@ -5394,6 +6274,55 @@
                 ],
                 "title": "SeasonTopStandingsResource"
             },
+            "SetHouseOwnerRequest": {
+                "type": "object",
+                "properties": {
+                    "player_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "The owner of the house, or null when nobody is."
+                    }
+                },
+                "required": [
+                    "player_id"
+                ],
+                "title": "SetHouseOwnerRequest"
+            },
+            "SetMainEventPotRequest": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "The Main Event pot so far, as a decimal string such as \"85.00\", or null when not known.",
+                        "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                    }
+                },
+                "required": [
+                    "amount"
+                ],
+                "title": "SetMainEventPotRequest"
+            },
+            "SetPartialPositionRequest": {
+                "type": "object",
+                "properties": {
+                    "player_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "The player in this position, or null to empty it."
+                    }
+                },
+                "required": [
+                    "player_id"
+                ],
+                "title": "SetPartialPositionRequest"
+            },
             "SimulateRequest": {
                 "type": "object",
                 "properties": {
@@ -5993,6 +6922,10 @@
                             "save_partial_results": {
                                 "type": "boolean"
                             },
+                            "answer_for_others": {
+                                "type": "boolean",
+                                "description": "Whether the user answers ALL IN or FOLD for other players."
+                            },
                             "quick_add_players": {
                                 "type": "boolean"
                             },
@@ -6013,6 +6946,7 @@
                             "run_nights",
                             "edit_played_nights",
                             "save_partial_results",
+                            "answer_for_others",
                             "quick_add_players",
                             "manage_players",
                             "manage_seasons",

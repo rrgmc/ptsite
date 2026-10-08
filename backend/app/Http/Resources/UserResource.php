@@ -27,6 +27,8 @@ class UserResource extends JsonResource
                 'run_nights' => $this->can('create', Night::class),
                 'edit_played_nights' => $this->can('updatePlayed', Night::class),
                 'save_partial_results' => $this->can('savePartialResult', Night::class),
+                /** Whether the user answers ALL IN or FOLD for other players. */
+                'answer_for_others' => $this->can('answerForOthers', Night::class),
                 'quick_add_players' => $this->can('quickAdd', Player::class),
                 'manage_players' => $this->can('create', Player::class),
                 'manage_seasons' => $this->can('create', Season::class),

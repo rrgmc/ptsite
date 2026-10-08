@@ -7,6 +7,7 @@ use PTSite\App\Http\Controllers\Api\AuthController;
 use PTSite\App\Http\Controllers\Api\HolidayController;
 use PTSite\App\Http\Controllers\Api\MainEventController;
 use PTSite\App\Http\Controllers\Api\NightController;
+use PTSite\App\Http\Controllers\Api\NightDashboardController;
 use PTSite\App\Http\Controllers\Api\PartialResultController;
 use PTSite\App\Http\Controllers\Api\PasswordResetController;
 use PTSite\App\Http\Controllers\Api\PlaceController;
@@ -63,6 +64,18 @@ Route::prefix('v1')->group(function () {
         Route::delete('nights/{night}/attendance/{player}', [AttendanceController::class, 'destroy']);
         Route::get('nights/{night}/partial-result', [PartialResultController::class, 'show']);
         Route::put('nights/{night}/partial-result', [PartialResultController::class, 'update']);
+        Route::middleware(RequireFeature::for(Feature::NightDashboard))->prefix('nights/{night}/dashboard')->group(function () {
+            Route::get('', [NightDashboardController::class, 'show']);
+            Route::patch('players/{player}', [NightDashboardController::class, 'markPlayer']);
+            Route::delete('players/{player}', [NightDashboardController::class, 'removePlayer']);
+            Route::post('players/{player}/rebuys', [NightDashboardController::class, 'addRebuy']);
+            // A rebuy of another night is not found.
+            Route::patch('rebuys/{rebuy}', [NightDashboardController::class, 'markRebuy'])->scopeBindings();
+            Route::delete('rebuys/{rebuy}', [NightDashboardController::class, 'removeRebuy'])->scopeBindings();
+            Route::put('house-owner', [NightDashboardController::class, 'setHouseOwner']);
+            Route::put('positions/{position}', [NightDashboardController::class, 'setPosition'])->whereNumber('position');
+            Route::put('main-event-pot', [NightDashboardController::class, 'setMainEventPot']);
+        });
 
         Route::get('statistics', [StatisticsController::class, 'show']);
 
