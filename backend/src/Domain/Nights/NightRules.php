@@ -24,6 +24,14 @@ final class NightRules
         }
     }
 
+    /** Only an open night goes back to scheduled ("Desfazer abertura"); a finished one is corrected instead. */
+    public function assertCanUndoOpen(NightStatus $status): void
+    {
+        if ($status !== NightStatus::Open) {
+            throw new RuleViolation('night.undo_open.not_open', null, ['status' => $status->value]);
+        }
+    }
+
     /** Only a scheduled night can be moved ("Remarcar"): an open or finished one is being or has been played. */
     public function assertCanReschedule(NightStatus $status): void
     {

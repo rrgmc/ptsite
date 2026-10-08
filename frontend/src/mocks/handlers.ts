@@ -66,6 +66,7 @@ export const handlers = [
     const night = Number(params.id) === openNight.id ? openNight : finishedNight
     return HttpResponse.json({ data: { ...night, ...body, place: place_id === undefined ? night.place : (places.find((p) => p.id === place_id) ?? null) } })
   }),
+  http.post('/api/v1/nights/:id/undo-open', () => HttpResponse.json({ data: { ...openNight, status: 'scheduled' } })),
   http.post('/api/v1/nights/:id/reschedule', async ({ request }) =>
     HttpResponse.json({ data: { ...openNight, status: 'scheduled', ...((await request.json()) as { starts_at: string }) } }),
   ),

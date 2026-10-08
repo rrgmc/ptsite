@@ -22,7 +22,8 @@ backend/
                             Ranking, NightRecord
   app/Actions/            one class per change; check policy, call domain, save, audit
     Nights/                 OpenNight, FinishNight, ScheduleNight, ScheduleNights (the planner's batch),
-                            ImportNight, RescheduleNight, CancelNight, UpdateNight (place, description, extra),
+                            ImportNight, RescheduleNight, CancelNight, UndoOpenNight (an opening by mistake),
+                            UpdateNight (place, description, extra),
                             WriteNightResult, NightSnapshot, SavePartialResult, KnownPlayers,
                             FinishMainEventNight, ImportMainEventNight, WriteMainEventResult, MainEventNight
     Nights/Dashboard/       the night dashboard, one change each: MarkNightPlayer, RemoveNightPlayer, AddRebuy,

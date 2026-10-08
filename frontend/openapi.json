@@ -1536,6 +1536,64 @@
                 }
             }
         },
+        "/v1/nights/{night}/undo-open": {
+            "post": {
+                "operationId": "night.undoOpen",
+                "summary": "\"Desfazer abertura\": make a night opened by mistake scheduled again. Deletes its partial result and what the\nnight dashboard recorded; the attendance answers stay. Admins",
+                "tags": [
+                    "Night"
+                ],
+                "parameters": [
+                    {
+                        "name": "night",
+                        "in": "path",
+                        "required": true,
+                        "description": "The night ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`NightResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/NightResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "place",
+                                                        "results",
+                                                        "main_event_positions"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/nights/{night}/finish": {
             "post": {
                 "operationId": "night.finish",

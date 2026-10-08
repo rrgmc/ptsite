@@ -8,6 +8,7 @@ return [
     'night.open.not_scheduled' => 'Só é possível abrir um evento agendado.',
     'night.open.another_open' => 'Já existe um evento aberto nesta temporada. Finalize-o antes de abrir outro.',
     'night.reschedule.not_scheduled' => 'Só é possível remarcar um evento agendado.',
+    'night.undo_open.not_open' => 'Só é possível desfazer a abertura de um evento aberto.',
     'night.cancel.not_scheduled' => 'Só é possível cancelar um evento agendado. Um evento finalizado pode ter o resultado corrigido.',
     'night.date_taken' => 'Já existe um evento nesta temporada em :date.',
     'night.finish.not_open' => 'Abra o evento antes de finalizá-lo.',

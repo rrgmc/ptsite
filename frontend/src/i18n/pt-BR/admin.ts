@@ -46,6 +46,7 @@ export const admin = {
     actions: {
       'night.scheduled': 'agendou o evento',
       'night.opened': 'abriu o evento',
+      'night.open_undone': 'desfez a abertura do evento',
       'night.finished': 'finalizou o evento',
       'night.corrected': 'corrigiu o resultado do evento',
       'night.imported': 'importou o evento',

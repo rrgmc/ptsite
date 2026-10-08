@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { Link, useNavigate, useParams } from 'react-router'
 import { ApiError, type Night } from '@/api/client'
-import { useCancelNight, useMe, useNight, useOpenNight, useRescheduleNight } from '@/api/queries'
+import { useCancelNight, useMe, useNight, useOpenNight, useRescheduleNight, useUndoOpenNight } from '@/api/queries'
 import { Button } from '@/components/Button'
 import { Card, PageHeader } from '@/components/Card'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -31,17 +31,21 @@ export function NightPage() {
   const me = useMe()
   const open = useOpenNight()
   const cancel = useCancelNight(nightId)
+  const undoOpen = useUndoOpenNight(nightId)
   const navigate = useNavigate()
   const pathOfSeason = usePathOfSeason()
   const [confirming, setConfirming] = useState(false)
   const [rescheduling, setRescheduling] = useState(false)
   const [cancelling, setCancelling] = useState(false)
+  const [undoingOpen, setUndoingOpen] = useState(false)
 
   if (night.isPending) return <Loading />
   if (night.error) return <ErrorBox error={night.error} />
   const n = night.data!
   const canRun = me.data?.abilities.run_nights
   const canEdit = canEditNight(n, me.data)
+  // "Desfazer abertura" deletes what the open night has on record, so only admins do it.
+  const canUndoOpen = n.status === 'open' && !n.archived && me.data?.abilities.edit_played_nights
   const description = plainText(n.description)
   // A Main Event night has a result of its own: the order of its players, with no pot.
   const isMainEvent = n.type === 'main_event'
@@ -78,6 +82,7 @@ export function NightPage() {
             {n.status === 'open' && <Link to={resultPath} className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover">{t.nights.page.finishEnterResult}</Link>}
             {n.status === 'finished' && <Link to={resultPath} className={secondaryLink}>{t.nights.page.editResult}</Link>}
             {canEdit && <Link to={`/nights/${n.id}/edit`} className={secondaryLink}>{t.nights.editNight}</Link>}
+            {canUndoOpen && <Button variant="ghost" onPress={() => setUndoingOpen(true)}>{t.nights.page.undoOpen}</Button>}
           </div>
           {open.error && <div className="mt-3"><ErrorBox error={open.error} /></div>}
           {rescheduling && <RescheduleForm night={n} onDone={() => setRescheduling(false)} />}
@@ -119,6 +124,20 @@ export function NightPage() {
       >
         {t.nights.page.cancelConfirmBody}
         {cancel.error instanceof ApiError ? ` ${cancel.error.body.message}` : ''}
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        isOpen={undoingOpen}
+        onOpenChange={setUndoingOpen}
+        title={t.nights.page.undoOpenConfirmTitle}
+        confirmLabel={t.nights.page.undoOpen}
+        cancelLabel={t.common.back}
+        confirmVariant="danger"
+        isPending={undoOpen.isPending}
+        onConfirm={() => undoOpen.mutate(undefined, { onSuccess: () => setUndoingOpen(false) })}
+      >
+        {hasDashboard ? t.nights.page.undoOpenConfirmBodyDashboard : t.nights.page.undoOpenConfirmBody}
+        {undoOpen.error instanceof ApiError ? ` ${undoOpen.error.body.message}` : ''}
       </ConfirmDialog>
 
       <ConfirmDialog

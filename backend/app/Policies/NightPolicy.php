@@ -67,6 +67,12 @@ class NightPolicy
         return $user->canRunNights();
     }
 
+    /** "Desfazer abertura" deletes what the open night has on record, so only admins do it. */
+    public function undoOpen(User $user, Night $night): bool
+    {
+        return $this->updatePlayed($user);
+    }
+
     public function reschedule(User $user, Night $night): bool
     {
         return $user->canRunNights();
