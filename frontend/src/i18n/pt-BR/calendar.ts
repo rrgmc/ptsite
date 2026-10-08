@@ -21,6 +21,10 @@ export const calendar = {
   viewInCalendar: 'Ver no calendário',
   goToToday: 'Ir para hoje',
 
+  // This month and the next, or the whole season
+  viewAll: 'Ver o calendário completo',
+  viewCurrent: 'Ver só este mês e o próximo',
+
   // The legend
   legend: {
     night: 'Evento',

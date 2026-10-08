@@ -78,7 +78,7 @@ export function SeasonPlanner({ today: now = today() }: { today?: string }) {
       {scheduled !== null ? (
         <Card>
           <p role="status" className="font-semibold text-success">{t.admin.planner.scheduledCount({ count: scheduled })}</p>
-          <Link to={pathOfSeason(seasonId, '/calendar')} className="mt-2 inline-block text-primary underline">{t.admin.planner.viewCalendar}</Link>
+          <Link to={`${pathOfSeason(seasonId, '/calendar')}?view=all`} className="mt-2 inline-block text-primary underline">{t.admin.planner.viewCalendar}</Link>
         </Card>
       ) : plan.isPending || holidays.isPending || nights.isLoading ? <Loading label={t.admin.planner.calculating} /> : plan.error ? <ErrorBox error={plan.error} /> : (
         // A new plan starts again from its own ticks.
