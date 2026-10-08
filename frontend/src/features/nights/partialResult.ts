@@ -1,5 +1,6 @@
 import type { NightDashboard, PartialResult, Player } from '@/api/client'
 import { hasFeature } from '@/lib/features'
+import { moneyText } from '@/lib/format'
 import { amountsInUse } from '../dashboard/dashboardMoney'
 
 /** What a result form starts from: the amounts as typed text, and the players in the order of the percentage table. */
@@ -8,11 +9,6 @@ export interface ResultSeed {
   mainEventPotText: string
   timeChipText: string
   order: (Player | null)[]
-}
-
-/** "840.00" → "840,00", as typed in a money field; nothing when the amount is not known. */
-export function moneyText(amount: string | null | undefined): string {
-  return amount ? amount.replace('.', ',') : ''
 }
 
 /** The form values for a partial result. Positions the season does not score are ignored. */
