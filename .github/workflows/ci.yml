@@ -117,7 +117,7 @@ jobs:
           curl -s http://127.0.0.1:8000/app/manifest.webmanifest | grep -q '"theme_color": "#1e3a8a"'
 
   frontend:
-    name: Frontend (lint, types, unit, build, Storybook a11y)
+    name: Frontend (lint, types, unit, build)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
@@ -139,10 +139,31 @@ jobs:
       - run: npx tsc -b
       - run: npm test
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+
+  storybook:
+    name: Storybook ${{ matrix.shard }}/2 (every story renders and passes axe)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    # Two jobs, each with half of the stories, as for the end-to-end tests below: the runner's two cores are the
+    # limit, so only a second runner makes this faster.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci && npx playwright install --with-deps chromium
       - run: npm run build-storybook
       - name: Every story renders and passes axe
-        run: npm run test:storybook
+        run: npm run test:storybook -- --shard=${{ matrix.shard }}/2
 
   e2e:
     name: End-to-end ${{ matrix.shard }}/2 (phone and desktop, axe)
