@@ -35,9 +35,10 @@ export const dashboard = {
     searchPlaceholder: 'Apelido ou nome',
     noneFound: 'Nenhum jogador encontrado.',
     more: ({ shown, total }: { shown: number; total: number }) => `Mostrando ${shown} de ${total}. Digite mais para encontrar.`,
-    confirm: 'Confirmar',
+    /** Brings the player onto the night with nothing paid: the answer it gives them. */
+    confirm: 'ALL IN',
     confirmPaid: 'Buy-in pago',
-    actionsOf: ({ nickname }: { nickname: string }) => `Confirmar ${nickname}`,
+    actionsOf: ({ nickname }: { nickname: string }) => `Adicionar ${nickname}`,
   },
 
   // The amounts, each worked out unless it is set by hand

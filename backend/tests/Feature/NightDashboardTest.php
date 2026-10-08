@@ -401,13 +401,13 @@ it('keeps no typed time chip on a site without the time chip', function () {
 
 it('fixes the participants and the prices when the night is finished', function () {
     ($this->play)();
-    $late = Player::factory()->create(['nickname' => 'Fábio']);
+    $late = Player::factory()->create(['nickname' => 'Fausto']);
     Sanctum::actingAs($this->keeper);
     $this->putJson("/api/v1/nights/{$this->night->id}/attendance/{$late->id}", ['answer' => 'all_in'])->assertOk();
 
     ($this->finish)('500.00')->assertOk();
 
-    // Fábio only answered ALL IN: finishing gives him a record.
+    // Fausto only answered ALL IN: finishing gives him a record.
     expect(NightPlayer::query()->where('player_id', $late->id)->exists())->toBeTrue();
     Sanctum::actingAs($this->admin);
     $this->patchJson("/api/v1/seasons/{$this->season->id}", ['buy_in' => '60.00', 'rebuy_value' => '70.00'])->assertOk();
@@ -428,10 +428,10 @@ it('fixes the participants and the prices when the night is finished', function 
 
 it('lets an admin add a player to a finished night without an answer', function () {
     ($this->finish)()->assertOk();
-    $late = Player::factory()->create(['nickname' => 'Fábio']);
+    $late = Player::factory()->create(['nickname' => 'Fausto']);
     Sanctum::actingAs($this->admin);
 
-    ($this->mark)($late, ['buy_in_paid' => true])->assertOk()->assertJsonPath('data.players.0.player.nickname', 'Fábio');
+    ($this->mark)($late, ['buy_in_paid' => true])->assertOk()->assertJsonPath('data.players.0.player.nickname', 'Fausto');
 
     expect(NightAttendance::query()->where('player_id', $late->id)->exists())->toBeFalse()
         ->and(AuditLog::query()->where('action', 'night.payments_changed')->sole()->after['buy_in_paid'])->toBeTrue();
