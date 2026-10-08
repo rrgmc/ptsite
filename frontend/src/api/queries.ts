@@ -499,7 +499,7 @@ export function useSavePlayerLogin() {
 export function useSaveSeason() {
   const client = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...body }: { id?: number; name?: string; starts_on?: string; default_place_id?: number | null; is_open?: boolean; is_finished?: boolean; percentages?: { position: number; percent: number }[]; schedule_weekday?: number; schedule_time?: string; schedule_every_weeks?: number; rounds?: number }) =>
+    mutationFn: async ({ id, ...body }: { id?: number; name?: string; starts_on?: string; default_place_id?: number | null; buy_in?: string | null; rebuy_value?: string | null; time_chip_value?: string | null; rebuys_allowed?: number; rebuy_charges_time_chip?: boolean; allows_extra_rebuys?: boolean; house_owner_buy_in?: string | null; is_open?: boolean; is_finished?: boolean; percentages?: { position: number; percent: number }[]; schedule_weekday?: number; schedule_time?: string; schedule_every_weeks?: number; rounds?: number }) =>
       id
         ? (await unwrap(api.PATCH('/v1/seasons/{season}', { params: { path: { season: id } }, body }))).data
         : (await unwrap(api.POST('/v1/seasons', { body: body as never }))).data,

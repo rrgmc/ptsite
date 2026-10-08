@@ -22,11 +22,14 @@ enum Feature: string
     /** "Main Event": a night of its own type, finished with the order of its players and no points. */
     case MainEvent = 'mainEvent';
 
+    /** A season's smaller buy-in for the owner of the house where the night is played. */
+    case HouseOwnerBuyIn = 'houseOwnerBuyIn';
+
     /** Whether a site that does not name the feature has it. */
     public function default(): bool
     {
         return match ($this) {
-            self::MainEvent => false,
+            self::MainEvent, self::HouseOwnerBuyIn => false,
             default => true,
         };
     }

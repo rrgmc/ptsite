@@ -18,6 +18,10 @@ class SeasonFactory extends Factory
             'name' => 'Liga '.fake()->unique()->year(),
             'starts_on' => fake()->date(),
             'buy_in' => '50.00',
+            'rebuy_value' => '50.00',
+            'time_chip_value' => '5.00',
+            'rebuys_allowed' => 2,
+            'rebuy_charges_time_chip' => true,
             'is_open' => true,
             'is_finished' => false,
         ];

@@ -10,8 +10,10 @@ import { Badge, ErrorBox, Loading } from '@/components/Feedback'
 import { Select } from '@/components/Select'
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
-import { formatDate, ordinal } from '@/lib/format'
+import { formatDate, ordinal, parseMoneyInput } from '@/lib/format'
 import { hasFeature } from '@/lib/features'
+import { currencySymbol } from '@/lib/site'
+import { moneyText } from '@/features/nights/partialResult'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 
 const STANDARD = [38, 23, 15, 11, 8, 5]
@@ -126,8 +128,28 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
   const [rounds, setRounds] = useState(season ? String(season.rounds) : '')
   const [everyWeeks, setEveryWeeks] = useState<number | null>(season?.schedule.every_weeks ?? null)
   const [percents, setPercents] = useState<string[]>((season?.percentages?.map((p) => p.percent) ?? STANDARD).map(String))
+  const [buyIn, setBuyIn] = useState(moneyText(season?.buy_in))
+  const [houseOwnerBuyIn, setHouseOwnerBuyIn] = useState(moneyText(season?.house_owner_buy_in))
+  const [timeChipValue, setTimeChipValue] = useState(moneyText(season?.time_chip_value))
+  const [rebuysAllowed, setRebuysAllowed] = useState(String(season?.rebuys_allowed ?? 0))
+  const [allowsExtraRebuys, setAllowsExtraRebuys] = useState(season?.allows_extra_rebuys ?? false)
+  const [rebuyValue, setRebuyValue] = useState(moneyText(season?.rebuy_value))
+  const [rebuyChargesTimeChip, setRebuyChargesTimeChip] = useState(season?.rebuy_charges_time_chip ?? false)
   const total = percents.reduce((sum, p) => sum + (Number(p) || 0), 0)
   const error = save.error instanceof ApiError ? save.error : null
+  // A season has rebuys when some are allowed, or when extra ones are. Without them, their fields are hidden.
+  const hasRebuys = Number(rebuysAllowed) > 0 || allowsExtraRebuys
+  const timeChip = hasFeature('timeChip')
+  const houseOwner = hasFeature('houseOwnerBuyIn')
+  /** An empty amount is none; a wrong one is undefined, and stops the form. */
+  const amount = (text: string) => (text.trim() === '' ? null : (parseMoneyInput(text) ?? undefined))
+  const amounts = {
+    buy_in: amount(buyIn),
+    ...(hasRebuys ? { rebuy_value: amount(rebuyValue) } : { rebuy_value: null }),
+    ...(timeChip && { time_chip_value: amount(timeChipValue) }),
+    ...(houseOwner && { house_owner_buy_in: amount(houseOwnerBuyIn) }),
+  }
+  const moneyError = (field: keyof typeof amounts) => error?.fieldError(field) ?? (amounts[field] === undefined ? t.nights.invalidMoney : undefined)
 
   return (
     <Card title={season ? t.admin.editItem({ name: season.name }) : t.admin.seasons.newTitle}>
@@ -135,12 +157,18 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
         className="flex flex-col gap-3"
         onSubmit={(e) => {
           e.preventDefault()
+          if (Object.values(amounts).includes(undefined)) return
           save.mutate(
             {
               id: season?.id,
               name,
               starts_on: startsOn,
               default_place_id: placeId,
+              ...(amounts as { [K in keyof typeof amounts]: string | null }),
+              rebuys_allowed: Number(rebuysAllowed) || 0,
+              allows_extra_rebuys: allowsExtraRebuys,
+              // An amount or a switch this site does not have is not sent: the API refuses it.
+              ...(timeChip && { rebuy_charges_time_chip: hasRebuys && rebuyChargesTimeChip }),
               is_finished: isFinished,
               is_open: !isFinished,
               percentages: percents.map((p, i) => ({ position: i + 1, percent: Number(p) || 0 })),
@@ -171,6 +199,49 @@ function SeasonForm({ season, onDone }: { season: Season | null; onDone: () => v
             <Select label={t.admin.seasons.weekday} options={WEEKDAYS} selectedKey={weekday} onSelectionChange={(k) => setWeekday(k === null ? null : Number(k))} placeholder={season ? t.common.select : t.admin.seasons.sameAsPrevious} />
             <TextField label={t.admin.seasons.time} type="time" value={nightTime} onChange={setNightTime} errorMessage={error?.fieldError('schedule_time')} />
             <Select label={t.admin.seasons.frequency} options={EVERY_WEEKS} selectedKey={everyWeeks} onSelectionChange={(k) => setEveryWeeks(k === null ? null : Number(k))} placeholder={season ? t.common.select : t.admin.seasons.sameAsPrevious} />
+          </div>
+        </fieldset>
+        <fieldset className="min-w-0 rounded-md border border-border p-3">
+          <legend className="px-1 text-sm font-semibold">{t.admin.seasons.money.title}</legend>
+          <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <TextField label={t.admin.seasons.money.buyIn({ currency: currencySymbol })} inputMode="decimal" value={buyIn} onChange={setBuyIn} errorMessage={moneyError('buy_in')} />
+              {houseOwner && (
+                <TextField
+                  label={t.admin.seasons.money.houseOwnerBuyIn({ currency: currencySymbol })}
+                  description={t.admin.seasons.money.houseOwnerBuyInHelp}
+                  inputMode="decimal"
+                  value={houseOwnerBuyIn}
+                  onChange={setHouseOwnerBuyIn}
+                  errorMessage={moneyError('house_owner_buy_in')}
+                />
+              )}
+              {timeChip && (
+                <TextField label={t.admin.seasons.money.timeChipValue({ currency: currencySymbol })} inputMode="decimal" value={timeChipValue} onChange={setTimeChipValue} errorMessage={moneyError('time_chip_value')} />
+              )}
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <TextField
+                label={t.admin.seasons.money.rebuysAllowed}
+                description={t.admin.seasons.money.rebuysAllowedHelp}
+                inputMode="numeric"
+                value={rebuysAllowed}
+                onChange={setRebuysAllowed}
+                errorMessage={error?.fieldError('rebuys_allowed')}
+              />
+              {hasRebuys && (
+                <TextField
+                  label={t.admin.seasons.money.rebuyValue({ currency: currencySymbol })}
+                  description={timeChip ? t.admin.seasons.money.rebuyValueHelp : undefined}
+                  inputMode="decimal"
+                  value={rebuyValue}
+                  onChange={setRebuyValue}
+                  errorMessage={moneyError('rebuy_value')}
+                />
+              )}
+            </div>
+            <Checkbox isSelected={allowsExtraRebuys} onChange={setAllowsExtraRebuys}>{t.admin.seasons.money.allowsExtraRebuys}</Checkbox>
+            {hasRebuys && timeChip && <Checkbox isSelected={rebuyChargesTimeChip} onChange={setRebuyChargesTimeChip}>{t.admin.seasons.money.rebuyChargesTimeChip}</Checkbox>}
           </div>
         </fieldset>
         <fieldset className="min-w-0 rounded-md border border-border p-3">

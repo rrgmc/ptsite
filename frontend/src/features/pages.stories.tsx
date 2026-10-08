@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { http, HttpResponse } from 'msw'
 import { RouterStory } from '@/mocks/RouterStory'
 import { handlers } from '@/mocks/handlers'
+import { withFeatures } from '@/mocks/withFeatures'
 import { extraNight, finishedNight, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, season, statisticsEmpty } from '@/mocks/data'
 import { MainEventAdmin } from './admin/MainEventAdmin'
 import { PlaceEditPage, PlacesAdmin } from './admin/PlacesAdmin'
@@ -348,6 +349,12 @@ export const SeasonsAdminList: StoryObj = {
 /** A season's own page in "Administração": its details, regular night and percentage table. */
 export const SeasonAdminPage: StoryObj = {
   render: () => <RouterStory path="/admin/seasons/:seasonId" url="/admin/seasons/1" element={<SeasonEditPage />} />,
+}
+
+/** A season's page on a site with no time chip and no house owner's buy-in: only the buy-in and the rebuys. */
+export const SeasonAdminPageFewAmounts: StoryObj = {
+  ...SeasonAdminPage,
+  decorators: [withFeatures({ timeChip: false, houseOwnerBuyIn: false })],
 }
 
 /** The place list in "Administração". */

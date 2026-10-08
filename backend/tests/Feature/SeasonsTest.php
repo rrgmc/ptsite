@@ -149,3 +149,119 @@ it('does not let non-admins create seasons', function () {
 
     $this->postJson('/api/v1/seasons', ['name' => 'X', 'starts_on' => '2027-01-01'])->assertForbidden();
 });
+
+it('saves the money settings of a season', function () {
+    config(['ptsite.features' => ['houseOwnerBuyIn' => true]]);
+    Sanctum::actingAs(User::factory()->admin()->create());
+
+    $id = $this->postJson('/api/v1/seasons', [
+        'name' => 'Liga 2027',
+        'starts_on' => '2027-01-01',
+        'buy_in' => '50',
+        'rebuy_value' => '50.00',
+        'time_chip_value' => '5',
+        'rebuys_allowed' => 2,
+        'rebuy_charges_time_chip' => true,
+        'allows_extra_rebuys' => true,
+        'house_owner_buy_in' => '25.00',
+    ])
+        ->assertCreated()
+        ->assertJsonPath('data.buy_in', '50.00')
+        ->assertJsonPath('data.rebuy_value', '50.00')
+        ->assertJsonPath('data.time_chip_value', '5.00')
+        ->assertJsonPath('data.rebuys_allowed', 2)
+        ->assertJsonPath('data.rebuy_charges_time_chip', true)
+        ->assertJsonPath('data.allows_extra_rebuys', true)
+        ->assertJsonPath('data.house_owner_buy_in', '25.00')
+        ->json('data.id');
+
+    // Only the fields sent change.
+    $this->patchJson("/api/v1/seasons/{$id}", ['rebuys_allowed' => 1, 'house_owner_buy_in' => null])
+        ->assertOk()
+        ->assertJsonPath('data.rebuys_allowed', 1)
+        ->assertJsonPath('data.rebuy_value', '50.00')
+        ->assertJsonPath('data.house_owner_buy_in', null);
+});
+
+it('starts a season with no rebuys and no amounts', function () {
+    Sanctum::actingAs(User::factory()->admin()->create());
+
+    $this->postJson('/api/v1/seasons', ['name' => 'Liga 2027', 'starts_on' => '2027-01-01'])
+        ->assertCreated()
+        ->assertJsonPath('data.buy_in', null)
+        ->assertJsonPath('data.rebuy_value', null)
+        ->assertJsonPath('data.rebuys_allowed', 0)
+        ->assertJsonPath('data.rebuy_charges_time_chip', false)
+        ->assertJsonPath('data.allows_extra_rebuys', false);
+});
+
+it('requires the rebuy value of a season with rebuys', function () {
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $season = Season::factory()->create(['rebuy_value' => null, 'rebuys_allowed' => 0]);
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['rebuys_allowed' => 2])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.rebuy_value.0', 'Informe o valor do rebuy, ou deixe a temporada sem rebuys.');
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['allows_extra_rebuys' => true])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['rebuy_value']);
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['rebuys_allowed' => 2, 'rebuy_value' => '30'])->assertOk();
+    // The stored number of rebuys still needs the value.
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['rebuy_value' => null])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['rebuy_value']);
+});
+
+it('refuses money settings in a wrong format', function () {
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $season = Season::factory()->create();
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['buy_in' => '50,00', 'rebuy_value' => '-5', 'time_chip_value' => '5.123', 'rebuys_allowed' => 21])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['buy_in', 'rebuy_value', 'time_chip_value', 'rebuys_allowed']);
+});
+
+it('keeps the house owner\'s buy-in at or below the buy-in', function () {
+    config(['ptsite.features' => ['houseOwnerBuyIn' => true]]);
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $season = Season::factory()->create(['buy_in' => '50.00']);
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['house_owner_buy_in' => '60.00'])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.house_owner_buy_in.0', 'O buy-in do dono da casa não pode ser maior que o buy-in.');
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['buy_in' => null, 'house_owner_buy_in' => '25.00'])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.house_owner_buy_in.0', 'Informe o buy-in antes do buy-in do dono da casa.');
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['house_owner_buy_in' => '50.00'])->assertOk();
+    // Lowering the buy-in below the stored house owner's buy-in is refused too.
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['buy_in' => '40.00'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['house_owner_buy_in']);
+});
+
+it('refuses the house owner\'s buy-in on a site without it', function () {
+    config(['ptsite.features' => ['houseOwnerBuyIn' => false]]);
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $season = Season::factory()->create(['buy_in' => '50.00', 'house_owner_buy_in' => '45.00']);
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['house_owner_buy_in' => '25.00'])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.house_owner_buy_in.0', 'Este site não usa o campo buy-in do dono da casa.');
+
+    // A value stored before the feature was turned off does not block the buy-in.
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['buy_in' => '40.00'])->assertOk();
+});
+
+it('refuses the time chip settings on a site without the time chip', function () {
+    config(['ptsite.features' => ['timeChip' => false]]);
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $season = Season::factory()->create();
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['time_chip_value' => '5.00', 'rebuy_charges_time_chip' => true])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['time_chip_value', 'rebuy_charges_time_chip']);
+
+    $this->patchJson("/api/v1/seasons/{$season->id}", ['rebuy_value' => '40.00'])->assertOk();
+});

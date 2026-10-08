@@ -1353,7 +1353,20 @@ export interface components {
             starts_on: string;
             default_place_id?: number | null;
             description?: string | null;
+            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
             buy_in?: string | null;
+            /** @description A rebuy's price, without the time chip it may also charge. Required when the season has rebuys. */
+            rebuy_value?: string | null;
+            /** @description The price of one time chip. Refused on a site without the time chip. */
+            time_chip_value?: string | null;
+            /** @description How many rebuys a player can make on a night; 0 means none. */
+            rebuys_allowed?: number;
+            /** @description Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
+            rebuy_charges_time_chip?: boolean;
+            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            allows_extra_rebuys?: boolean;
+            /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
+            house_owner_buy_in?: string | null;
             /** @description How many nights ("rodadas") the season has; 26 by default. Scheduling more is allowed, with a warning. */
             rounds?: number;
             is_open?: boolean;
@@ -1395,7 +1408,20 @@ export interface components {
             name: string;
             starts_on: string;
             description: string | null;
+            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
             buy_in: string | null;
+            /** @description A rebuy's price, without the time chip it may also charge. */
+            rebuy_value: string | null;
+            /** @description The price of one time chip. */
+            time_chip_value: string | null;
+            /** @description How many rebuys a player can make on a night; 0 means none. */
+            rebuys_allowed: number;
+            /** @description Whether a rebuy also charges a time chip. */
+            rebuy_charges_time_chip: boolean;
+            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            allows_extra_rebuys: boolean;
+            /** @description The smaller buy-in of the owner of the house where the night is played. */
+            house_owner_buy_in: string | null;
             /** @description How many nights ("rodadas") the season has. */
             rounds: number;
             /** @description The season's nights that are not archived, in any state; compare with rounds. */
@@ -1574,7 +1600,20 @@ export interface components {
             starts_on?: string;
             default_place_id?: number | null;
             description?: string | null;
+            /** @description What a player pays to enter a night. The season only records its money settings: no rule uses them. */
             buy_in?: string | null;
+            /** @description A rebuy's price, without the time chip it may also charge. Required when the season has rebuys. */
+            rebuy_value?: string | null;
+            /** @description The price of one time chip. Refused on a site without the time chip. */
+            time_chip_value?: string | null;
+            /** @description How many rebuys a player can make on a night; 0 means none. */
+            rebuys_allowed?: number;
+            /** @description Whether a rebuy also charges a time chip. Refused on a site without the time chip. */
+            rebuy_charges_time_chip?: boolean;
+            /** @description Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            allows_extra_rebuys?: boolean;
+            /** @description The smaller buy-in of the owner of the house; not above the buy-in. Refused on a site without this feature. */
+            house_owner_buy_in?: string | null;
             /** @description How many nights ("rodadas") the season has; 26 by default. Scheduling more is allowed, with a warning. */
             rounds?: number;
             is_open?: boolean;

@@ -37,18 +37,19 @@ After changing `brandColor` or `logo`, run `npm run icons` in `frontend/`. It dr
 ## Features
 
 A league that does not use a part of the site turns it off in `features`, and turns on the ones that are off
-unless asked for. A site that names none has every feature but the Main Event:
+unless asked for. A site that names none has every feature but the Main Event and the house owner's buy-in:
 
 ```json
-"features": { "mainEventPot": false, "timeChip": false, "mainEvent": true }
+"features": { "mainEventPot": false, "timeChip": false, "mainEvent": true, "houseOwnerBuyIn": true }
 ```
 
 | Feature | Unless named | What it is | With `false` |
 |---|---|---|---|
 | `mainEventPot` | on | "Pote ME": the money a night sets aside for the Main Event. | The result forms, the night's result and the season totals have no "Pote ME". Finishing a night does not ask for it. |
-| `timeChip` | on | "Time chip": the money a night sets aside for the year party. | The same, for "Time chip". |
+| `timeChip` | on | "Time chip": the money a night sets aside for the year party. | The same, for "Time chip". A season's form also has no time chip value and no "O rebuy também paga o time chip". |
 | `seasonPlanner` | on | "Planejar datas": the calendar that schedules a season's regular nights at once. | "Administração" has no "Planejar datas". Nights are scheduled one at a time with "+ Agendar". The holiday table and the season calendar stay. |
 | `mainEvent` | off | "Main Event": a season's final game, as a night of its own type that records the order of its players, with no pot and no points. | A night cannot be scheduled as a Main Event, the menu has no "Main Event", and "Temporadas" shows no Main Event champion. Extra nights stay. |
+| `houseOwnerBuyIn` | off | "Buy-in do dono da casa": a season's smaller buy-in for the owner of the house where the night is played. | A season's form has no "Buy-in do dono da casa". |
 
 The build stops on a name that is not in this table, or on a value that is not `true` or `false`.
 
