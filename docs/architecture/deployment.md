@@ -9,7 +9,7 @@ so the site is built on a developer's machine or in CI and uploaded as a zip.
 
 ## Build (CI)
 
-The tests of one pull request take about 6 minutes, in seven jobs.
+The tests of one pull request take about 4 minutes, in nine jobs and one that sums them up.
 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs each thing once:
 
 | When | What runs |
