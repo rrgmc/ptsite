@@ -19,9 +19,15 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(page.getByRole('term').filter({ hasText: 'Pote Total' }).locator('xpath=..').getByRole('definition')).toHaveText(/^R\$/)
   const totals = page.getByRole('table', { name: 'Jogadores por pontuação total' })
   await expect(totals.getByRole('row')).toHaveCount(11) // the header and the first ten
-  // One list for each scoring position, inside "Posições".
-  await expect(page.getByRole('heading', { name: '1º lugar' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: '6º lugar' })).toBeVisible()
+  // "Posições": a line per player and a column per scoring position. It shows the first ten, then everyone.
+  const positions = page.getByRole('table', { name: 'Jogadores por vezes em cada posição' })
+  await expect(positions.getByRole('columnheader', { name: '1º' })).toBeVisible()
+  await expect(positions.getByRole('columnheader', { name: '6º' })).toBeVisible()
+  await expect(positions.getByRole('row')).toHaveCount(11)
+  await page.getByRole('button', { name: /^Ver todos \(\d+\)$/ }).click()
+  await expect(positions.getByRole('row')).not.toHaveCount(11)
+  await page.getByRole('button', { name: 'Ver só os 10 primeiros' }).click()
+  await expect(positions.getByRole('row')).toHaveCount(11)
   await expect(page.getByRole('img', { name: /^Gráfico de linhas: pontos acumulados dos 8 jogadores com mais pontos, por evento/ })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Gráfico de barras: vitórias por jogador/ })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Gráfico de linha: pote por evento/ })).toBeVisible()
@@ -31,9 +37,9 @@ test('a player sees the statistics of a season and of every season', async ({ pa
 
   // A box folds: its title hides its lists, and shows them again.
   await page.getByRole('heading', { name: 'Posições' }).click()
-  await expect(page.getByRole('heading', { name: '1º lugar' })).toBeHidden()
+  await expect(positions).toBeHidden()
   await page.getByRole('heading', { name: 'Posições' }).click()
-  await expect(page.getByRole('heading', { name: '1º lugar' })).toBeVisible()
+  await expect(positions).toBeVisible()
   await expectAccessible(page)
 
   // A night in "Maiores Potes" opens the night.

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { http, HttpResponse } from 'msw'
 import { statistics, statisticsEmpty } from '@/mocks/data'
 import { RouterStory } from '@/mocks/RouterStory'
+import { PositionTable } from './PositionTable'
 import { PlacesChart, PointsProgressChart, PotsChart, WinsChart } from './StatisticsCharts'
 import { AllTimeStatisticsPage, StatisticsPage, StatisticsView } from './StatisticsPage'
 
@@ -59,4 +60,10 @@ export const ManyPlaces: StoryObj = {
       }}
     />
   ),
+}
+
+/** "Posições": twelve players, the first ten shown, with "Ver todos" for the rest. */
+export const Positions: StoryObj = {
+  parameters: { layout: 'padded' },
+  render: () => <RouterStory path="/" url="/" element={<PositionTable rows={statistics.position_table} />} />,
 }

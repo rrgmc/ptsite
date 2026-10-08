@@ -279,6 +279,10 @@ const playerList = (values: [player: number, rank: number, value: number][], key
   ...extra,
 })
 
+/** The medal table: each player's times in the 1st, 2nd and 3rd place. */
+const positionTable = (lines: [player: number, rank: number, counts: number[]][]): Statistics['position_table'] =>
+  lines.map(([player, rank, counts]) => ({ rank, player: players[player], positions: counts.map((count, i) => ({ position: i + 1, count })) }))
+
 const potNight = (id: number, day: string, seasonName: string) => ({ id, starts_at: `${day}T21:30:00-03:00`, season_id: 1, season_name: seasonName })
 
 /** One season: five nights, with ties in the lists and a cut tie in "Posição: 3º". */
@@ -329,6 +333,10 @@ export const statistics: Statistics = {
     pots: ['840.00', '755.00', '810.00', '900.00', '840.00'],
   },
   wins_not_shown: 0,
+  position_table: positionTable([
+    [0, 1, [2, 1, 0]], [2, 2, [1, 2, 0]], [1, 3, [1, 0, 1]], [7, 3, [1, 0, 1]], [3, 5, [0, 1, 1]], [4, 6, [0, 1, 0]],
+    [5, 7, [0, 0, 1]], [6, 7, [0, 0, 1]], [8, 7, [0, 0, 1]], [9, 7, [0, 0, 1]], [10, 7, [0, 0, 1]], [11, 7, [0, 0, 1]],
+  ]),
   // The season's own Main Event. The screen lists the Main Events only over every season.
   main_event: {
     count: 1,
@@ -391,6 +399,7 @@ export const statisticsEmpty: Statistics = {
   places: playerList([], 'count'),
   points_progress: { steps: [], series: [], pots: [] },
   wins_not_shown: 0,
+  position_table: [],
   main_event: null,
 }
 

@@ -11,6 +11,7 @@ use PTSite\Domain\Features\Features;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Statistics\MainEventStatistics;
 use PTSite\Domain\Statistics\MainEventSummary;
+use PTSite\Domain\Statistics\PositionTableRow;
 use PTSite\Domain\Statistics\RankedRow;
 use PTSite\Domain\Statistics\Statistics;
 use PTSite\Domain\Statistics\TopList;
@@ -43,6 +44,7 @@ final class LeagueStatistics
         $players = Player::query()->findMany([
             ...array_merge(...array_map(fn (TopList $list) => array_map(fn (RankedRow $row) => $row->id, $list->rows), $playerLists)),
             ...array_keys($summary->progress->totals),
+            ...array_map(fn (PositionTableRow $row) => $row->playerId, $summary->positionTable),
         ])->keyBy('id');
         $places = Place::query()->findMany(array_map(fn (RankedRow $row) => $row->id, $summary->places->rows))->keyBy('id');
 
@@ -80,6 +82,11 @@ final class LeagueStatistics
             ),
             array_map(fn (Money $pot) => $pot->toDecimal(), $summary->progress->pots),
             $summary->winsNotShown,
+            array_map(fn (PositionTableRow $row) => [
+                'rank' => $row->rank,
+                'player' => $players[$row->playerId],
+                'positions' => array_map(fn (int $position, int $count) => ['position' => $position, 'count' => $count], array_keys($row->counts), $row->counts),
+            ], $summary->positionTable),
             $mainEvent ? new MainEventStatisticsReport(
                 $mainEvent->count,
                 $counted($mainEvent->titles),

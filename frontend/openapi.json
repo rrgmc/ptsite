@@ -6701,6 +6701,44 @@
                         "type": "integer",
                         "description": "First places of the players who are not in the first \"Posi\u00e7\u00e3o\" list (\"Outros\")."
                     },
+                    "position_table": {
+                        "type": "array",
+                        "description": "Every player who scored, with the times in each scoring position (zeros included), ordered as a\nmedal table: most 1st places first, then most 2nd places, and so on. Equal lines share a `rank`.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "rank": {
+                                    "type": "integer"
+                                },
+                                "player": {
+                                    "$ref": "#/components/schemas/PlayerResource"
+                                },
+                                "positions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "position": {
+                                                "type": "integer"
+                                            },
+                                            "count": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "required": [
+                                            "position",
+                                            "count"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "rank",
+                                "player",
+                                "positions"
+                            ]
+                        }
+                    },
                     "main_event": {
                         "anyOf": [
                             {
@@ -6726,6 +6764,7 @@
                     "places",
                     "points_progress",
                     "wins_not_shown",
+                    "position_table",
                     "main_event"
                 ],
                 "title": "StatisticsResource"

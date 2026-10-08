@@ -13,6 +13,7 @@ final readonly class StatisticsSummary
      * @param  TopList  $biggestPots  nights by pot, in cents
      * @param  TopList  $places  places by number of nights
      * @param  int  $winsNotShown  first places of players outside the first-place list
+     * @param  list<PositionTableRow>  $positionTable  every player who scored, as a medal table
      */
     public function __construct(
         public int $nightsCount,
@@ -26,5 +27,6 @@ final readonly class StatisticsSummary
         public TopList $places,
         public PointsProgress $progress,
         public int $winsNotShown,
+        public array $positionTable,
     ) {}
 }

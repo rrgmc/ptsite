@@ -1827,6 +1827,18 @@ export interface components {
             };
             /** @description First places of the players who are not in the first "Posição" list ("Outros"). */
             wins_not_shown: number;
+            /**
+             * @description Every player who scored, with the times in each scoring position (zeros included), ordered as a
+             *     medal table: most 1st places first, then most 2nd places, and so on. Equal lines share a `rank`.
+             */
+            position_table: {
+                rank: number;
+                player: components["schemas"]["PlayerResource"];
+                positions: {
+                    position: number;
+                    count: number;
+                }[];
+            }[];
             main_event: components["schemas"]["MainEventStatisticsResource"] | null;
         };
         /** SuggestedNightResource */

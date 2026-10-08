@@ -57,6 +57,17 @@ class StatisticsResource extends JsonResource
             ],
             /** First places of the players who are not in the first "Posição" list ("Outros"). */
             'wins_not_shown' => $this->winsNotShown,
+            /**
+             * Every player who scored, with the times in each scoring position (zeros included), ordered as a
+             * medal table: most 1st places first, then most 2nd places, and so on. Equal lines share a `rank`.
+             *
+             * @var list<array{rank: int, player: PlayerResource, positions: list<array{position: int, count: int}>}>
+             */
+            'position_table' => array_map(fn (array $row) => [
+                'rank' => $row['rank'],
+                'player' => new PlayerResource($row['player']),
+                'positions' => $row['positions'],
+            ], $this->positionTable),
             /** The lists of the finished Main Events of the same seasons. Null on a site with no Main Event. */
             'main_event' => $this->mainEvent === null ? null : new MainEventStatisticsResource($this->mainEvent),
         ];

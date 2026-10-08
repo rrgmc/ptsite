@@ -78,6 +78,23 @@ it('counts how often each player finished in each position', function () {
         ->and(rows($positions[3]))->toBe([[1, S_ANA, 1], [1, S_CARLA, 1]]);
 });
 
+it('orders the players as a medal table, by 1st places, then 2nd places, and so on', function () {
+    $table = (new Statistics)->summarise(everySeason())->positionTable;
+
+    expect(array_map(fn ($row) => [$row->rank, $row->playerId, $row->counts], $table))->toBe([
+        [1, S_ANA, [1 => 2, 2 => 0, 3 => 1]],
+        [2, S_BRENO, [1 => 1, 2 => 1, 3 => 0]],
+        [3, S_CARLA, [1 => 0, 2 => 2, 3 => 1]],
+    ]);
+});
+
+it('gives players with the same counts the same line in the medal table', function () {
+    // Ana and Breno: one 1st and one 2nd place each. Carla: two 3rd places.
+    $table = (new Statistics)->positionTable([1 => [S_ANA => 1, S_BRENO => 1], 2 => [S_BRENO => 1, S_ANA => 1], 3 => [S_CARLA => 2]]);
+
+    expect(array_map(fn ($row) => [$row->rank, $row->playerId], $table))->toBe([[1, S_ANA], [1, S_BRENO], [3, S_CARLA]]);
+});
+
 it('lists the biggest pots, and counts the nights and adds up their three amounts', function () {
     $summary = (new Statistics)->summarise(everySeason());
 

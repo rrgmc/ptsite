@@ -11,10 +11,11 @@ import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { RankedList, type RankedRow } from '@/components/RankedList'
 import { StatTiles } from '@/components/StatTiles'
 import { t } from '@/i18n'
-import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
+import { formatMoney, formatPoints, nightTitle } from '@/lib/format'
 import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { amountRows } from '../nights/amounts'
+import { PositionTable } from './PositionTable'
 import { PlacesChart, PointsProgressChart, PotsChart, subtitle, WinsChart } from './StatisticsCharts'
 
 /** "Estatísticas" of the selected season (docs/specs/statistics.md). */
@@ -69,7 +70,7 @@ function ListBlock({ title, children, className = '' }: { title: string; childre
   )
 }
 
-/** A top ten list of players by a count: nights scored, times in a position, Main Events won. */
+/** A top ten list of players by a count: nights scored, Main Events won. */
 function CountList({ title, caption, valueHeader, list }: { title: string; caption: string; valueHeader: string; list: RankedListData }) {
   return (
     <ListBlock title={title}>
@@ -152,18 +153,7 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
           </FoldPanel>
 
           <FoldPanel title={t.statistics.positions}>
-            {/* Every position at once on a wide screen, and two across on a phone. */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-3 lg:grid-cols-6">
-              {statistics.positions.map((list) => (
-                <CountList
-                  key={list.position}
-                  title={t.statistics.positionTitle({ position: ordinal(list.position!) })}
-                  caption={t.statistics.positionCaption({ position: ordinal(list.position!) })}
-                  valueHeader={t.statistics.times}
-                  list={list}
-                />
-              ))}
-            </div>
+            <PositionTable rows={statistics.position_table} />
           </FoldPanel>
         </>
       )}

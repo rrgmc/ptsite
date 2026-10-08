@@ -22,9 +22,11 @@ Everyone logged in: players, results keepers and admins.
 3. Each list shows the **first 10**, highest first:
    - **"Pontuação Total"**: players by total points.
    - **"Eventos Pontuando"**: players by the number of nights on which they scored.
-   - **"Posições"**: "1º lugar", "2º lugar" and so on, one list per scoring position: players by the times they
-     finished there.
    - **"Maiores Potes"**: nights by pot.
+3c. **"Posições"** is a table like a medal table: a line for each player who scored and a column for each
+   scoring position, with the times the player finished there. A position the player never reached shows 0.
+   The order is by most 1st places, then by most 2nd places, and so on. Players with the same number in every
+   column share a position (rule 4). It shows the first 10 lines, and "Ver todos" shows every line.
 3a. **"Locais"** is a pie chart of the first 10 places by the number of nights. A night with no place is not
    counted. The pie has eight colors: with more than eight places, the ones after the seventh are one slice,
    "Outros".
@@ -36,7 +38,7 @@ Everyone logged in: players, results keepers and admins.
 5. **"Pontos acumulados"** is a line chart of the running total of the **eight players with most points**: one step
    per night in "Temporada", one step per season in "Geral". The box of a point lists the players by their total
    at that point, highest first.
-6. **"Vitórias"** is a bar chart of the "1º lugar" list, with the first places of everyone else added up as
+6. **"Vitórias"** is a bar chart of the ten players with most 1st places, with the first places of everyone else added up as
    "Outros".
 7. The view also shows how many nights it counts and their total pot. The Main Event pots and the time chips of
    those nights are added up too; "Resultados" shows the same three totals of the season. A site with no Main
@@ -84,7 +86,10 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - **Total points, every season.** Ana 288,00 (114 + 60 + 114), Breno 221,00, Carla 206,00.
 - **Total points, season A only.** Breno 221,00, Ana 174,00, Carla 137,00.
 - **Nights scored, with a tie.** Ana 3 and Carla 3 share 1st; Breno, with 2, is 3rd.
-- **Finishing positions.** 1st: Ana 2, Breno 1. 2nd: Carla 2, Breno 1. 3rd: Ana 1 and Carla 1 share 1st.
+- **Finishing positions.** 1st: Ana 2, Breno 1. 2nd: Carla 2, Breno 1. 3rd: Ana 1 and Carla 1. The table is Ana
+  (2, 0, 1), then Breno (1, 1, 0), then Carla (0, 2, 1): Ana has most 1st places, and Carla has none.
+- **The same positions.** Ana and Breno have one 1st and one 2nd place each, and Carla two 3rd places: Ana and
+  Breno share 1st, and Carla is 3rd.
 - **Biggest pots.** Night 2 (R$ 400,00) is 1st; nights 1 and 3 (R$ 300,00) share 2nd. The total pot is R$ 1.000,00
   over 3 nights. Each night sets aside a tenth of its pot for the Main Event and R$ 20,00 of time chips: the
   totals are R$ 100,00 and R$ 60,00.
@@ -95,8 +100,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   Carla 45,00 then 137,00.
 - **Points per season.** In "Geral" the chart has two steps, the end of A and the end of B: Ana 174,00 then
   288,00; Breno 221,00 then 221,00; Carla 137,00 then 206,00.
-- **The cut at ten.** Twelve players won one night each: "1º lugar" shows ten, all in 1st, and "e mais 2
-  empatados"; "Vitórias" shows ten bars and "Outros: 2".
+- **The cut at ten.** Twelve players won one night each, and nobody else scored: "Posições" shows ten lines, all
+  in 1st, and "Ver todos (12)"; "Vitórias" shows ten bars and "Outros: 2".
 - **Ten places.** A league played at ten places: the pie has the seven with most nights and "Outros", which adds
   up the other three.
 - **The Main Events.** Season A's Main Event ends Ana, Breno, Carla, Dudu, and season B's ends Breno, Ana,
@@ -129,8 +134,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
   - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
     over the other, beside the list.
-  - **"Posições"**: one list per scoring position. All of them are side by side on a wide screen, three across
-    on a tablet and two across on a phone.
+  - **"Posições"**: the table of rule 3c, with the columns "1º", "2º" and so on.
   - **"Main Event"**, in "Geral": "Títulos", "Pódios" and "Participações", side by side, two across on a phone.
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, below "Próximos eventos" and above the
@@ -144,7 +148,6 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 ## Open questions
 
 - Which view opens first. It is "Temporada" for now, like the other season screens.
-- A table of every player by finishing position, and new lists such as podiums and averages, were offered and not
-  chosen for now. One player's finishing positions are on the player's page (rule 9).
+- New lists such as podiums and averages were offered and not chosen for now.
 - Should a player's "Pontos acumulados" in "Geral" start at the player's first season, instead of showing a flat
   line at zero for the seasons before it?

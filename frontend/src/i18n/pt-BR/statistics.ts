@@ -15,9 +15,10 @@ export const statistics = {
   places: 'Locais',
   noPlaces: 'Nenhum evento com local.',
   placesCaption: 'Locais por número de eventos',
-  /** The title of one list inside "Posições". */
-  positionTitle: ({ position }: { position: string }) => `${position} lugar`,
-  positionCaption: ({ position }: { position: string }) => `Jogadores por vezes em ${position} lugar`,
+  // "Posições": a line per player and a column per scoring position
+  positionTableCaption: 'Jogadores por vezes em cada posição',
+  showAll: ({ count }: { count: number }) => `Ver todos (${count})`,
+  showFirst: ({ count }: { count: number }) => `Ver só os ${count} primeiros`,
   times: 'Vezes',
 
   // The Main Events of every season, on a site that has the Main Event
