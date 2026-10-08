@@ -58,7 +58,19 @@ async function shot(name, fullPage = false) {
   // The pointer stays where the last click was, which can be over a chart: move it away, or a tooltip shows
   await page.mouse.move(0, 0)
   await page.waitForTimeout(300)
-  await page.screenshot({ path: `${out}${name}.png`, fullPage })
+  if (!fullPage) {
+    await page.screenshot({ path: `${out}${name}.png` })
+    return
+  }
+  // The whole page: make the screen as tall as the page and take that. Playwright's own fullPage leaves the
+  // header and the bottom bar, which stick to the screen, drawn across the middle of the picture.
+  const screen = page.viewportSize()
+  const height = await page.evaluate(() => document.documentElement.scrollHeight)
+  await page.setViewportSize({ width: screen.width, height })
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: `${out}${name}.png` })
+  await page.setViewportSize(screen)
 }
 async function login(username) {
   await page.goto('login')
