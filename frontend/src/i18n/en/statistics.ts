@@ -21,6 +21,7 @@ export const statistics: Messages['statistics'] = {
   never: '–',
   highestOfPosition: '(the highest of the position)',
   showAll: ({ count }) => `Show all (${count})`,
+  showMost: ({ count }) => `Show the first ${count}`,
   showFirst: ({ count }) => `Show only the first ${count}`,
   times: 'Times',
 

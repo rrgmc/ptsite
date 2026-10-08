@@ -9,18 +9,20 @@ import { ordinal } from '@/lib/format'
 
 /** How many lines show before "Ver todos". */
 const FIRST = 10
+/** How many lines show at most, after it: a league with many players would make the table too long. */
+const MOST = 30
 
 /**
  * "Posições" as a medal table: a line per player and a column per scoring position, with the times the player
  * finished there. The API orders it: most 1st places first, then most 2nd places, and so on.
- * It shows the first ten lines, and the rest on request. The highest number of each column is marked, and a
+ * It shows the first ten lines, and on request up to thirty. The highest number of each column is marked, and a
  * position the player never reached shows a dash.
  */
 export function PositionTable({ rows }: { rows: Statistics['position_table'] }) {
   const [all, setAll] = useState(false)
   const positions = rows[0]?.positions.map((p) => p.position) ?? []
-  const shown = all ? rows : rows.slice(0, FIRST)
-  // The highest number of each column, among every line and not only the ones shown.
+  const shown = rows.slice(0, all ? MOST : FIRST)
+  // The highest number of each column, among every line: also the ones not shown.
   const highest = positions.map((_, column) => Math.max(...rows.map((row) => row.positions[column].count)))
 
   return (
@@ -72,7 +74,7 @@ export function PositionTable({ rows }: { rows: Statistics['position_table'] }) 
       </div>
       {rows.length > FIRST && (
         <Button variant="ghost" className="mt-2" aria-expanded={all} onPress={() => setAll(!all)}>
-          {all ? t.statistics.showFirst({ count: FIRST }) : t.statistics.showAll({ count: rows.length })}
+          {all ? t.statistics.showFirst({ count: FIRST }) : rows.length > MOST ? t.statistics.showMost({ count: MOST }) : t.statistics.showAll({ count: rows.length })}
         </Button>
       )}
     </>

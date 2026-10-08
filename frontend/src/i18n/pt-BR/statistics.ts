@@ -24,6 +24,8 @@ export const statistics = {
   /** Read by screen readers after the highest number of a column. */
   highestOfPosition: '(o maior da posição)',
   showAll: ({ count }: { count: number }) => `Ver todos (${count})`,
+  /** In place of "Ver todos" when there are more lines than the table shows at most. */
+  showMost: ({ count }: { count: number }) => `Ver os ${count} primeiros`,
   showFirst: ({ count }: { count: number }) => `Ver só os ${count} primeiros`,
   times: 'Vezes',
 
