@@ -297,15 +297,17 @@ export const DASHBOARD_REFRESH_MS = 10_000
 const dashboardScope = (nightId: number) => `night-dashboard-${nightId}`
 
 /**
- * A night's dashboard ("Painel do evento"), on a site that has it. It is asked for again every few seconds while
- * the screen is visible, but not while a change of this browser is on its way: its answer is newer.
+ * A night's dashboard ("Painel do evento"), on a site that has it. While the night is open it is asked for again
+ * every few seconds while the screen is visible, but not while a change of this browser is on its way: its answer
+ * is newer.
  */
 export function useNightDashboard(nightId: number, enabled = true) {
   const changing = useIsMutating({ predicate: (m) => m.options.scope?.id === dashboardScope(nightId) }) > 0
   return useQuery({
     queryKey: keys.nightDashboard(nightId),
     enabled,
-    refetchInterval: changing ? false : DASHBOARD_REFRESH_MS,
+    // A finished night changes only when an admin corrects it: it is read again like any other screen.
+    refetchInterval: (query) => (changing || query.state.data?.status === 'finished' ? false : DASHBOARD_REFRESH_MS),
     // A night with no dashboard (not open yet, or a Main Event) stays without one.
     retry: (failures, error) => !(error instanceof ApiError) && failures < 1,
     queryFn: async () =>

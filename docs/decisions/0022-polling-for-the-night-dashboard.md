@@ -17,6 +17,7 @@ refreshed by itself; a screen was read again when its window got the focus back.
 - **The dashboard asks the API for the whole dashboard again every 10 seconds** (polling), with one request:
   `GET /nights/{id}/dashboard`.
 - **It asks only while it is on screen.** A phone that is locked, or showing another app, asks nothing.
+- **It asks only while the night is open.** A finished night changes only when an admin corrects it.
 - **It does not ask while a change of its own is on its way.** Every change answers the whole dashboard, which
   is newer than a refresh.
 - **Only the dashboard does this.** Every other screen keeps reading again on focus.
