@@ -242,6 +242,7 @@ it('keeps the house owner\'s buy-in at or below the buy-in', function () {
 });
 
 it('refuses the house owner\'s buy-in on a site without it', function () {
+    config(['ptsite.features' => ['houseOwnerBuyIn' => false]]);
     Sanctum::actingAs(User::factory()->admin()->create());
     $season = Season::factory()->create(['buy_in' => '50.00', 'house_owner_buy_in' => '45.00']);
 
