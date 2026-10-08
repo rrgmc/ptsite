@@ -56,6 +56,27 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    nights (rule 25). A new season starts with the
    previous season's number. It is a target, not a limit: scheduling a night past it shows a warning ("A temporada
    já tem 26 eventos de 26 rodadas") but is allowed.
+5b. A season has its **money settings** ("Valores"): what a night of the season costs. An admin sets them on the
+   season's page in "Administração". Each one is optional unless a rule below says otherwise:
+   - the **buy-in**: what a player pays to enter a night;
+   - the **time chip value**: the price of one time chip, on a site with the time chip (rule 9c);
+   - the **rebuys allowed** ("Rebuys permitidos"): how many rebuys a player can make on a night, from 0 to 20.
+     A new season starts with 0;
+   - whether a player can make **rebuys past the limit** ("Permitir rebuys além do limite"). Those rebuys do not
+     count for the season's points;
+   - the **rebuy value**: the price of a rebuy, without the time chip it may also charge;
+   - whether **a rebuy also pays the time chip** ("O rebuy também paga o time chip"), on a site with the time chip;
+   - the **house owner's buy-in** ("Buy-in do dono da casa"): the smaller buy-in of the owner of the house where
+     the night is played, on a site that turns this on (`houseOwnerBuyIn` in `features`,
+     [`site/README.md`](../../site/README.md)).
+5c. **A season has rebuys** when it allows at least one, or allows rebuys past the limit. A season with rebuys
+   must have a rebuy value. A season with 0 rebuys and none past the limit has no rebuys: its form shows no
+   rebuy value and no "O rebuy também paga o time chip".
+5d. The house owner's buy-in needs a buy-in, and cannot be above it. It can be the same, or zero.
+5e. **The season only records its money settings. No rule calculates with them yet**: a night's pot and time chip
+   are still the totals the keeper enters (rule 9), and a night records no rebuys.
+5f. A setting of a feature the site does not have is not shown, and the API refuses it. A value recorded before
+   the feature was turned off stays in the database.
 
 ### Game nights ("Evento")
 
@@ -183,6 +204,25 @@ The selected season, in the demo league (the current season, and Liga 2022, whic
 - **A season that is gone.** Opening `/seasons/999999/results` shows the results of the current season, without
   the notice.
 
+Money settings:
+
+- **A season with rebuys.** Liga 2027 has a buy-in of R$ 50,00, 2 rebuys allowed at R$ 50,00 each, a time chip of
+  R$ 5,00 that every rebuy also pays, and rebuys past the limit. All of it is saved.
+- **No rebuys.** A new season has 0 rebuys allowed and none past the limit. It has no rebuys, and needs no rebuy
+  value.
+- **Only past the limit.** A season allows 0 rebuys but allows rebuys past the limit. It has rebuys, none of which
+  counts for points, and needs a rebuy value.
+- **No rebuy value.** A season with no rebuy value is changed to allow 2 rebuys: refused ("Informe o valor do
+  rebuy, ou deixe a temporada sem rebuys.").
+- **Too many.** 21 rebuys allowed is refused; 20 is accepted.
+- **The owner of the house.** With a buy-in of R$ 50,00, a house owner's buy-in of R$ 25,00, R$ 0,00 or R$ 50,00
+  is accepted. R$ 60,00 is refused ("O buy-in do dono da casa não pode ser maior que o buy-in."). So is R$ 25,00
+  in a season with no buy-in ("Informe o buy-in antes do buy-in do dono da casa.").
+- **A site without the time chip.** The season's form has no time chip value and no "O rebuy também paga o time
+  chip", and the API refuses both.
+- **A site without the house owner's buy-in.** The form does not show it and the API refuses it. A season that
+  already has one can still change its buy-in.
+
 Moving and cancelling:
 
 - **Remarcar.** The night of 12/03/2027 is moved to 19/03/2027 at 20:00. Ana's ALL IN, given before answers were
@@ -259,10 +299,12 @@ Suggested dates, for a season whose regular night is Friday at 21:30:
   The **Main Event pot** is recorded on every night.
 - A night can be **extra**, outside the season's calendar (rules 25 to 30).
 - The **time chip** is recorded on every night.
+- A season records its **money settings** (rules 5b to 5f). Nothing calculates with them yet.
 - Attendance answers ("ALL IN" / "FOLD") are described in [attendance.md](attendance.md).
 
 ## Open questions
 
 - **Time chip total.** Should the season show the time chips added up (the year party fund)?
-- **Buy-in.** A season can store a buy-in that no rule uses yet. Keep it?
+- **Using the money settings.** Should a night record each player's rebuys, and work out the pot, the time chip
+  and the points from the season's settings? Then a night also needs to say who owns the house.
 - **Deleting nights.** Archiving, like players, could replace hiding deleted nights.

@@ -106,7 +106,7 @@ A site turns a part of the product off in `features` of its `site.json`
   against it and stops the build on a name it does not know.
 - **A screen asks `hasFeature('timeChip')`** of `src/lib/features.ts`, and leaves out the field, the row or the
   link when the answer is no. Hiding is cosmetic: the API refuses the feature too.
-- **The demo site has every feature**, the Main Event too, which it turns on in `site/site.json`. So a test or a story shows the other way with `overrideFeatures` (a test)
+- **The demo site has every feature**, the Main Event and the house owner's buy-in too, which it turns on in `site/site.json`. So a test or a story shows the other way with `overrideFeatures` (a test)
   or the decorator `withFeatures` of `src/mocks/withFeatures.tsx` (a story).
 - To add a flag, follow "Adding a feature flag" in [backend-layers.md](backend-layers.md).
 
