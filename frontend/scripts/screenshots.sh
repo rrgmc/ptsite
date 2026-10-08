@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Regenerates the phone screenshots in docs/screens (shown in README.md).
+# README.md is in English, so the screenshots are too: they come from a copy of the demo site (../site) in English.
 # Builds the frontend, then starts Laravel on a fresh MySQL database with the development seed,
 # runs scripts/screenshots.mjs, and stops the server. MySQL must be running (`task db:up`).
 # Set PW_CHROMIUM_PATH if Chromium is preinstalled elsewhere.
@@ -13,6 +14,18 @@ OFFSET=$({ sed -n 's/^PORT_OFFSET=//p' ../local/ports.env 2>/dev/null || true; }
 PORT=${PORT:-$((8130 + ${OFFSET:-${PORT_OFFSET:-0}}))}
 # Its own database: the development one's name plus this suffix (backend/config/database.php).
 export DB_DATABASE_SUFFIX=_screenshots
+# The demo site in English, in a folder git ignores. Both the build and Laravel read it. Git Bash on Windows
+# needs the path in the Windows form (pwd -W), for PHP and Node to find it.
+SITE=$(pwd -W 2>/dev/null || pwd)/node_modules/.screenshots-site
+rm -rf "$SITE"
+cp -r ../site "$SITE"
+node -e '
+  const fs = require("node:fs")
+  const file = process.argv[1] + "/site.json"
+  const english = { name: "Demo League", shortName: "League", tagline: "A poker league among friends", nightTitlePrefix: "League", locale: "en-US" }
+  fs.writeFileSync(file, JSON.stringify({ ...JSON.parse(fs.readFileSync(file, "utf8")), ...english }, null, 2))
+' "$SITE"
+export PTSITE_SITE_DIR=$SITE
 
 npm run build >/dev/null
 (cd "$BACKEND" && php artisan ptsite:prepare-database -q)
