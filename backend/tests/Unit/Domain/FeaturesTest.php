@@ -16,7 +16,7 @@ it('gives each feature its default when the site names none', function () {
 });
 
 it('has every feature by default but the Main Event and the house owner\'s buy-in, which a site turns on', function () {
-    $off = [Feature::MainEvent, Feature::HouseOwnerBuyIn];
+    $off = [Feature::MainEvent, Feature::HouseOwnerBuyIn, Feature::NightDashboard];
 
     foreach (Feature::cases() as $feature) {
         expect($feature->default())->toBe(! in_array($feature, $off, true));

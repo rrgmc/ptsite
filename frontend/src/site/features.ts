@@ -16,6 +16,8 @@ export const FEATURE_DEFAULTS = {
   mainEvent: false,
   /** A season's smaller buy-in for the owner of the house where the night is played. Off unless a site turns it on. */
   houseOwnerBuyIn: false,
+  /** "Painel do evento": who paid what on a night, and the pot and time chip worked out from it. Off unless a site turns it on. */
+  nightDashboard: false,
 }
 
 export type FeatureName = keyof typeof FEATURE_DEFAULTS

@@ -25,11 +25,14 @@ enum Feature: string
     /** A season's smaller buy-in for the owner of the house where the night is played. */
     case HouseOwnerBuyIn = 'houseOwnerBuyIn';
 
+    /** "Painel do evento": who paid what on a night, and the pot and time chip worked out from it. */
+    case NightDashboard = 'nightDashboard';
+
     /** Whether a site that does not name the feature has it. */
     public function default(): bool
     {
         return match ($this) {
-            self::MainEvent, self::HouseOwnerBuyIn => false,
+            self::MainEvent, self::HouseOwnerBuyIn, self::NightDashboard => false,
             default => true,
         };
     }
