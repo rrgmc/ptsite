@@ -27,10 +27,10 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 4. **A participant** is a player the dashboard has a record of, or, while the night is open, a player who answered
    ALL IN ([attendance.md](attendance.md)). Each participant owes one **buy-in**.
 5. **Acting on a player makes them a participant.** While the night is open it also answers ALL IN for them,
-   whatever their answer was. So does "Confirmar", which does nothing else.
+   whatever their answer was. So does "ALL IN", beside a player found by the search, which does nothing else.
 5a. **A player who is not on the night is found by a search** ("Adicionar jogador"), at the top of the
    participants, by nickname or name. The dashboard lists none of them until someone searches, since a league may have more than a hundred players,
-   and then shows eight at most. Each one found has "Confirmar" and "Buy-in pago". An inactive player is found
+   and then shows eight at most. Each one found has "ALL IN" and "Buy-in pago". An inactive player is found
    too, and marked. **The dashboard creates no player**: a first-timer is added in the site first, by whoever
    may ([players.md](players.md)).
 5b. The participants ("Jogadores") can be folded away, with their search, to reach the amounts and the positions

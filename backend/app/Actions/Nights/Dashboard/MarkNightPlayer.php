@@ -10,7 +10,7 @@ use PTSite\Domain\Features\Features;
 
 /**
  * Sets a participant's marks on the night dashboard: the buy-in paid, the time chip owed and the time chip
- * paid. With no mark it only makes the player a participant ("Confirmar").
+ * paid. With no mark it only makes the player a participant ("ALL IN").
  */
 final class MarkNightPlayer
 {

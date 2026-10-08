@@ -37,9 +37,9 @@ test('players record the payments of an open night on its dashboard, and the kee
 
   // One tap confirms a player who did not answer and marks the buy-in as paid
   // …found by a search: the dashboard lists nobody until someone searches, and creates no player
-  await expect(page.getByRole('group', { name: /^Confirmar / })).toHaveCount(0)
+  await expect(page.getByRole('group', { name: /^Adicionar / })).toHaveCount(0)
   await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('jacob')
-  await page.getByRole('group', { name: 'Confirmar Jacobson' }).getByRole('button', { name: 'Buy-in pago' }).click()
+  await page.getByRole('group', { name: 'Adicionar Jacobson' }).getByRole('button', { name: 'Buy-in pago' }).click()
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true')
   await expect(totals(page)).toContainText('PoteR$ 50,00Pago R$ 50,00')
 
@@ -52,7 +52,7 @@ test('players record the payments of an open night on its dashboard, and the kee
 
   // The owner of the house pays the smaller buy-in
   await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('duha')
-  await page.getByRole('group', { name: 'Confirmar Duhamel' }).getByRole('button', { name: 'Confirmar', exact: true }).click()
+  await page.getByRole('group', { name: 'Adicionar Duhamel' }).getByRole('button', { name: 'ALL IN', exact: true }).click()
   await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
   await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
   await expect(page.getByText('Dono da casa: Duhamel')).toBeVisible()

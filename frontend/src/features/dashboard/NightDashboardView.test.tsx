@@ -130,16 +130,16 @@ describe('NightDashboardView', () => {
     const onChange = view()
 
     // Nobody is listed until someone searches: a league may have more than a hundred players.
-    expect(screen.queryByRole('group', { name: /^Confirmar / })).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: /^Adicionar / })).not.toBeInTheDocument()
 
     await userEvent.type(screen.getByRole('searchbox', { name: 'Adicionar jogador' }), 'fáu')
-    await userEvent.click(within(screen.getByRole('group', { name: 'Confirmar Fausto' })).getByRole('button', { name: 'Confirmar' }))
+    await userEvent.click(within(screen.getByRole('group', { name: 'Adicionar Fausto' })).getByRole('button', { name: 'ALL IN' }))
     expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: fausto })
     // The search is empty again, ready for the next player.
     expect(screen.getByRole('searchbox', { name: 'Adicionar jogador' })).toHaveValue('')
 
     await userEvent.type(screen.getByRole('searchbox', { name: 'Adicionar jogador' }), 'Fausto da')
-    await userEvent.click(within(screen.getByRole('group', { name: 'Confirmar Fausto' })).getByRole('button', { name: 'Buy-in pago' }))
+    await userEvent.click(within(screen.getByRole('group', { name: 'Adicionar Fausto' })).getByRole('button', { name: 'Buy-in pago' }))
     expect(onChange).toHaveBeenLastCalledWith({ type: 'mark', player: fausto, buy_in_paid: true })
   })
 
@@ -148,12 +148,12 @@ describe('NightDashboardView', () => {
 
     await userEvent.type(screen.getByRole('searchbox', { name: 'Adicionar jogador' }), 'ana')
     // Ana is on the night; Joana is not.
-    expect(screen.queryByRole('group', { name: 'Confirmar Ana' })).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Confirmar Joana' })).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Adicionar Ana' })).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Adicionar Joana' })).toBeInTheDocument()
 
     await userEvent.clear(screen.getByRole('searchbox', { name: 'Adicionar jogador' }))
     await userEvent.type(screen.getByRole('searchbox', { name: 'Adicionar jogador' }), 'kiko')
-    expect(screen.getByRole('group', { name: 'Confirmar Kiko' }).closest('li')).toHaveTextContent(/inativo/i)
+    expect(screen.getByRole('group', { name: 'Adicionar Kiko' }).closest('li')).toHaveTextContent(/inativo/i)
 
     await userEvent.clear(screen.getByRole('searchbox', { name: 'Adicionar jogador' }))
     await userEvent.type(screen.getByRole('searchbox', { name: 'Adicionar jogador' }), 'zzz')
@@ -165,7 +165,7 @@ describe('NightDashboardView', () => {
     view(nightDashboard, { players: [...players, ...many] })
 
     await userEvent.type(screen.getByRole('searchbox', { name: 'Adicionar jogador' }), 'silva 0')
-    expect(screen.getAllByRole('group', { name: /^Confirmar Silva/ })).toHaveLength(8)
+    expect(screen.getAllByRole('group', { name: /^Adicionar Silva/ })).toHaveLength(8)
     expect(screen.getByText('Mostrando 8 de 9. Digite mais para encontrar.')).toBeInTheDocument()
   })
 
