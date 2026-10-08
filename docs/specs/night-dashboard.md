@@ -43,7 +43,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 10. **Rebuys follow the season.** A season with no rebuys takes none. At the season's limit a player takes
     another only when the season allows rebuys past the limit. No player has more than 50. A rebuy past the limit
     costs the same and goes to the pot like any other; what it changes is that its player scores no points on
-    that night (rule 5b of [seasons-and-nights.md](seasons-and-nights.md)).
+    that night (rule 5b of [seasons-and-nights.md](seasons-and-nights.md)). The site does not enforce that: the
+    keeper leaves that player out of the positions.
 11. **The amounts**, each shown as owed, paid and pending:
     - **"Pote"**: the buy-ins and every rebuy, also the ones past the limit;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
@@ -139,5 +140,3 @@ Finishing:
 ## Open questions
 
 - **Statistics.** Should the site show each player's rebuys and what each night collected?
-- **Players past the limit.** A player who rebought past the limit scores no points on that night. Should the
-  dashboard mark that player, and refuse them in a scoring position? Today nothing stops the keeper.
