@@ -49,4 +49,4 @@ The API has its own version, in its path (`/api/v1`). A site repository pins the
 
 - Never move or delete a published tag. To correct a release, release the next patch version.
 - Never tag a commit that is not on `master`. The workflow refuses such a tag.
-- A release costs about 3 CI minutes (see "Build (CI)" in deployment.md).
+- A release takes about 3 minutes of CI (see "Build (CI)" in deployment.md).

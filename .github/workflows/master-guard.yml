@@ -1,8 +1,8 @@
 name: Master guard
 
-# `master` only changes through a pull request (AGENTS.md, "Branches"). GitHub cannot refuse a direct push to a
-# private repository on a free plan, so this workflow reports one: it fails, which shows a red mark on the
-# commit and sends an email. The pre-push hook in .githooks stops the push on a machine that has it on.
+# `master` only changes through a pull request (AGENTS.md, "Branches"). A ruleset on `master` refuses a direct
+# push, and the pre-push hook in .githooks stops it on a machine that has it on. This workflow is the check
+# behind both: if such a push still arrives, it fails, which shows a red mark on the commit and sends an email.
 #
 # It takes a few seconds. A release tag does not start it.
 on:
