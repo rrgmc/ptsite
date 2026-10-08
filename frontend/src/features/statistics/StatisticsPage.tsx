@@ -98,11 +98,7 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
 
       {statistics.nights_count > 0 && (
         <>
-          {/* On a wide screen the line chart takes three quarters of the width, and is as tall as the bar chart. */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-            <PointsProgressChart className="lg:col-span-3" progress={statistics.points_progress} perSeason={allTime} />
-            <WinsChart statistics={statistics} />
-          </div>
+          <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />
 
           <FoldPanel title={t.common.players}>
             <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
@@ -153,7 +149,11 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
           </FoldPanel>
 
           <FoldPanel title={t.statistics.positions}>
-            <PositionTable rows={statistics.position_table} />
+            {/* On a wide screen "Vitórias" is at the right of the table, in the width the table leaves. */}
+            <div className="flex flex-col gap-x-10 gap-y-6 lg:flex-row lg:items-start">
+              <div className="min-w-0"><PositionTable rows={statistics.position_table} /></div>
+              <WinsChart bare className="lg:flex-1" statistics={statistics} />
+            </div>
           </FoldPanel>
         </>
       )}

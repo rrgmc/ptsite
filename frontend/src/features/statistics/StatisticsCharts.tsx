@@ -98,11 +98,13 @@ export function PointsProgressChart({ progress, perSeason, className }: { progre
 }
 
 /** "Vitórias": who finished first most often, with everyone else added up as "Outros". */
-export function WinsChart({ statistics }: { statistics: Statistics }) {
+export function WinsChart({ statistics, bare, className }: { statistics: Statistics; bare?: boolean; className?: string }) {
   const bars = winsData(statistics)
   const others = statistics.wins_not_shown
   return (
     <Figure
+      bare={bare}
+      className={className}
       title={t.statistics.wins}
       description={t.statistics.winsDescription({ top: bars[0] })}
       table={
