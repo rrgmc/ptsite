@@ -197,4 +197,14 @@ await shot('14-admin-holidays')
 await page.goto('seasons/2/calendar')
 await page.getByRole('region', { name: 'Abril de 2022' }).waitFor()
 await shot('15-calendar', true)
+
+// The Main Event of 2022: its players in order and the season's Main Event pot. Then its result form, as an admin
+// correcting it: one player per position.
+await page.goto('seasons/2/main-event')
+await page.getByRole('list', { name: /^Classificação: Main Event/ }).waitFor()
+await shot('19-main-event', true)
+await page.getByRole('heading', { level: 2 }).getByRole('link').first().click()
+await page.getByRole('link', { name: 'Editar resultado' }).click()
+await page.getByRole('heading', { name: 'Editar classificação' }).waitFor()
+await shot('20-main-event-result-form', true)
 await browser.close()
