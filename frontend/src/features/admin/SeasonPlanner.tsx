@@ -9,6 +9,7 @@ import { type GridDay, GridLegend, MonthGrid, type MonthNote, MonthNotes } from 
 import { TextField } from '@/components/TextField'
 import { t } from '@/i18n'
 import { addDays, dayOf, monthsBetween, today, yearsBetween, zonedDateTime } from '@/lib/dates'
+import { usePathOfSeason } from '../layout/useSelectedSeason'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 
 /**
@@ -21,6 +22,7 @@ import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
 export function SeasonPlanner({ today: now = today() }: { today?: string }) {
   const seasonId = Number(useParams().seasonId)
   const season = useSeason(seasonId)
+  const pathOfSeason = usePathOfSeason()
   const start = [now, season.data?.starts_on ?? ''].sort()[1]
   const [from, setFrom] = useState<string | null>(null)
   const [to, setTo] = useState<string | null>(null)
@@ -68,7 +70,7 @@ export function SeasonPlanner({ today: now = today() }: { today?: string }) {
       {scheduled !== null ? (
         <Card>
           <p role="status" className="font-semibold text-success">{t.admin.planner.scheduledCount({ count: scheduled })}</p>
-          <Link to="/calendar" className="mt-2 inline-block text-primary underline">{t.admin.planner.viewCalendar}</Link>
+          <Link to={pathOfSeason(seasonId, '/calendar')} className="mt-2 inline-block text-primary underline">{t.admin.planner.viewCalendar}</Link>
         </Card>
       ) : plan.isPending || holidays.isPending ? <Loading label={t.admin.planner.calculating} /> : plan.error ? <ErrorBox error={plan.error} /> : (
         // A new plan starts again from its own ticks.

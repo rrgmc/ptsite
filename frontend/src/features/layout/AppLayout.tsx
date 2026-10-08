@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { Link, NavLink, Navigate, Outlet, ScrollRestoration, useLocation } from 'react-router'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, Navigate, Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router'
 import { useLogout, useMe } from '@/api/queries'
 import { Loading } from '@/components/Feedback'
 import { t } from '@/i18n'
+import { isSeasonScreen, splitSeasonPath, useSeasonPath } from '@/lib/seasonPath'
 import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { NavDrawer } from './NavDrawer'
-import { isSeasonScreen, navItemsFor } from './navigation'
+import { navItemsFor } from './navigation'
 import { SeasonNotice } from './SeasonNotice'
 import { SiteFooter } from './SiteFooter'
 import { useSelectedSeason } from './useSelectedSeason'
@@ -17,6 +18,12 @@ export function AppLayout() {
   const location = useLocation()
   // After "Sair" the next person logs in fresh; only an expired session returns to the page it was on.
   const [loggingOut, setLoggingOut] = useState(false)
+  const to = useSeasonPath()
+
+  // A screen with no season of its own (Jogadores, a night) leads back to the last season the tab showed.
+  useEffect(() => {
+    if (isSeasonScreen(location.pathname)) setSelectedSeasonId(splitSeasonPath(location.pathname).seasonId)
+  }, [location.pathname])
 
   if (me.isPending) return <Loading />
   if (!me.data) return <Navigate to="/login" replace state={loggingOut ? undefined : { from: location.pathname }} />
@@ -36,13 +43,13 @@ export function AppLayout() {
       <header className="sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-2 gap-y-0 px-4 py-2">
           <NavDrawer items={items} userName={userName} onLogout={logOut} />
-          <NavLink to="/" className="flex shrink-0 items-center gap-2 font-display text-xl font-extrabold text-primary">
+          <NavLink to={to('/')} className="flex shrink-0 items-center gap-2 font-display text-xl font-extrabold text-primary">
             <span aria-hidden>{site.logo}</span> {site.shortName}
           </NavLink>
           <nav aria-label={t.layout.mainNav} className="hidden flex-wrap gap-1 sm:flex">
             {items.filter((item) => item.top).map((item) => (
               // Words only: with the menu button and the season name, the icons do not fit the top bar.
-              <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
+              <NavLink key={item.to} to={to(item.to)} end={item.end} className={linkClass}>
                 {item.label}
               </NavLink>
             ))}
@@ -69,7 +76,7 @@ export function AppLayout() {
 
       <nav aria-label={t.layout.mainNav} className="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden">
         {items.filter((item) => item.tab).map((item) => (
-          <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
+          <NavLink key={item.to} to={to(item.to)} end={item.end} className={linkClass}>
             <span aria-hidden className="text-lg">{item.icon}</span>
             <span className="max-w-full truncate font-medium tracking-tight">{item.label}</span>
           </NavLink>
@@ -79,7 +86,7 @@ export function AppLayout() {
   )
 }
 
-/** The season on screen, as the way to "Escolher temporada". Picking a season there returns to the screen it was opened from. */
+/** The season on screen, as the way to "Escolher temporada". Picking a season there opens the screen it was opened from, for that season. */
 function SelectedSeasonLink() {
   const { season } = useSelectedSeason()
   const { pathname } = useLocation()
@@ -100,6 +107,8 @@ function SelectedSeasonLink() {
 function SelectedSeasonNotice() {
   const { season, isCurrent } = useSelectedSeason()
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   if (isCurrent || !season || !isSeasonScreen(pathname)) return null
-  return <SeasonNotice season={season} onBack={() => setSelectedSeasonId(null)} />
+  // The same screen at the address with no season in it, which is the current season's.
+  return <SeasonNotice season={season} onBack={() => void navigate(splitSeasonPath(pathname).screen)} />
 }

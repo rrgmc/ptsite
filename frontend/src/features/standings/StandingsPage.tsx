@@ -4,6 +4,7 @@ import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { formatDate, formatMoney, formatWeekday } from '@/lib/format'
 import { t } from '@/i18n'
+import { useSeasonPath } from '@/lib/seasonPath'
 import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
 import { NightMark } from '../nights/NightMark'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
@@ -13,6 +14,7 @@ export function StandingsPage() {
   const { season, isPending, error } = useSelectedSeason()
   const standings = useStandings(season?.id)
   const nights = useSeasonNights(season?.id)
+  const to = useSeasonPath()
 
   if (isPending) return <Loading />
   if (error) return <ErrorBox error={error} />
@@ -56,14 +58,14 @@ export function StandingsPage() {
             </Card>
           )}
           {last && (
-            <Card title={t.standings.lastResult} action={<Link to="/results" className="text-sm font-semibold text-primary">{t.standings.seeAll}</Link>}>
+            <Card title={t.standings.lastResult} action={<Link to={to('/results')} className="text-sm font-semibold text-primary">{t.standings.seeAll}</Link>}>
               <Link to={`/nights/${last.id}`} className="block rounded-md p-2 hover:bg-surface-sunken">
                 <span className="block font-semibold">{t.standings.lastResultLine({ date: formatDate(last.starts_at), pot: formatMoney(last.pot) })}</span>
                 <span className="text-muted">🥇 {last.results?.[0]?.player.nickname}</span>
               </Link>
             </Card>
           )}
-          <Link to="/simulator" className="rounded-lg border-2 border-dashed border-border p-4 text-center font-semibold text-primary hover:bg-primary-soft">
+          <Link to={to('/simulator')} className="rounded-lg border-2 border-dashed border-border p-4 text-center font-semibold text-primary hover:bg-primary-soft">
             {t.standings.simulate}
           </Link>
         </div>

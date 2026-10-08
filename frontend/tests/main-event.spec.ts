@@ -70,7 +70,8 @@ test('an admin adds the Main Event of a season in "Administração", and its nig
   await expectAccessible(page)
 
   // "Main Event" shows it for the season, with the season's Main Event pot
-  await page.goto('main-event')
+  // The season's own address: "main-event" alone is the current season's.
+  await page.goto(seasonResults.replace(/results$/, 'main-event'))
   await expect(page.getByRole('heading', { name: 'Main Event', level: 1 })).toBeVisible()
   await expect(page.getByRole('list', { name: /^Classificação: Main Event/ }).getByRole('listitem')).toHaveCount(2)
   await expect(page.getByRole('heading', { name: 'Pote ME da temporada' })).toBeVisible()

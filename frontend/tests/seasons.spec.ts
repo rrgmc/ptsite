@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { expectAccessible, login, logout, pickSeason, seasonLink, seasonNotice } from './helpers'
 
-// One season on every screen, picked in "Escolher temporada", the seasons with their first ten in "Temporadas"
+// A season at its own address, opened from "Escolher temporada", the seasons with their first ten in "Temporadas"
 // (docs/specs/seasons-and-nights.md), and the left menu.
 
 test('the season list marks the current season, which is the selected one at first', async ({ page }) => {
@@ -21,16 +21,16 @@ test('the season list marks the current season, which is the selected one at fir
   await expectAccessible(page)
 })
 
-test('a picked season stays on every screen until the user goes back to the current one', async ({ page }) => {
+test('a picked season has its own address, which the menu keeps until the user goes back to the current one', async ({ page }) => {
   await login(page, 'dev-keeper')
   await pickSeason(page, 'Liga 2022')
-  await expect(page).toHaveURL(/\/app\/?$/)
+  await expect(page).toHaveURL(/\/app\/seasons\/\d+$/)
   await expect(page.getByText(/^Liga 2022 · \d+ eventos$/)).toBeVisible()
   await expect(seasonNotice(page)).toContainText('Você está vendo Liga 2022, que não é a temporada atual.')
 
   const tab = (name: string) => page.getByRole('link', { name }).first()
   await tab('Resultados').click()
-  await expect(page).toHaveURL(/\/results$/)
+  await expect(page).toHaveURL(/\/seasons\/\d+\/results$/)
   await expect(tab('Resultados')).toHaveAttribute('aria-current', 'page')
   await expect(page.getByText(/^Liga \d+ - \d\d\/\d\d\/2022$/).first()).toBeVisible()
   await expect(seasonNotice(page)).toBeVisible()
@@ -38,24 +38,46 @@ test('a picked season stays on every screen until the user goes back to the curr
   await expect(page.getByRole('button', { name: '+ Agendar' })).toHaveCount(0)
 
   await tab('Calendário').click()
+  await expect(page).toHaveURL(/\/seasons\/\d+\/calendar$/)
   await expect(page.getByRole('region', { name: 'Abril de 2022' })).toBeVisible()
   await tab('Simulação').click()
+  await expect(page).toHaveURL(/\/seasons\/\d+\/simulator$/)
   await expect(page.getByText(/· Liga 2022$/)).toBeVisible()
 
   await page.reload()
   await expect(seasonLink(page)).toContainText('Liga 2022')
 
-  // Screens that do not show a season have no notice.
+  // Screens that do not show a season have no notice, and their menu leads back to the season the tab showed last.
   await tab('Jogadores').click()
+  await expect(page).toHaveURL(/\/app\/players$/)
   await expect(page.getByRole('heading', { name: 'Jogadores', level: 1 })).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)
   await expect(seasonLink(page)).toContainText('Liga 2022')
 
   await tab('Resultados').click()
+  await expect(page).toHaveURL(/\/seasons\/\d+\/results$/)
   await seasonNotice(page).getByRole('button', { name: 'Voltar para a atual' }).click()
+  await expect(page).toHaveURL(/\/app\/results$/)
   await expect(seasonNotice(page)).toHaveCount(0)
   await expect(seasonLink(page)).not.toContainText('Liga 2022')
   await expect(page.getByRole('button', { name: '+ Agendar' })).toBeVisible()
+
+  // The browser's "back" returns to the season's own address.
+  await page.goBack()
+  await expect(page).toHaveURL(/\/seasons\/\d+\/results$/)
+  await expect(seasonNotice(page)).toBeVisible()
+})
+
+test('a player opened from a season shows that season, at the season\'s address', async ({ page }) => {
+  await login(page, 'dev-player')
+  await pickSeason(page, 'Liga 2022')
+  await page.getByRole('table').getByRole('row').nth(1).getByRole('link').first().click()
+  await expect(page).toHaveURL(/\/seasons\/\d+\/players\/\d+$/)
+  await expect(seasonNotice(page)).toContainText('Liga 2022')
+
+  await seasonNotice(page).getByRole('button', { name: 'Voltar para a atual' }).click()
+  await expect(page).toHaveURL(/\/app\/players\/\d+$/)
+  await expect(seasonNotice(page)).toHaveCount(0)
 })
 
 test('picking the current season again removes the notice', async ({ page }) => {
@@ -65,6 +87,7 @@ test('picking the current season again removes the notice', async ({ page }) => 
 
   await seasonLink(page).click()
   await page.getByRole('listitem').filter({ hasText: 'Atual' }).getByRole('button').click()
+  await expect(page).toHaveURL(/\/app\/?$/)
   await expect(page.getByRole('heading', { name: 'Classificação', level: 1 })).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)
 })
@@ -93,6 +116,7 @@ test('"Temporadas" shows the first ten of every season, and makes one the select
   await expectAccessible(page)
 
   await season.getByRole('button', { name: 'Ver esta temporada: Liga 2022' }).click()
+  await expect(page).toHaveURL(/\/app\/seasons\/\d+$/)
   await expect(page.getByRole('heading', { name: 'Classificação', level: 1 })).toBeVisible()
   await expect(seasonLink(page)).toContainText('Liga 2022')
   await expect(seasonNotice(page)).toBeVisible()
@@ -104,22 +128,50 @@ test('"Temporadas" shows the first ten of every season, and makes one the select
   await expect(season).toContainText('✓ Selecionada')
 })
 
-test('a link to one season picks that season', async ({ page }) => {
+test('a link to one season shows that season and stays at its address', async ({ page }) => {
   await login(page, 'dev-player')
   await pickSeason(page, 'Liga 2022')
-  const id = await page.evaluate(() => Object.values({ ...sessionStorage })[0])
+  const id = page.url().match(/seasons\/(\d+)$/)![1]
   await seasonNotice(page).getByRole('button', { name: 'Voltar para a atual' }).click()
   await expect(seasonNotice(page)).toHaveCount(0)
 
   await page.goto(`seasons/${id}/results`)
-  await expect(page).toHaveURL(/\/app\/results$/)
+  await expect(page).toHaveURL(new RegExp(`/app/seasons/${id}/results$`))
   await expect(seasonLink(page)).toContainText('Liga 2022')
   await expect(page.getByText(/^Liga \d+ - \d\d\/\d\d\/2022$/).first()).toBeVisible()
+  await expect(seasonNotice(page)).toBeVisible()
 })
 
-test('a picked season that no longer exists falls back to the current one', async ({ page }) => {
+test('the address with no season in it is always the current season', async ({ page }) => {
+  await login(page, 'dev-player')
+  await pickSeason(page, 'Liga 2022')
+  await expect(seasonNotice(page)).toBeVisible()
+
+  // Typed by hand in the same tab, which showed another season last.
+  await page.goto('results')
+  await expect(page.getByRole('heading', { name: 'Resultados', level: 1 })).toBeVisible()
+  await expect(seasonLink(page)).not.toContainText('Liga 2022')
+  await expect(seasonNotice(page)).toHaveCount(0)
+})
+
+test('the current season at its own address has no notice', async ({ page }) => {
+  await login(page, 'dev-player')
+  const { id, name } = await page.evaluate(async () => {
+    const response = await fetch('/api/v1/seasons/current', { headers: { Accept: 'application/json' } })
+    return ((await response.json()) as { data: { id: number; name: string } }).data
+  })
+
+  await page.goto(`seasons/${id}/results`)
+  await expect(page).toHaveURL(new RegExp(`/app/seasons/${id}/results$`))
+  await expect(page.getByRole('heading', { name: 'Resultados', level: 1 })).toBeVisible()
+  await expect(seasonLink(page)).toContainText(name)
+  await expect(seasonNotice(page)).toHaveCount(0)
+})
+
+test('the address of a season that does not exist leads to the current one', async ({ page }) => {
   await login(page, 'dev-player')
   await page.goto('seasons/999999/results')
+  await expect(page).toHaveURL(/\/app\/results$/)
   await expect(page.getByRole('heading', { name: 'Resultados', level: 1 })).toBeVisible()
   await expect(seasonLink(page)).toContainText('Liga')
   await expect(seasonNotice(page)).toHaveCount(0)
@@ -128,10 +180,16 @@ test('a picked season that no longer exists falls back to the current one', asyn
 test('logging out goes back to the current season', async ({ page }) => {
   await login(page, 'dev-player')
   await pickSeason(page, 'Liga 2022')
+  // A screen with no season of its own remembers the season the tab showed last.
+  await page.goto('players')
+  await expect(seasonLink(page)).toContainText('Liga 2022')
   await logout(page)
   await login(page, 'dev-player')
+  await expect(page).toHaveURL(/\/app\/?$/)
   await expect(seasonLink(page)).not.toContainText('Liga 2022')
   await expect(seasonNotice(page)).toHaveCount(0)
+  await page.goto('players')
+  await expect(seasonLink(page)).not.toContainText('Liga 2022')
 })
 
 test('the menu lists every place of the site, and "Administração" only for admins', async ({ page }) => {

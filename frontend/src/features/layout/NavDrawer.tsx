@@ -2,11 +2,13 @@ import { Button as AriaButton, Dialog, DialogTrigger, Modal, ModalOverlay } from
 import { NavLink } from 'react-router'
 import { Button } from '@/components/Button'
 import { t } from '@/i18n'
+import { useSeasonPath } from '@/lib/seasonPath'
 import type { NavItem } from './navigation'
 import { site } from '@/lib/site'
 
 /** The left menu: every place of the site, then the user and "Sair". Opens from the "Menu" button in the header. */
 export function NavDrawer({ items, userName, onLogout, defaultOpen }: { items: NavItem[]; userName: string; onLogout: () => void; defaultOpen?: boolean }) {
+  const to = useSeasonPath()
   return (
     <DialogTrigger defaultOpen={defaultOpen}>
       <AriaButton
@@ -30,7 +32,7 @@ export function NavDrawer({ items, userName, onLogout, defaultOpen }: { items: N
                   {items.map((item) => (
                     <NavLink
                       key={item.to}
-                      to={item.to}
+                      to={to(item.to)}
                       end={item.end}
                       onClick={close}
                       className={({ isActive }) =>

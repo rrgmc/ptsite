@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { http, HttpResponse } from 'msw'
-import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { RouterStory } from '@/mocks/RouterStory'
 import { handlers } from '@/mocks/handlers'
 import { extraNight, finishedNight, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, statisticsEmpty } from '@/mocks/data'
@@ -119,13 +118,9 @@ export const MainEventResultFormCorrecting: StoryObj = {
 /** A screen inside the site's header and menus. The header names the season on screen and leads to "Temporadas". */
 export const Layout: StoryObj = { render: () => <RouterStory path="/" url="/" element={<StandingsPage />} layout={<AppLayout />} /> }
 
-/** Another season was picked in "Temporadas": a notice says so and offers the way back. */
+/** The address names another season: a notice says so and offers the way back. */
 export const LayoutWithAnotherSeason: StoryObj = {
-  beforeEach: () => {
-    setSelectedSeasonId(2)
-    return () => setSelectedSeasonId(null)
-  },
-  render: () => <RouterStory path="/" url="/" element={<StandingsPage />} layout={<AppLayout />} />,
+  render: () => <RouterStory path="/seasons/:seasonId" url="/seasons/2" element={<StandingsPage />} layout={<AppLayout />} />,
 }
 
 /** An open night before anyone filled the partial result. */

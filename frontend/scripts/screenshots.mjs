@@ -86,7 +86,7 @@ await login('dev-keeper')
 await page.goto('seasons')
 await page.getByRole('heading', { name: 'Temporadas' }).waitFor()
 await shot('16-seasons')
-// "Escolher temporada": picking 2022 makes it the season on every screen, with a notice that it is not the current one
+// "Escolher temporada": picking 2022 opens that season's own address, with a notice that it is not the current one
 await page.getByRole('link', { name: /^Temporada:/ }).click()
 await page.getByRole('heading', { name: 'Escolher temporada' }).waitFor()
 await shot('18-season-picker')
