@@ -10,6 +10,7 @@
   "brandColor": "#14532d",
   "siteDomain": "",
   "features": {
-    "mainEvent": true
+    "mainEvent": true,
+    "houseOwnerBuyIn": true
   }
 }

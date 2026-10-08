@@ -16,7 +16,20 @@ class SeasonResource extends JsonResource
             'name' => $this->name,
             'starts_on' => $this->starts_on->toDateString(),
             'description' => $this->description,
+            /** What a player pays to enter a night. The season only records its money settings: no rule uses them. */
             'buy_in' => $this->buy_in,
+            /** A rebuy's price, without the time chip it may also charge. */
+            'rebuy_value' => $this->rebuy_value,
+            /** The price of one time chip. */
+            'time_chip_value' => $this->time_chip_value,
+            /** How many rebuys a player can make on a night; 0 means none. */
+            'rebuys_allowed' => $this->rebuys_allowed,
+            /** Whether a rebuy also charges a time chip. */
+            'rebuy_charges_time_chip' => $this->rebuy_charges_time_chip,
+            /** Whether a player can rebuy past the allowed number; those rebuys do not count for the season's points. */
+            'allows_extra_rebuys' => $this->allows_extra_rebuys,
+            /** The smaller buy-in of the owner of the house where the night is played. */
+            'house_owner_buy_in' => $this->house_owner_buy_in,
             /** How many nights ("rodadas") the season has. */
             'rounds' => $this->rounds,
             /** The season's nights that are not archived, in any state; compare with rounds. */

@@ -9,6 +9,7 @@ use PTSite\Domain\Nights\NightResult;
 use PTSite\Domain\Nights\NightRules;
 use PTSite\Domain\Nights\NightStatus;
 use PTSite\Domain\Scoring\PercentageTable;
+use PTSite\Domain\Seasons\SeasonMoney;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Shared\RuleViolation;
 
@@ -140,4 +141,56 @@ it('requires the Main Event pot and the time chip on a site that has them', func
 })->with([
     'no Main Event pot' => [null, '0', 'night.result.main_event_pot_required'],
     'no time chip' => ['170.00', null, 'night.result.time_chip_required'],
+]);
+
+it('takes a season with no rebuys and no amounts', function () {
+    $money = SeasonMoney::of();
+
+    expect($money->hasRebuys())->toBeFalse()->and($money->rebuyValue)->toBeNull();
+});
+
+it('has rebuys when some are allowed, or when extra ones are', function (int $allowed, bool $extra, bool $hasRebuys) {
+    $money = SeasonMoney::of(rebuyValue: Money::fromDecimal('50.00'), rebuysAllowed: $allowed, allowsExtraRebuys: $extra);
+
+    expect($money->hasRebuys())->toBe($hasRebuys);
+})->with([
+    'none' => [0, false, false],
+    'two allowed' => [2, false, true],
+    'only extra ones' => [0, true, true],
+]);
+
+it('requires the rebuy value of a season with rebuys', function (int $allowed, bool $extra) {
+    $violation = violation(fn () => SeasonMoney::of(buyIn: Money::fromDecimal('50.00'), rebuysAllowed: $allowed, allowsExtraRebuys: $extra));
+
+    expect($violation?->rule)->toBe('season.money.rebuy_value_required')
+        ->and($violation?->field)->toBe('rebuy_value');
+})->with([
+    'two allowed' => [2, false],
+    'only extra ones' => [0, true],
+]);
+
+it('allows from 0 to 20 rebuys', function (int $allowed, ?string $rule) {
+    $violation = violation(fn () => SeasonMoney::of(rebuyValue: Money::fromDecimal('50.00'), rebuysAllowed: $allowed));
+
+    expect($violation?->rule)->toBe($rule);
+})->with([
+    [0, null],
+    [20, null],
+    [21, 'season.money.rebuys_allowed'],
+    [-1, 'season.money.rebuys_allowed'],
+]);
+
+it('keeps the buy-in of the owner of the house at or below the buy-in', function (?string $buyIn, string $houseOwner, ?string $rule) {
+    $violation = violation(fn () => SeasonMoney::of(
+        buyIn: $buyIn === null ? null : Money::fromDecimal($buyIn),
+        houseOwnerBuyIn: Money::fromDecimal($houseOwner),
+    ));
+
+    expect($violation?->rule)->toBe($rule);
+})->with([
+    'half the buy-in' => ['50.00', '25.00', null],
+    'free' => ['50.00', '0', null],
+    'the same' => ['50.00', '50.00', null],
+    'above' => ['50.00', '60.00', 'season.money.house_owner_above_buy_in'],
+    'no buy-in' => [null, '25.00', 'season.money.house_owner_without_buy_in'],
 ]);
