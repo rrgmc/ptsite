@@ -8,6 +8,7 @@ return [
     'night.open.not_scheduled' => 'Only a scheduled night can be opened.',
     'night.open.another_open' => 'This season already has an open night. Finish it before opening another one.',
     'night.reschedule.not_scheduled' => 'Only a scheduled night can be rescheduled.',
+    'night.undo_open.not_open' => 'Only an open night can have its opening undone.',
     'night.cancel.not_scheduled' => 'Only a scheduled night can be cancelled. A finished night can have its result corrected.',
     'night.date_taken' => 'This season already has a night on :date.',
     'night.finish.not_open' => 'Open the night before finishing it.',

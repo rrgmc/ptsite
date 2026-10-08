@@ -426,6 +426,28 @@ it('fixes the participants and the prices when the night is finished', function 
     $this->putJson("{$this->url}/positions/1", ['player_id' => $this->ana->id])->assertConflict()->assertJsonPath('rule', 'night.dashboard.finished');
 });
 
+it('deletes what the dashboard recorded when the opening of the night is undone', function () {
+    ($this->play)();
+    $this->putJson("{$this->url}/positions/1", ['player_id' => $this->ana->id])->assertOk();
+    $answers = NightAttendance::query()->where('night_id', $this->night->id)->count();
+    Sanctum::actingAs($this->admin);
+
+    $this->postJson("/api/v1/nights/{$this->night->id}/undo-open")->assertOk()
+        ->assertJsonPath('data.status', 'scheduled');
+
+    expect(NightPlayer::query()->where('night_id', $this->night->id)->exists())->toBeFalse()
+        ->and(NightRebuy::query()->where('night_id', $this->night->id)->exists())->toBeFalse()
+        ->and($this->night->partialResult()->exists())->toBeFalse()
+        ->and($this->night->refresh()->house_owner_player_id)->toBeNull()
+        // Acting on a player answered ALL IN for them: the answers stay.
+        ->and(NightAttendance::query()->where('night_id', $this->night->id)->count())->toBe($answers);
+    $before = AuditLog::query()->where('action', 'night.open_undone')->sole()->before;
+    expect($before['house_owner_player_id'])->toBe($this->elio->id)
+        ->and($before['dashboard_players'])->toHaveCount(5)
+        ->and($before['dashboard_rebuys'])->toHaveCount(4)
+        ->and($before['partial_result']['positions'])->toBe([['position' => 1, 'player_id' => $this->ana->id]]);
+});
+
 it('lets an admin add a player to a finished night without an answer', function () {
     ($this->finish)()->assertOk();
     $late = Player::factory()->create(['nickname' => 'Fausto']);

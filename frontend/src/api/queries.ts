@@ -475,6 +475,21 @@ export function useOpenNight() {
   })
 }
 
+/** "Desfazer abertura": makes an open night scheduled again, and deletes what was recorded while it was open. */
+export function useUndoOpenNight(nightId: number) {
+  const changed = useNightChanged()
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async () =>
+      (await unwrap(api.POST('/v1/nights/{night}/undo-open', { params: { path: { night: nightId } } }))).data,
+    onSuccess: (night) => {
+      changed(night.season_id, night.id)
+      client.removeQueries({ queryKey: keys.partialResult(night.id) })
+      client.removeQueries({ queryKey: keys.nightDashboard(night.id) })
+    },
+  })
+}
+
 export function useFinishNight(nightId: number) {
   const changed = useNightChanged()
   return useMutation({

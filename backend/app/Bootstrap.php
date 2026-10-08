@@ -29,12 +29,12 @@ final class Bootstrap
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        // A broken business rule: 409 for a state conflict (opening, finishing, moving or cancelling a night, or
+        // A broken business rule: 409 for a state conflict (opening, undoing the opening, finishing, moving or cancelling a night, or
         // saving its partial result or changing its dashboard, at the wrong time), otherwise 422.
         // Same body shape as Laravel's validation errors, with the message in the site's language.
         $exceptions->render(function (RuleViolation $e) {
             $message = __("rules.{$e->rule}", $e->context);
-            $conflicts = ['night.open.', 'night.finish.', 'night.reschedule.', 'night.cancel.', 'night.partial_result.', 'night.dashboard.'];
+            $conflicts = ['night.open.', 'night.undo_open.', 'night.finish.', 'night.reschedule.', 'night.cancel.', 'night.partial_result.', 'night.dashboard.'];
             $status = collect($conflicts)->contains(fn ($prefix) => str_starts_with($e->rule, $prefix)) ? 409 : 422;
 
             return response()->json([

@@ -45,6 +45,7 @@
 | `POST /nights/{id}/reschedule` | results keeper, admin | "Remarcar" a scheduled night: `starts_at`. 409 if not scheduled; 422 if a round moves onto a day that already has a round |
 | `POST /nights/{id}/cancel` | results keeper, admin | "Cancelar" a scheduled night: archives it. 409 if not scheduled |
 | `POST /nights/{id}/open` | results keeper, admin | Open a scheduled night |
+| `POST /nights/{id}/undo-open` | admin | "Desfazer abertura": make an open night scheduled again. Deletes its partial result and what its dashboard recorded (participants, rebuys, prices, house owner); the attendance answers stay. 409 if not open |
 | `POST /nights/{id}/finish` | results keeper, admin | Enter or correct results: `pot`, `main_event_pot`, `time_chip` (decimal strings; the last two may be `"0"`), `positions`. On a site with no Main Event pot or no time chip, that amount is not required and not kept. 422 on a Main Event night |
 | `POST /nights/{id}/main-event-result` | results keeper, admin | Enter or correct the result of a Main Event night: `player_ids`, the 1st place first, at least one and nobody twice. 409 if the night is scheduled; 422 on a regular night. 404 on a site with no Main Event |
 | `GET /nights/{id}/attendance` | logged in | Answers in the order given: `player`, `answer` (`all_in`/`fold`), `answered_at`, `answered_by` |

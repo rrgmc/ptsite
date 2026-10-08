@@ -27,7 +27,8 @@ Everyone who uses the site.
 
 6. **Admin actions appear in context.** On a night's page, a results keeper or admin also sees "Abrir" (open),
    "Finalizar" (finish), "Editar resultados" (edit results) and "Editar evento" (edit the place and description;
-   on an open or finished night, admins only). Players don't see them.
+   on an open or finished night, admins only). On an open night an admin also sees "Desfazer abertura" (undo the
+   opening). Players don't see them.
 7. **"Administração"** is a section of the same site for managing lists (seasons, players, places, accounts).
    Only admins see it in the menu. Its tab **"Configurações"** shows which features the site has and the site's
    version. It changes nothing: a site's features are set when the site is built. A **place can be archived**: it is no longer offered when a night or a season
