@@ -138,7 +138,7 @@ them all.
 | `task db:up`, `task db:reset`, `task db:stop` | Starts MySQL and Mailpit and seeds the database if it is missing; recreates the database; stops both |
 | `task build` | Builds the frontend into `backend/public/app` |
 | `task check` | Everything to run before pushing: style, types, unit tests, build |
-| `task test`, `task test:e2e` | The unit tests; the end-to-end tests |
+| `task test`, `task test:e2e` | The unit tests; the end-to-end tests, phone and desktop at once (one file: `task test:e2e -- tests/admin.spec.ts`) |
 | `task api` | Regenerates `frontend/openapi.json` and the API types |
 | `task package`, `task deploy` | Builds the deploy package; uploads it to the site configured in `local/deploy.env` (see [deployment.md](docs/architecture/deployment.md)) |
 | `task release -- 2.1.0` | Releases a version: tags `master` and pushes the tag, which builds the package and the GitHub release (see [RELEASE.md](RELEASE.md)) |

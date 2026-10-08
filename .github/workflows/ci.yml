@@ -145,9 +145,16 @@ jobs:
         run: npm run test:storybook
 
   e2e:
-    name: End-to-end (phone and desktop, axe)
+    name: End-to-end ${{ matrix.shard }}/2 (phone and desktop, axe)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    # Two jobs, each with half of the test files: the tests are the slowest part of CI, and this halves the wait
+    # for about three more billed minutes. When one half fails the other still finishes, so one run shows every
+    # failing test.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     services:
       mysql:
         image: mysql:5.7
@@ -182,7 +189,7 @@ jobs:
         run: php -i | grep -E '^opcache\.(enable|enable_cli|jit|jit_buffer_size) '
       # One job runs both sizes at once: a job is billed by how long it runs, so this costs fewer minutes.
       - name: End-to-end tests, phone and desktop side by side
-        run: npm run test:e2e:parallel
+        run: npm run test:e2e:parallel -- --shard=${{ matrix.shard }}/2
         working-directory: frontend
         env:
           E2E_GDB: '1'
@@ -193,7 +200,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-traces
+          name: playwright-traces-${{ matrix.shard }}
           path: |
             frontend/test-results
             backend/storage/logs/*.log

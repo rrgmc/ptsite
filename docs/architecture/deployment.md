@@ -10,12 +10,13 @@ so the site is built on a developer's machine or in CI and uploaded as a zip.
 ## Build (CI)
 
 The repository is private and on GitHub's free plan, which gives the whole account 2,000 minutes of jobs and
-500 MB of stored artifacts a month. The tests of one pull request take about 15 minutes of that. So
+500 MB of stored artifacts a month. The tests of one pull request take about 6.5 minutes
+and about 23 minutes of that, because each of the five jobs is billed on its own, rounded up. So
 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs as little as it can:
 
 | When | What runs |
 |---|---|
-| A pull request | The tests: backend, frontend with Storybook, end to end |
+| A pull request | The tests: backend, frontend with Storybook, end to end in two jobs |
 | A push to `master`, which is a merged pull request | Nothing. The pull request already ran the tests |
 | A change that touches only `docs/` or `.md` files | Nothing |
 | Started by hand (`gh workflow run ci.yml`, or "Run workflow" on GitHub) | The `package` job only |
