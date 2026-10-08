@@ -32,7 +32,9 @@ Everyone logged in: players, results keepers and admins.
    season stops at its last night.
 5. **The next night** is highlighted and shown at the top. The calendar opens at the top of the page, like every
    other screen. **"Ver no calendário"**, under the next night, goes to its month.
-5a. **Today** has a ring around it on the grid, whatever kind of day it is, and the legend shows "Hoje". The
+5a. **Today** is a square on the grid, where every other day is round, and the legend shows "Hoje". On a day
+   with nothing else, the square is filled dark. On a night or a holiday, it keeps that day's colors and has a
+   ring. So today never looks like the next night, which is round with an outline. The
    month of today has a slightly different background color from the other months. When
    no night is coming, **"Ir para hoje"** goes to today's month. A season that does not include today shows none of
    these. Neither button is shown when its month is the first one, which is already at the top.
@@ -50,8 +52,8 @@ A season starting on 01/01/2027, Fridays every other week, with the `sao-paulo` 
 - **Answers.** The night of 02/04 is open and two players answered ALL IN, one of them you: 02/04 shows
   "2 ALL IN · Você: ALL IN". Still scheduled and with no answers, it shows only the time and the place.
 - **A finished season.** The same season, finished after 12/03, stops there: 01/01, 05/02 and 12/03.
-- **Today.** On 10/03/2027, a Wednesday with no night, 10/03 has the ring and the next night, 12/03, keeps its
-  highlight. On 12/03 the same day has both. On both days March has the different background and the other
+- **Today.** On 10/03/2027, a Wednesday with no night, 10/03 is the dark square and the next night, 12/03, keeps its
+  highlight. On 12/03 the same day is a square with the highlight. On both days March has the different background and the other
   months do not.
 - **Today in a finished season.** On 20/02/2027, with every night finished, the calendar opens at the top and
   "Ir para hoje" goes to February.
