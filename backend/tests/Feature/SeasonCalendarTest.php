@@ -47,7 +47,7 @@ it('lists the nights and the regular nights left out, in date order', function (
         '28/05 bridge: Corpus Christi',
     ]);
     $response->assertJsonPath('data.2.night', [
-        'id' => $finished->id, 'status' => 'finished', 'place' => null, 'winner' => 'Ana', 'pot' => '840.00', 'all_in_count' => 0, 'my_answer' => null,
+        'id' => $finished->id, 'status' => 'finished', 'type' => 'regular', 'is_extra' => false, 'place' => null, 'winner' => 'Ana', 'pot' => '840.00', 'all_in_count' => 0, 'my_answer' => null,
     ])->assertJsonPath('data.4.night.all_in_count', 2)
         ->assertJsonPath('data.4.night.my_answer', 'all_in');
 });

@@ -12,7 +12,7 @@ use PTSite\Domain\Shared\RuleViolation;
 
 /**
  * Schedules the nights chosen in the season planner, all or none. Each one is scheduled (and audited) like a single
- * night. Dates that already have a night in the season, or that are sent twice, are refused.
+ * night. Dates that already have a round of the season, or that are sent twice, are refused.
  */
 final class ScheduleNights
 {
@@ -26,7 +26,7 @@ final class ScheduleNights
     {
         Gate::forUser($user)->authorize('update', $season);
 
-        $taken = $season->nights()->notArchived()->pluck('starts_at')
+        $taken = $season->nights()->notArchived()->rounds()->pluck('starts_at')
             ->map(fn ($d) => CarbonImmutable::parse($d)->toDateString())->flip();
         foreach ($startsAt as $i => $value) {
             $date = CarbonImmutable::parse($value);

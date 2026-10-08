@@ -16,13 +16,17 @@ final readonly class CalendarEntry
         /** scheduled, open or finished. */
         public ?string $status = null,
         public ?string $place = null,
-        /** The 1st place of a finished night. */
+        /** The 1st place of a finished night, a Main Event too. */
         public ?string $winner = null,
         public ?string $pot = null,
         /** How many players answered ALL IN. */
         public int $allInCount = 0,
         /** The logged-in player's answer: all_in, fold or null. */
         public ?string $myAnswer = null,
+        /** regular or main_event, for a night. */
+        public string $type = 'regular',
+        /** Outside the season's calendar. Always true for a Main Event. */
+        public bool $isExtra = false,
         public ?SkipKind $skipKind = null,
         public ?string $holiday = null,
     ) {}

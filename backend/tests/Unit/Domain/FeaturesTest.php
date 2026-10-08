@@ -7,11 +7,22 @@
 use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
 
-it('has every feature when the site names none', function () {
+it('gives each feature its default when the site names none', function () {
     $features = new Features;
 
     foreach (Feature::cases() as $feature) {
-        expect($features->enabled($feature))->toBeTrue();
+        expect($features->enabled($feature))->toBe($feature->default());
+    }
+});
+
+it('has every feature by default but the Main Event, which a site turns on', function () {
+    expect(Feature::MainEvent->default())->toBeFalse()
+        ->and((new Features(['mainEvent' => true]))->enabled(Feature::MainEvent))->toBeTrue();
+
+    foreach (Feature::cases() as $feature) {
+        if ($feature !== Feature::MainEvent) {
+            expect($feature->default())->toBeTrue();
+        }
     }
 });
 

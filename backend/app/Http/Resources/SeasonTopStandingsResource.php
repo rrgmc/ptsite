@@ -17,6 +17,8 @@ class SeasonTopStandingsResource extends JsonResource
             'rows' => StandingResource::collection($this->rows),
             /** Players left out who have the same total as the last one shown. */
             'tied_not_shown' => $this->tiedNotShown,
+            /** The 1st place of the season's Main Event. Null before it is played, and on a site with no Main Event. */
+            'main_event_champion' => $this->mainEventChampion ? new PlayerResource($this->mainEventChampion) : null,
         ];
     }
 }

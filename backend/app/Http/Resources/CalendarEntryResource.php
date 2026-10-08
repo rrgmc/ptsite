@@ -20,8 +20,12 @@ class CalendarEntryResource extends JsonResource
                 'id' => $this->nightId,
                 /** @var 'scheduled'|'open'|'finished' */
                 'status' => $this->status,
+                /** @var 'regular'|'main_event' */
+                'type' => $this->type,
+                /** Outside the season's calendar: not a round. Always true for a Main Event. */
+                'is_extra' => $this->isExtra,
                 'place' => $this->place,
-                /** Nickname of the 1st place, for finished nights. */
+                /** Nickname of the 1st place, for finished nights. A Main Event has one too. */
                 'winner' => $this->winner,
                 'pot' => $this->pot,
                 /** How many players answered ALL IN. */

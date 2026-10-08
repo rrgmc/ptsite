@@ -2,9 +2,10 @@
 
 namespace PTSite\App\Queries;
 
+use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
 
-/** One season with the first rows of its standings. */
+/** One season with the first rows of its standings and its Main Event champion. */
 final readonly class SeasonTopStandings
 {
     /**
@@ -15,5 +16,7 @@ final readonly class SeasonTopStandings
         public Season $season,
         public array $rows,
         public int $tiedNotShown,
+        /** The 1st place of the season's Main Event. */
+        public ?Player $mainEventChampion = null,
     ) {}
 }

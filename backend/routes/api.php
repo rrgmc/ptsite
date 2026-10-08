@@ -5,6 +5,7 @@ use PTSite\App\Http\Controllers\Api\AttendanceController;
 use PTSite\App\Http\Controllers\Api\AuditLogController;
 use PTSite\App\Http\Controllers\Api\AuthController;
 use PTSite\App\Http\Controllers\Api\HolidayController;
+use PTSite\App\Http\Controllers\Api\MainEventController;
 use PTSite\App\Http\Controllers\Api\NightController;
 use PTSite\App\Http\Controllers\Api\PartialResultController;
 use PTSite\App\Http\Controllers\Api\PasswordResetController;
@@ -45,6 +46,7 @@ Route::prefix('v1')->group(function () {
         Route::post('seasons/{season}/simulate', [SeasonController::class, 'simulate']);
         Route::post('seasons/{season}/nights', [NightController::class, 'store']);
         Route::post('seasons/{season}/nights/import', [NightController::class, 'import']);
+        Route::post('seasons/{season}/main-event/import', [MainEventController::class, 'import'])->middleware(RequireFeature::for(Feature::MainEvent));
         Route::get('seasons/{season}/night-plan', [SeasonController::class, 'nightPlan'])->middleware(RequireFeature::for(Feature::SeasonPlanner));
         Route::get('seasons/{season}/calendar', [SeasonController::class, 'calendar']);
         Route::post('seasons/{season}/nights/batch', [NightController::class, 'storeMany'])->middleware(RequireFeature::for(Feature::SeasonPlanner));
@@ -55,6 +57,7 @@ Route::prefix('v1')->group(function () {
         Route::post('nights/{night}/cancel', [NightController::class, 'cancel']);
         Route::post('nights/{night}/open', [NightController::class, 'open']);
         Route::post('nights/{night}/finish', [NightController::class, 'finish']);
+        Route::post('nights/{night}/main-event-result', [MainEventController::class, 'finish'])->middleware(RequireFeature::for(Feature::MainEvent));
         Route::get('nights/{night}/attendance', [AttendanceController::class, 'index']);
         Route::put('nights/{night}/attendance/{player}', [AttendanceController::class, 'update']);
         Route::delete('nights/{night}/attendance/{player}', [AttendanceController::class, 'destroy']);

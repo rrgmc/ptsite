@@ -32,10 +32,13 @@ class NightController extends Controller
         return $this->resource($night);
     }
 
-    /** Schedule a night in a season ("Adicionar"). Results keepers and admins. */
+    /**
+     * Schedule a night in a season ("Adicionar"). Results keepers and admins. An extra night is not a round and may
+     * share its date. A Main Event night is always extra, and a season takes one.
+     */
     public function store(ScheduleNightRequest $request, Season $season, ScheduleNight $schedule): JsonResponse
     {
-        $night = $schedule($request->user(), $season, $request->validated('starts_at'), $request->validated('place_id'), $request->validated('description'));
+        $night = $schedule($request->user(), $season, $request->validated('starts_at'), $request->validated('place_id'), $request->validated('description'), $request->validated('type') ?? 'regular', $request->boolean('is_extra'));
 
         return $this->resource($night)->response()->setStatusCode(201);
     }
@@ -48,7 +51,7 @@ class NightController extends Controller
     {
         $nights = $schedule($request->user(), $season, $request->validated('starts_at'));
 
-        return NightResource::collection(collect($nights)->map(fn (Night $n) => $n->load(['place', 'results.player'])))
+        return NightResource::collection(collect($nights)->map(fn (Night $n) => $n->load(NightResource::RELATIONS)))
             ->response()->setStatusCode(201);
     }
 
@@ -58,7 +61,7 @@ class NightController extends Controller
         $night = $import(
             $request->user(), $season, $request->validated('starts_at'), $request->validated('place_id'),
             $request->validated('pot'), $request->validated('main_event_pot'), $request->validated('time_chip'),
-            $request->playerByPosition(),
+            $request->playerByPosition(), $request->boolean('is_extra'),
         );
 
         return $this->resource($night)->response()->setStatusCode(201);
@@ -70,7 +73,10 @@ class NightController extends Controller
         return $this->resource($open(request()->user(), $night));
     }
 
-    /** Enter or correct a night's results ("Finalizar"). Points are calculated from the pot. */
+    /**
+     * Enter or correct a night's results ("Finalizar"). Points are calculated from the pot. A Main Event night is
+     * finished with POST nights/{night}/main-event-result.
+     */
     public function finish(FinishNightRequest $request, Night $night, FinishNight $finish): NightResource
     {
         return $this->resource($finish(
@@ -81,8 +87,8 @@ class NightController extends Controller
     }
 
     /**
-     * "Editar evento": change a night's place or description. Results keepers and admins for a scheduled night;
-     * only admins for an open or finished one.
+     * "Editar evento": change a night's place or description, or whether it is extra. Results keepers and admins
+     * for a scheduled night; only admins for an open or finished one.
      */
     public function update(UpdateNightRequest $request, Night $night, UpdateNight $update): NightResource
     {
@@ -103,6 +109,6 @@ class NightController extends Controller
 
     private function resource(Night $night): NightResource
     {
-        return new NightResource($night->load(['place', 'results.player']));
+        return new NightResource($night->load(NightResource::RELATIONS));
     }
 }

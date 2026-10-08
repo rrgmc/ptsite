@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use PTSite\App\Models\Concerns\Archivable;
 use PTSite\Database\Factories\NightFactory;
 
-#[Fillable(['season_id', 'starts_at', 'place_id', 'description', 'status', 'pot', 'main_event_pot', 'time_chip'])]
+#[Fillable(['season_id', 'starts_at', 'place_id', 'description', 'status', 'type', 'is_extra', 'pot', 'main_event_pot', 'time_chip'])]
 class Night extends Model
 {
     /** @use HasFactory<NightFactory> */
@@ -27,6 +27,7 @@ class Night extends Model
     {
         return [
             'starts_at' => 'datetime',
+            'is_extra' => 'boolean',
             'pot' => 'decimal:2',
             'main_event_pot' => 'decimal:2',
             'time_chip' => 'decimal:2',
@@ -37,6 +38,18 @@ class Night extends Model
     public function scopeFinished(Builder $query): void
     {
         $query->notArchived()->where('status', 'finished');
+    }
+
+    /** The nights of the season's calendar: the ones that are not extra. A Main Event night is always extra. */
+    public function scopeRounds(Builder $query): void
+    {
+        $query->where('is_extra', false);
+    }
+
+    /** The nights that have a pot and give points: every one but a Main Event night. */
+    public function scopeScoring(Builder $query): void
+    {
+        $query->where('type', 'regular');
     }
 
     /** @return BelongsTo<Season, $this> */
@@ -61,6 +74,12 @@ class Night extends Model
     public function results(): HasMany
     {
         return $this->hasMany(NightResult::class)->orderBy('position');
+    }
+
+    /** @return HasMany<NightMainEventPosition, $this> */
+    public function mainEventPositions(): HasMany
+    {
+        return $this->hasMany(NightMainEventPosition::class)->orderBy('position');
     }
 
     /** @return HasOne<NightPartialResult, $this> */

@@ -12,7 +12,7 @@ use PTSite\Domain\Statistics\NightRecord;
 
 /**
  * The nights the statistics count: the finished, non-archived nights of one season, or of every season that is
- * not archived.
+ * not archived. A Main Event night has no pot and no points, so it is left out; an extra night is counted.
  */
 final class FinishedNights
 {
@@ -21,6 +21,7 @@ final class FinishedNights
     {
         return Night::query()
             ->finished()
+            ->scoring()
             ->when($season, fn ($q) => $q->where('season_id', $season->id), fn ($q) => $q->whereHas('season', fn ($s) => $s->notArchived()))
             ->with(['results', 'season:id,name'])
             ->orderBy('starts_at')

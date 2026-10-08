@@ -12,30 +12,27 @@ use PTSite\Domain\Nights\NightStatus;
 use PTSite\Domain\Nights\NightType;
 
 /**
- * "Finalizar": enters the results of an open night, or corrects the results of a finished one. A Main Event
- * night is finished by FinishMainEventNight.
+ * "Finalizar" for a Main Event night: enters the order of its players, or corrects it on a finished one.
  */
-final class FinishNight
+final class FinishMainEventNight
 {
     public function __construct(
         private readonly NightRules $rules,
-        private readonly WriteNightResult $writeResult,
+        private readonly WriteMainEventResult $writeResult,
         private readonly AuditLogger $audit,
     ) {}
 
-    /** @param array<int, int> $playerByPosition position => player id */
-    public function __invoke(User $user, Night $night, string $pot, ?string $mainEventPot, ?string $timeChip, array $playerByPosition): Night
+    /** @param list<int> $playerIds the 1st place first */
+    public function __invoke(User $user, Night $night, array $playerIds): Night
     {
         Gate::forUser($user)->authorize('finish', $night);
-        $this->rules->assertTakesPoints(NightType::from($night->type));
+        $this->rules->assertTakesMainEventOrder(NightType::from($night->type));
         $wasFinished = $night->status === NightStatus::Finished->value;
         $this->rules->assertCanFinish(NightStatus::from($night->status));
 
-        return DB::transaction(function () use ($user, $night, $pot, $mainEventPot, $timeChip, $playerByPosition, $wasFinished) {
+        return DB::transaction(function () use ($user, $night, $playerIds, $wasFinished) {
             $before = NightSnapshot::of($night);
-            ($this->writeResult)($night, $pot, $mainEventPot, $timeChip, $playerByPosition);
-            // The official result replaces the partial one.
-            $night->partialResult()->delete();
+            ($this->writeResult)($night, $playerIds);
             $this->audit->record($user, $wasFinished ? 'night.corrected' : 'night.finished', $night, $before, NightSnapshot::of($night));
 
             return $night;

@@ -36,7 +36,7 @@ final class SeasonStandings
     public function scoreLines(Season $season): array
     {
         return NightResult::query()
-            ->whereHas('night', fn ($q) => $q->finished()->where('season_id', $season->id))
+            ->whereHas('night', fn ($q) => $q->finished()->scoring()->where('season_id', $season->id))
             ->get(['player_id', 'points', 'position'])
             ->map(fn (NightResult $line) => new ScoreLine($line->player_id, Money::fromDecimal((string) $line->points), $line->position))
             ->all();

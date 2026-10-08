@@ -17,7 +17,7 @@ final class SuggestNightDates
     /** @return list<SuggestedNight> */
     public function __invoke(Season $season, ?CarbonImmutable $today = null): array
     {
-        $taken = $season->nights()->notArchived()->pluck('starts_at')
+        $taken = $season->nights()->notArchived()->rounds()->pluck('starts_at')
             ->map(fn ($d) => CarbonImmutable::parse($d))->all();
 
         $suggestions = $this->suggester->suggest(

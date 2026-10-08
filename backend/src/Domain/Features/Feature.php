@@ -19,9 +19,15 @@ enum Feature: string
     /** "Planejar datas": the calendar that schedules a season's regular nights at once. */
     case SeasonPlanner = 'seasonPlanner';
 
+    /** "Main Event": a night of its own type, finished with the order of its players and no points. */
+    case MainEvent = 'mainEvent';
+
     /** Whether a site that does not name the feature has it. */
     public function default(): bool
     {
-        return true;
+        return match ($this) {
+            self::MainEvent => false,
+            default => true,
+        };
     }
 }

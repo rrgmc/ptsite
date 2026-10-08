@@ -11,6 +11,7 @@ use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
 use PTSite\Domain\Nights\NightRules;
 use PTSite\Domain\Nights\NightStatus;
+use PTSite\Domain\Nights\NightType;
 use PTSite\Domain\Scoring\PercentageTable;
 
 /**
@@ -37,6 +38,7 @@ final class SavePartialResult
         return DB::transaction(function () use ($user, $night, $pot, $mainEventPot, $timeChip, $playerByPosition) {
             // The lock keeps a save from landing on a night that is being finished at the same moment.
             $night = Night::query()->whereKey($night->id)->lockForUpdate()->firstOrFail();
+            $this->rules->assertTakesPoints(NightType::from($night->type));
             $this->rules->assertCanSavePartialResult(NightStatus::from($night->status), $night->isArchived());
             $this->rules->assertValidPartialPositions($playerByPosition, PercentageTable::of($night->season->percentByPosition()));
             $this->players->assertExist(array_values($playerByPosition));
