@@ -7,9 +7,9 @@ import { RankCell } from '@/components/RankedList'
 import { t } from '@/i18n'
 import { ordinal } from '@/lib/format'
 
-/** How many lines show before "Ver todos". */
+/** How many lines show at first. */
 const FIRST = 10
-/** How many lines show at most, after it: a league with many players would make the table too long. */
+/** How many lines show at most, on request: a league with many players would make the table too long. */
 const MOST = 30
 
 /**
@@ -74,7 +74,7 @@ export function PositionTable({ rows }: { rows: Statistics['position_table'] }) 
       </div>
       {rows.length > FIRST && (
         <Button variant="ghost" className="mt-2" aria-expanded={all} onPress={() => setAll(!all)}>
-          {all ? t.statistics.showFirst({ count: FIRST }) : rows.length > MOST ? t.statistics.showMost({ count: MOST }) : t.statistics.showAll({ count: rows.length })}
+          {t.statistics.showFirst({ count: all ? FIRST : Math.min(rows.length, MOST) })}
         </Button>
       )}
     </>

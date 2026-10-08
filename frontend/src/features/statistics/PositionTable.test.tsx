@@ -34,17 +34,17 @@ describe('PositionTable', () => {
     expect(screen.queryByRole('button')).toBeNull()
   })
 
-  it('shows the first ten lines, then all of them, then the first ten again', async () => {
+  it('shows the first ten lines, then all twelve, then the first ten again', async () => {
     view(12)
 
     expect(lines()).toBe(10)
-    await userEvent.click(screen.getByRole('button', { name: 'Ver todos (12)' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ver os 12 primeiros' }))
     expect(lines()).toBe(12)
-    await userEvent.click(screen.getByRole('button', { name: 'Ver só os 10 primeiros' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ver os 10 primeiros' }))
     expect(lines()).toBe(10)
   })
 
-  it('shows thirty lines at most, and says so on the button', async () => {
+  it('shows thirty lines at most, and the button says thirty', async () => {
     view(35)
 
     await userEvent.click(screen.getByRole('button', { name: 'Ver os 30 primeiros' }))

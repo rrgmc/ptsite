@@ -27,8 +27,9 @@ Everyone logged in: players, results keepers and admins.
    scoring position, with the times the player finished there. A position the player never reached shows a
    dash. The highest number of each position is marked, on every line that has it.
    The order is by most 1st places, then by most 2nd places, and so on. Players with the same number in every
-   column share a position (rule 4). It shows the first 10 lines, and "Ver todos" shows the others, up to 30 lines
-   in all. With more than 30 players, the button says "Ver os 30 primeiros" instead.
+   column share a position (rule 4). It shows the first 10 lines. The button under it shows up to 30 lines, and
+   says how many: "Ver os 30 primeiros", or "Ver os 14 primeiros" with 14 players. Then "Ver os 10 primeiros"
+   shows the first 10 again.
 3a. **"Locais"** is a pie chart of the first 10 places by the number of nights. A night with no place is not
    counted. The pie has eight colors: with more than eight places, the ones after the seventh are one slice,
    "Outros".
@@ -105,7 +106,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - **Points per season.** In "Geral" the chart has two steps, the end of A and the end of B: Ana 174,00 then
   288,00; Breno 221,00 then 221,00; Carla 137,00 then 206,00.
 - **The cut at ten.** Twelve players won one night each, and nobody else scored: "Posições" shows ten lines, all
-  in 1st, and "Ver todos (12)"; "Vitórias" shows ten bars and "Outros: 2".
+  in 1st, and "Ver os 12 primeiros"; "Vitórias" shows ten bars and "Outros: 2".
 - **More than thirty.** 35 players scored: "Posições" shows ten lines and "Ver os 30 primeiros", which shows
   thirty lines. The other five are not shown.
 - **Ten places.** A league played at ten places: the pie has the seven with most nights and "Outros", which adds
