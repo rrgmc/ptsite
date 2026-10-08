@@ -24,7 +24,7 @@ jobs:
   backend:
     name: Backend (Pint, Pest, API spec)
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # The same MySQL as compose.yaml: the shared host's version, with its data in memory.
     services:
       mysql:
@@ -65,7 +65,7 @@ jobs:
   example-site:
     name: Example site (the package and the frontend, built for another site in English)
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     services:
       mysql:
         image: mysql:5.7
@@ -123,7 +123,7 @@ jobs:
   frontend:
     name: Frontend (lint, types, unit, build)
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     defaults:
       run:
         working-directory: frontend
@@ -147,7 +147,7 @@ jobs:
   storybook:
     name: Storybook ${{ matrix.shard }}/${{ strategy.job-total }} (every story renders and passes axe)
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # Two jobs, each with half of the stories. A job is about half setup already, and the end-to-end jobs below
     # take longer, so more jobs here would not shorten a run.
     strategy:
@@ -164,7 +164,9 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - run: npm ci && npx playwright install --with-deps chromium
+      # Without --with-deps: the runner already has the browser's libraries, and the option only adds fonts
+      # that no test needs, from a package mirror that is sometimes very slow.
+      - run: npm ci && npx playwright install chromium
       - run: npm run build-storybook
       - name: Every story renders and passes axe
         run: npm run test:storybook -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
@@ -172,7 +174,7 @@ jobs:
   e2e:
     name: End-to-end ${{ matrix.shard }}/${{ strategy.job-total }} (phone and desktop, axe)
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # Four jobs, each with a quarter of the test files: the tests are the slowest part of CI. Each job spends
     # about a minute and a half on setup, so more jobs than this gain little. When one job fails the others
     # still finish, so one run shows every failing test.
@@ -206,10 +208,19 @@ jobs:
         working-directory: backend
       - run: cp .env.example .env && php artisan key:generate
         working-directory: backend
-      - run: npm ci && npm run build && npx playwright install --with-deps chromium
+      - run: npm ci && npm run build && npx playwright install chromium
         working-directory: frontend
       # The test servers run under gdb, so a crash of PHP itself prints a backtrace (see tests/php-server.ts).
-      - run: sudo apt-get install -y -q gdb
+      # The package mirror is sometimes very slow, and gdb only helps to read a crash. So the install gets at
+      # most a minute, and the tests run without gdb when that is not enough.
+      - name: Install gdb, if the package mirror answers in time
+        id: gdb
+        run: |
+          if sudo timeout 30 apt-get update -q && sudo timeout 30 apt-get install -y -q gdb; then
+            echo "use=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::gdb is not installed: the package mirror was too slow. A crash of PHP will have no backtrace."
+          fi
       - name: PHP opcache settings (the test servers turn the JIT off)
         run: php -i | grep -E '^opcache\.(enable|enable_cli|jit|jit_buffer_size) '
       # One job runs both sizes at once, so it takes less time.
@@ -217,7 +228,7 @@ jobs:
         run: npm run test:e2e:parallel -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
         working-directory: frontend
         env:
-          E2E_GDB: '1'
+          E2E_GDB: ${{ steps.gdb.outputs.use }}
       - name: Show the end of the test servers' logs
         if: failure()
         run: for f in storage/logs/*.log; do echo "=== $f"; tail -n 80 "$f"; done
@@ -236,7 +247,7 @@ jobs:
     name: Checks passed
     if: always() && github.event_name == 'pull_request'
     needs: [backend, example-site, frontend, storybook, e2e]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Every job passed
         run: |
@@ -253,7 +264,7 @@ jobs:
     # Off unless the workflow is started by hand. It only stores the zip as an artifact: uploading it to the
     # site is `task deploy:ci`, from a developer's machine.
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
