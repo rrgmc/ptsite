@@ -53,6 +53,8 @@ async function shot(name, fullPage = false) {
     }))
     return [...document.images].filter((img) => img.naturalWidth === 0).map((img) => img.src)
   })
+  // The footer's version changes with every commit, and would change the pictures of screens that did not: hide it
+  await page.locator('footer span').evaluateAll((spans) => { for (const span of spans) span.style.display = 'none' })
   if (broken.length) console.warn(`screenshots: ${name} has images that did not load: ${broken.join(', ')}`)
   await networkIdle()
   // The pointer stays where the last click was, which can be over a chart: move it away, or a tooltip shows
