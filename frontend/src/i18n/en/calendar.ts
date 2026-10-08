@@ -20,9 +20,9 @@ export const calendar: Messages['calendar'] = {
   viewInCalendar: 'View in the calendar',
   goToToday: 'Go to today',
 
-  // This month and the next, or the whole season
+  // From this month on, or the whole season
   viewAll: 'View the complete calendar',
-  viewCurrent: 'View only this month and the next',
+  viewCurrent: 'View from this month on',
 
   // The legend
   legend: {

@@ -19,7 +19,7 @@ export const FinishedSeason: StoryObj = {
   ),
 }
 
-/** Today (10/03/2027) is ringed and in the legend, and March is tinted; the next night, 12/03, keeps its outline. Only March and April are shown, with a link to the complete calendar. */
+/** Today (10/03/2027) is ringed and in the legend, and March is tinted; the next night, 12/03, keeps its outline. The page starts at March, with a link to the complete calendar. */
 export const Today: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => (
@@ -29,7 +29,7 @@ export const Today: StoryObj = {
   ),
 }
 
-/** The complete calendar, from January: "Ver no calendário" goes to March, and a link goes back to the two months. */
+/** The complete calendar, from January: "Ver no calendário" goes to March, and a link goes back to the page from March. */
 export const WholeSeason: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => (

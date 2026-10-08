@@ -65,7 +65,7 @@ export function SeasonCalendar({ season, entries, holidays = [], showAll = false
   season: Season
   entries: CalendarEntry[]
   holidays?: CalendarHoliday[]
-  /** Every month of the season, not only this month and the next. */
+  /** Every month of the season, not only from this month on. */
   showAll?: boolean
   /** "2027-03-05". Today in São Paulo unless given (stories and tests). */
   today?: string
@@ -98,10 +98,10 @@ export function SeasonCalendar({ season, entries, holidays = [], showAll = false
   const first = [season.starts_on, dayOf(entries[0].starts_at)].sort()[0]
   const last = dayOf(entries.at(-1)!.starts_at)
   const months = monthsBetween(first, last)
-  // The page shows this month and the next one. A season that does not include today has no such months, so it
-  // shows them all.
+  // The page shows the months from this one to the last. A season that does not include today has no such month,
+  // so it shows them all.
   const at = months.indexOf(now.slice(0, 7))
-  const current = at < 0 ? months : months.slice(at, at + 2)
+  const current = at < 0 ? months : months.slice(at)
   const canNarrow = current.length < months.length
   const shown = showAll ? months : current
   // The page opens at the top. A button goes to the next night's month, or to today's when nothing is coming.

@@ -27,15 +27,15 @@ test('the calendar marks today', async ({ page }) => {
   await page.getByRole('link', { name: /Calendário/ }).first().click()
   await pickSeason(page, 'Liga 2022')
 
-  // Today is in the season, so the page shows April and May only, with a link to the complete calendar.
-  await expect(page.getByRole('region', { name: 'Abril de 2022' })).toBeVisible()
+  // Today is in the season, so the page starts at April, with a link to the complete calendar.
+  await expect(page.getByRole('region').first()).toHaveAccessibleName('Abril de 2022')
   await expect(page.getByRole('region', { name: 'Maio de 2022' })).toBeVisible()
-  await expect(page.getByRole('region')).toHaveCount(2)
+  await expect(page.getByRole('region', { name: 'Março de 2022' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Ir para hoje' })).toHaveCount(0)
   await page.getByRole('link', { name: 'Ver o calendário completo' }).click()
   await expect(page).toHaveURL(/\/calendar\?view=all$/)
   await expect(page.getByRole('region', { name: 'Março de 2022' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Ver só este mês e o próximo' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Ver a partir deste mês' })).toBeVisible()
 
   const today = page.locator('[aria-current="date"]')
   await expect(today).toHaveCount(1)
