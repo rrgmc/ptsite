@@ -206,6 +206,8 @@ only on desktop also exists on another screen.
 
 - **Navigation:** the bottom tab bar on phones becomes links in the top bar, which also has "Estatísticas",
   "Temporadas", "Administração" (admins) and "Sair". "Meu perfil" is the last item before "Administração".
+  In every menu the screens of the season on screen stay together and come first: "Classificação", "Resultados",
+  "Calendário", "Simulação", "Main Event" and "Estatísticas". "Jogadores" and "Temporadas" follow them.
 - **Width:** content is centred with a maximum width of 1024px (`max-w-5xl`).
 - **Standings:** the table gains the "Pontuou" and "Vitórias" columns, and the last result and simulator link
   move to a side column (from 1024px, `lg`).

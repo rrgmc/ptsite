@@ -10,8 +10,13 @@ const bar = (flag: 'tab' | 'top') => navItemsFor('player').filter((item) => item
 
 it('has "Meu perfil" on both bars, the last one, and the simulator only in the left menu', () => {
   expect(bar('tab')).toEqual(['/', '/results', '/calendar', '/players', '/profile'])
-  expect(bar('top')).toEqual(['/', '/results', '/calendar', '/players', '/seasons', '/statistics', '/profile'])
+  expect(bar('top')).toEqual(['/', '/results', '/calendar', '/statistics', '/players', '/seasons', '/profile'])
   expect(paths('player')).toContain('/simulator')
+})
+
+it('keeps the screens of a season together, before "Jogadores" and "Temporadas"', () => {
+  restore = overrideFeatures({ mainEvent: true })
+  expect(paths('player')).toEqual(['/', '/results', '/calendar', '/simulator', '/main-event', '/statistics', '/players', '/seasons', '/profile'])
 })
 
 it('lists "Main Event" only on a site that has it', () => {

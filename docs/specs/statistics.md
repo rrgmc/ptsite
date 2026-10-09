@@ -129,7 +129,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 
 ## Screens
 
-- **"📊 Estatísticas"** in the menu, after "Temporadas" and "Main Event". It is not on the phone's bottom bar,
+- **"📊 Estatísticas"** in the menu, after "Main Event" and before "Jogadores": the last of the season's screens. It is not on the phone's bottom bar,
   which is full.
 - A switch **"Temporada" / "Geral"**. Each view has its own address, so it can be shared.
 - At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then "Pontos

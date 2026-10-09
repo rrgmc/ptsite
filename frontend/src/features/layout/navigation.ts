@@ -19,15 +19,16 @@ export interface NavItem {
   feature?: FeatureName
 }
 
+// The screens of the season on screen come first and stay together; "Jogadores" and "Temporadas" follow them.
 export const navItems: NavItem[] = [
   { to: '/', label: t.layout.nav.standings, icon: '🏆', end: true, tab: true, top: true },
   { to: '/results', label: t.layout.nav.results, icon: '🃏', tab: true, top: true },
   { to: '/calendar', label: t.layout.nav.calendar, icon: '📅', tab: true, top: true },
   { to: '/simulator', label: t.layout.nav.simulator, icon: '🔮' },
-  { to: '/players', label: t.layout.nav.players, icon: '👥', tab: true, top: true },
-  { to: '/seasons', label: t.layout.nav.seasons, icon: '🗂️', end: true, top: true },
   { to: '/main-event', label: t.layout.nav.mainEvent, icon: '🏅', feature: 'mainEvent' },
   { to: '/statistics', label: t.layout.nav.statistics, icon: '📊', top: true },
+  { to: '/players', label: t.layout.nav.players, icon: '👥', tab: true, top: true },
+  { to: '/seasons', label: t.layout.nav.seasons, icon: '🗂️', end: true, top: true },
   { to: '/profile', label: t.layout.nav.profile, icon: '👤', tab: true, top: true },
   { to: '/admin', label: t.layout.nav.admin, icon: '⚙️', top: true, adminOnly: true },
 ]
