@@ -38,6 +38,14 @@ export const StandingsWithMainEvent: StoryObj = {
   render: () => <RouterStory path="/" url="/" element={<StandingsPage />} />,
 }
 
+/** "Classificação" of a finished season: no "Evento aberto" and no "Próximo evento", even with a night left open. */
+export const StandingsFinishedSeason: StoryObj = {
+  parameters: {
+    msw: [http.get('/api/v1/seasons/current', () => HttpResponse.json({ data: { ...season, is_open: false, is_finished: true } })), ...handlers],
+  },
+  render: () => <RouterStory path="/" url="/" element={<StandingsPage />} />,
+}
+
 /** The same banner above "Resultados", for a player who already answered: Ana is ALL IN. Then the upcoming nights, the chart and the results. */
 export const Results: StoryObj = {
   parameters: { msw: [http.get('/api/v1/me', () => HttpResponse.json({ data: { ...keeper, player: players[0] } })), ...handlers] },
