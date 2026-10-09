@@ -10,6 +10,7 @@ import { OpenNightAttendance } from '../attendance/OpenNightAttendance'
 import { MainEventPodium } from '../mainEvent/MainEventPodium'
 import { NightMark } from '../nights/NightMark'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
+import { nextNight } from './nextNight'
 import { StandingsTable } from './StandingsTable'
 
 export function StandingsPage() {
@@ -24,7 +25,7 @@ export function StandingsPage() {
 
   // The nights with a pot and points. A Main Event night has neither; an extra night is not a round.
   const finished = (nights.data ?? []).filter((n) => n.status === 'finished' && n.type === 'regular')
-  const next = (nights.data ?? []).find((n) => n.status === 'open') ?? (nights.data ?? []).find((n) => n.status === 'scheduled')
+  const next = nextNight(season, nights.data ?? [])
   const last = finished.at(-1)
   // The season's Main Event, once it is played: its first three go above the standings.
   const mainEvent = hasFeature('mainEvent')
