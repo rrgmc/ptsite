@@ -160,6 +160,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 17c. **"Próximos eventos"**, on "Resultados", lists the season's **next two** nights that are not finished,
     the earliest first. When the season has more to come, the link "Ver todos no calendário" leads to the
     calendar. **A finished season has no such box**, even with a night that was never finished.
+    "Classificação" follows the same rule: its box "Evento aberto" or "Próximo evento" shows the season's open
+    night, or else its next scheduled one, and a finished season has no such box.
 
 ### Extra nights ("Evento extra")
 
