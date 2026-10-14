@@ -355,8 +355,8 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
             {(marked[field.key] || isLeaving) && <p id={`${field.key}-help`} className="text-sm text-muted">{field.help}</p>}
           </div>
         ) : (
-          <div key={field.key} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-            {textField}
+          <div key={field.key} className="flex flex-wrap items-end gap-x-3 gap-y-2">
+            <div className="min-w-40 flex-1">{textField}</div>
             {mark}
           </div>
         )

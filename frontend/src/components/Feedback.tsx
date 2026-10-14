@@ -32,5 +32,5 @@ export function Badge({ tone = 'neutral', children }: { tone?: 'neutral' | 'prim
     warning: 'bg-warning-soft text-warning',
     danger: 'bg-danger-soft text-danger',
   }
-  return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${tones[tone]}`}>{children}</span>
+  return <span className={`inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${tones[tone]}`}>{children}</span>
 }

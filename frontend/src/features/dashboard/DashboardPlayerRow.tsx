@@ -39,10 +39,10 @@ export function DashboardPlayerRow({
 
   return (
     <li className="px-2 py-1.5 even:bg-surface-stripe">
-      <div className="flex items-center justify-between gap-2">
-        <span className="flex min-w-0 items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
+        <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
           <PlayerThumbnail player={player} size="xs" />
-          <span className="truncate font-semibold">{player.nickname}</span>
+          <span className="min-w-0 truncate font-semibold">{player.nickname}</span>
           {line.is_house_owner && <Badge tone="primary">{t.dashboard.players.houseOwner}</Badge>}
         </span>
         <span className="shrink-0 text-sm tabular">
