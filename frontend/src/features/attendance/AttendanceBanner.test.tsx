@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { overrideFeatures } from '@/lib/features'
-import { openMainEventNight, openNight } from '@/mocks/data'
+import { openNight } from '@/mocks/data'
 import { type Answer } from './AttendancePanel'
 import { AttendanceBanner } from './AttendanceBanner'
 
@@ -49,20 +49,10 @@ describe('AttendanceBanner', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('As confirmações deste evento estão encerradas.')
   })
 
-  it('leads to the night dashboard of a regular night, on a site that has it', () => {
+  it('has no link to the night dashboard, even on a site that has it', () => {
     const restore = overrideFeatures({ nightDashboard: true })
     banner('all_in')
-    expect(screen.getByRole('link', { name: 'Painel do evento' })).toHaveAttribute('href', '/nights/11/dashboard')
-    cleanup()
-
-    banner('all_in', undefined, openMainEventNight)
     expect(screen.queryByRole('link', { name: 'Painel do evento' })).not.toBeInTheDocument()
     restore()
-    cleanup()
-
-    const off = overrideFeatures({ nightDashboard: false })
-    banner('all_in')
-    expect(screen.queryByRole('link', { name: 'Painel do evento' })).not.toBeInTheDocument()
-    off()
   })
 })
