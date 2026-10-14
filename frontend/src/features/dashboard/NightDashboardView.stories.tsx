@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router'
 import { applyChange, recalculated } from './dashboardMoney'
 import { finishedNightDashboard, finishedNight, nightDashboard, openNight, players, season } from '@/mocks/data'
 import { withFeatures } from '@/mocks/withFeatures'
+import { withLargeFont } from '@/mocks/withLargeFont'
 import { NightDashboardView } from './NightDashboardView'
 
 const meta = {
@@ -75,3 +76,6 @@ export const PotOnly: Story = {
   decorators: [withFeatures({ timeChip: false, mainEventPot: false })],
   args: { dashboard: recalculated({ ...nightDashboard, totals: { ...nightDashboard.totals, time_chip: null }, suggested_main_event_pot: null }) },
 }
+
+/** On a small phone set to its largest font: the totals at the foot move to a new line rather than cut an amount. */
+export const LargeFont: Story = { decorators: [withLargeFont()] }

@@ -355,8 +355,8 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
             {(marked[field.key] || isLeaving) && <p id={`${field.key}-help`} className="text-sm text-muted">{field.help}</p>}
           </div>
         ) : (
-          <div key={field.key} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-            {textField}
+          <div key={field.key} className="flex flex-wrap items-end gap-x-3 gap-y-2">
+            <div className="min-w-40 flex-1">{textField}</div>
             {mark}
           </div>
         )
@@ -372,7 +372,8 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
  * The night's amounts, always in sight at the foot of the screen: the pot, the time chip apart from it, and the
  * two added up. An amount typed by hand stands in for the one worked out, which is still shown below it. Each
  * says what was paid and what is pending, of what the players owe. Once a payment was not in cash, a line below
- * says how much of what was paid is in cash, to check the money in hand.
+ * says how much of what was paid is in cash, to check the money in hand. With a large font, a column that does
+ * not fit moves to a new line rather than cut its amounts short.
  */
 export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
   const { totals, manual, received } = dashboard
@@ -387,18 +388,18 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
       aria-label={t.dashboard.totals.label}
       className="sticky bottom-0 z-10 -mx-4 mt-auto border-t border-border bg-surface px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-raised"
     >
-      <dl className="flex gap-3">
+      <dl className="flex flex-wrap gap-x-3 gap-y-2">
         {columns.map(({ label, amount, amounts, isManual }) => (
-          <div key={label} className="min-w-0 flex-1">
+          <div key={label} className="min-w-min flex-1">
             <dt className="text-xs font-semibold uppercase text-muted">
               {label}
               {isManual && <span className="ml-1 lowercase text-primary">({t.dashboard.manual.mark})</span>}
             </dt>
             <dd>
-              <span className="block truncate font-display text-lg font-extrabold tabular">{formatMoney(amount)}</span>
-              {isManual && <span className="block truncate text-xs text-muted tabular">{t.dashboard.totals.calculated({ amount: formatMoney(amounts.owed) })}</span>}
-              <span className="block truncate text-xs text-muted tabular">{t.dashboard.totals.paid({ amount: formatMoney(amounts.paid) })}</span>
-              <span className={`block truncate text-xs tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
+              <span className="block font-display text-lg font-extrabold tabular">{formatMoney(amount)}</span>
+              {isManual && <span className="block text-xs text-muted tabular">{t.dashboard.totals.calculated({ amount: formatMoney(amounts.owed) })}</span>}
+              <span className="block text-xs text-muted tabular">{t.dashboard.totals.paid({ amount: formatMoney(amounts.paid) })}</span>
+              <span className={`block text-xs tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
                 {t.dashboard.totals.pending({ amount: formatMoney(amounts.pending) })}
               </span>
             </dd>

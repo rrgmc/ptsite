@@ -17,7 +17,8 @@ const choices: { id: Answer | 'none'; label: string }[] = [
 
 /**
  * "Confirme sua presença": the player's own answer, the lists of who is coming and who folded, and for results
- * keepers and admins a way to answer for someone else (docs/specs/attendance.md).
+ * keepers and admins a way to answer for someone else (docs/specs/attendance.md). With a large font, a choice
+ * that does not fit moves to a new line rather than overflow its button.
  */
 export function AttendancePanel({
   attendances,
@@ -63,12 +64,12 @@ export function AttendancePanel({
           className="mb-4 flex flex-col gap-2"
         >
           <Label className="text-sm font-semibold">{t.attendance.panel.yourAnswer}</Label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="flex flex-wrap gap-2">
             {choices.map((c) => (
               <Radio
                 key={c.id}
                 value={c.id}
-                className="flex min-h-touch cursor-pointer items-center justify-center rounded-md border border-border bg-surface px-2 text-center font-bold outline-none selected:border-primary selected:bg-primary selected:text-on-primary focus-visible:outline-3 focus-visible:outline-focus disabled:opacity-60"
+                className="flex min-h-touch min-w-min flex-1 cursor-pointer items-center justify-center rounded-md border border-border bg-surface px-2 py-1 text-center font-bold outline-none selected:border-primary selected:bg-primary selected:text-on-primary focus-visible:outline-3 focus-visible:outline-focus disabled:opacity-60"
               >
                 {c.label}
               </Radio>
@@ -117,13 +118,14 @@ export function AttendancePanel({
       {isOpen && canAnswerForOthers && (
         <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
           <PlayerPicker label={t.attendance.panel.answerForOther} players={players} value={other} onChange={setOther} />
-          <div className="grid grid-cols-3 gap-2">
+          <div className="flex flex-wrap gap-2">
             {choices.map((c) => (
               <Button
                 key={c.id}
                 variant="secondary"
                 isDisabled={other === null}
                 onPress={() => other && onAnswer(other, c.id === 'none' ? null : c.id)}
+                className="min-w-min flex-1 py-1 text-center"
               >
                 {c.label}
               </Button>
