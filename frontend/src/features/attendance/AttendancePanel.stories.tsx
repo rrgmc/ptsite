@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { MemoryRouter } from 'react-router'
 import type { Attendance, Player } from '@/api/client'
 import { attendances, players } from '@/mocks/data'
+import { withLargeFont } from '@/mocks/withLargeFont'
 import { type Answer, AttendancePanel } from './AttendancePanel'
 
 /** A stateful panel: answering updates the lists, as the real API does. */
@@ -50,3 +51,5 @@ export const NotOpenYet: Story = { args: { initial: [], myPlayerId: 1, isOpen: f
 export const Closed: Story = { args: { initial: attendances, myPlayerId: 1, isOpen: false, canAnswerForOthers: true } }
 /** The API refused the answer. */
 export const WithError: Story = { args: { initial: attendances, myPlayerId: 1, isOpen: true, canAnswerForOthers: false, error: 'As confirmações deste evento estão encerradas.' } }
+/** On a small phone set to its largest font: "Não confirmado" moves to a new line rather than overflow its button. */
+export const LargeFont: Story = { args: { initial: attendances, myPlayerId: 1, isOpen: true, canAnswerForOthers: true }, decorators: [withLargeFont()] }
