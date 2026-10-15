@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatLongDate, formatMoney, fullNameIfDifferent, moneyText, nightTitle, parseMoneyInput, parseSignedMoneyInput, shareOf, titleOfNight } from './format'
+import { formatDate, formatDayMonth, formatLongDate, formatMoney, formatTime, fullNameIfDifferent, moneyText, nightTitle, parseMoneyInput, parseSignedMoneyInput, shareOf, titleOfNight } from './format'
 
 describe('format', () => {
   it('formats money in reais', () => {
@@ -10,6 +10,11 @@ describe('format', () => {
     expect(formatDate('2026-04-01')).toBe('01/04/2026')
     expect(formatLongDate('2027-03-26')).toBe('Sexta-feira, 26/03/2027')
     expect(formatLongDate('2027-03-26T21:30:00-03:00')).toBe('Sexta-feira, 26/03/2027')
+  })
+
+  it('gives a day and month, and a time, in the time zone of the site', () => {
+    expect(formatDayMonth('2026-03-12T21:40:00Z')).toBe('12/03')
+    expect(formatTime('2026-03-12T21:40:00Z')).toBe('18:40')
   })
 
   it('titles nights by their date, with their number in the season when it is known', () => {

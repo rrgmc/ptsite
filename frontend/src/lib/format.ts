@@ -9,6 +9,7 @@ const money = new Intl.NumberFormat(locale, { style: 'currency', currency: site.
 const points = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const weekdayDate = new Intl.DateTimeFormat(locale, { weekday: 'long', day: '2-digit', month: '2-digit', timeZone })
 const longDate = new Intl.DateTimeFormat(locale, { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', timeZone })
+const dayMonth = new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', timeZone })
 const shortDate = new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone })
 const time = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone })
 const whole = new Intl.NumberFormat(locale)
@@ -60,6 +61,12 @@ export function formatLongDate(iso: string): string {
   return capitalized(longDate.format(toDate(iso)))
 }
 
+/** ISO date → "14/03", for a date close enough to need no year */
+export function formatDayMonth(iso: string): string {
+  return dayMonth.format(toDate(iso))
+}
+
+/** ISO date and time → "18:40" */
 export function formatTime(iso: string): string {
   return time.format(toDate(iso))
 }

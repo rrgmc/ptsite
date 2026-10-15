@@ -108,6 +108,8 @@ export function amountsInUse(dashboard: NightDashboard): { pot: string; timeChip
 const emptyLine = (player: Player): DashboardPlayer => ({
   player,
   is_house_owner: false,
+  // The API's answer brings the time the tap confirmed the player, if it did.
+  confirmed_at: null,
   buy_in: '0.00',
   buy_in_paid: false,
   buy_in_non_cash: false,

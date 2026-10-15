@@ -1298,11 +1298,13 @@ export interface components {
              * @description The participants, by name. `buy_in` is the price that applies to the player. `owed`, `paid` and
              *     `pending` add up the buy-in, the rebuys and the time chips of the player. `buy_in_non_cash` and a
              *     rebuy's `non_cash` say that it was paid, but not in cash; the player's `non_cash` is how much of
-             *     `paid` that is.
+             *     `paid` that is. `confirmed_at` is when the player answered ALL IN; null when they have no such
+             *     answer.
              */
             players: {
                 player: components["schemas"]["PlayerResource"];
                 is_house_owner: boolean;
+                confirmed_at: string | null;
                 buy_in: string;
                 buy_in_paid: boolean;
                 buy_in_non_cash: boolean;
