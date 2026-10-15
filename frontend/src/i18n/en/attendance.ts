@@ -9,6 +9,7 @@ export const attendance: Messages['attendance'] = {
   banner: {
     label: 'Open night',
     title: ({ weekday }: { weekday: string }) => `Open night: ${weekday}`,
+    allInCount: ({ count }: { count: number }) => `${count} ALL IN`,
     you: 'You: {answer}',
     confirmPresence: 'Confirm your attendance',
     change: 'Change',

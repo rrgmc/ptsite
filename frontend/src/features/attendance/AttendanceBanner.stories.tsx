@@ -9,7 +9,7 @@ const meta = {
   title: 'Attendance/Banner',
   component: AttendanceBanner,
   decorators: [(Story) => <MemoryRouter><Story /></MemoryRouter>],
-  args: { night: openNight, answer: null, onAnswer: () => {} },
+  args: { night: openNight, answer: null, allInCount: 2, onAnswer: () => {} },
 } satisfies Meta<typeof AttendanceBanner>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -20,6 +20,8 @@ export const NotAnswered: Story = {}
 export const AllIn: Story = { args: { answer: 'all_in' } }
 /** A player who answered FOLD. */
 export const Fold: Story = { args: { answer: 'fold' } }
+/** Nobody has answered ALL IN yet. */
+export const NobodyAllIn: Story = { args: { allInCount: 0 } }
 /** The API refused the answer. */
 export const WithError: Story = { args: { error: 'As confirmações deste evento estão encerradas.' } }
 /** A night with no place yet. */
