@@ -122,6 +122,17 @@ function filesIn(dir: string, prefix = ''): string[] {
 }
 
 /**
+ * Points the page's links to the generated files at the app's base (`/app/`). Vite does this itself only for
+ * the files it finds in public/, and these are not there: a link left at the root finds nothing, and Chrome then
+ * finds no manifest and will not install the site.
+ */
+export function linkGeneratedFiles(html: string, base: string): string {
+  return GENERATED_FILES.reduce((page, file) => page.replaceAll(`href="/${file}"`, `href="${base}${file}"`), html)
+}
+
+const GENERATED_FILES = ['manifest.webmanifest', 'favicon.svg']
+
+/**
  * Puts the site into the build:
  * - the page's title, language, theme color and brand shades (index.html);
  * - manifest.webmanifest and favicon.svg, made from the settings;
@@ -136,12 +147,16 @@ export function sitePlugin(site: SiteSettings): Plugin {
   const sitePublic = join(siteDir, 'public')
   const themeFile = join(siteDir, 'theme.css')
   const theme = existsSync(themeFile) ? readFileSync(themeFile, 'utf8') : ''
+  let base = '/'
 
   return {
     name: 'ptsite-site',
+    configResolved(config) {
+      base = config.base
+    },
     transformIndexHtml(html) {
       return {
-        html: html
+        html: linkGeneratedFiles(html, base)
           .replace(/<html lang="[^"]*">/, `<html lang="${site.locale}">`)
           .replace(/<title>[^<]*<\/title>/, `<title>${site.name.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</title>`)
           .replace(/(<meta name="theme-color" content=")[^"]*(")/, `$1${site.brandColor}$2`),
