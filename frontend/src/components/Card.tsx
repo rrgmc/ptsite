@@ -1,10 +1,12 @@
-import type { ReactNode } from 'react'
+import { useContext, type ReactNode } from 'react'
 import { usePageTitle } from '@/lib/usePageTitle'
+import { AdminSurface } from './adminSurface'
 
 /** A titled box. It may be narrower than its content (min-w-0), so a wide table inside scrolls instead of widening the page. */
 export function Card({ title, action, children, className = '' }: { title?: ReactNode; action?: ReactNode; children: ReactNode; className?: string }) {
+  const admin = useContext(AdminSurface)
   return (
-    <section className={`min-w-0 rounded-lg bg-surface p-4 shadow-card ${className}`}>
+    <section className={`min-w-0 rounded-lg ${admin ? 'bg-surface-admin' : 'bg-surface'} p-4 shadow-card ${className}`}>
       {(title || action) && (
         <header className="mb-3 flex flex-wrap items-center justify-between gap-3">
           {title && <h2 className="font-display text-lg font-bold">{title}</h2>}
