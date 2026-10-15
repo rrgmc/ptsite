@@ -1,6 +1,5 @@
 import { NavLink, Route, Routes, useSearchParams } from 'react-router'
 import { useMe } from '@/api/queries'
-import { AdminSurface } from '@/components/adminSurface'
 import { PageHeader } from '@/components/Card'
 import { ErrorBox } from '@/components/Feedback'
 import { t } from '@/i18n'
@@ -35,21 +34,19 @@ export function AdminRoutes() {
         <NavLink to="/admin/audit-log" className={tab}>{t.admin.auditLog.tab}</NavLink>
         <NavLink to="/admin/settings" className={tab}>{t.admin.settings.tab}</NavLink>
       </nav>
-      <AdminSurface.Provider value>
-        <Routes>
-          <Route index element={<SeasonsAdmin />} />
-          <Route path="seasons/:seasonId" element={<SeasonEditPage />} />
-          {hasFeature('seasonPlanner') && <Route path="seasons/:seasonId/plan" element={<SeasonPlanner />} />}
-          {hasFeature('mainEvent') && <Route path="seasons/:seasonId/main-event" element={<MainEventAdmin />} />}
-          <Route path="holidays" element={<HolidaysPage />} />
-          <Route path="players" element={<PlayersAdmin />} />
-          <Route path="players/:playerId" element={<PlayerEditPage />} />
-          <Route path="places" element={<PlacesAdmin />} />
-          <Route path="places/:placeId" element={<PlaceEditPage />} />
-          <Route path="audit-log" element={<AuditLogPage />} />
-          <Route path="settings" element={<SettingsAdmin />} />
-        </Routes>
-      </AdminSurface.Provider>
+      <Routes>
+        <Route index element={<SeasonsAdmin />} />
+        <Route path="seasons/:seasonId" element={<SeasonEditPage />} />
+        {hasFeature('seasonPlanner') && <Route path="seasons/:seasonId/plan" element={<SeasonPlanner />} />}
+        {hasFeature('mainEvent') && <Route path="seasons/:seasonId/main-event" element={<MainEventAdmin />} />}
+        <Route path="holidays" element={<HolidaysPage />} />
+        <Route path="players" element={<PlayersAdmin />} />
+        <Route path="players/:playerId" element={<PlayerEditPage />} />
+        <Route path="places" element={<PlacesAdmin />} />
+        <Route path="places/:placeId" element={<PlaceEditPage />} />
+        <Route path="audit-log" element={<AuditLogPage />} />
+        <Route path="settings" element={<SettingsAdmin />} />
+      </Routes>
     </>
   )
 }
