@@ -8,6 +8,7 @@ use PTSite\App\Models\NightRebuy;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\User;
 use PTSite\App\Support\NightLedger;
+use PTSite\Domain\Attendance\AttendanceAnswer;
 use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
 use PTSite\Domain\Nights\MoneyTotal;
@@ -40,14 +41,17 @@ final class NightDashboard
         $rebuys = $this->ledger->rebuysByPlayer($night);
         $entries = $this->ledger->entries($night, $rebuys);
         $players = Player::query()->findMany(array_keys($entries))->keyBy('id');
+        // When each participant answered ALL IN; a player added without an answer has none.
+        $confirmedAt = $night->attendances()->where('answer', AttendanceAnswer::AllIn->value)->get(['player_id', 'answered_at'])->pluck('answered_at', 'player_id');
 
         $lines = SortByName::sort(collect($entries), fn (NightEntry $entry) => $players[$entry->playerId]->nickname)
-            ->map(function (NightEntry $entry) use ($money, $players, $rebuys) {
+            ->map(function (NightEntry $entry) use ($money, $players, $rebuys, $confirmedAt) {
                 $owes = $money->potOf($entry)->plus($money->timeChipOf($entry));
 
                 return [
                     'player' => $players[$entry->playerId],
                     'is_house_owner' => $entry->isHouseOwner,
+                    'confirmed_at' => $confirmedAt->get($entry->playerId)?->toIso8601String(),
                     'buy_in' => $money->buyInOf($entry)->toDecimal(),
                     'buy_in_paid' => $entry->buyInPaid,
                     'buy_in_non_cash' => $entry->buyInPaid && $entry->buyInNonCash,

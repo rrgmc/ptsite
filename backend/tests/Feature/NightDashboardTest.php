@@ -154,6 +154,24 @@ it('lists the players who answered ALL IN as participants who owe a buy-in', fun
     expect(NightPlayer::query()->count())->toBe(0);
 });
 
+it('says when each participant answered ALL IN, keeping the time of an answer given again', function () {
+    Sanctum::actingAs($this->carlaUser);
+    $this->travelTo('2025-03-12 18:40:00');
+    $this->putJson("/api/v1/nights/{$this->night->id}/attendance/{$this->carla->id}", ['answer' => 'all_in'])->assertOk();
+    $this->travelTo('2025-03-13 09:00:00');
+    $this->putJson("/api/v1/nights/{$this->night->id}/attendance/{$this->carla->id}", ['answer' => 'all_in'])->assertOk();
+
+    Sanctum::actingAs($this->anaUser);
+    $this->travelTo('2025-03-14 22:10:00');
+    ($this->mark)($this->dudu)->assertOk();
+
+    $this->getJson($this->url)
+        ->assertJsonPath('data.players.0.player.nickname', 'Carla')
+        ->assertJsonPath('data.players.0.confirmed_at', '2025-03-12T18:40:00-03:00')
+        ->assertJsonPath('data.players.1.player.nickname', 'Dudu')
+        ->assertJsonPath('data.players.1.confirmed_at', '2025-03-14T22:10:00-03:00');
+});
+
 it('marks a time chip that is paid as owed, and one that is not owed as not paid', function () {
     ($this->mark)($this->carla, ['time_chip_paid' => true])
         ->assertJsonPath('data.players.0.time_chip', true)
@@ -544,7 +562,9 @@ it('lets an admin add a player to a finished night without an answer', function 
     $late = Player::factory()->create(['nickname' => 'Fausto']);
     Sanctum::actingAs($this->admin);
 
-    ($this->mark)($late, ['buy_in_paid' => true])->assertOk()->assertJsonPath('data.players.0.player.nickname', 'Fausto');
+    ($this->mark)($late, ['buy_in_paid' => true])->assertOk()
+        ->assertJsonPath('data.players.0.player.nickname', 'Fausto')
+        ->assertJsonPath('data.players.0.confirmed_at', null);
 
     expect(NightAttendance::query()->where('player_id', $late->id)->exists())->toBeFalse()
         ->and(AuditLog::query()->where('action', 'night.payments_changed')->sole()->after['buy_in_paid'])->toBeTrue();
