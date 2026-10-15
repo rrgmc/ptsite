@@ -298,6 +298,9 @@ Chrome offers the install only when all of these hold:
 - the site is served over HTTPS;
 - `public/manifest.webmanifest` has a name, `display: standalone` and PNG icons of 192 and 512 pixels;
 - a service worker is registered (`public/sw.js`, registered in `src/main.tsx` in production builds only).
+- the page links the manifest at its real address, under the app's base (`/app/manifest.webmanifest`).
+  The manifest and `favicon.svg` are made by `sitePlugin`, not kept in `public/`, so Vite does not point
+  their links at the base; `linkGeneratedFiles` in `site-settings.ts` does.
 
 The icons in `public/icons` are made from `public/favicon.svg` by `npm run icons` (`scripts/make-icons.mjs`)
 and committed. Run it again when the logo changes. The "maskable" icon and the iPhone icon have no transparent

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { faviconFor, loadSite, manifestFor } from '../site-settings'
+import { faviconFor, linkGeneratedFiles, loadSite, manifestFor } from '../site-settings'
 
 // Chrome on Android offers to install the site only when the manifest lists PNG icons of 192 and 512 pixels.
 // The manifest is made from the site's settings (site-settings.ts). The icons are the files in public/, which
@@ -51,5 +51,14 @@ describe('web app manifest', () => {
 describe('site icon', () => {
   it('is drawn on the main color', () => {
     expect(faviconFor({ ...site, brandColor: '#1e3a8a' })).toContain('fill="#1e3a8a"')
+  })
+})
+
+describe('the page links', () => {
+  // The site is served under /app/. A link at the root finds nothing, and Chrome then offers no install.
+  const page = linkGeneratedFiles(readFileSync(resolve('index.html'), 'utf8'), '/app/')
+
+  it.each(['manifest', 'icon'])('find the %s under the app base', (rel) => {
+    expect(page).toMatch(new RegExp(`<link rel="${rel}"[^>]* href="/app/`))
   })
 })
