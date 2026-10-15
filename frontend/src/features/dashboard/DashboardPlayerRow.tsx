@@ -5,7 +5,7 @@ import { Badge } from '@/components/Feedback'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { ToggleChip } from '@/components/ToggleChip'
 import { t } from '@/i18n'
-import { formatMoney } from '@/lib/format'
+import { formatDayMonth, formatMoney, formatTime } from '@/lib/format'
 import { type DashboardChange, type DashboardPlayer, hasPayments, nextPayment } from './dashboardMoney'
 
 /** The most rebuys the API takes for one player, whatever the season allows past its limit. */
@@ -61,6 +61,9 @@ export function DashboardPlayerRow({
           )}
         </span>
       </div>
+      {line.confirmed_at && (
+        <p className="text-xs text-muted">{t.dashboard.players.confirmedAt({ date: formatDayMonth(line.confirmed_at), time: formatTime(line.confirmed_at) })}</p>
+      )}
 
       <div role="group" aria-label={t.dashboard.players.marksOf({ nickname: player.nickname })} className="mt-1 flex flex-wrap items-center gap-1.5">
         <ToggleChip

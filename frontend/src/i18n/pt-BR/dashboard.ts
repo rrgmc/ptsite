@@ -14,6 +14,8 @@ export const dashboard = {
     heading: ({ count }: { count: number }) => `Jogadores (${count})`,
     empty: 'Nenhum jogador ainda. Adicione quem chegou na busca abaixo.',
     houseOwner: 'Dono da casa',
+    /** Under the name: when the player answered ALL IN. */
+    confirmedAt: ({ date, time }: { date: string; time: string }) => `Confirmou ${date} às ${time}`,
     buyIn: 'Buy-in',
     timeChip: 'Time chip',
     timeChipPaid: 'TC pago',

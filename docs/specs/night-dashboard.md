@@ -48,7 +48,7 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
    A line under the participants says what the two signs mean. The time chip has no such mark of its own: a
    late player's time chip counts as paid the way their buy-in was, and a rebuy's time chip the way the rebuy
    was.
-7b. **Each participant's row shows when they answered ALL IN** ("Confirmou 14/03 18:40"), in small faded letters
+7b. **Each participant's row shows when they answered ALL IN** ("Confirmou 14/03 às 18:40"), in small faded letters
    under the name: the date and time of their latest change to ALL IN. Answering ALL IN again keeps the time. A
    participant with no ALL IN answer, such as one an admin added to a finished night, shows none. A league may
    charge a player who confirms late, on the night's own day for instance; the site charges nothing and only
@@ -180,7 +180,7 @@ Participants, on the open night of 14/03:
 - **Acting confirms.** Dudu did not answer. Ana types "du" in "Adicionar jogador", finds Dudu and taps "Buy-in
   pago": Dudu is on the dashboard with his buy-in paid, and listed under "Vão jogar" with the answer set by Ana.
 - **When each confirmed.** Carla answered ALL IN on 12/03 at 18:40 and again on 13/03; Dudu was confirmed by
-  Ana's tap on 14/03 at 22:10. Their rows say "Confirmou 12/03 18:40" and "Confirmou 14/03 22:10".
+  Ana's tap on 14/03 at 22:10. Their rows say "Confirmou 12/03 às 18:40" and "Confirmou 14/03 às 22:10".
 - **Leaving.** Carla answered ALL IN and has no marks. She changes to FOLD: she leaves the dashboard. Dudu, who
   paid, tries the same: refused ("Remova os pagamentos e os rebuys do jogador antes.").
 - **The house owner.** Élio did not answer. Ana picks him as the house owner: he is a participant and answered

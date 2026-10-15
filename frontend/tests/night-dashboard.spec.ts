@@ -41,6 +41,8 @@ test('players record the payments of an open night on its dashboard, and the kee
   await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('jacob')
   await page.getByRole('group', { name: 'Adicionar Jacobson' }).getByRole('button', { name: 'Buy-in pago' }).click()
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true')
+  // The tap confirmed him: his row says when
+  await expect(page.getByRole('listitem').filter({ hasText: 'Jacobson' })).toContainText(/Confirmou \d{2}\/\d{2} às \d{2}:\d{2}/)
   await expect(totals(page)).toContainText('PoteR$ 50,00Pago R$ 50,00')
 
   // A rebuy is owed until it is marked as paid, and adds its time chip, which is shown apart from the pot

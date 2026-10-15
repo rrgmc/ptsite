@@ -14,6 +14,7 @@ export const dashboard = {
     heading: ({ count }: { count: number }) => `Players (${count})`,
     empty: 'No players yet. Add who arrived with the search below.',
     houseOwner: 'House owner',
+    confirmedAt: ({ date, time }: { date: string; time: string }) => `Confirmed ${date} at ${time}`,
     buyIn: 'Buy-in',
     timeChip: 'Time chip',
     timeChipPaid: 'TC paid',

@@ -44,6 +44,14 @@ describe('NightDashboardView', () => {
     expect(screen.getByRole('heading', { name: 'Jogadores (5)' })).toBeInTheDocument()
   })
 
+  it('says under each name when the player answered ALL IN, and nothing for a player with no answer', () => {
+    view({ ...nightDashboard, players: nightDashboard.players.map((line, i) => (i === 0 ? { ...line, confirmed_at: null } : line)) })
+    const rows = screen.getAllByRole('listitem')
+
+    expect(rows.find((row) => row.textContent?.includes('Carlão'))).toHaveTextContent('Confirmou 18/04 às 18:40')
+    expect(rows.find((row) => row.textContent?.includes(ana.nickname))).not.toHaveTextContent('Confirmou')
+  })
+
   it('shows the pot, the time chip apart from it, and the total', () => {
     view()
     const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
