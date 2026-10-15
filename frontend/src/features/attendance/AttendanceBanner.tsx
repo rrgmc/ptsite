@@ -16,12 +16,15 @@ const labels: Record<Answer, string> = { all_in: t.attendance.allIn, fold: t.att
 export function AttendanceBanner({
   night,
   answer,
+  allInCount,
   onAnswer,
   error,
 }: {
   night: Night
   /** The logged-in player's answer; null when there is none yet. */
   answer: Answer | null
+  /** How many players answered ALL IN. */
+  allInCount: number
   onAnswer: (answer: Answer) => void
   error?: string
 }) {
@@ -30,7 +33,7 @@ export function AttendanceBanner({
     <aside aria-label={t.attendance.banner.label} className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-md bg-primary-soft p-3">
       <p className="min-w-0 wrap-anywhere">
         <Link to={nightPath} className="font-semibold underline">{t.attendance.banner.title({ weekday: formatWeekday(night.starts_at) })}</Link>
-        <span className="text-muted"> · {night.place?.name ?? t.nights.noPlace}</span> <NightMark night={night} />
+        <span className="text-muted"> · {night.place?.name ?? t.nights.noPlace} · {t.attendance.banner.allInCount({ count: allInCount })}</span> <NightMark night={night} />
         <span className="block">
           {answer ? rich(t.attendance.banner.you, { answer: <strong>{labels[answer]}</strong> }) : t.attendance.banner.confirmPresence}
         </span>

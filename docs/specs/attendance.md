@@ -37,8 +37,8 @@ Know who is coming to the night that is open, so the host can plan, and make ent
 7. When finishing a night, the player picker lists the players who answered **ALL IN first**, under
    "Confirmados", then the other active and inactive players as usual.
 8. While a night of the **current season** is open, a banner at the top of "Classificação" and "Resultados"
-   names it. A player who has not answered gets the buttons **"ALL IN"** and **"FOLD"** there. A player who has
-   answered sees the answer ("Você: ALL IN") and "Alterar", which leads to the night's page; the answer is
+   names it and says how many players answered ALL IN ("3 ALL IN"), as the calendar does. A player who has
+   not answered gets the buttons **"ALL IN"** and **"FOLD"** there. A player who has answered sees the answer ("Você: ALL IN") and "Alterar", which leads to the night's page; the answer is
    changed or removed there. The banner is about the current season's night also while another season is on
    screen. An account with no player sees no banner.
 
@@ -52,8 +52,8 @@ Names are invented.
 - **Answering.** The night is opened. Ana answers ALL IN at 10:00, Breno answers ALL IN at 11:00 and Carla
   answers FOLD. The night's page shows "Vão jogar (2): 1. Ana, 2. Breno" and "Fold (1): Carla".
 - **Banner.** Before answering, Ana opens "Classificação". The banner says "Evento aberto: Sexta-feira, 28/03"
-  and "Confirme sua presença", with the buttons ALL IN and FOLD. She taps ALL IN: the banner now says
-  "Você: ALL IN" with "Alterar", and "Resultados" shows the same. Helena, an admin with no player, sees no banner.
+  with "0 ALL IN", and "Confirme sua presença", with the buttons ALL IN and FOLD. She taps ALL IN: the banner
+  now says "1 ALL IN" and "Você: ALL IN" with "Alterar", and "Resultados" shows the same. Helena, an admin with no player, sees no banner.
 - **Changing.** Later Ana changes to FOLD. Now "Vão jogar (1): 1. Breno" and "Fold (2)", with Ana after
   Carla because her answer is newer.
 - **Repeating.** Breno taps ALL IN again. Nothing changes: he stays 1st.

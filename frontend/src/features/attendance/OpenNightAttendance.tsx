@@ -29,6 +29,7 @@ function OpenNightAnswer({ night, player }: { night: Night; player: Player }) {
     <AttendanceBanner
       night={night}
       answer={attendance.data.find((a) => a.player.id === player.id)?.answer ?? null}
+      allInCount={attendance.data.filter((a) => a.answer === 'all_in').length}
       onAnswer={(value) => answer.mutate({ player, answer: value })}
       error={answer.error instanceof ApiError ? answer.error.body.message : undefined}
     />

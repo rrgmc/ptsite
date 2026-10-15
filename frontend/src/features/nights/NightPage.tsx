@@ -69,7 +69,7 @@ export function NightPage() {
       {description && <p className="mb-4 max-w-xl whitespace-pre-line">{description}</p>}
 
       {canRun && (
-        <Card className="mb-4" title={t.nights.page.actions}>
+        <Card className="mb-4" title={t.nights.page.actions} restricted>
           <div className="flex flex-col gap-2 sm:flex-row">
             {n.status === 'scheduled' && !n.archived && (
               <>

@@ -8,6 +8,7 @@ export const attendance = {
   banner: {
     label: 'Evento aberto',
     title: ({ weekday }: { weekday: string }) => `Evento aberto: ${weekday}`,
+    allInCount: ({ count }: { count: number }) => `${count} ALL IN`,
     you: 'Você: {answer}',
     confirmPresence: 'Confirme sua presença',
     change: 'Alterar',

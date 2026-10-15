@@ -13,6 +13,7 @@
   /* Surfaces and text */
   --color-canvas: #f4f3ef;
   --color-surface: #ffffff;
+  --color-surface-restricted: #eef1f6; /* a box on a public screen that only admins or results keepers see */
   --color-surface-sunken: #ebe9e3;
   --color-surface-current: #f2f7f3; /* the current month's box on a calendar */
   --color-today: #1d4ed8; /* today on a calendar: a color no kind of day uses */

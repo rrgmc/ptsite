@@ -9,11 +9,11 @@ import { AttendanceBanner } from './AttendanceBanner'
 
 // The banner above "Classificação" and "Resultados" (docs/specs/attendance.md, rule 8 and the "Banner" example).
 
-function banner(answer: Answer | null, error?: string, night = openNight) {
+function banner(answer: Answer | null, error?: string, night = openNight, allInCount = 2) {
   const onAnswer = vi.fn()
   render(
     <MemoryRouter>
-      <AttendanceBanner night={night} answer={answer} onAnswer={onAnswer} error={error} />
+      <AttendanceBanner night={night} answer={answer} allInCount={allInCount} onAnswer={onAnswer} error={error} />
     </MemoryRouter>,
   )
   return onAnswer
@@ -24,8 +24,13 @@ afterEach(cleanup)
 describe('AttendanceBanner', () => {
   it('names the open night and links to its page', () => {
     banner(null)
-    expect(screen.getByRole('complementary', { name: 'Evento aberto' })).toHaveTextContent('Evento aberto: Sábado, 18/04 · Casa do Breno')
+    expect(screen.getByRole('complementary', { name: 'Evento aberto' })).toHaveTextContent('Evento aberto: Sábado, 18/04 · Casa do Breno · 2 ALL IN')
     expect(screen.getByRole('link', { name: 'Evento aberto: Sábado, 18/04' })).toHaveAttribute('href', '/nights/11')
+  })
+
+  it('shows how many players answered ALL IN, also when nobody has', () => {
+    banner(null, undefined, openNight, 0)
+    expect(screen.getByRole('complementary')).toHaveTextContent('Casa do Breno · 0 ALL IN')
   })
 
   it('offers ALL IN and FOLD to a player who has not answered', async () => {
