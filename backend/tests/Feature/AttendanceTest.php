@@ -5,6 +5,7 @@
  */
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use PTSite\App\Models\AuditLog;
 use PTSite\App\Models\Night;
@@ -71,6 +72,15 @@ it('gives a player who answers ALL IN again the place of their first ALL IN', fu
     expect(($this->lists)())->toBe(['coming' => ['Breno'], 'fold' => []]);
     ($this->answer)($this->anaUser, $this->ana, 'all_in', '2025-03-26 10:00')->assertJsonPath('data.answered_at', '2025-03-24T10:00:00-03:00');
     expect(($this->lists)())->toBe(['coming' => ['Ana', 'Breno'], 'fold' => []]);
+});
+
+it('keeps the answer time when something else in the answer changes', function () {
+    ($this->answer)($this->anaUser, $this->ana, 'all_in', '2025-03-24 10:00');
+    Carbon::setTestNow('2025-03-25 10:00');
+    // The database must not set the time by itself (MySQL 5.7 does so on the first timestamp column of a table).
+    DB::table('night_attendances')->update(['answered_by_user_id' => $this->anaUser->id]);
+
+    expect(DB::table('night_attendances')->value('answered_at'))->toBe('2025-03-24 10:00:00');
 });
 
 it('lets a results keeper answer for someone else, recording who and auditing it', function () {
