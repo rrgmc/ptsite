@@ -42,25 +42,29 @@ final class AnswerAttendance
 
         return DB::transaction(function () use ($user, $night, $player, $answer) {
             $row = NightAttendance::query()->where('night_id', $night->id)->where('player_id', $player->id)->lockForUpdate()->first();
-            $current = $row ? AttendanceAnswer::from($row->answer) : null;
+            $current = $row?->answer === null ? null : AttendanceAnswer::from($row->answer);
             if ($answer !== AttendanceAnswer::AllIn && $this->features->enabled(Feature::NightDashboard)) {
                 ($this->leave)($user, $night, $player);
             }
             if (! $this->rules->changes($current, $answer)) {
-                return $row;
+                return $current === null ? null : $row;
             }
 
-            if ($answer === null) {
+            // An ALL IN keeps the time of the player's first one, also after a FOLD or a removed answer.
+            $row ??= new NightAttendance(['night_id' => $night->id, 'player_id' => $player->id]);
+            if ($answer === AttendanceAnswer::AllIn) {
+                $row->confirmed_at ??= now();
+            }
+            if ($answer === null && $row->confirmed_at === null) {
                 $row->delete();
-                $row = null;
             } else {
-                $row ??= new NightAttendance(['night_id' => $night->id, 'player_id' => $player->id]);
                 $row->fill([
-                    'answer' => $answer->value,
-                    'answered_at' => now(),
+                    'answer' => $answer?->value,
+                    'answered_at' => $answer === AttendanceAnswer::AllIn ? $row->confirmed_at : now(),
                     'answered_by_user_id' => $user->player_id === $player->id ? null : $user->id,
                 ])->save();
             }
+            $row = $answer === null ? null : $row;
 
             if ($user->player_id !== $player->id) {
                 $this->audit->record($user, 'attendance.set_for_player', $night,

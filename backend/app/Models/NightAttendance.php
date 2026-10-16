@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['night_id', 'player_id', 'answer', 'answered_at', 'answered_by_user_id'])]
+#[Fillable(['night_id', 'player_id', 'answer', 'answered_at', 'confirmed_at', 'answered_by_user_id'])]
 class NightAttendance extends Model
 {
     public $timestamps = false;
 
     protected function casts(): array
     {
-        return ['answered_at' => 'datetime'];
+        return ['answered_at' => 'datetime', 'confirmed_at' => 'datetime'];
     }
 
     /** @return BelongsTo<Player, $this> */
