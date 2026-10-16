@@ -34,6 +34,8 @@ it('lists the nights and the regular nights left out, in date order', function (
     $next = Night::factory()->for($this->season)->create(['starts_at' => '2027-04-02 21:30:00', 'status' => 'scheduled']);
     NightAttendance::query()->create(['night_id' => $next->id, 'player_id' => $player->id, 'answer' => 'all_in', 'answered_at' => now()]);
     NightAttendance::query()->create(['night_id' => $next->id, 'player_id' => Player::factory()->create()->id, 'answer' => 'all_in', 'answered_at' => now()]);
+    // A removed answer that keeps its confirmation time is not counted.
+    NightAttendance::query()->create(['night_id' => $next->id, 'player_id' => Player::factory()->create()->id, 'answer' => null, 'answered_at' => now(), 'confirmed_at' => now()]);
 
     $response = $this->getJson("/api/v1/seasons/{$this->season->id}/calendar")->assertOk();
 

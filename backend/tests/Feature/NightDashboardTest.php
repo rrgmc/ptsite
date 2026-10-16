@@ -154,12 +154,21 @@ it('lists the players who answered ALL IN as participants who owe a buy-in', fun
     expect(NightPlayer::query()->count())->toBe(0);
 });
 
-it('says when each participant answered ALL IN, keeping the time of an answer given again', function () {
+it('says when each participant first answered ALL IN, also after a FOLD or a removed answer', function () {
     Sanctum::actingAs($this->carlaUser);
+    $carla = "/api/v1/nights/{$this->night->id}/attendance/{$this->carla->id}";
     $this->travelTo('2025-03-12 18:40:00');
-    $this->putJson("/api/v1/nights/{$this->night->id}/attendance/{$this->carla->id}", ['answer' => 'all_in'])->assertOk();
+    $this->putJson($carla, ['answer' => 'all_in'])->assertOk();
     $this->travelTo('2025-03-13 09:00:00');
-    $this->putJson("/api/v1/nights/{$this->night->id}/attendance/{$this->carla->id}", ['answer' => 'all_in'])->assertOk();
+    $this->putJson($carla, ['answer' => 'all_in'])->assertOk();
+    $this->travelTo('2025-03-13 10:00:00');
+    $this->putJson($carla, ['answer' => 'fold'])->assertOk();
+    $this->travelTo('2025-03-13 11:00:00');
+    $this->putJson($carla, ['answer' => 'all_in'])->assertOk();
+    $this->travelTo('2025-03-13 12:00:00');
+    $this->deleteJson($carla)->assertNoContent();
+    $this->travelTo('2025-03-13 13:00:00');
+    $this->putJson($carla, ['answer' => 'all_in'])->assertOk()->assertJsonPath('data.answered_at', '2025-03-12T18:40:00-03:00');
 
     Sanctum::actingAs($this->anaUser);
     $this->travelTo('2025-03-14 22:10:00');
@@ -405,7 +414,7 @@ it('keeps a participant with a mark or a rebuy on the night', function () {
 
     ($this->mark)($this->dudu, ['buy_in_paid' => false])->assertOk();
     $this->deleteJson("{$this->url}/players/{$this->dudu->id}")->assertOk()->assertJsonPath('data.players', []);
-    expect(NightAttendance::query()->where('player_id', $this->dudu->id)->exists())->toBeFalse();
+    expect(NightAttendance::query()->where('player_id', $this->dudu->id)->whereNotNull('answer')->exists())->toBeFalse();
 });
 
 it('makes the owner of the house a participant, and audits the change', function () {

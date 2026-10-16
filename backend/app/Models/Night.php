@@ -65,10 +65,10 @@ class Night extends Model
         return $this->belongsTo(Place::class);
     }
 
-    /** @return HasMany<NightAttendance, $this> */
+    /** @return HasMany<NightAttendance, $this> The answers given; a removed answer that keeps its row is left out. */
     public function attendances(): HasMany
     {
-        return $this->hasMany(NightAttendance::class)->orderBy('answered_at')->orderBy('id');
+        return $this->hasMany(NightAttendance::class)->whereNotNull('answer')->orderBy('answered_at')->orderBy('id');
     }
 
     /** @return HasMany<NightResult, $this> */

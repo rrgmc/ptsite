@@ -24,6 +24,9 @@ Know who is coming to the night that is open, so the host can plan, and make ent
    night before this rule existed are kept and listed; they can be changed once the night is open.
 3. A player has **one answer per night**. A different answer replaces the previous one and takes the new answer
    time. Repeating the same answer changes nothing, so nobody loses their place in the list.
+3a. **An ALL IN keeps the time of the player's first ALL IN on that night.** A player who changes to FOLD, or
+   removes the answer, and then answers ALL IN again gets the first time back, and with it their place in the
+   list. The night dashboard shows this time ([night-dashboard.md](night-dashboard.md), rule 7b).
 4. Results keepers and admins can set or remove the answer of any player who is not archived. The answer records
    who set it, and the change goes to the audit log. A player's own answers are not audited.
 4a. On a site with the night dashboard, whoever changes the dashboard of the open night answers for any player
@@ -57,6 +60,8 @@ Names are invented.
 - **Changing.** Later Ana changes to FOLD. Now "Vão jogar (1): 1. Breno" and "Fold (2)", with Ana after
   Carla because her answer is newer.
 - **Repeating.** Breno taps ALL IN again. Nothing changes: he stays 1st.
+- **Confirming again.** Ana changes back to ALL IN. Her answer takes the time of her first ALL IN, 10:00:
+  "Vão jogar (2): 1. Ana, 2. Breno". The same happens if she removes her answer and then answers ALL IN.
 - **Removing.** Carla removes her answer. She is no longer listed.
 - **For someone else.** Dudu tells the host he is coming. Maria, a results keeper, answers ALL IN for him. The
   answer shows that Maria set it, and the audit log records it.

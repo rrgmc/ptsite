@@ -59,6 +59,20 @@ it('moves a changed answer to the end, keeps a repeated one in place, and remove
     expect(($this->lists)())->toBe(['coming' => ['Breno'], 'fold' => ['Ana']]);
 });
 
+it('gives a player who answers ALL IN again the place of their first ALL IN', function () {
+    ($this->answer)($this->anaUser, $this->ana, 'all_in', '2025-03-24 10:00');
+    ($this->answer)($this->brenoUser, $this->breno, 'all_in', '2025-03-24 11:00');
+
+    ($this->answer)($this->anaUser, $this->ana, 'fold', '2025-03-25 09:00');
+    ($this->answer)($this->anaUser, $this->ana, 'all_in', '2025-03-25 10:00')->assertJsonPath('data.answered_at', '2025-03-24T10:00:00-03:00');
+    expect(($this->lists)())->toBe(['coming' => ['Ana', 'Breno'], 'fold' => []]);
+
+    ($this->answer)($this->anaUser, $this->ana, null, '2025-03-26 09:00')->assertNoContent();
+    expect(($this->lists)())->toBe(['coming' => ['Breno'], 'fold' => []]);
+    ($this->answer)($this->anaUser, $this->ana, 'all_in', '2025-03-26 10:00')->assertJsonPath('data.answered_at', '2025-03-24T10:00:00-03:00');
+    expect(($this->lists)())->toBe(['coming' => ['Ana', 'Breno'], 'fold' => []]);
+});
+
 it('lets a results keeper answer for someone else, recording who and auditing it', function () {
     $keeper = User::factory()->resultsKeeper()->create(['name' => 'Maria']);
 
