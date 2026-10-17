@@ -124,6 +124,18 @@ export const dashboard = {
     /** The pot for points counts the house owner's buy-in in full; the money owed is less by this much. */
     houseOwnerDiscount: ({ amount }: { amount: string }) => `Desconto do dono da casa ${amount}`,
   },
+  // The summary's money added up, under the tiles
+  money: {
+    title: 'Dinheiro',
+    pot: 'Pote total',
+    /** Taken from the pot: the house owner pays a smaller buy-in. */
+    houseOwnerDiscount: 'Desconto do dono da casa',
+    timeChip: 'Time chip total',
+    /** What was paid and what is pending of the pot. */
+    potPayments: 'Pote',
+    timeChipPayments: 'Time chip',
+    totalPending: 'Total que falta',
+  },
   recorded: {
     title: 'Resultado registrado',
     help: 'Os valores com que o evento foi finalizado. Eles contam para os pontos; os do painel, não.',

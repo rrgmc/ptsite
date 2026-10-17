@@ -112,6 +112,16 @@ export const dashboard = {
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
     houseOwnerDiscount: ({ amount }: { amount: string }) => `${amount} house owner's discount`,
   },
+  // The summary's money added up, under the tiles
+  money: {
+    title: 'Money',
+    pot: 'Pot total',
+    houseOwnerDiscount: "House owner's discount",
+    timeChip: 'Time chip total',
+    potPayments: 'Pot',
+    timeChipPayments: 'Time chip',
+    totalPending: 'Total pending',
+  },
   recorded: {
     title: 'Recorded result',
     help: 'The amounts the night was finished with. They count for the points; the dashboard\'s do not.',
