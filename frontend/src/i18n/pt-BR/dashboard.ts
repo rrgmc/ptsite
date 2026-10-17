@@ -84,6 +84,8 @@ export const dashboard = {
     pot: 'Pote',
     timeChip: 'Time chip',
     total: 'Total',
+    /** The total on a site with the time chip, which it includes. */
+    totalWithTimeChip: 'Total com time chip',
     paid: ({ amount }: { amount: string }) => `Pago ${amount}`,
     pending: ({ amount }: { amount: string }) => `Falta ${amount}`,
     /** The pot for points counts the house owner's buy-in in full; the money owed is less by this much. */

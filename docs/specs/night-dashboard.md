@@ -74,7 +74,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
       the night has, paid or not, once it has one;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
       season says a rebuy also pays the time chip, one for each rebuy. A rebuy's time chip is paid with the rebuy;
-    - **"Total"**: the money of the two added up: the pot less the house owner's discount, and the time chip.
+    - **"Total com time chip"** (total with the time chip): the money of the two added up: the pot less the
+      house owner's discount, and the time chip. On a site without the time chip it is called **"Total"**.
     The time chip is never mixed into the pot.
 11b. **"Premiação"** (payout), on a line under the amounts: the money paid out to the players. It is the total
     without the time chip, less the Main Event pot: the pot in use less the house owner's discount, less the Main

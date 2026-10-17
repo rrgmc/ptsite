@@ -387,7 +387,7 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
     ...(totals.time_chip
       ? [{ label: t.dashboard.totals.timeChip, amount: inUse.timeChip!, worked: totals.time_chip.owed, amounts: totals.time_chip, isManual: manual.time_chip !== null }]
       : []),
-    { label: t.dashboard.totals.total, amount: inUse.total, worked: totals.total.owed, amounts: totals.total, isManual: manual.pot !== null || manual.time_chip !== null },
+    { label: totals.time_chip ? t.dashboard.totals.totalWithTimeChip : t.dashboard.totals.total, amount: inUse.total, worked: totals.total.owed, amounts: totals.total, isManual: manual.pot !== null || manual.time_chip !== null },
   ]
   return (
     <section

@@ -80,6 +80,7 @@ export const dashboard = {
     pot: 'Pot',
     timeChip: 'Time chip',
     total: 'Total',
+    totalWithTimeChip: 'Total with time chip',
     paid: ({ amount }: { amount: string }) => `${amount} paid`,
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
     houseOwnerDiscount: ({ amount }: { amount: string }) => `${amount} house owner's discount`,
