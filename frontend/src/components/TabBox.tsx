@@ -12,10 +12,12 @@ export interface TabBoxTab {
  * the title of the part on show is filled with the main color. The first one shows at first.
  * It may be narrower than its content (min-w-0), as a Card, and its titles scroll sideways when they do not fit.
  */
-export function TabBox({ label, tabs }: {
+export function TabBox({ label, tabs, keepMounted = false }: {
   /** For screen readers: what the tabs are. */
   label: string
   tabs: TabBoxTab[]
+  /** Keep the parts not on show, only hidden, so that what was typed in them is still there when they come back. */
+  keepMounted?: boolean
 }) {
   return (
     <Tabs className="min-w-0">
@@ -35,7 +37,8 @@ export function TabBox({ label, tabs }: {
         <TabPanel
           key={tab.id}
           id={tab.id}
-          className="rounded-b-lg border-t-3 border-primary bg-surface p-4 shadow-card outline-none focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus"
+          shouldForceMount={keepMounted}
+          className="rounded-b-lg data-inert:hidden border-t-3 border-primary bg-surface p-4 shadow-card outline-none focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus"
         >
           {tab.content}
         </TabPanel>
