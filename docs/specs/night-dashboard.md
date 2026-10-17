@@ -83,7 +83,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     that night (rule 5b of [seasons-and-nights.md](seasons-and-nights.md)). The site does not enforce that: the
     keeper leaves that player out of the positions.
 11. **The amounts.** The summary shows the pot and the time chip in two tiles, one amount each. Below them,
-    **"Dinheiro"** (money) adds the money up: "Pote total", "Desconto do dono da casa" when there is one,
+    **"Dinheiro"** (money) adds the money up: "Pote total", "Desconto do dono da casa" and, in bold, "Pote com desconto" (the pot less the discount)
+    when there is one,
     "Time chip total" and the total. Then it shows what was paid and what is pending of the pot and of the time
     chip, and **"Total que falta"** (total pending):
     - **"Pote"**: the pot for points: the buy-ins, the house owner's counted in full (rule 9a), and every rebuy,

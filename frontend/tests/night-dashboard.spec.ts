@@ -81,7 +81,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
   await expect(page.getByText('Dono da casa: Duhamel')).toBeVisible()
   await expect(totals(page)).toContainText('PoteR$ 150,00')
-  await expect(money(page)).toContainText('Desconto do dono da casa-R$ 25,00')
+  await expect(money(page)).toContainText('Desconto do dono da casa-R$ 25,00Pote com descontoR$ 125,00')
   await expect(money(page)).toContainText('PotePago R$ 100,00Falta R$ 25,00')
 
   // Each amount is in a closed field until it is marked "Manual". The Main Event pot is the season's share of the money

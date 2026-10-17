@@ -130,6 +130,8 @@ export const dashboard = {
     pot: 'Pote total',
     /** Taken from the pot: the house owner pays a smaller buy-in. */
     houseOwnerDiscount: 'Desconto do dono da casa',
+    /** The pot less the house owner's discount: the pot's money. Shown only when there is a discount. */
+    potLessDiscount: 'Pote com desconto',
     timeChip: 'Time chip total',
     /** What was paid and what is pending of the pot. */
     potPayments: 'Pote',

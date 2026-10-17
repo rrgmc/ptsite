@@ -374,8 +374,8 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
  * "Valores do evento" has two tiles, the pot for points and the time chip, each one amount. An amount typed by
  * hand stands in for the one worked out, and its tile says so.
  *
- * "Dinheiro" adds the money up: the pot, the house owner's discount when the owner of the house pays less, the
- * time chip and the total. Below them come what was paid and what is pending, of the pot, of the time chip and
+ * "Dinheiro" adds the money up: the pot, the house owner's discount and the pot less it when the owner of the
+ * house pays less, the time chip and the total. Below them come what was paid and what is pending, of the pot, of the time chip and
  * of the total. A pot or time chip typed by hand shows the one worked out beside it.
  *
  * Then come the payout, the Main Event pot and, once a payment was not in cash, how much of what was paid is in
@@ -395,7 +395,12 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
   ]
   const sums: { label: string; amount: string; worked?: string; strong?: boolean }[] = [
     { label: t.dashboard.money.pot, amount: inUse.pot, worked: manual.pot !== null ? dashboard.scoring_pot : undefined },
-    ...(discount ? [{ label: t.dashboard.money.houseOwnerDiscount, amount: `-${discount}` }] : []),
+    ...(discount
+      ? [
+          { label: t.dashboard.money.houseOwnerDiscount, amount: `-${discount}` },
+          { label: t.dashboard.money.potLessDiscount, amount: (Number(inUse.pot) - Number(discount)).toFixed(2), strong: true },
+        ]
+      : []),
     ...(totals.time_chip
       ? [{ label: t.dashboard.money.timeChip, amount: inUse.timeChip!, worked: manual.time_chip !== null ? totals.time_chip.owed : undefined }]
       : []),

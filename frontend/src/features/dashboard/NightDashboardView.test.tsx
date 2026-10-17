@@ -66,11 +66,19 @@ describe('NightDashboardView', () => {
 
     expect(money.getByText('Pote total').closest('div')).toHaveTextContent('Pote totalR$ 450,00')
     expect(money.getByText('Desconto do dono da casa').closest('div')).toHaveTextContent('Desconto do dono da casa-R$ 25,00')
+    expect(money.getByText('Pote com desconto').closest('div')).toHaveTextContent('Pote com descontoR$ 425,00')
     expect(money.getByText('Time chip total').closest('div')).toHaveTextContent('Time chip totalR$ 25,00')
     expect(money.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chipR$ 450,00')
     expect(money.getByText('Pote').closest('div')).toHaveTextContent('PotePago R$ 275,00Falta R$ 150,00')
     expect(money.getByText('Time chip').closest('div')).toHaveTextContent('Time chipPago R$ 20,00Falta R$ 5,00')
     expect(money.getByText('Total que falta').closest('div')).toHaveTextContent('Total que faltaR$ 155,00')
+  })
+
+  it('adds no pot less the discount when the house owner has no discount', () => {
+    view({ ...nightDashboard, house_owner_discount: '0.00' })
+    const money = within(screen.getByRole('region', { name: 'Dinheiro' }))
+    expect(money.queryByText('Desconto do dono da casa')).not.toBeInTheDocument()
+    expect(money.queryByText('Pote com desconto')).not.toBeInTheDocument()
   })
 
   it('shows the payout, the total without the time chip less the Main Event pot, and the Main Event pot', () => {

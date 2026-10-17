@@ -117,6 +117,7 @@ export const dashboard = {
     title: 'Money',
     pot: 'Pot total',
     houseOwnerDiscount: "House owner's discount",
+    potLessDiscount: 'Pot after discount',
     timeChip: 'Time chip total',
     potPayments: 'Pot',
     timeChipPayments: 'Time chip',
