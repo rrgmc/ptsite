@@ -70,7 +70,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 11. **The amounts**, each shown as owed, paid and pending:
     - **"Pote"**: the pot for points: the buy-ins, the house owner's counted in full (rule 9a), and every rebuy,
       also the ones past the limit. Its owed, paid and pending are money, so the owed is the pot less the house
-      owner's discount. A line under the pot shows the discount when there is one;
+      owner's discount. A line under the pot shows the discount when there is one, and another how many rebuys
+      the night has, paid or not, once it has one;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
       season says a rebuy also pays the time chip, one for each rebuy. A rebuy's time chip is paid with the rebuy;
     - **"Total"**: the money of the two added up: the pot less the house owner's discount, and the time chip.
@@ -149,7 +150,8 @@ house owner's buy-in:
   | Total | 450,00 | 295,00 | 155,00 |
 
   Élio owes R$ 25,00 of buy-in. Breno owes R$ 215,00 in all and has R$ 55,00 pending. The pot for points is
-  R$ 450,00: the R$ 425,00 owed and the house owner's discount of R$ 25,00, shown under the pot.
+  R$ 450,00: the R$ 425,00 owed and the house owner's discount of R$ 25,00, shown under the pot. Under it too,
+  "4 rebuys": Ana's one and Breno's three.
 - **Not in cash.** On that night Ana paid her rebuy by bank transfer, and Breno his buy-in. Ana's rebuy is
   R$ 55,00, with the time chip it pays, and Breno's buy-in R$ 50,00: of the R$ 295,00 paid, R$ 105,00 are not in
   cash and R$ 190,00 are in cash. The pot and the time chip are the same.

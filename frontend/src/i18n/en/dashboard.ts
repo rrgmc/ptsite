@@ -1,3 +1,5 @@
+import { plural } from '../plural'
+
 // The night dashboard: who paid what on a night, on a screen of its own made for a phone.
 export const dashboard = {
   title: 'Night dashboard',
@@ -81,6 +83,7 @@ export const dashboard = {
     paid: ({ amount }: { amount: string }) => `${amount} paid`,
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
     houseOwnerDiscount: ({ amount }: { amount: string }) => `${amount} house owner's discount`,
+    rebuys: ({ count }: { count: number }) => `${count} ${plural(count, { one: 'rebuy', other: 'rebuys' })}`,
     cash: ({ amount }: { amount: string }) => `${amount} in cash`,
     nonCash: ({ amount }: { amount: string }) => `${amount} not in cash`,
   },

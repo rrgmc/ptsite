@@ -47,7 +47,7 @@ test('players record the payments of an open night on its dashboard, and the kee
 
   // A rebuy is owed until it is marked as paid, and adds its time chip, which is shown apart from the pot
   await marksOf(page, 'Jacobson').getByRole('button', { name: '+ Rebuy' }).click()
-  await expect(totals(page)).toContainText('PoteR$ 100,00Pago R$ 50,00Falta R$ 50,00')
+  await expect(totals(page)).toContainText('PoteR$ 100,001 rebuyPago R$ 50,00Falta R$ 50,00')
   await expect(totals(page)).toContainText('Time chipR$ 5,00Pago R$ 0,00Falta R$ 5,00')
   await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
   await expect(totals(page)).toContainText('TotalR$ 105,00Pago R$ 105,00Falta R$ 0,00')
@@ -68,7 +68,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
   await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
   await expect(page.getByText('Dono da casa: Duhamel')).toBeVisible()
-  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,00Pago R$ 100,00Falta R$ 25,00')
+  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,001 rebuyPago R$ 100,00Falta R$ 25,00')
 
   // Each amount is in a closed field until it is marked "Manual". The Main Event pot is the season's share of the money
   await expect(page.getByLabel('Pote (R$)')).toBeDisabled()
@@ -89,7 +89,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(page.getByLabel('Pote (R$)')).toHaveValue('300,00')
   await expect(totals(page)).toContainText('Pote(Manual)R$ 300,00')
   await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,00Pago R$ 100,00Falta R$ 25,00')
+  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,001 rebuyPago R$ 100,00Falta R$ 25,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
   // An adjustment of what was not in cash, for anything out of the ordinary, takes a negative amount
   // …in a field that shows only once its mark is ticked
@@ -123,7 +123,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await keeper.goto(`${nightUrl}/dashboard`)
   await expect(marksOf(keeper, 'Jacobson').getByRole('button', { name: 'Rebuy 1' })).toHaveAttribute('aria-pressed', 'true')
   await marksOf(keeper, 'Duhamel').getByRole('button', { name: 'Buy-in' }).click()
-  await expect(totals(keeper)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,00Pago R$ 125,00')
+  await expect(totals(keeper)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,001 rebuyPago R$ 125,00')
   // …which the player's dashboard shows by itself a few seconds later
   await expect(marksOf(page, 'Duhamel').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true', { timeout: 20_000 })
 

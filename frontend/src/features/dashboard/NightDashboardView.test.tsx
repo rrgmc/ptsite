@@ -56,9 +56,24 @@ describe('NightDashboardView', () => {
     view()
     const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
 
-    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('PoteR$ 450,00Desconto do dono da casa R$ 25,00Pago R$ 275,00Falta R$ 150,00')
+    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('PoteR$ 450,00Desconto do dono da casa R$ 25,004 rebuysPago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
     expect(totals.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
+  })
+
+  it('says under the pot how many rebuys the night has, and nothing on a night with none', () => {
+    const withRebuys = (counts: number[]) => ({
+      ...nightDashboard,
+      players: nightDashboard.players.map((line, i) => ({ ...line, rebuys: Array.from({ length: counts[i] ?? 0 }, (_, id) => ({ id, paid: false, non_cash: false })) })),
+    })
+    const pot = () => within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Pote').closest('div')
+
+    view(withRebuys([1]))
+    expect(pot()).toHaveTextContent('R$ 25,001 rebuyPago')
+    cleanup()
+
+    view(withRebuys([]))
+    expect(pot()).not.toHaveTextContent('rebuy')
   })
 
   it('marks a buy-in as paid in cash at one tap, as not in cash at another, and unmarks it at a third', async () => {
@@ -348,7 +363,7 @@ describe('NightDashboardView', () => {
     const onChange = view({ ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '90.00' })
     const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
 
-    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(Manual)R$ 600,00Calculado R$ 450,00Desconto do dono da casa R$ 25,00Pago R$ 275,00Falta R$ 150,00')
+    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(Manual)R$ 600,00Calculado R$ 450,00Desconto do dono da casa R$ 25,004 rebuysPago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
     expect(totals.getByText('Total').closest('div')).toHaveTextContent('Total(Manual)R$ 600,00Calculado R$ 450,00')
 
