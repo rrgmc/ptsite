@@ -58,7 +58,7 @@ export function AttendancePanel({
     return (
       <Card className="max-w-xl text-sm" title={t.attendance.panel.title}>
         <div className="flex flex-col gap-2">
-          <CompactList id="attendance-coming" heading={t.attendance.panel.comingHeading({ count: coming.length })} attendances={coming} empty={t.attendance.panel.nobodyConfirmed} />
+          <CompactList id="attendance-coming" heading={t.attendance.panel.playedHeading({ count: coming.length })} attendances={coming} empty={t.attendance.panel.nobodyConfirmed} />
           <CompactList id="attendance-fold" heading={t.attendance.panel.foldedHeading({ count: folded.length })} attendances={folded} empty={t.attendance.panel.nobody} />
         </div>
       </Card>
