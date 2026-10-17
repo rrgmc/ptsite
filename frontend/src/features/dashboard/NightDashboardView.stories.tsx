@@ -16,8 +16,14 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** The night of the spec's example, at Estela's house: Breno's third rebuy and Dudu's buy-in are pending. */
+/**
+ * The night of the spec's example, at Estela's house: Breno's third rebuy and Dudu's buy-in are pending. Estela
+ * pays the smaller buy-in, and the pot for points counts hers in full: the foot of the screen shows the discount.
+ */
 export const Open: Story = {}
+
+/** The same night with no house owner: Estela pays the buy-in, and there is no discount. */
+export const NoHouseOwner: Story = { args: { dashboard: recalculated({ ...nightDashboard, house_owner: null }) } }
 
 /** The night was just opened: nobody is on it yet. */
 export const NoPlayers: Story = {
@@ -28,7 +34,7 @@ export const NoPlayers: Story = {
 export const ReadOnly: Story = { args: { dashboard: { ...nightDashboard, can_edit: false } } }
 
 /** A night that does not record every payment: the pot and the Main Event pot are marked "Manual", and the time chip is still worked out. */
-export const AmountsSetByHand: Story = { args: { dashboard: { ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '100.00', suggested_main_event_pot: '120.00' } } }
+export const AmountsSetByHand: Story = { args: { dashboard: { ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '100.00', suggested_main_event_pot: '115.00' } } }
 
 /**
  * Ana paid her rebuy by bank transfer and Breno his buy-in: their marks have a sign of their own, and the foot of

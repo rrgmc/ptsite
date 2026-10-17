@@ -79,7 +79,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    - whether **a rebuy also pays the time chip** ("O rebuy também paga o time chip"), on a site with the time chip;
    - the **house owner's buy-in** ("Buy-in do dono da casa"): the smaller buy-in of the owner of the house where
      the night is played, on a site that turns this on (`houseOwnerBuyIn` in `features`,
-     [`site/README.md`](../../site/README.md));
+     [`site/README.md`](../../site/README.md)). The pot for points still counts the full buy-in
+     ([night-dashboard.md](night-dashboard.md), rule 9a);
    - the **Main Event pot share** ("Pote ME: % do pote"): the share of a night's pot, from 0 to 100%, that the
      night dashboard uses as the night's Main Event pot unless one is set by hand, on a site with the Main Event pot and the night
      dashboard.

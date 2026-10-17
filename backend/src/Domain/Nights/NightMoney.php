@@ -7,8 +7,8 @@ use PTSite\Domain\Shared\RuleViolation;
 
 /**
  * A night's money, worked out from what its participants bought and paid (docs/specs/night-dashboard.md).
- * The pot is the buy-ins and every rebuy. The time chip is apart: one for each late player and, when the season
- * says so, one for each rebuy.
+ * The pot is the buy-ins and every rebuy; the pot for points counts the house owner's buy-in in full. The time
+ * chip is apart: one for each late player and, when the season says so, one for each rebuy.
  */
 final readonly class NightMoney
 {
@@ -54,6 +54,33 @@ final readonly class NightMoney
         }
 
         return $pot;
+    }
+
+    /**
+     * The house owner's discount (rule 9a): how much less than the buy-in the owner of the house owes. Zero when
+     * the night has no house owner.
+     *
+     * @param  iterable<NightEntry>  $entries
+     */
+    public function houseOwnerDiscount(iterable $entries): Money
+    {
+        foreach ($entries as $entry) {
+            if ($entry->isHouseOwner) {
+                return $this->prices->buyIn->minus($this->prices->houseOwnerBuyIn);
+            }
+        }
+
+        return Money::zero();
+    }
+
+    /**
+     * The pot played for, which gives the points: the pot owed with the house owner's buy-in counted in full.
+     *
+     * @param  iterable<NightEntry>  $entries
+     */
+    public function scoringPot(iterable $entries): Money
+    {
+        return $this->pot($entries)->owed->plus($this->houseOwnerDiscount($entries));
     }
 
     /** @param  iterable<NightEntry>  $entries */

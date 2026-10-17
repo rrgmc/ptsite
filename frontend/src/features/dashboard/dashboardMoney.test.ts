@@ -171,19 +171,33 @@ describe('hasPayments', () => {
   })
 })
 
+describe('the pot for points', () => {
+  it('counts the buy-in of the owner of the house in full', () => {
+    expect(nightDashboard).toMatchObject({ scoring_pot: '450.00', house_owner_discount: '25.00' })
+    expect(nightDashboard.totals.pot.owed).toBe('425.00')
+  })
+
+  it('has no discount on a night with no house owner', () => {
+    const noOwner = applyChange(nightDashboard, { type: 'houseOwner', player: null })
+    expect(noOwner).toMatchObject({ scoring_pot: '450.00', house_owner_discount: '0.00' })
+    expect(noOwner.totals.pot.owed).toBe('450.00')
+  })
+})
+
 describe('amountsInUse', () => {
   it('is what the dashboard works out, with the season\'s share of the pot as the Main Event pot', () => {
-    expect(amountsInUse(nightDashboard)).toEqual({ pot: '425.00', timeChip: '25.00', total: '450.00', mainEventPot: '85.00' })
+    // The pot for points counts the house owner's buy-in in full; the total is money.
+    expect(amountsInUse(nightDashboard)).toEqual({ pot: '450.00', timeChip: '25.00', total: '450.00', mainEventPot: '85.00' })
   })
 
   it('takes an amount typed by hand in place of the one worked out, one at a time', () => {
     const typed = applyChange(nightDashboard, { type: 'amounts', pot: '600.00', time_chip: null })
     expect(typed.manual).toEqual({ pot: '600.00', time_chip: null })
-    expect(amountsInUse(typed)).toMatchObject({ pot: '600.00', timeChip: '25.00', total: '625.00' })
+    expect(amountsInUse(typed)).toMatchObject({ pot: '600.00', timeChip: '25.00', total: '600.00' })
     // What the players owe is still worked out.
     expect(typed.totals).toEqual(nightDashboard.totals)
 
-    expect(amountsInUse({ ...nightDashboard, manual: { pot: null, time_chip: '40.00' } })).toMatchObject({ pot: '425.00', timeChip: '40.00', total: '465.00' })
+    expect(amountsInUse({ ...nightDashboard, manual: { pot: null, time_chip: '40.00' } })).toMatchObject({ pot: '450.00', timeChip: '40.00', total: '465.00' })
   })
 
   it('takes a Main Event pot set by hand, and has none when the season sets no share', () => {
@@ -196,6 +210,6 @@ describe('amountsInUse', () => {
     const typed = applyChange(noTimeChip, { type: 'amounts', pot: '600.00', time_chip: '40.00' })
 
     expect(typed.manual).toEqual({ pot: '600.00', time_chip: null })
-    expect(amountsInUse(typed)).toMatchObject({ pot: '600.00', timeChip: null, total: '600.00' })
+    expect(amountsInUse(typed)).toMatchObject({ pot: '600.00', timeChip: null, total: '575.00' })
   })
 })

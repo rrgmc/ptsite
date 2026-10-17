@@ -84,6 +84,8 @@ export const dashboard = {
     total: 'Total',
     paid: ({ amount }: { amount: string }) => `Pago ${amount}`,
     pending: ({ amount }: { amount: string }) => `Falta ${amount}`,
+    /** The pot for points counts the house owner's buy-in in full; the money owed is less by this much. */
+    houseOwnerDiscount: ({ amount }: { amount: string }) => `Desconto do dono da casa ${amount}`,
     /** Of what was paid: what should be in hand, and what was paid another way, such as a bank transfer. */
     cash: ({ amount }: { amount: string }) => `Em dinheiro ${amount}`,
     nonCash: ({ amount }: { amount: string }) => `Fora do dinheiro ${amount}`,

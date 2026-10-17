@@ -80,6 +80,7 @@ export const dashboard = {
     total: 'Total',
     paid: ({ amount }: { amount: string }) => `${amount} paid`,
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
+    houseOwnerDiscount: ({ amount }: { amount: string }) => `${amount} house owner's discount`,
     cash: ({ amount }: { amount: string }) => `${amount} in cash`,
     nonCash: ({ amount }: { amount: string }) => `${amount} not in cash`,
   },

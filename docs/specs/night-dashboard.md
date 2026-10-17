@@ -58,16 +58,22 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 9. **A night has at most one house owner** ("Dono da casa"), picked on the dashboard. Picking one makes them a
    participant. On a site with the house owner's buy-in, they owe the season's house owner's buy-in instead of
    the buy-in. Their rebuys cost the same as anyone's.
+9a. **The pot for points counts the house owner's full buy-in.** The owner pays less, but the others play for
+   the same pot as if the owner had paid the buy-in. The difference is the **house owner's discount**
+   ("Desconto do dono da casa"): the buy-in less the house owner's buy-in. A night with no house owner, or a site
+   without the house owner's buy-in, has none.
 10. **Rebuys follow the season.** A season with no rebuys takes none. At the season's limit a player takes
     another only when the season allows rebuys past the limit. No player has more than 50. A rebuy past the limit
     costs the same and goes to the pot like any other; what it changes is that its player scores no points on
     that night (rule 5b of [seasons-and-nights.md](seasons-and-nights.md)). The site does not enforce that: the
     keeper leaves that player out of the positions.
 11. **The amounts**, each shown as owed, paid and pending:
-    - **"Pote"**: the buy-ins and every rebuy, also the ones past the limit;
+    - **"Pote"**: the pot for points: the buy-ins, the house owner's counted in full (rule 9a), and every rebuy,
+      also the ones past the limit. Its owed, paid and pending are money, so the owed is the pot less the house
+      owner's discount. A line under the pot shows the discount when there is one;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
       season says a rebuy also pays the time chip, one for each rebuy. A rebuy's time chip is paid with the rebuy;
-    - **"Total"**: the two added up.
+    - **"Total"**: the money of the two added up: the pot less the house owner's discount, and the time chip.
     The time chip is never mixed into the pot.
 11a. **What was paid is split by how**, so that the money in hand can be checked:
     - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
@@ -92,20 +98,20 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     saves an amount meanwhile, the fields that were not touched show it, and the ones that were marked, unmarked
     or typed in stay as they were left.
 13b. An amount set by hand is used at the foot of the screen, for the points shown beside the positions, for the
-    Main Event pot's share and at "Finalizar". The amount worked out stays in sight beside it ("Calculado"),
+    Main Event pot's share and at "Finalizar". A pot set by hand stands in for the pot for points. The amount worked out stays in sight beside it ("Calculado"),
     with what was paid and what is pending.
 13c. **"Valores" also has "Ajuste fora do dinheiro"**, for anything out of the ordinary: an amount that is added
     to what was paid not in cash. Its mark, "Ajustar o valor fora do dinheiro", comes first, and its field shows
     only while the mark is ticked. The amount may be negative, which takes it from what was not in cash; a line
     below the field says so. Unmarking it takes the adjustment away. Both are saved by the same "Salvar". It is
     kept when the night is finished.
-14. **The Main Event pot worked out is the season's share of the pot**: the **Main Event pot share** ("Pote ME: %
-    do pote", from 0 to 100) of the pot in use, rounded to a whole unit. A season with no share has an empty
+14. **The Main Event pot worked out is the season's share of the money**: the **Main Event pot share** ("Pote ME: %
+    do pote", from 0 to 100) of the pot in use less the house owner's discount, rounded to a whole unit. A season with no share has an empty
     Main Event pot until it is marked "Manual" and typed, or entered at "Finalizar".
 14a. **The dashboard does not finish a night.** What it holds is what the players recorded; a results keeper or
     an admin makes it the night's result with "Finalizar", on the night's page.
 15. **"Finalizar" starts filled from the dashboard**: the pot and the time chip (the ones set by hand, or else
-    the ones that are owed), the Main Event pot and the positions. The keeper changes what is needed and
+    the pot for points and the time chip owed), the Main Event pot and the positions. The keeper changes what is needed and
     finishes as usual. The form says how much is still pending.
 16. **Finishing fixes the night's money.** Every player who answered ALL IN becomes a recorded participant, and
     the season's prices are copied to the night: changing the season's money settings later does not change a
@@ -142,7 +148,8 @@ house owner's buy-in:
   | Time chip | 25,00 | 20,00 | 5,00 |
   | Total | 450,00 | 295,00 | 155,00 |
 
-  Élio owes R$ 25,00 of buy-in. Breno owes R$ 215,00 in all and has R$ 55,00 pending.
+  Élio owes R$ 25,00 of buy-in. Breno owes R$ 215,00 in all and has R$ 55,00 pending. The pot for points is
+  R$ 450,00: the R$ 425,00 owed and the house owner's discount of R$ 25,00, shown under the pot.
 - **Not in cash.** On that night Ana paid her rebuy by bank transfer, and Breno his buy-in. Ana's rebuy is
   R$ 55,00, with the time chip it pays, and Breno's buy-in R$ 50,00: of the R$ 295,00 paid, R$ 105,00 are not in
   cash and R$ 190,00 are in cash. The pot and the time chip are the same.
@@ -152,17 +159,19 @@ house owner's buy-in:
 - **An adjustment.** Breno alone marked his buy-in as not in cash: R$ 50,00 not in cash and R$ 245,00 in cash.
   Ana ticks "Usar" beside "Ajuste fora do dinheiro", types -5,00 and saves: R$ 45,00 not in cash and R$ 250,00
   in cash. With 20,00 instead: R$ 70,00 and R$ 225,00.
-- **A site without the house owner's buy-in.** The same night: Élio owes R$ 50,00, and the pot owed is R$ 450,00.
+- **A site without the house owner's buy-in.** The same night: Élio owes R$ 50,00, the pot owed is R$ 450,00, and
+  there is no discount. The pot for points is the same R$ 450,00.
 - **A site without the time chip.** The same night has no time chip: the total is the pot.
 - **A rebuy that does not pay the time chip.** With that setting off, the time chip owed is Carla's R$ 5,00.
 - **A season with no prices.** Every amount is R$ 0,00.
-- **The Main Event pot.** With a share of 20%, the pot of R$ 425,00 gives R$ 85,00, shown in a closed field. With
+- **The Main Event pot.** With a share of 20%, the money of R$ 425,00 (the pot of R$ 450,00 less the discount)
+  gives R$ 85,00, shown in a closed field. With
   15% it gives R$ 64,00, from R$ 63,75. A season with no share gives none. Ana marks its "Manual" and saves
   R$ 90,00: the dashboard and "Finalizar" use R$ 90,00. She unmarks it and saves: R$ 85,00 again.
-- **Set by hand.** On another night nobody marks the rebuys. The pot's field is closed and shows R$ 425,00. Ana
+- **Set by hand.** On another night nobody marks the rebuys. The pot's field is closed and shows R$ 450,00. Ana
   marks its "Manual", types R$ 600,00 over it and taps "Salvar", leaving the time chip unmarked. The foot of the screen shows
-  the pot R$ 600,00 with "Calculado R$ 425,00" below it, the time chip R$ 25,00 and the total R$ 625,00. The
-  Main Event pot is R$ 120,00, the 20% of the typed pot. "Finalizar" starts with R$ 600,00.
+  the pot R$ 600,00 with "Calculado R$ 450,00" below it, the time chip R$ 25,00 and the total R$ 600,00, without the discount. The
+  Main Event pot is R$ 115,00, the 20% of the typed pot less the discount. "Finalizar" starts with R$ 600,00.
 - **No new player here.** Ana searches for "Estreante", who never played: nobody is found. A results keeper adds
   the player in the site, and the search then finds them.
 
@@ -203,7 +212,7 @@ Undoing the opening:
 
 Finishing:
 
-- **Filled.** Maria, a results keeper, goes back to the night's page and taps "Finalizar". The form has the pot R$ 425,00, the
+- **Filled.** Maria, a results keeper, goes back to the night's page and taps "Finalizar". The form has the pot R$ 450,00, the
   Main Event pot R$ 85,00, the time chip R$ 25,00 and the positions, and says R$ 155,00 is pending. She finishes.
 - **Fixed.** An admin then changes the season's buy-in to R$ 60,00. The finished night's dashboard still charges
   R$ 50,00.
