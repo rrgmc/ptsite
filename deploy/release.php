@@ -7,6 +7,7 @@
 // - <version> is X.Y.Z, with or without the leading "v": 2.1.0 and v2.1.0 both make the tag v2.1.0.
 // - The tag is the version. No file holds the number, so nothing is committed and master is never pushed.
 // - The tag push starts .github/workflows/release.yml, which builds the package and the GitHub release.
+//   "Run workflow" on that workflow runs this script itself, then builds the tag in the same run.
 // - It refuses a commit whose pull request has a check that is running or did not pass. It needs gh, the
 //   GitHub CLI, signed in.
 // - --dry-run does every check and prints the tag and push commands instead of running them.
@@ -76,4 +77,9 @@ foreach ($commands as $command) {
 }
 
 printf("%s %s on %s%s.\n", $dryRun ? 'Would release' : 'Released', $tag, substr($head, 0, 7), $latest ? ", after $latest" : ', the first release');
-$dryRun || print "The release workflow now builds the package: gh run watch, then gh release view $tag\n";
+if (! $dryRun) {
+    // "Run workflow" on the release workflow runs this script, and that same run builds the package next.
+    print getenv('GITHUB_ACTIONS') === 'true'
+        ? "This run now builds the package and publishes the release.\n"
+        : "The release workflow now builds the package: gh run watch, then gh release view $tag\n";
+}

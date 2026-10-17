@@ -1,12 +1,25 @@
 name: Release
 
-# A release is a tag on master, pushed by `task release` (see RELEASE.md). This builds the deploy package with
-# the tag as its version and publishes the GitHub release with the package attached.
+# A release is a tag on master (see RELEASE.md). This builds the deploy package with the tag as its version and
+# publishes the GitHub release with the package attached.
+#
+# It starts in one of two ways:
+# - A pushed tag, from `task release`.
+# - "Run workflow" on GitHub, with the version. This first does the checks of `task release` on the latest
+#   commit of master and makes and pushes the tag itself, so a release needs no terminal. A tag pushed with
+#   the workflow's own token starts no other workflow, so this run is the only one for its tag, and it goes on
+#   to build and publish it.
 #
 # It takes about 3 minutes. The package is a release asset, not a stored artifact, so it does not expire.
 on:
   push:
     tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version to release, as X.Y.Z. It tags the latest commit of master.'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -20,12 +33,32 @@ jobs:
         with:
           # The whole history, to check the tag against master and to write the release notes.
           fetch-depth: 0
-      - name: Refuse a tag that is not on master
-        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/master
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           coverage: none
+      - name: Make the tag (Run workflow only)
+        # Before anything that could leave files in the working tree: release.php refuses a tree with changes.
+        # The version goes through env, never into the script itself, so it cannot inject shell.
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          php deploy/release.php "$VERSION"
+        env:
+          VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ github.token }}
+      - name: The tag of this release
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            echo "TAG=v${VERSION#v}" >> "$GITHUB_ENV"
+          else
+            echo "TAG=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+          fi
+        env:
+          VERSION: ${{ inputs.version }}
+      - name: Refuse a tag that is not on master
+        run: git merge-base --is-ancestor "$TAG^{commit}" origin/master
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -34,19 +67,18 @@ jobs:
       - name: Build the package (see docs/architecture/deployment.md)
         run: |
           php deploy/build-package.php
-          mv local/build/ptsite.zip "ptsite-$GITHUB_REF_NAME.zip"
+          mv local/build/ptsite.zip "ptsite-$TAG.zip"
         env:
-          APP_VERSION: ${{ github.ref_name }}
+          APP_VERSION: ${{ env.TAG }}
       - name: Publish the GitHub release
         # GitHub writes the notes with bare URLs. The sed turns each one into a short link: "#6" for a pull
         # request, "v2.0.0...v2.1.0" for the full changelog.
         run: |
-          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="$GITHUB_REF_NAME" --jq .body \
+          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="$TAG" --jq .body \
             | sed -E \
                 -e 's,https://github\.com/[^/ ]+/[^/ ]+/pull/([0-9]+),[#\1](&),g' \
                 -e 's,https://github\.com/[^/ ]+/[^/ ]+/(compare|commits)/([^ ]+),[\2](&),g' \
             > release-notes.md
-          gh release create "$GITHUB_REF_NAME" --verify-tag --notes-file release-notes.md "ptsite-$GITHUB_REF_NAME.zip"
+          gh release create "$TAG" --verify-tag --notes-file release-notes.md "ptsite-$TAG.zip"
         env:
           GH_TOKEN: ${{ github.token }}
-
