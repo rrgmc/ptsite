@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.29.0] - 2026-10-17
+
 ### Added
 
 - A release can start from GitHub, without a terminal: "Run workflow" on the Release workflow, with the
@@ -158,7 +160,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.28.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.29.0...HEAD
+[1.29.0]: https://github.com/rrgmc/ptsite/compare/v1.28.1...v1.29.0
 [1.28.1]: https://github.com/rrgmc/ptsite/compare/v1.28.0...v1.28.1
 [1.28.0]: https://github.com/rrgmc/ptsite/compare/v1.27.1...v1.28.0
 [1.27.1]: https://github.com/rrgmc/ptsite/compare/v1.27.0...v1.27.1
