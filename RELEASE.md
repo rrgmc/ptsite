@@ -6,8 +6,9 @@ A release is a version of the core with a number, such as `v2.1.0`. The reasons 
 ## The tag is the version
 
 - A release is an annotated git tag on `master`, named `vX.Y.Z`.
-- **No file holds the version.** `frontend/package.json` says `0.0.0` and stays that way. A release makes no
-  commit and needs no pull request (PR), and `master` is never pushed.
+- **No file holds the version.** `frontend/package.json` says `0.0.0` and stays that way. The tag itself makes
+  no commit and needs no pull request (PR), and `master` is never pushed. Only the changelog changes before a
+  release (step 2).
 - The build reads the version from git (`git describe --tags`). The footer of every page shows it, and so does
   `/version.txt` on a deployed site.
 - Between releases the version names the last tag, the number of commits since, and the commit:
@@ -26,7 +27,11 @@ The API has its own version, in its path (`/api/v1`). A site repository pins the
 ## Steps
 
 1. Merge everything the release needs into `master`, each change through its PR with the checks passed.
-2. In a checkout that is on `master`, clean and up to date (`git pull`), run:
+2. Update [`CHANGELOG.md`](CHANGELOG.md) through a PR of its own. Add a heading for the new version and today's
+   date, such as `## [2.1.0] - 2026-10-17`, under `## [Unreleased]`. Below it, list the changes since the last
+   release under Added, Changed, Fixed or Removed. At the bottom, add the version's compare link and point
+   `[Unreleased]` at the new tag. Merge the PR before you tag, so the tag includes the changelog.
+3. In a checkout that is on `master`, clean and up to date (`git pull`), run:
 
    ```
    task release -- 2.1.0 --dry-run
@@ -38,14 +43,14 @@ The API has its own version, in its path (`/api/v1`). A site repository pins the
    check of the pull request that made `master`'s latest commit is still running or did not pass; that needs
    `gh` signed in. It then makes the tag and pushes the tag only. With `--dry-run` it checks and changes
    nothing.
-3. The tag starts [`release.yml`](.github/workflows/release.yml). It builds the deploy package with the tag as
+4. The tag starts [`release.yml`](.github/workflows/release.yml). It builds the deploy package with the tag as
    its version and publishes the GitHub release, with notes made from the merged PRs and `ptsite-vX.Y.Z.zip`
    attached. Follow it with `gh run watch`, then look at `gh release view v2.1.0`.
-4. To put the release on a site, set `local/deploy.env` and run `task deploy:release -- v2.1.0`. It downloads
+5. To put the release on a site, set `local/deploy.env` and run `task deploy:release -- v2.1.0`. It downloads
    that zip and uploads it like `task deploy` (see [deployment.md](docs/architecture/deployment.md)).
    `task deploy:release:ftp -- v2.1.0` does the same over FTP, without the cPanel API token. The workflow never
    uploads to a site.
-5. Check `https://example.com/version.txt` (the address of the site) and the footer.
+6. Check `https://example.com/version.txt` (the address of the site) and the footer.
 
 ## Rules
 
