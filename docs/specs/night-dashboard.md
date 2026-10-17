@@ -104,7 +104,7 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
       each rebuy paid not in cash, with the time chip it pays; and the adjustment of rule 13c, when there is one;
     - **"Em dinheiro"** (in cash): the total paid, less what was not in cash.
-    The summary shows both under the payout, once anything is not in cash. A player's row says
+    "Dinheiro" shows both right after the total, "Em dinheiro" first, once anything is not in cash. A player's row says
     how much that player paid not in cash, beside what they have pending. Neither changes the pot, the time
     chip, what is pending or the night's result.
 12. **A participant with a mark or a rebuy cannot leave the night**: FOLD, removing the answer and "Remover do

@@ -375,11 +375,11 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
  * hand stands in for the one worked out, and its tile says so.
  *
  * "Dinheiro" adds the money up: the pot, the house owner's discount and the pot less it when the owner of the
- * house pays less, the time chip and the total. Below them come what was paid and what is pending, of the pot, of the time chip and
- * of the total. A pot or time chip typed by hand shows the one worked out beside it.
+ * house pays less, the time chip and the total, then, once a payment was not in cash, how much of what was paid
+ * is in cash and how much is not, to check the money in hand. Below them come what was paid and what is pending,
+ * of the pot, of the time chip and of the total. A pot or time chip typed by hand shows the one worked out beside it.
  *
- * Then come the payout, the Main Event pot and, once a payment was not in cash, how much of what was paid is in
- * cash, to check the money in hand.
+ * Then come the payout and the Main Event pot.
  *
  * "Pagamentos" counts the players, who owes nothing more, and how many buy-ins, rebuys and time chips were paid.
  * A finished night also shows the amounts it was finished with.
@@ -405,6 +405,12 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
       ? [{ label: t.dashboard.money.timeChip, amount: inUse.timeChip!, worked: manual.time_chip !== null ? totals.time_chip.owed : undefined }]
       : []),
     { label: totals.time_chip ? t.dashboard.totals.totalWithTimeChip : t.dashboard.totals.total, amount: inUse.total, strong: true },
+    ...(Number(received.non_cash) !== 0
+      ? [
+          { label: t.dashboard.summary.cash, amount: received.cash, strong: true },
+          { label: t.dashboard.summary.nonCash, amount: received.non_cash },
+        ]
+      : []),
   ]
   const balances: { label: string; amounts: Amounts }[] = [
     { label: t.dashboard.money.potPayments, amounts: totals.pot },
@@ -413,9 +419,6 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
   const money: [label: string, amount: string, strong?: boolean][] = [
     [t.dashboard.summary.payout, inUse.payout, true],
     ...(inUse.mainEventPot !== null ? [[t.dashboard.summary.mainEventPot, inUse.mainEventPot] as [string, string]] : []),
-    ...(Number(received.non_cash) !== 0
-      ? [[t.dashboard.summary.cash, received.cash, true] as [string, string, boolean], [t.dashboard.summary.nonCash, received.non_cash] as [string, string]]
-      : []),
   ]
   const payments: [label: string, paid: number, total: number][] = [
     [t.dashboard.summary.settled, counts.settled, counts.players],
