@@ -7,7 +7,7 @@ import { withLargeFont } from '@/mocks/withLargeFont'
 import { type Answer, AttendancePanel } from './AttendancePanel'
 
 /** A stateful panel: answering updates the lists, as the real API does. */
-function Panel(props: { initial: Attendance[]; myPlayerId: number | null; isOpen: boolean; notOpenYet?: boolean; canAnswerForOthers: boolean; error?: string }) {
+function Panel(props: { initial: Attendance[]; myPlayerId: number | null; isOpen: boolean; notOpenYet?: boolean; canAnswerForOthers: boolean; error?: string; compact?: boolean }) {
   const [rows, setRows] = useState(props.initial)
   const answer = (target: Player, value: Answer | null) => {
     const playerId = target.id
@@ -28,6 +28,7 @@ function Panel(props: { initial: Attendance[]; myPlayerId: number | null; isOpen
       myPlayer={players.find((p) => p.id === props.myPlayerId) ?? null}
       onAnswer={answer}
       error={props.error}
+      compact={props.compact}
     />
   )
 }
@@ -49,6 +50,8 @@ export const Empty: Story = { args: { initial: [], myPlayerId: 1, isOpen: true, 
 export const NotOpenYet: Story = { args: { initial: [], myPlayerId: 1, isOpen: false, notOpenYet: true, canAnswerForOthers: true } }
 /** After the night is finished, the lists stay and answers are closed. */
 export const Closed: Story = { args: { initial: attendances, myPlayerId: 1, isOpen: false, canAnswerForOthers: true } }
+/** On a finished night's page, under the result: a small box with only the two lists. */
+export const Compact: Story = { args: { initial: attendances, myPlayerId: 1, isOpen: false, canAnswerForOthers: true, compact: true } }
 /** The API refused the answer. */
 export const WithError: Story = { args: { initial: attendances, myPlayerId: 1, isOpen: true, canAnswerForOthers: false, error: 'As confirmações deste evento estão encerradas.' } }
 /** On a small phone set to its largest font: "Não confirmado" moves to a new line rather than overflow its button. */

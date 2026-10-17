@@ -1,12 +1,11 @@
 import { Button as AriaButton, Menu, MenuItem, MenuTrigger, Popover } from 'react-aria-components'
 import type { NightDashboard } from '@/api/client'
 import { Button } from '@/components/Button'
-import { Badge } from '@/components/Feedback'
-import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { ToggleChip } from '@/components/ToggleChip'
 import { t } from '@/i18n'
-import { formatDayMonth, formatMoney, formatTime } from '@/lib/format'
+import { formatDayMonth, formatTime } from '@/lib/format'
 import { type DashboardChange, type DashboardPlayer, hasPayments, nextPayment } from './dashboardMoney'
+import { PlayerMoneyLine } from './PlayerMoneyLine'
 
 /** The most rebuys the API takes for one player, whatever the season allows past its limit. */
 const MAX_REBUYS = 50
@@ -39,28 +38,7 @@ export function DashboardPlayerRow({
 
   return (
     <li className="px-2 py-1.5 even:bg-surface-stripe">
-      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
-        <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
-          <PlayerThumbnail player={player} size="xs" />
-          <span className="min-w-0 truncate font-semibold">{player.nickname}</span>
-          {line.is_house_owner && <Badge tone="primary">{t.dashboard.players.houseOwner}</Badge>}
-        </span>
-        <span className="shrink-0 text-sm tabular">
-          {Number(line.pending) > 0 ? (
-            <span className="font-semibold text-warning">{t.dashboard.players.pending({ amount: formatMoney(line.pending) })}</span>
-          ) : (
-            Number(line.owed) > 0 && <span className="text-muted">{t.dashboard.players.settled}</span>
-          )}
-          {Number(line.non_cash) > 0 && (
-            // With the sign of a payment that was not in cash; a screen reader gets it in words.
-            <span className="text-muted">
-              {' '}
-              <span aria-hidden>{t.dashboard.players.nonCashAmount({ amount: formatMoney(line.non_cash) })}</span>
-              <span className="sr-only">{t.dashboard.players.nonCashAmountSpoken({ amount: formatMoney(line.non_cash) })}</span>
-            </span>
-          )}
-        </span>
-      </div>
+      <PlayerMoneyLine line={line} />
       {line.confirmed_at && (
         <p className="text-xs text-muted">{t.dashboard.players.confirmedAt({ date: formatDayMonth(line.confirmed_at), time: formatTime(line.confirmed_at) })}</p>
       )}

@@ -3,8 +3,8 @@ import { useAnswerAttendance, useAttendance, useMe, usePlayers } from '@/api/que
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { AttendancePanel } from './AttendancePanel'
 
-/** The attendance panel for a night, connected to the API. */
-export function NightAttendance({ night }: { night: Night }) {
+/** The attendance panel for a night, connected to the API. `compact` is for a finished night. */
+export function NightAttendance({ night, compact = false }: { night: Night; compact?: boolean }) {
   const me = useMe()
   const attendance = useAttendance(night.id)
   const canAnswerForOthers = Boolean(me.data?.abilities.answer_for_others)
@@ -25,6 +25,7 @@ export function NightAttendance({ night }: { night: Night }) {
       players={canAnswerForOthers ? (players.data ?? []) : []}
       onAnswer={(player, value) => answer.mutate({ player, answer: value })}
       error={answer.error instanceof ApiError ? answer.error.body.message : undefined}
+      compact={compact}
     />
   )
 }

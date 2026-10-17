@@ -153,8 +153,17 @@ test('players record the payments of an open night on its dashboard, and the kee
   await keeper.getByRole('button', { name: 'Finalizar evento' }).click()
   await expect(keeper.getByText('Finalizado', { exact: true })).toBeVisible()
   await expect(keeper.getByRole('article').getByRole('listitem').nth(5)).toContainText('Duhamel')
-  // The finished night keeps its dashboard
-  await expect(keeper.getByRole('link', { name: 'Abrir o painel' })).toBeVisible()
+  // The finished night's page shows the result with its rebuys and late arrivals, and beside it what each player paid
+  await expect(keeper.getByRole('article')).toContainText('Rebuys1')
+  await expect(keeper.getByRole('article')).toContainText('Time chips (atrasos)0')
+  await expect(marksOf(keeper, 'Jacobson')).toContainText('Rebuy 1: pago fora do dinheiro')
+  await expect(marksOf(keeper, 'Jacobson').getByRole('button')).toHaveCount(0)
+  // Only an admin changes a finished night's dashboard, so the keeper has no link to it
+  await expect(keeper.getByRole('heading', { name: 'Painel do evento' })).toHaveCount(0)
+  await expect(keeper.getByRole('link', { name: 'Abrir o painel' })).toHaveCount(0)
+  // The attendance is a small box under the result
+  await expect(keeper.getByRole('heading', { name: 'Presença' })).toBeVisible()
+  await expectAccessible(keeper)
   await other.close()
 
   // A player sees a finished night's dashboard, and no longer changes it

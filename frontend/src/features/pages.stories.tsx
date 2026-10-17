@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw'
 import { RouterStory } from '@/mocks/RouterStory'
 import { handlers } from '@/mocks/handlers'
 import { withFeatures } from '@/mocks/withFeatures'
-import { extraNight, finishedNight, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, season, statisticsEmpty } from '@/mocks/data'
+import { extraNight, finishedNight, finishedNightDashboard, keeper, mainEventNight, openMainEventNight, openNight, partialResult, players, season, statisticsEmpty } from '@/mocks/data'
 import { MainEventAdmin } from './admin/MainEventAdmin'
 import { PlaceEditPage, PlacesAdmin } from './admin/PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './admin/PlayersAdmin'
@@ -183,6 +183,22 @@ export const OpenNightAsAdmin: StoryObj = {
   decorators: [withFeatures({ nightDashboard: true })],
   parameters: { msw: [asAdmin, ...handlers] },
   render: () => <RouterStory path="/nights/:nightId" url="/nights/11" element={<NightPage />} />,
+}
+
+const withFinishedDashboard = http.get('/api/v1/nights/:id/dashboard', () => HttpResponse.json({ data: finishedNightDashboard }))
+
+/** A finished night with a dashboard: the result with its rebuys and late arrivals, what each player paid, and the attendance last. */
+export const FinishedNightWithDashboard: StoryObj = {
+  decorators: [withFeatures({ nightDashboard: true })],
+  parameters: { msw: [withFinishedDashboard, ...handlers] },
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/10" element={<NightPage />} />,
+}
+
+/** The same night as an admin sees it: "Abrir o painel" in "Ações" leads to the dashboard, which only an admin changes. */
+export const FinishedNightWithDashboardAsAdmin: StoryObj = {
+  decorators: [withFeatures({ nightDashboard: true })],
+  parameters: { msw: [asAdmin, withFinishedDashboard, ...handlers] },
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/10" element={<NightPage />} />,
 }
 
 /** "Painel do evento": a screen of its own, with no header and no menus, made for a phone at the table. */

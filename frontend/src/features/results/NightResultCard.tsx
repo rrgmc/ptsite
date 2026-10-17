@@ -2,16 +2,24 @@ import { Link } from 'react-router'
 import type { Night } from '@/api/client'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { PlayerLink } from '@/components/PlayerLink'
-import { formatMoney, formatPoints, nightTitle, ordinal } from '@/lib/format'
+import { t } from '@/i18n'
+import { formatMoney, formatPoints, formatWhole, nightTitle, ordinal } from '@/lib/format'
 import { amountRows } from '../nights/amounts'
 import { NightMark } from '../nights/NightMark'
+
+/** What a night's dashboard counted: its rebuys, and the players who arrived late (null on a site with no time chip). */
+export type NightCounts = { rebuys: number; lateArrivals: number | null }
 
 /**
  * A finished night: who finished in each scoring position, then the night's amounts.
  * `number` is the night's place in its season, counting from 1. An extra night has no number, and is marked.
+ * `counts`, from the night's dashboard, adds how many rebuys and late arrivals it had.
  */
-export function NightResultCard({ night, number }: { night: Night; number?: number }) {
+export function NightResultCard({ night, number, counts }: { night: Night; number?: number; counts?: NightCounts }) {
   const amounts = amountRows({ pot: night.pot, mainEventPot: night.main_event_pot, timeChip: night.time_chip })
+  const countRows: [label: string, count: number][] = counts
+    ? [[t.nights.amounts.rebuys, counts.rebuys], ...(counts.lateArrivals !== null ? [[t.nights.amounts.lateArrivals, counts.lateArrivals] as [string, number]] : [])]
+    : []
 
   return (
     // On a phone the rows are shorter and the card has less padding, so that a night takes less of the screen.
@@ -39,6 +47,12 @@ export function NightResultCard({ night, number }: { night: Night; number?: numb
           <div key={label} className="flex items-center justify-between py-0.5">
             <dt className="font-semibold">{label}</dt>
             <dd className="tabular">{formatMoney(amount)}</dd>
+          </div>
+        ))}
+        {countRows.map(([label, count]) => (
+          <div key={label} className="flex items-center justify-between py-0.5">
+            <dt className="font-semibold">{label}</dt>
+            <dd className="tabular">{formatWhole(count)}</dd>
           </div>
         ))}
       </dl>

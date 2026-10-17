@@ -52,9 +52,9 @@ test('a results keeper schedules, opens and finishes a night on a phone, with a 
   await expect(page.getByText('Finalizado', { exact: true })).toBeVisible()
   await expect(page.getByText('Estreante E2E')).toBeVisible()
   await expect(page.getByText('321,10')).toBeVisible()
-  // The three amounts are listed below the positions
+  // The three amounts are listed below the positions, then the rebuys and late arrivals the dashboard counted
   const amounts = page.getByRole('article').getByRole('definition')
-  await expect(amounts).toHaveText(['R$ 845,00', 'R$ 170,00', 'R$ 25,50'])
+  await expect(amounts).toHaveText(['R$ 845,00', 'R$ 170,00', 'R$ 25,50', '0', '0'])
 })
 
 test('opening a second night is refused with the rule message', async ({ page }) => {

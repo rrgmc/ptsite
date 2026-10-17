@@ -36,7 +36,8 @@ Know who is coming to the night that is open, so the host can plan, and make ent
    the answer** until those are removed ([night-dashboard.md](night-dashboard.md), rule 12).
 5. An account that is not linked to a player (an admin who does not play) cannot answer for itself.
 6. The night's page lists **who is coming**, numbered in the order they answered, and **who folded**. Players
-   without an answer are not listed.
+   without an answer are not listed. Once the night is finished the lists move under the result, as a small box
+   with each list on a line.
 7. When finishing a night, the player picker lists the players who answered **ALL IN first**, under
    "Confirmados", then the other active and inactive players as usual.
 8. While a night of the **current season** is open, a banner at the top of "Classificação" and "Resultados"

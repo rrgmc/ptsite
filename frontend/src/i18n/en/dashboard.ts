@@ -54,6 +54,12 @@ export const dashboard = {
     unsetHouseOwner: 'Is not the house owner',
     removeLastRebuy: 'Remove the last rebuy',
     removeFromNight: 'Remove from the night',
+    chipState: ({ payment, state }: { payment: string; state: string }) => `${payment}: ${state}`,
+    paid: 'paid',
+    paidCash: 'paid in cash',
+    paidNonCash: 'paid not in cash',
+    unpaid: 'not paid',
+    lateArrival: 'arrived late',
   },
 
   // Under the participants: what the signs on a buy-in and on a rebuy mean

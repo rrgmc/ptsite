@@ -21,7 +21,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 1. **A regular night has a dashboard once it is open**, and keeps it when it is finished. A scheduled night, a
    cancelled night and a Main Event night have none.
 2. **The dashboard is a screen of its own**, with no menu, made for a phone. "Voltar ao site" leads to the night's
-   page. The night's page leads to it; the open night's banner does not.
+   page. The open night's page leads to it, with "Abrir o painel"; the open night's banner does not. On a finished
+   night only an admin gets that link, in "Ações".
 2a. **The dashboard is split into tabs**, under its title, and opens on the first:
     - **"Resumo"** (summary): the night at a glance. It has the amounts (rules 11, 11a and 11b), the Main Event
       pot in use, and "Pagamentos" (rule 2b). A finished night also shows the amounts it was finished with.
@@ -33,6 +34,10 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     the participants with everything paid, the buy-ins, the rebuys (once the night has one) and the late
     players' time chips (on a site with the time chip, once a player is late). A rebuy's time chip goes with the
     rebuy and is not counted apart.
+2c. **A finished night's page shows what its dashboard recorded**: beside the result, its participants and
+    their marks, which nobody changes there ("Jogadores"). Under the pot, the result says how many **rebuys** the
+    night had and, on a site with the time chip, how many players **arrived late** ("Time chips (atrasos)"); the
+    time chip a rebuy pays is not counted. On a phone the participants come under the result.
 3. **It refreshes by itself** every few seconds, so several people can use it at once. A change is saved at the
    tap, with no "Salvar".
 4. **A participant** is a player the dashboard has a record of, or, while the night is open, a player who answered
