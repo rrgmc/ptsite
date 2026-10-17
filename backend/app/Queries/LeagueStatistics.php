@@ -104,6 +104,8 @@ final class LeagueStatistics
                 $counted($summary->moneyOnlyRebuys),
                 $timeChip ? $summary->timeChipCount : null,
                 $timeChip ? $counted($summary->timeChips) : null,
+                $summary->progress->rebuys,
+                $timeChip ? $summary->progress->timeChips : null,
             ) : null,
         );
     }

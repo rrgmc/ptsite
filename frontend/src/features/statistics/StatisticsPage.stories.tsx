@@ -26,12 +26,23 @@ export const Rebuys: StoryObj = {
   },
 }
 
+/** "Eventos" with the rebuys and the late time chips of each night, beside the pots. */
+export const RebuysPerNight: StoryObj = {
+  parameters: { layout: 'padded' },
+  render: () => <RouterStory path="/" url="/" element={<StatisticsView statistics={statistics} />} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByRole('tab', { name: 'Eventos' }))
+    await canvas.findByRole('table', { name: 'Rebuys por evento' })
+    await canvas.findByRole('columnheader', { name: 'Time chips por atraso' })
+  },
+}
+
 /** Nights not run on the night dashboard, on a site with no time chip: each list says nothing was recorded. */
 export const NoRebuysRecorded: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => {
     const none = { ...statistics.rebuys!.rebuys, rows: [] }
-    const rebuys = { rebuy_count: 0, rebuys: none, money_only_rebuy_count: 0, money_only_rebuys: none, time_chip_count: null, time_chips: null }
+    const rebuys = { rebuy_count: 0, rebuys: none, money_only_rebuy_count: 0, money_only_rebuys: none, time_chip_count: null, time_chips: null, rebuys_per_step: [0, 0, 0, 0, 0], time_chips_per_step: null }
     return <RouterStory path="/" url="/" element={<StatisticsView statistics={{ ...statistics, rebuys }} />} />
   },
   play: async ({ canvas, userEvent }) => {

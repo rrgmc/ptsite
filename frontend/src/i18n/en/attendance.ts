@@ -22,6 +22,7 @@ export const attendance: Messages['attendance'] = {
     yourAnswer: 'Your answer',
     notOpenYet: 'Answers start when the night is opened.',
     comingHeading: ({ count }: { count: number }) => `Playing (${count})`,
+    playedHeading: ({ count }: { count: number }) => `Played (${count})`,
     nobodyConfirmed: 'Nobody has confirmed yet.',
     foldedHeading: ({ count }: { count: number }) => `Fold (${count})`,
     nobody: 'Nobody.',

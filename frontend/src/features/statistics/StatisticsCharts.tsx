@@ -3,7 +3,7 @@ import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, Pie, PieChart
 import type { Statistics } from '@/api/client'
 import { t } from '@/i18n'
 import { formatMoney, formatPoints, formatWhole } from '@/lib/format'
-import { placesData, potsData, progressData, SERIES_COLORS, winsData } from './chartData'
+import { placesData, potsData, progressData, rebuysData, SERIES_COLORS, winsData } from './chartData'
 import { cell, head, highestFirst, tick, tooltip } from './chartStyle'
 
 /** The title of one list or chart inside a box that holds several. */
@@ -199,6 +199,84 @@ export function PotsChart({ progress, perSeason, className }: { progress: Pick<S
               activeDot={{ r: 5, stroke: 'var(--color-surface)', strokeWidth: 2 }}
               isAnimationActive={false}
             />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Figure>
+  )
+}
+
+/**
+ * "Rebuys por evento": the rebuys the night dashboard recorded on each night, or in each season over every season,
+ * with a second line for the time chips of late players on a site with the time chip.
+ */
+export function RebuysChart({ progress, rebuys, perSeason, className }: { progress: Pick<Statistics['points_progress'], 'steps'>; rebuys: Pick<NonNullable<Statistics['rebuys']>, 'rebuys_per_step' | 'time_chips_per_step'>; perSeason: boolean; className?: string }) {
+  const points = rebuysData(progress, rebuys)
+  const withTimeChips = rebuys.time_chips_per_step !== null
+  const top = points.reduce<(typeof points)[number] | undefined>((best, point) => (point.rebuys > (best?.rebuys ?? 0) ? point : best), undefined)
+  const title = perSeason ? t.statistics.rebuysPerSeason : t.statistics.rebuysPerNight
+  const lines: { key: 'rebuys' | 'timeChips'; name: string; color: string }[] = [
+    { key: 'rebuys', name: t.statistics.rebuys, color: SERIES_COLORS[0] },
+    ...(withTimeChips ? [{ key: 'timeChips' as const, name: t.statistics.timeChips, color: SERIES_COLORS[1] }] : []),
+  ]
+  return (
+    <Figure
+      bare
+      className={className}
+      title={title}
+      description={t.statistics.rebuysPerStepDescription({ perSeason, top: top && { label: top.label, count: top.rebuys }, withTimeChips })}
+      legend={
+        withTimeChips && (
+          <ul aria-label={t.statistics.legend} className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            {lines.map((line) => (
+              <li key={line.key} className="flex items-center gap-2">
+                <span aria-hidden className="inline-block h-1 w-5 rounded-full" style={{ background: line.color }} />
+                {line.name}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      table={
+        <table className="w-full border-collapse">
+          <caption className="sr-only">{title}</caption>
+          <thead>
+            <tr>
+              <th scope="col" className={`${head} text-left`}>{perSeason ? t.common.season : t.common.night}</th>
+              {lines.map((line) => <th key={line.key} scope="col" className={head}>{line.name}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {points.map((point) => (
+              <tr key={point.label} className="even:bg-surface-stripe">
+                <th scope="row" className={`${cell} text-left font-semibold`}>{point.label}</th>
+                {lines.map((line) => <td key={line.key} className={cell}>{point[line.key]}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      }
+    >
+      <div className="relative min-h-48 flex-1">
+        <ResponsiveContainer width="100%" height="100%" className="absolute inset-0">
+          <LineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
+            <CartesianGrid stroke="var(--color-border)" vertical={false} />
+            <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />
+            <YAxis tick={tick} tickLine={false} axisLine={false} width={48} allowDecimals={false} />
+            <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} />
+            {lines.map((line) => (
+              <Line
+                key={line.key}
+                dataKey={line.key}
+                name={line.name}
+                type="linear"
+                stroke={line.color}
+                strokeWidth={2}
+                dot={points.length <= 12 ? { r: 4, fill: line.color, stroke: 'var(--color-surface)', strokeWidth: 2 } : false}
+                activeDot={{ r: 5, stroke: 'var(--color-surface)', strokeWidth: 2 }}
+                isAnimationActive={false}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>

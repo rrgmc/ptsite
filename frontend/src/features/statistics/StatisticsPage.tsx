@@ -16,7 +16,7 @@ import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { amountRows } from '../nights/amounts'
 import { PositionTable } from './PositionTable'
-import { PlacesChart, PointsProgressChart, PotsChart, subtitle, WinsChart } from './StatisticsCharts'
+import { PlacesChart, PointsProgressChart, PotsChart, RebuysChart, subtitle, WinsChart } from './StatisticsCharts'
 
 /** "Estatísticas" of the selected season (docs/specs/statistics.md). */
 export function StatisticsPage() {
@@ -91,6 +91,7 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
   const hasNights = statistics.nights_count > 0
   if (!hasNights && !mainEvent) return <Empty>{t.statistics.noNights}</Empty>
 
+  const rebuys = hasNights ? statistics.rebuys : null
   const tabs: TabBoxTab[] = []
   if (hasNights) {
     tabs.push(
@@ -128,10 +129,10 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
         id: 'nights',
         title: t.common.nights,
         content: (
-          // On a wide screen the two charts are one over the other, beside the list.
+          // On a wide screen the charts are one over the other, beside the list.
           <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
             <PotsChart className="md:col-span-2" progress={statistics.points_progress} perSeason={allTime} />
-            <ListBlock title={t.statistics.biggestPots} className="lg:row-span-2">
+            <ListBlock title={t.statistics.biggestPots} className={rebuys ? 'lg:row-span-3' : 'lg:row-span-2'}>
               <RankedList
                 compact
                 caption={t.statistics.biggestPotsCaption}
@@ -151,6 +152,7 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
                 tiedNotShown={statistics.biggest_pots.tied_not_shown}
               />
             </ListBlock>
+            {rebuys && <RebuysChart className="md:col-span-2" progress={statistics.points_progress} rebuys={rebuys} perSeason={allTime} />}
             {statistics.places.rows.length === 0 ? (
               <ListBlock title={t.statistics.places} className="lg:col-span-2"><Empty>{t.statistics.noPlaces}</Empty></ListBlock>
             ) : (
@@ -161,7 +163,6 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
       },
     )
   }
-  const rebuys = hasNights ? statistics.rebuys : null
   if (rebuys) {
     tabs.push({
       id: 'rebuys',

@@ -14,5 +14,9 @@ final readonly class RebuyStatisticsReport
         /** The time chips of late players. Null on a site with no time chip, as the list after it. */
         public ?int $timeChipCount,
         public ?RankedList $timeChips,
+        /** @var list<int> the rebuys of each step of the points progress: of a night, or of a season's nights */
+        public array $rebuysPerStep,
+        /** @var list<int>|null the time chips of late players of each step, as the rebuys. Null on a site with no time chip. */
+        public ?array $timeChipsPerStep,
     ) {}
 }

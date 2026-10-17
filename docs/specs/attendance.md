@@ -37,7 +37,7 @@ Know who is coming to the night that is open, so the host can plan, and make ent
 5. An account that is not linked to a player (an admin who does not play) cannot answer for itself.
 6. The night's page lists **who is coming**, numbered in the order they answered, and **who folded**. Players
    without an answer are not listed. Once the night is finished the lists move under the result, as a small box
-   with each list on a line.
+   with each list on a line, and the list of who came is headed "Jogaram".
 7. When finishing a night, the player picker lists the players who answered **ALL IN first**, under
    "Confirmados", then the other active and inactive players as usual.
 8. While a night of the **current season** is open, a banner at the top of "Classificação" and "Resultados"
@@ -69,7 +69,8 @@ Names are invented.
 - **With the night dashboard.** Ana, an active player, answers ALL IN for Dudu, who told her he is coming. Dudu
   pays his buy-in, which Ana marks on the dashboard. Dudu then tries FOLD: refused ("Remova os pagamentos e os
   rebuys do jogador antes.").
-- **Closed.** After the night is finished, nobody can answer; the lists stay as they were.
+- **Closed.** After the night is finished, nobody can answer; the lists stay as they were, now "Jogaram (2): Ana,
+  Breno" and "Fold (1): Carla".
 - **At the table.** When Maria finishes the night, the picker for each position lists Breno and Dudu first,
   under "Confirmados".
 

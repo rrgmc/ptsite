@@ -24,6 +24,18 @@ class RebuyStatisticsResource extends JsonResource
             'time_chip_count' => $this->timeChipCount,
             /** Players by nights on which they arrived late (`count`). Null on a site with no time chip. */
             'time_chips' => $this->timeChips === null ? null : new RankedListResource($this->timeChips),
+            /**
+             * The rebuys of each step of `points_progress.steps`: of the night, or of the season's nights added up.
+             *
+             * @var list<int>
+             */
+            'rebuys_per_step' => $this->rebuysPerStep,
+            /**
+             * The time chips late players owed in each step of `points_progress.steps`. Null on a site with no time chip.
+             *
+             * @var list<int>|null
+             */
+            'time_chips_per_step' => $this->timeChipsPerStep,
         ];
     }
 }

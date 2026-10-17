@@ -22,7 +22,7 @@ export function PlayerName({ line }: { line: DashboardPlayer }) {
     <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
       <PlayerThumbnail player={player} size="xs" />
       <span className="min-w-0 truncate font-semibold">{player.nickname}</span>
-      {line.is_house_owner && <Badge tone="primary">{t.dashboard.players.houseOwner}</Badge>}
+      {line.is_house_owner && <Badge tone="info">{t.dashboard.players.houseOwner}</Badge>}
     </span>
   )
 }
