@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.27.0] - 2026-10-17
+
+### Added
+
+- The statistics count the rebuys and the late players' time chips that the night dashboard recorded.
+- On a finished night's page, the result says how many rebuys and late arrivals the night had. Beside it, a
+  read-only list shows what each player paid, in cash or not, their rebuys and their time chip.
+
+### Changed
+
+- The night dashboard is split into tabs: "Resumo", with a count of the payments, "Jogadores" and "Valores".
+- On a finished night's page, the attendance is a small box under the result. The "Painel do evento" card is
+  gone; an admin opens the dashboard from "Ações".
+- The API spec is exported with the default address, not the worktree's port.
+
 ## [1.26.1] - 2026-10-17
 
 ### Fixed
@@ -108,7 +123,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.26.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.27.0...HEAD
+[1.27.0]: https://github.com/rrgmc/ptsite/compare/v1.26.1...v1.27.0
 [1.26.1]: https://github.com/rrgmc/ptsite/compare/v1.26.0...v1.26.1
 [1.26.0]: https://github.com/rrgmc/ptsite/compare/v1.25.0...v1.26.0
 [1.25.0]: https://github.com/rrgmc/ptsite/compare/v1.24.0...v1.25.0
