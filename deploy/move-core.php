@@ -7,28 +7,46 @@
 //
 // - It runs in a site's repository (PTSITE_PROJECT_ROOT), never in the core's.
 // - It makes the commit "Move the core to <tag>[, <summary>]" on top of origin/master, on the branch
-//   core-<tag>. It writes the commit with git's plumbing, so no file of a checkout changes.
+//   core-<tag>. The commit moves the submodule and writes the new version of rrgmc/ptsite in the site's
+//   backend/composer.lock. It is made with git's plumbing, so no file of a checkout changes.
 // - It pushes the branch, opens the pull request, waits for its checks and merges it. When a check fails it
 //   stops and leaves the pull request open.
 // - It refuses when the core's backend/composer.json changed between the two tags: the site's composer.lock
-//   then needs `composer update`, which this script does not do.
+//   then needs `composer update`, which this script does not do. Otherwise the version is the only line of
+//   the lock that composer would change.
 // - It asks before pushing, unless --yes is given. --dry-run does every check and pushes nothing.
 
 require __DIR__.'/lib.php';
 
 /**
- * Runs git in the project with $input on standard input and returns its output, stopping the script when
- * git fails.
+ * Runs git in the project with $input on standard input and $env added to the environment, and returns its
+ * output as it is, stopping the script when git fails.
+ *
+ * @param  array<string, string>  $env
  */
-function git_input(string $input, string ...$args): string
+function git_pipe(string $input, array $env, string ...$args): string
 {
-    $process = proc_open(['git', '-C', root(), ...$args], [['pipe', 'r'], ['pipe', 'w'], STDERR], $pipes);
+    $process = proc_open(['git', '-C', root(), ...$args], [['pipe', 'r'], ['pipe', 'w'], STDERR], $pipes, null, $env + getenv());
     is_resource($process) || fail('Could not start git.');
     fwrite($pipes[0], $input);
     fclose($pipes[0]);
-    $output = trim((string) stream_get_contents($pipes[1]));
+    $output = (string) stream_get_contents($pipes[1]);
     $code = proc_close($process);
     $code === 0 || fail('Failed ('.$code.'): git '.implode(' ', $args));
+
+    return $output;
+}
+
+/** Runs a command and returns its output, leaving out what it writes to standard error. */
+function quiet_output(array $command): string
+{
+    $process = proc_open($command, [STDIN, ['pipe', 'w'], ['pipe', 'w']], $pipes, root());
+    if (! is_resource($process)) {
+        return '';
+    }
+    $output = trim((string) stream_get_contents($pipes[1]));
+    stream_get_contents($pipes[2]);
+    proc_close($process);
 
     return $output;
 }
@@ -88,19 +106,23 @@ git_output('ls-remote', '--heads', 'origin', "refs/heads/$branch") === ''
 [$code] = git('rev-parse', '--verify', '--quiet', "refs/heads/$branch");
 $code !== 0 || fail("The branch $branch exists here already. Delete it first: git branch -D $branch");
 
-// The tree of origin/master with the core's entry pointing to the new commit. The core is at the top of the
-// tree, so only that level changes.
-$tree = preg_replace(
-    '/^160000 commit [0-9a-f]+\tcore$/m',
-    "160000 commit $target\tcore",
-    git_output('ls-tree', 'origin/master'),
-    -1,
-    $count,
-);
-$count === 1 || fail('origin/master has no submodule named core at the top of its tree.');
+// The core's version in the site's composer.lock, when the site has one.
+$lockPath = 'backend/composer.lock';
+$lock = null;
+if (git_output('ls-tree', 'origin/master', $lockPath) !== '') {
+    $lock = preg_replace(
+        '#("name": "rrgmc/ptsite",\s*"version": ")[^"]*(")#',
+        '${1}'.$tag.'${2}',
+        git_pipe('', [], 'cat-file', 'blob', "origin/master:$lockPath"),
+        -1,
+        $count,
+    );
+    $count === 1 || fail("$lockPath on origin/master has no rrgmc/ptsite package with a version.");
+}
 
 echo "Moves the core from $from to $tag on top of origin/master (".substr($base, 0, 7).").\n";
 echo "Commit: $subject\n";
+echo $lock === null ? "The site has no $lockPath, so only the submodule changes.\n" : "It also writes $tag in $lockPath.\n";
 echo "Then: push $branch, open its pull request, wait for its checks and merge it.\n";
 if ($dryRun) {
     echo "Dry run: nothing was committed or pushed.\n";
@@ -114,12 +136,21 @@ if (! $yes) {
     }
 }
 
-$treeId = git_input($tree."\n", 'mktree');
-$commit = git_input($subject."\n", 'commit-tree', $treeId, '-p', $base);
+// The tree of origin/master with the new core and lock, built in an index of its own.
+$index = ['GIT_INDEX_FILE' => tempnam(sys_get_temp_dir(), 'move-core-index')];
+git_pipe('', $index, 'read-tree', 'origin/master');
+git_pipe('', $index, 'update-index', '--cacheinfo', "160000,$target,core");
+if ($lock !== null) {
+    $blob = trim(git_pipe($lock, [], 'hash-object', '-w', '--stdin'));
+    git_pipe('', $index, 'update-index', '--cacheinfo', "100644,$blob,$lockPath");
+}
+$treeId = trim(git_pipe('', $index, 'write-tree'));
+@unlink($index['GIT_INDEX_FILE']);
+$commit = trim(git_pipe($subject."\n", [], 'commit-tree', $treeId, '-p', $base));
 git_output('push', '--quiet', 'origin', "$commit:refs/heads/$branch");
 
 // The pull request quotes the core's release notes, when the core's repository is on GitHub.
-$body = "Moves the core from $from to $tag. Only the submodule changes.";
+$body = "Moves the core from $from to $tag".($lock === null ? '.' : ", and writes $tag in $lockPath.");
 $url = git_output('config', '-f', '.gitmodules', 'submodule.core.url');
 if (preg_match('#github\.com[:/]([^/]+/[^/]+?)(\.git)?$#', $url, $repo)) {
     [$code, $notes] = gh('release', 'view', $tag, '--repo', $repo[1], '--json', 'body', '--jq', '.body');
@@ -130,7 +161,8 @@ echo "Opened $pull\n";
 
 // GitHub starts the checks a few seconds after the pull request opens.
 for ($try = 0; $try < 24; $try++) {
-    [, $checks] = gh('pr', 'checks', $pull, '--json', 'name');
+    // Until the checks start, gh says "no checks reported" on standard error, which is left out here.
+    $checks = quiet_output(['gh', 'pr', 'checks', $pull, '--json', 'name']);
     if ($checks !== '' && $checks !== '[]') {
         break;
     }
