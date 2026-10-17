@@ -125,7 +125,12 @@ it('counts the rebuys and the late players the night dashboard recorded', functi
         ->assertJsonPath('data.rebuys.money_only_rebuys.rows.1.player.id', $this->carla->id)
         ->assertJsonPath('data.rebuys.money_only_rebuys.rows.1.count', 1)
         ->assertJsonPath('data.rebuys.time_chip_count', 1)
-        ->assertJsonPath('data.rebuys.time_chips.rows.0.player.id', $this->carla->id);
+        ->assertJsonPath('data.rebuys.time_chips.rows.0.player.id', $this->carla->id)
+        ->assertJsonPath('data.rebuys.rebuys_per_step', [7, 0])
+        ->assertJsonPath('data.rebuys.time_chips_per_step', [1, 0]);
+    $this->getJson("/api/v1/statistics?season={$this->seasonA->id}")->assertOk()
+        ->assertJsonPath('data.rebuys.rebuys_per_step', [3, 4])
+        ->assertJsonPath('data.rebuys.time_chips_per_step', [1, 0]);
     $this->getJson("/api/v1/statistics?season={$this->seasonB->id}")->assertOk()
         ->assertJsonPath('data.rebuys.rebuy_count', 0)
         ->assertJsonPath('data.rebuys.rebuys.rows', []);
@@ -134,7 +139,8 @@ it('counts the rebuys and the late players the night dashboard recorded', functi
     $this->getJson('/api/v1/statistics')->assertOk()
         ->assertJsonPath('data.rebuys.rebuy_count', 7)
         ->assertJsonPath('data.rebuys.time_chip_count', null)
-        ->assertJsonPath('data.rebuys.time_chips', null);
+        ->assertJsonPath('data.rebuys.time_chips', null)
+        ->assertJsonPath('data.rebuys.time_chips_per_step', null);
 
     config(['ptsite.features' => ['nightDashboard' => false]]);
     $this->getJson('/api/v1/statistics')->assertOk()->assertJsonPath('data.rebuys', null);

@@ -60,6 +60,10 @@ export const statistics: Messages['statistics'] = {
   potsPerSeason: 'Pot per season',
   potsDescription: ({ perSeason, top }) =>
     `Line chart: pot per ${perSeason ? 'season' : 'night'}.${top ? ` The biggest is ${top.pot}, in ${top.label}.` : ''} The numbers are in the table below.`,
+  rebuysPerNight: 'Rebuys per night',
+  rebuysPerSeason: 'Rebuys per season',
+  rebuysPerStepDescription: ({ perSeason, top, withTimeChips }) =>
+    `Line chart: rebuys${withTimeChips ? ' and late time chips' : ''} per ${perSeason ? 'season' : 'night'}.${top ? ` The most rebuys are ${top.count}, in ${top.label}.` : ''} The numbers are in the table below.`,
   placesDescription: ({ top }) =>
     `Pie chart: nights by place.${top ? ` ${top.name} has the most: ${top.count}.` : ''} The numbers are in the table below.`,
 

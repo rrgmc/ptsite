@@ -1608,6 +1608,10 @@ export interface components {
             /** @description How many time chips late players owed. Null on a site with no time chip. */
             time_chip_count: number | null;
             time_chips: components["schemas"]["RankedListResource"] | null;
+            /** @description The rebuys of each step of `points_progress.steps`: of the night, or of the season's nights added up. */
+            rebuys_per_step: number[];
+            /** @description The time chips late players owed in each step of `points_progress.steps`. Null on a site with no time chip. */
+            time_chips_per_step: number[] | null;
         };
         /** RequestPasswordResetRequest */
         RequestPasswordResetRequest: {

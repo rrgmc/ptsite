@@ -80,6 +80,22 @@ export function potsData(progress: Pick<Statistics['points_progress'], 'steps' |
   }))
 }
 
+export interface RebuyPoint {
+  label: string
+  rebuys: number
+  /** Absent on a site with no time chip. */
+  timeChips?: number
+}
+
+/** The rebuys and the late time chips of each step as chart points, labelled as in {@link progressData}. */
+export function rebuysData(progress: Pick<Statistics['points_progress'], 'steps'>, rebuys: Pick<NonNullable<Statistics['rebuys']>, 'rebuys_per_step' | 'time_chips_per_step'>): RebuyPoint[] {
+  return progress.steps.map((step, i) => ({
+    label: step.starts_at ? formatDate(step.starts_at) : step.season_name,
+    rebuys: rebuys.rebuys_per_step[i] ?? 0,
+    ...(rebuys.time_chips_per_step ? { timeChips: rebuys.time_chips_per_step[i] ?? 0 } : {}),
+  }))
+}
+
 export interface PlaceSlice {
   key: number | 'others'
   name: string

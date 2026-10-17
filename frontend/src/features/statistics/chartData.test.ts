@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { playerStatistics, playerStatisticsAllTime, statistics, statisticsAllTime } from '@/mocks/data'
-import { placesData, playerProgressData, positionsData, potsData, progressData, SERIES_COLORS, winsData } from './chartData'
+import { placesData, playerProgressData, positionsData, potsData, progressData, rebuysData, SERIES_COLORS, winsData } from './chartData'
 
 describe('progressData', () => {
   it('has one point per night in a season, labelled by date', () => {
@@ -45,6 +45,21 @@ describe('potsData', () => {
       { label: 'Liga 2025', pot: 29875 },
       { label: 'Liga 2026', pot: 4145 },
     ])
+  })
+})
+
+describe('rebuysData', () => {
+  it('has the rebuys and the late time chips of each night in a season, and of each season over every season', () => {
+    expect(rebuysData(statistics.points_progress, statistics.rebuys!)[0]).toEqual({ label: '03/04/2026', rebuys: 4, timeChips: 1 })
+    expect(rebuysData(statisticsAllTime.points_progress, statisticsAllTime.rebuys!)).toEqual([
+      { label: 'Liga 2024', rebuys: 0, timeChips: 0 },
+      { label: 'Liga 2025', rebuys: 41, timeChips: 12 },
+      { label: 'Liga 2026', rebuys: 17, timeChips: 6 },
+    ])
+  })
+
+  it('has no time chips on a site with no time chip', () => {
+    expect(rebuysData(statistics.points_progress, { ...statistics.rebuys!, time_chips_per_step: null })[0]).toEqual({ label: '03/04/2026', rebuys: 4 })
   })
 })
 
