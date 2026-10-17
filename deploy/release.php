@@ -7,32 +7,11 @@
 // - <version> is X.Y.Z, with or without the leading "v": 2.1.0 and v2.1.0 both make the tag v2.1.0.
 // - The tag is the version. No file holds the number, so nothing is committed and master is never pushed.
 // - The tag push starts .github/workflows/release.yml, which builds the package and the GitHub release.
+// - It refuses a commit whose pull request has a check that is running or did not pass. It needs gh, the
+//   GitHub CLI, signed in.
 // - --dry-run does every check and prints the tag and push commands instead of running them.
 
 require __DIR__.'/lib.php';
-
-/**
- * Runs git and returns its exit code and output.
- *
- * @return array{int, string}
- */
-function git(string ...$args): array
-{
-    $process = proc_open(['git', '-C', root(), ...$args], [STDIN, ['pipe', 'w'], STDERR], $pipes);
-    is_resource($process) || fail('Could not start git.');
-    $output = trim((string) stream_get_contents($pipes[1]));
-
-    return [proc_close($process), $output];
-}
-
-/** Git's output, stopping the script when git fails. */
-function git_output(string ...$args): string
-{
-    [$code, $output] = git(...$args);
-    $code === 0 || fail('Failed ('.$code.'): git '.implode(' ', $args));
-
-    return $output;
-}
 
 $version = null;
 $dryRun = false;
@@ -69,6 +48,18 @@ if ($latest !== null && version_compare($version, ltrim($latest, 'v'), '<=')) {
 }
 if ($latest !== null && git_output('rev-parse', "$latest^{commit}") === $head) {
     fail("This commit is already released as $latest.");
+}
+
+// CI runs on the pull request, not on master, so the checks to look at are those of the branch the pull
+// request merged. A change that runs no check, such as one to docs only, passes.
+$pullHead = gh_output('api', "repos/{owner}/{repo}/commits/$head/pulls", '--jq', '[.[] | select(.merged_at != null) | .head.sha][0] // ""');
+$pullHead !== '' || fail('master\'s latest commit did not come through a merged pull request.');
+$checks = gh_output('api', "repos/{owner}/{repo}/commits/$pullHead/check-runs?per_page=100", '--jq', '.check_runs[] | [.name, .status, .conclusion // ""] | @tsv');
+foreach (array_filter(explode("\n", $checks)) as $line) {
+    [$name, $status, $conclusion] = explode("\t", $line) + ['', '', ''];
+    $status === 'completed' || fail("The check \"$name\" of the merged pull request has not finished. Wait for it, then release.");
+    in_array($conclusion, ['success', 'skipped', 'neutral'], true)
+        || fail("The check \"$name\" of the merged pull request did not pass ($conclusion). Fix it through a new pull request first.");
 }
 
 $commands = [

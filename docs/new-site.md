@@ -130,6 +130,12 @@ core's version.
 - **A new version of the core.** `git -C core fetch --tags && git -C core checkout <new tag>`, then
   `composer update rrgmc/ptsite --with-dependencies` in `backend/`, `task frontend:install`, `task db:up` and
   `task build`. Read the core's release notes first. Commit the submodule and `composer.lock` together.
+  When the core's `backend/composer.json` did not change between the two versions, only the submodule
+  changes, and [`deploy/move-core.php`](../deploy/move-core.php) does the whole move:
+  `php core/deploy/move-core.php v1.25.0 --summary "with <what is new>"` (with `PTSITE_PROJECT_ROOT` set to
+  the site). It makes the commit on top of `origin/master` without touching a checkout, pushes the branch
+  `core-v1.25.0`, opens its pull request with the core's release notes, waits for its checks and merges it.
+  When a check fails, it leaves the pull request open. `--dry-run` only checks.
 - **Rewording a text of a screen.** Add `site/messages.json` with only the texts to change, in the shape of
   `core/frontend/src/i18n/pt-BR` (the core's `site/README.md`). Then `task build`.
 - **Rewording a message of the API.** Add `backend/lang/pt_BR/rules.php` (or `auth.php`, `validation.php`)

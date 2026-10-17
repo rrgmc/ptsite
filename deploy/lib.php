@@ -55,6 +55,53 @@ function run(string|array $command, string $cwd, array $env = []): void
 }
 
 /**
+ * Runs git in the project and returns its exit code and output.
+ *
+ * @return array{int, string}
+ */
+function git(string ...$args): array
+{
+    $process = proc_open(['git', '-C', root(), ...$args], [STDIN, ['pipe', 'w'], STDERR], $pipes);
+    is_resource($process) || fail('Could not start git.');
+    $output = trim((string) stream_get_contents($pipes[1]));
+
+    return [proc_close($process), $output];
+}
+
+/** Git's output, stopping the script when git fails. */
+function git_output(string ...$args): string
+{
+    [$code, $output] = git(...$args);
+    $code === 0 || fail('Failed ('.$code.'): git '.implode(' ', $args));
+
+    return $output;
+}
+
+/**
+ * Runs gh, the GitHub CLI, in the project and returns its exit code and output. gh fills in {owner}/{repo}
+ * in an API path from the project's git remote.
+ *
+ * @return array{int, string}
+ */
+function gh(string ...$args): array
+{
+    $process = proc_open(['gh', ...$args], [STDIN, ['pipe', 'w'], STDERR], $pipes, root());
+    is_resource($process) || fail('Could not start gh, the GitHub CLI.');
+    $output = trim((string) stream_get_contents($pipes[1]));
+
+    return [proc_close($process), $output];
+}
+
+/** gh's output, stopping the script when gh fails. */
+function gh_output(string ...$args): string
+{
+    [$code, $output] = gh(...$args);
+    $code === 0 || fail('Failed ('.$code.'): gh '.implode(' ', $args));
+
+    return $output;
+}
+
+/**
  * The settings a cPanel script needs that are not in the environment yet. The API token comes from
  * DEPLOY_CPANEL_TOKEN, or else from the "cPanel token:" line of local/keys.md. It is never printed.
  *
