@@ -39,6 +39,9 @@ export function NightDashboardCard({ nightId }: { nightId: number }) {
           </div>
         ))}
       </dl>
+      {Number(dashboard.data.house_owner_discount) !== 0 && (
+        <p className="text-xs text-muted tabular">{t.dashboard.totals.houseOwnerDiscount({ amount: formatMoney(dashboard.data.house_owner_discount) })}</p>
+      )}
       <Link
         to={`/nights/${nightId}/dashboard`}
         className="mt-3 inline-flex min-h-touch w-full items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover sm:w-auto"

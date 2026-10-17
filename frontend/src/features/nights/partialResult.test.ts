@@ -48,10 +48,11 @@ describe('isEmptyPartial', () => {
 })
 
 describe('seedFromDashboard', () => {
-  it('fills the pot and the time chip that are owed, the suggested Main Event pot and the positions', () => {
+  it('fills the pot for points, the time chip that is owed, the suggested Main Event pot and the positions', () => {
     const seed = seedFromDashboard(percentages, nightDashboard)
 
-    expect(seed.potText).toBe('425,00')
+    // The house owner's buy-in counts in full.
+    expect(seed.potText).toBe('450,00')
     expect(seed.timeChipText).toBe('25,00')
     expect(seed.mainEventPotText).toBe('85,00')
     expect(seed.order).toEqual([null, null, null, null, null, players[3]])
@@ -70,7 +71,7 @@ describe('seedFromDashboard', () => {
 
   it('leaves empty what the dashboard does not have: no players yet, no time chip on the site, no share of the pot', () => {
     const totals = { pot: { owed: '0.00', paid: '0.00', pending: '0.00' }, time_chip: null, total: { owed: '0.00', paid: '0.00', pending: '0.00' } }
-    const seed = seedFromDashboard(percentages, { ...nightDashboard, totals, suggested_main_event_pot: null, positions: [] })
+    const seed = seedFromDashboard(percentages, { ...nightDashboard, totals, scoring_pot: '0.00', house_owner_discount: '0.00', suggested_main_event_pot: null, positions: [] })
 
     expect(seed).toEqual({ potText: '', mainEventPotText: '', timeChipText: '', order: [null, null, null, null, null, null] })
   })

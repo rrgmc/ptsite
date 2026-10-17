@@ -56,7 +56,7 @@ describe('NightDashboardView', () => {
     view()
     const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
 
-    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('PoteR$ 425,00Pago R$ 275,00Falta R$ 150,00')
+    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('PoteR$ 450,00Desconto do dono da casa R$ 25,00Pago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
     expect(totals.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
   })
@@ -269,7 +269,7 @@ describe('NightDashboardView', () => {
     view()
 
     expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toBeDisabled()
-    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('425,00')
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('450,00')
     expect(screen.getByRole('textbox', { name: 'Time chip (R$)' })).toBeDisabled()
     expect(screen.getByRole('textbox', { name: 'Time chip (R$)' })).toHaveValue('25,00')
     // The Main Event pot is the season's share of the pot.
@@ -291,7 +291,7 @@ describe('NightDashboardView', () => {
     const pot = screen.getByRole('textbox', { name: 'Pote (R$)' })
     // The field starts from the amount worked out. Nothing is sent, and nothing is to be saved, yet.
     expect(pot).toBeEnabled()
-    expect(pot).toHaveValue('425,00')
+    expect(pot).toHaveValue('450,00')
     expect(screen.getByRole('textbox', { name: 'Time chip (R$)' })).toBeDisabled()
     expect(onChange).not.toHaveBeenCalled()
 
@@ -348,9 +348,9 @@ describe('NightDashboardView', () => {
     const onChange = view({ ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '90.00' })
     const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
 
-    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(Manual)R$ 600,00Calculado R$ 425,00Pago R$ 275,00Falta R$ 150,00')
+    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(Manual)R$ 600,00Calculado R$ 450,00Desconto do dono da casa R$ 25,00Pago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
-    expect(totals.getByText('Total').closest('div')).toHaveTextContent('Total(Manual)R$ 625,00Calculado R$ 450,00')
+    expect(totals.getByText('Total').closest('div')).toHaveTextContent('Total(Manual)R$ 600,00Calculado R$ 450,00')
 
     expect(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' })).toBeChecked()
     expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('600,00')
@@ -381,7 +381,7 @@ describe('NightDashboardView', () => {
     await userEvent.type(screen.getByRole('textbox', { name: 'Pote (R$)' }), '600')
     await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
 
-    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('425,00')
+    expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('450,00')
     expect(screen.queryByRole('button', { name: 'Salvar' })).not.toBeInTheDocument()
     // What was typed is back when it is marked again.
     await userEvent.click(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))

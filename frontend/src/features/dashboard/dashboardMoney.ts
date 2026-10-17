@@ -52,6 +52,9 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
   const pot = { owed: 0, paid: 0 }
   const timeChip = { owed: 0, paid: 0 }
   let nonCashMarked = 0
+  // The pot for points counts the house owner's buy-in in full (rule 9a).
+  const hasHouseOwner = dashboard.players.some((line) => line.player.id === dashboard.house_owner?.id)
+  const houseOwnerDiscount = hasHouseOwner ? cents(prices.buy_in) - cents(prices.house_owner_buy_in) : 0
 
   const players = dashboard.players.map((line) => {
     const isHouseOwner = line.player.id === dashboard.house_owner?.id
@@ -84,6 +87,8 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
       time_chip: hasTimeChip ? amounts(timeChip.owed, timeChip.paid) : null,
       total: amounts(pot.owed + timeChip.owed, pot.paid + timeChip.paid),
     },
+    scoring_pot: decimal(pot.owed + houseOwnerDiscount),
+    house_owner_discount: decimal(houseOwnerDiscount),
     received: {
       cash: decimal(pot.paid + timeChip.paid - nonCash),
       non_cash: decimal(nonCash),
@@ -95,14 +100,16 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
 
 /**
  * The night's pot and time chip as they stand: the ones typed by hand ("Definir manualmente") when there are,
- * and else the ones worked out from the players. `timeChip` is null on a site without the time chip. The Main
- * Event pot is the one set by hand, or else the season's share of the pot; null when the season sets none.
+ * and else the ones worked out from the players. The pot is the pot for points, which counts the house owner's
+ * buy-in in full; the total is money, so it leaves the house owner's discount out. `timeChip` is null on a site
+ * without the time chip. The Main Event pot is the one set by hand, or else the season's share of the money; null
+ * when the season sets none.
  */
 export function amountsInUse(dashboard: NightDashboard): { pot: string; timeChip: string | null; total: string; mainEventPot: string | null } {
-  const pot = dashboard.manual.pot ?? dashboard.totals.pot.owed
+  const pot = dashboard.manual.pot ?? dashboard.scoring_pot
   const timeChip = dashboard.totals.time_chip ? (dashboard.manual.time_chip ?? dashboard.totals.time_chip.owed) : null
   const mainEventPot = dashboard.main_event_pot ?? dashboard.suggested_main_event_pot
-  return { pot, timeChip, total: decimal(cents(pot) + cents(timeChip ?? '0')), mainEventPot }
+  return { pot, timeChip, total: decimal(cents(pot) - cents(dashboard.house_owner_discount) + cents(timeChip ?? '0')), mainEventPot }
 }
 
 const emptyLine = (player: Player): DashboardPlayer => ({

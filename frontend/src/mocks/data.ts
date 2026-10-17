@@ -157,6 +157,8 @@ export const nightDashboard: NightDashboard = recalculated({
   main_event_pot: null,
   suggested_main_event_pot: '85.00',
   totals: { pot: noAmounts, time_chip: noAmounts, total: noAmounts },
+  scoring_pot: '0.00',
+  house_owner_discount: '0.00',
   received: { cash: '0.00', non_cash: '0.00', non_cash_marked: '0.00', non_cash_adjustment: null },
   manual: { pot: null, time_chip: null },
   recorded: null,
