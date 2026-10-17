@@ -21,6 +21,7 @@ export const attendance = {
     yourAnswer: 'Sua resposta',
     notOpenYet: 'As confirmações começam quando o evento for aberto.',
     comingHeading: ({ count }: { count: number }) => `Vão jogar (${count})`,
+    playedHeading: ({ count }: { count: number }) => `Jogaram (${count})`,
     nobodyConfirmed: 'Ninguém confirmou ainda.',
     foldedHeading: ({ count }: { count: number }) => `Fold (${count})`,
     nobody: 'Ninguém.',

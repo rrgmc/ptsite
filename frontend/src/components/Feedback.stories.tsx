@@ -10,6 +10,7 @@ export const Badges: StoryObj = {
     <div className="flex gap-2">
       <Badge>inativo</Badge>
       <Badge tone="primary">Aberto</Badge>
+      <Badge tone="info">Dono da casa</Badge>
       <Badge tone="warning">Fechada</Badge>
       <Badge tone="danger">arquivado</Badge>
     </div>

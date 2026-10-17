@@ -28,6 +28,8 @@
   --color-primary-hover: #0f3f22;
   --color-primary-soft: #dcebe1;
   --color-on-primary: #fbfaf7;
+  --color-info: #6d28d9; /* a badge that must stand apart from the paid chips, such as the house owner */
+  --color-info-soft: #ede9fe;
   --color-accent: #b42318;
   --color-accent-soft: #fbe4e1;
 
