@@ -69,9 +69,9 @@ describe('NightDashboardView', () => {
     expect(money.getByText('Pote com desconto').closest('div')).toHaveTextContent('Pote com descontoR$ 425,00')
     expect(money.getByText('Time chip total').closest('div')).toHaveTextContent('Time chip totalR$ 25,00')
     expect(money.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chipR$ 450,00')
-    expect(money.getByText('Pote').closest('div')).toHaveTextContent('PotePago R$ 275,00Falta R$ 150,00')
-    expect(money.getByText('Time chip').closest('div')).toHaveTextContent('Time chipPago R$ 20,00Falta R$ 5,00')
-    expect(money.getByText('Total que falta').closest('div')).toHaveTextContent('Total que faltaR$ 155,00')
+    expect(money.getByText('Pote').closest('tr')).toHaveTextContent('PoteR$ 275,00R$ 150,00')
+    expect(money.getByText('Time chip').closest('tr')).toHaveTextContent('Time chipR$ 20,00R$ 5,00')
+    expect(money.getByText('Total que falta').closest('tr')).toHaveTextContent('Total que faltaR$ 155,00')
   })
 
   it('adds no pot less the discount when the house owner has no discount', () => {
@@ -169,7 +169,7 @@ describe('NightDashboardView', () => {
     const split = within(screen.getByRole('region', { name: 'Premiação' }))
     expect(split.getByText('Em dinheiro').closest('div')).toHaveTextContent('Em dinheiroR$ 190,00')
     expect(split.getByText('Fora do dinheiro').closest('div')).toHaveTextContent('Fora do dinheiroR$ 105,00')
-    expect(within(screen.getByRole('region', { name: 'Dinheiro' })).getByText('Total que falta').closest('div')).toHaveTextContent('Total que faltaR$ 155,00')
+    expect(within(screen.getByRole('region', { name: 'Dinheiro' })).getByText('Total que falta').closest('tr')).toHaveTextContent('Total que faltaR$ 155,00')
   })
 
   it('shows the field of the adjustment of what was not in cash only while it is marked, and takes a negative amount', async () => {
@@ -410,7 +410,7 @@ describe('NightDashboardView', () => {
     const money = within(screen.getByRole('region', { name: 'Dinheiro' }))
     expect(money.getByText('Pote total').closest('div')).toHaveTextContent('Pote totalCalculado R$ 450,00R$ 600,00')
     expect(money.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chipR$ 600,00')
-    expect(money.getByText('Pote').closest('div')).toHaveTextContent('PotePago R$ 275,00Falta R$ 150,00')
+    expect(money.getByText('Pote').closest('tr')).toHaveTextContent('PoteR$ 275,00R$ 150,00')
 
     expect(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' })).toBeChecked()
     expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('600,00')

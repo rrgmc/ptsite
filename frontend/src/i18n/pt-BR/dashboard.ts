@@ -137,6 +137,9 @@ export const dashboard = {
     potPayments: 'Pote',
     timeChipPayments: 'Time chip',
     totalPending: 'Total que falta',
+    /** The headings of the columns of what was paid and what is pending. */
+    paid: 'Pago',
+    pending: 'Falta',
   },
   recorded: {
     title: 'Resultado registrado',

@@ -454,23 +454,34 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
             </div>
           ))}
         </dl>
-        <dl className="mt-3 divide-y divide-border/60 border-t border-border text-sm">
-          {balances.map(({ label, amounts }) => (
-            <div key={label} className="flex flex-wrap items-baseline justify-between gap-x-2 py-1.5">
-              <dt>{label}</dt>
-              <dd className="text-right tabular">
-                {t.dashboard.totals.paid({ amount: formatMoney(amounts.paid) })}
-                <span className={`ml-2 ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
-                  {t.dashboard.totals.pending({ amount: formatMoney(amounts.pending) })}
-                </span>
-              </dd>
-            </div>
-          ))}
-          <div className="flex items-baseline justify-between gap-2 py-1.5">
-            <dt className="font-semibold">{t.dashboard.money.totalPending}</dt>
-            <dd className={`tabular font-semibold ${Number(totals.total.pending) > 0 ? 'text-warning' : ''}`}>{formatMoney(totals.total.pending)}</dd>
-          </div>
-        </dl>
+        {/* A table, so that what was paid and what is pending line up in columns. */}
+        <table className="mt-3 w-full border-collapse border-t border-border text-sm">
+          <thead>
+            <tr className="text-xs text-muted">
+              <th scope="col"><span className="sr-only">{t.dashboard.money.title}</span></th>
+              <th scope="col" className="py-1.5 pl-3 text-right font-semibold">{t.dashboard.money.paid}</th>
+              <th scope="col" className="py-1.5 pl-3 text-right font-semibold">{t.dashboard.money.pending}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/60">
+            {balances.map(({ label, amounts }) => (
+              <tr key={label}>
+                <th scope="row" className="py-1.5 text-left font-normal">{label}</th>
+                <td className="py-1.5 pl-3 text-right tabular">{formatMoney(amounts.paid)}</td>
+                <td className={`py-1.5 pl-3 text-right tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
+                  {formatMoney(amounts.pending)}
+                </td>
+              </tr>
+            ))}
+            <tr>
+              <th scope="row" className="py-1.5 text-left font-semibold">{t.dashboard.money.totalPending}</th>
+              <td />
+              <td className={`py-1.5 pl-3 text-right tabular font-semibold ${Number(totals.total.pending) > 0 ? 'text-warning' : ''}`}>
+                {formatMoney(totals.total.pending)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
       <section aria-label={t.dashboard.summary.payout}>

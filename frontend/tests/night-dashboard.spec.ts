@@ -50,14 +50,14 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true')
   // The tap confirmed him: his row says when
   await expect(page.getByRole('listitem').filter({ hasText: 'Jacobson' })).toContainText(/Confirmou \d{2}\/\d{2} às \d{2}:\d{2}/)
-  await expect(money(page)).toContainText('PotePago R$ 50,00Falta R$ 0,00')
+  await expect(money(page)).toContainText('PoteR$ 50,00R$ 0,00')
 
   // A rebuy is owed until it is marked as paid, and adds its time chip, which is shown apart from the pot
   await marksOf(page, 'Jacobson').getByRole('button', { name: '+ Rebuy' }).click()
   await expect(totals(page)).toContainText('PoteR$ 100,00')
   await expect(totals(page)).toContainText('Time chipR$ 5,00')
-  await expect(money(page)).toContainText('PotePago R$ 50,00Falta R$ 50,00')
-  await expect(money(page)).toContainText('Time chipPago R$ 0,00Falta R$ 5,00')
+  await expect(money(page)).toContainText('PoteR$ 50,00R$ 50,00')
+  await expect(money(page)).toContainText('Time chipR$ 0,00R$ 5,00')
   await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
   await expect(money(page)).toContainText('Total com time chipR$ 105,00')
   await expect(money(page)).toContainText('Total que faltaR$ 0,00')
@@ -82,7 +82,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(page.getByText('Dono da casa: Duhamel')).toBeVisible()
   await expect(totals(page)).toContainText('PoteR$ 150,00')
   await expect(money(page)).toContainText('Desconto do dono da casa-R$ 25,00Pote com descontoR$ 125,00')
-  await expect(money(page)).toContainText('PotePago R$ 100,00Falta R$ 25,00')
+  await expect(money(page)).toContainText('PoteR$ 100,00R$ 25,00')
 
   // Each amount is in a closed field until it is marked "Manual". The Main Event pot is the season's share of the money
   await openTab(page, 'Valores')
@@ -107,7 +107,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await page.getByRole('button', { name: 'Salvar' }).click()
   await expect(totals(page)).toContainText('PoteR$ 150,00')
   await expect(money(page)).toContainText('Desconto do dono da casa-R$ 25,00')
-  await expect(money(page)).toContainText('PotePago R$ 100,00Falta R$ 25,00')
+  await expect(money(page)).toContainText('PoteR$ 100,00R$ 25,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
   // An adjustment of what was not in cash, for anything out of the ordinary, takes a negative amount
   // …in a field that shows only once its mark is ticked
@@ -142,7 +142,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await openTab(keeper, /^Jogadores/)
   await expect(marksOf(keeper, 'Jacobson').getByRole('button', { name: 'Rebuy 1' })).toHaveAttribute('aria-pressed', 'true')
   await marksOf(keeper, 'Duhamel').getByRole('button', { name: 'Buy-in' }).click()
-  await expect(money(keeper)).toContainText('PotePago R$ 125,00')
+  await expect(money(keeper)).toContainText('PoteR$ 125,00')
   // …which the player's dashboard shows by itself a few seconds later
   await openTab(page, /^Jogadores/)
   await expect(marksOf(page, 'Duhamel').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true', { timeout: 20_000 })
@@ -205,7 +205,7 @@ test('an admin undoes the opening of a night opened by mistake, and what its das
   await openTab(page, /^Jogadores/)
   await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('jacob')
   await page.getByRole('group', { name: 'Adicionar Jacobson' }).getByRole('button', { name: 'Buy-in pago' }).click()
-  await expect(money(page)).toContainText('PotePago R$ 50,00Falta R$ 0,00')
+  await expect(money(page)).toContainText('PoteR$ 50,00R$ 0,00')
   // A results keeper cannot undo the opening
   await page.goto(nightUrl)
   await expect(page.getByRole('link', { name: /Finalizar/ })).toBeVisible()

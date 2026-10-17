@@ -122,6 +122,8 @@ export const dashboard = {
     potPayments: 'Pot',
     timeChipPayments: 'Time chip',
     totalPending: 'Total pending',
+    paid: 'Paid',
+    pending: 'Pending',
   },
   recorded: {
     title: 'Recorded result',
