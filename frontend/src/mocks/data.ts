@@ -361,6 +361,8 @@ export const statistics: Statistics = {
     money_only_rebuys: playerList([[3, 1, 2], [1, 2, 1], [4, 2, 1]], 'count'),
     time_chip_count: 6,
     time_chips: playerList([[5, 1, 3], [2, 2, 1], [6, 2, 1], [9, 2, 1]], 'count'),
+    rebuys_per_step: [4, 2, 5, 3, 3],
+    time_chips_per_step: [1, 2, 0, 2, 1],
   },
 }
 
@@ -394,6 +396,8 @@ export const statisticsAllTime: Statistics = {
     ],
     pots: ['27300.00', '29875.00', '4145.00'],
   },
+  // The night dashboard came in the last season: the first one has nothing recorded.
+  rebuys: { ...statistics.rebuys!, rebuys_per_step: [0, 41, 17], time_chips_per_step: [0, 12, 6] },
   wins_not_shown: 8,
   // Three Main Events, with ties in every list.
   main_event: {

@@ -69,6 +69,11 @@ export const statistics = {
   /** `top` is the step with the biggest pot, when there is one; its `pot` is already written as money. */
   potsDescription: ({ perSeason, top }: { perSeason: boolean; top?: { label: string; pot: string } }) =>
     `Gráfico de linha: pote por ${perSeason ? 'temporada' : 'evento'}.${top ? ` O maior é ${top.pot}, em ${top.label}.` : ''} Os números estão na tabela abaixo.`,
+  rebuysPerNight: 'Rebuys por evento',
+  rebuysPerSeason: 'Rebuys por temporada',
+  /** `top` is the step with most rebuys, when there is one. `withTimeChips`: the chart also has the time chips of late players. */
+  rebuysPerStepDescription: ({ perSeason, top, withTimeChips }: { perSeason: boolean; top?: { label: string; count: number }; withTimeChips: boolean }) =>
+    `Gráfico de linhas: rebuys${withTimeChips ? ' e time chips por atraso' : ''} por ${perSeason ? 'temporada' : 'evento'}.${top ? ` O maior número de rebuys é ${top.count}, em ${top.label}.` : ''} Os números estão na tabela abaixo.`,
   /** `top` is the place with most nights, when there is one. */
   placesDescription: ({ top }: { top?: { name: string; count: number } }) =>
     `Gráfico de pizza: eventos por local.${top ? ` ${top.name} tem mais: ${top.count}.` : ''} Os números estão na tabela abaixo.`,

@@ -47,6 +47,7 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await tabs.filter({ hasText: 'Eventos' }).click()
   await expect(page.getByRole('img', { name: /^Gráfico de linha: pote por evento/ })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Gráfico de pizza: eventos por local/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Gráfico de linhas: rebuys e time chips por atraso por evento/ })).toBeVisible()
   // A night in "Maiores Potes" opens the night.
   const pots = page.getByRole('table', { name: 'Eventos por pote' })
   await expect(pots.getByRole('link').first()).toHaveAttribute('href', /nights\/\d+$/)
@@ -77,6 +78,7 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await tabs.filter({ hasText: 'Eventos' }).click()
   await expect(page.getByRole('img', { name: /^Gráfico de linha: pote por temporada/ })).toBeVisible()
   await expect(page.getByRole('table', { name: 'Eventos por pote' }).getByRole('row').nth(1)).toContainText('Liga')
+  await expect(page.getByRole('img', { name: /^Gráfico de linhas: rebuys e time chips por atraso por temporada/ })).toBeVisible()
 
   // The Main Events of every season: who won, who was in the first three and who played.
   await tabs.filter({ hasText: 'Main Event' }).click()

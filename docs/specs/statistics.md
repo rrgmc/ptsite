@@ -84,6 +84,10 @@ Everyone logged in: players, results keepers and admins.
 
     The view adds up the three as well, beside its other totals (rule 7).
 
+    **"Rebuys por evento"** is a line chart of the rebuys of each night, oldest first. On a site with the time
+    chip, a second line shows the "Time chips por atraso" of each night. In "Geral" it is "Rebuys por
+    temporada": one step per season, with the season's nights added up, as in "Pote por temporada" (rule 3b).
+
 The site stores only the scoring positions of a night, not everyone who played. So a player's page cannot say
 how many nights they played, only on how many they scored.
 
@@ -134,6 +138,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - **Past the limit.** Breno's third rebuy of night 1 and Carla's last two of night 2 are past the limit: 3 in all;
   Carla 2, Breno 1.
 - **Late time chips.** 3 in all: Carla 2, Ana 1. The time chips Breno's and Carla's rebuys paid are not counted.
+- **Rebuys per night.** The chart's rebuys are 4, 6 and 0, and its late time chips 1, 2 and 0. In "Geral" they
+  are 10 and 3 for season A, then 0 and 0 for season B.
 - **A player, every season.** Ana is 1st with 288,00, scored on 3 nights and won 2. Her positions: 1st 2, 2nd 0,
   3rd 1.
 - **A player, one season.** In season A, Ana is 2nd with 174,00, scored on 2 nights and won 1.
@@ -163,8 +169,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
     On a phone, a table of more than four positions gives each player two lines: the nickname, then the
     numbers under the positions.
   - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
-  - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
-    over the other, beside the list.
+  - **"Eventos"**: "Pote por evento", "Maiores Potes", "Locais" and, on a site with the night dashboard,
+    "Rebuys por evento" (rule 14). On a wide screen the charts are one over the other, beside the list.
   - **"Rebuys"**, on a site with the night dashboard: "Rebuys", "Rebuys além do limite" and "Time chips por
     atraso", side by side, one under the other on a phone. A list with nothing recorded says "Nenhum registrado
     no painel do evento.". The boxes at the top add "Rebuys", "Rebuys além do limite" and "Time chips por atraso".
