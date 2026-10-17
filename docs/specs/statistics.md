@@ -169,8 +169,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
     On a phone, a table of more than four positions gives each player two lines: the nickname, then the
     numbers under the positions.
   - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
-  - **"Eventos"**: "Pote por evento", "Maiores Potes", "Locais" and, on a site with the night dashboard,
-    "Rebuys por evento" (rule 14). On a wide screen the charts are one over the other, beside the list.
+  - **"Eventos"**: "Pote por evento", "Maiores Potes", "Rebuys por evento" on a site with the night dashboard
+    (rule 14), and last "Locais". On a wide screen the charts are one over the other, beside the list.
   - **"Rebuys"**, on a site with the night dashboard: "Rebuys", "Rebuys além do limite" and "Time chips por
     atraso", side by side, one under the other on a phone. A list with nothing recorded says "Nenhum registrado
     no painel do evento.". The boxes at the top add "Rebuys", "Rebuys além do limite" and "Time chips por atraso".

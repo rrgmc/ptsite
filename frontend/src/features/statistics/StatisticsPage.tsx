@@ -152,12 +152,12 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
                 tiedNotShown={statistics.biggest_pots.tied_not_shown}
               />
             </ListBlock>
+            {rebuys && <RebuysChart className="md:col-span-2" progress={statistics.points_progress} rebuys={rebuys} perSeason={allTime} />}
             {statistics.places.rows.length === 0 ? (
               <ListBlock title={t.statistics.places} className="lg:col-span-2"><Empty>{t.statistics.noPlaces}</Empty></ListBlock>
             ) : (
               <PlacesChart className="lg:col-span-2" places={statistics.places} />
             )}
-            {rebuys && <RebuysChart className="md:col-span-2" progress={statistics.points_progress} rebuys={rebuys} perSeason={allTime} />}
           </div>
         ),
       },
