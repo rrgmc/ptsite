@@ -3,7 +3,7 @@ import { Card } from '@/components/Card'
 import { ChipSign, StatusChip } from '@/components/ToggleChip'
 import { t } from '@/i18n'
 import type { DashboardPlayer } from './dashboardMoney'
-import { PlayerMoneyLine } from './PlayerMoneyLine'
+import { PlayerBalance, PlayerName } from './PlayerMoneyLine'
 
 const labels = t.dashboard.players
 
@@ -36,9 +36,10 @@ export function DashboardPlayersCard({ dashboard }: { dashboard: NightDashboard 
 
 function PlayerStatusRow({ line, hasTimeChip }: { line: DashboardPlayer; hasTimeChip: boolean }) {
   return (
-    <li className="px-2 py-1 even:bg-surface-stripe">
-      <PlayerMoneyLine line={line} />
-      <div role="group" aria-label={labels.marksOf({ nickname: line.player.nickname })} className="mt-1 flex flex-wrap items-center gap-1">
+    // One line when it fits: the name, the marks as small tags, then what is pending at the end.
+    <li className="flex flex-wrap items-center gap-x-2 gap-y-1 px-2 py-1 even:bg-surface-stripe">
+      <PlayerName line={line} />
+      <div role="group" aria-label={labels.marksOf({ nickname: line.player.nickname })} className="flex flex-wrap items-center gap-1">
         <StatusChip
           tone={line.buy_in_non_cash ? 'otherWay' : 'done'}
           isSelected={line.buy_in_paid}
@@ -67,6 +68,7 @@ function PlayerStatusRow({ line, hasTimeChip }: { line: DashboardPlayer; hasTime
           </StatusChip>
         ))}
       </div>
+      <PlayerBalance line={line} showSettled={false} className="ml-auto" />
     </li>
   )
 }
