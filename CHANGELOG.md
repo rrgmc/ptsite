@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- A release can start from GitHub, without a terminal: "Run workflow" on the Release workflow, with the
+  version. It does the checks of `task release`, makes the tag and builds the release in the same run.
+
 ## [1.28.1] - 2026-10-17
 
 ### Changed

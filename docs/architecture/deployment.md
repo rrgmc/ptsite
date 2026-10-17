@@ -18,6 +18,7 @@ The tests of one pull request take about 4 minutes, in nine jobs and one that su
 | A push to `master`, which is a merged pull request | Nothing. The pull request already ran the tests |
 | Started by hand (`gh workflow run ci.yml`, or "Run workflow" on GitHub) | The `package` job only |
 | A version tag (`vX.Y.Z`) is pushed | [`release.yml`](../../.github/workflows/release.yml), about 3 minutes. See "Releases" |
+| "Run workflow" on the Release workflow, with a version | [`release.yml`](../../.github/workflows/release.yml), which makes the tag first. See "Releases" |
 
 Every job names its runner image, `ubuntu-26.04`, and not `ubuntu-latest`. GitHub moves `ubuntu-latest` to a
 new image over several weeks, and during those weeks a job could run on either. A new image arrives here by a
@@ -67,12 +68,16 @@ A release is a git tag `vX.Y.Z` on `master`, and the tag is the version
 same for a package, passes the answer to the frontend build, and writes it to `public/version.txt`. So
 `https://example.com/version.txt` tells which build the site runs.
 
-**What a tag starts.** [`release.yml`](../../.github/workflows/release.yml) runs when a `vX.Y.Z` tag is pushed:
+**What a tag starts.** [`release.yml`](../../.github/workflows/release.yml) runs when a `vX.Y.Z` tag is pushed,
+or when someone starts it with "Run workflow" and a version:
 
-1. It refuses a tag whose commit is not on `master`.
-2. It runs `deploy/build-package.php` with `APP_VERSION` set to the tag. This is the script `task package`
+1. Started by "Run workflow" only, it runs [`deploy/release.php`](../../deploy/release.php) on the latest
+   commit of `master`, with the checks of `task release`, and makes and pushes the tag. A tag pushed with the
+   workflow's own token starts no other workflow, so this run builds the tag itself.
+2. It refuses a tag whose commit is not on `master`.
+3. It runs `deploy/build-package.php` with `APP_VERSION` set to the tag. This is the script `task package`
    runs, so both packages are built the same way.
-3. It publishes the GitHub release, with notes made from the merged pull requests and the package attached as
+4. It publishes the GitHub release, with notes made from the merged pull requests and the package attached as
    `ptsite-vX.Y.Z.zip`. A release asset does not count against the 500 MB of stored artifacts.
 
 It runs no tests: every commit on `master` was tested on its pull request. It does not upload to a site.

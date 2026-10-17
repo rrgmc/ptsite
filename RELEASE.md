@@ -43,6 +43,13 @@ The API has its own version, in its path (`/api/v1`). A site repository pins the
    check of the pull request that made `master`'s latest commit is still running or did not pass; that needs
    `gh` signed in. It then makes the tag and pushes the tag only. With `--dry-run` it checks and changes
    nothing.
+
+   Without a terminal, start the release from GitHub instead. On the website or in the app, open Actions,
+   then the Release workflow, then "Run workflow", and give the version (`2.1.0`). A session that cannot push
+   tags, such as a cloud session, starts it with `gh workflow run release.yml --ref master -f version=2.1.0`
+   or through its GitHub connector. The workflow runs `deploy/release.php` on the latest commit of `master`,
+   with the same checks, and makes and pushes the tag itself. A tag pushed this way starts no other workflow,
+   so that same run does step 4.
 4. The tag starts [`release.yml`](.github/workflows/release.yml). It builds the deploy package with the tag as
    its version and publishes the GitHub release, with notes made from the merged PRs and `ptsite-vX.Y.Z.zip`
    attached. Follow it with `gh run watch`, then look at `gh release view v2.1.0`.
