@@ -82,16 +82,20 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     costs the same and goes to the pot like any other; what it changes is that its player scores no points on
     that night (rule 5b of [seasons-and-nights.md](seasons-and-nights.md)). The site does not enforce that: the
     keeper leaves that player out of the positions.
-11. **The amounts**, each shown as owed, paid and pending:
+11. **The amounts.** The summary shows the pot and the time chip in two tiles, one amount each. Below them,
+    **"Dinheiro"** (money) adds the money up: "Pote total", "Desconto do dono da casa" and, in bold, "Pote com desconto" (the pot less the discount)
+    when there is one,
+    "Time chip total" and the total. Then it shows what was paid and what is pending of the pot and of the time
+    chip, and **"Total que falta"** (total pending):
     - **"Pote"**: the pot for points: the buy-ins, the house owner's counted in full (rule 9a), and every rebuy,
-      also the ones past the limit. Its owed, paid and pending are money, so the owed is the pot less the house
-      owner's discount. A line under the pot shows the discount when there is one;
+      also the ones past the limit. Its paid and pending are money, so what is owed is the pot less the house
+      owner's discount;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
       season says a rebuy also pays the time chip, one for each rebuy. A rebuy's time chip is paid with the rebuy;
     - **"Total com time chip"** (total with the time chip): the money of the two added up: the pot less the
       house owner's discount, and the time chip. On a site without the time chip it is called **"Total"**.
     The time chip is never mixed into the pot.
-11b. **"Premiação"** (payout), under the amounts: the money paid out to the players. It is the total
+11b. **"Premiação"** (payout), under "Dinheiro": the money paid out to the players. It is the total
     without the time chip, less the Main Event pot: the pot in use less the house owner's discount, less the Main
     Event pot in use (rule 14). On a finished night, the Main Event pot is the one the night was finished with.
     A season with no Main Event pot pays out all of that money. It changes neither the night's result nor its
@@ -119,8 +123,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     saves an amount meanwhile, the fields that were not touched show it, and the ones that were marked, unmarked
     or typed in stay as they were left.
 13b. An amount set by hand is used in the summary, for the points shown beside the positions, for the
-    Main Event pot's share and at "Finalizar". A pot set by hand stands in for the pot for points. The amount worked out stays in sight beside it ("Calculado"),
-    with what was paid and what is pending.
+    Main Event pot's share and at "Finalizar". A pot set by hand stands in for the pot for points. The amount worked out stays in sight beside it in
+    "Dinheiro" ("Calculado"). What was paid and what is pending still come from the players.
 13c. **"Valores" also has "Ajuste fora do dinheiro"**, for anything out of the ordinary: an amount that is added
     to what was paid not in cash. Its mark, "Ajustar o valor fora do dinheiro", comes first, and its field shows
     only while the mark is ticked. The amount may be negative, which takes it from what was not in cash; a line
@@ -196,7 +200,7 @@ house owner's buy-in:
   R$ 90,00: the dashboard and "Finalizar" use R$ 90,00. She unmarks it and saves: R$ 85,00 again.
 - **Set by hand.** On another night nobody marks the rebuys. The pot's field is closed and shows R$ 450,00. Ana
   marks its "Manual", types R$ 600,00 over it and taps "Salvar", leaving the time chip unmarked. The summary shows
-  the pot R$ 600,00 with "Calculado R$ 450,00" below it, the time chip R$ 25,00 and the total R$ 600,00, without the discount. The
+  the pot R$ 600,00 with "Calculado R$ 450,00" beside it, the time chip R$ 25,00 and the total R$ 600,00, without the discount. The
   Main Event pot is R$ 115,00, the 20% of the typed pot less the discount. "Finalizar" starts with R$ 600,00.
 - **No new player here.** Ana searches for "Estreante", who never played: nobody is found. A results keeper adds
   the player in the site, and the search then finds them.

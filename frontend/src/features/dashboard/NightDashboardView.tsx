@@ -371,11 +371,15 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
 /**
  * "Resumo", the first tab: the night at a glance.
  *
- * "Valores do evento" has the pot, the time chip apart from it, and the two added up, each with what was paid and
- * what is pending, of what the players owe. The pot is the pot for points; when the owner of the house pays less,
- * a line says by how much, so that what the players owe adds up. An amount typed by hand stands in for the one
- * worked out, which is still shown below it. Under them come the payout, the Main Event pot and, once a payment
- * was not in cash, how much of what was paid is in cash, to check the money in hand.
+ * "Valores do evento" has two tiles, the pot for points and the time chip, each one amount. An amount typed by
+ * hand stands in for the one worked out, and its tile says so.
+ *
+ * "Dinheiro" adds the money up: the pot, the house owner's discount and the pot less it when the owner of the
+ * house pays less, the time chip and the total. Below them come what was paid and what is pending, of the pot, of the time chip and
+ * of the total. A pot or time chip typed by hand shows the one worked out beside it.
+ *
+ * Then come the payout, the Main Event pot and, once a payment was not in cash, how much of what was paid is in
+ * cash, to check the money in hand.
  *
  * "Pagamentos" counts the players, who owes nothing more, and how many buy-ins, rebuys and time chips were paid.
  * A finished night also shows the amounts it was finished with.
@@ -385,12 +389,26 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
   const inUse = amountsInUse(dashboard)
   const counts = paymentCounts(dashboard)
   const discount = Number(dashboard.house_owner_discount) !== 0 ? dashboard.house_owner_discount : null
-  const tiles: { label: string; amount: string; worked: string; discount?: string | null; amounts: Amounts; isManual: boolean }[] = [
-    { label: t.dashboard.totals.pot, amount: inUse.pot, worked: dashboard.scoring_pot, discount, amounts: totals.pot, isManual: manual.pot !== null },
-    ...(totals.time_chip
-      ? [{ label: t.dashboard.totals.timeChip, amount: inUse.timeChip!, worked: totals.time_chip.owed, amounts: totals.time_chip, isManual: manual.time_chip !== null }]
+  const tiles: { label: string; amount: string; isManual: boolean }[] = [
+    { label: t.dashboard.totals.pot, amount: inUse.pot, isManual: manual.pot !== null },
+    ...(totals.time_chip ? [{ label: t.dashboard.totals.timeChip, amount: inUse.timeChip!, isManual: manual.time_chip !== null }] : []),
+  ]
+  const sums: { label: string; amount: string; worked?: string; strong?: boolean }[] = [
+    { label: t.dashboard.money.pot, amount: inUse.pot, worked: manual.pot !== null ? dashboard.scoring_pot : undefined },
+    ...(discount
+      ? [
+          { label: t.dashboard.money.houseOwnerDiscount, amount: `-${discount}` },
+          { label: t.dashboard.money.potLessDiscount, amount: (Number(inUse.pot) - Number(discount)).toFixed(2), strong: true },
+        ]
       : []),
-    { label: totals.time_chip ? t.dashboard.totals.totalWithTimeChip : t.dashboard.totals.total, amount: inUse.total, worked: totals.total.owed, amounts: totals.total, isManual: manual.pot !== null || manual.time_chip !== null },
+    ...(totals.time_chip
+      ? [{ label: t.dashboard.money.timeChip, amount: inUse.timeChip!, worked: manual.time_chip !== null ? totals.time_chip.owed : undefined }]
+      : []),
+    { label: totals.time_chip ? t.dashboard.totals.totalWithTimeChip : t.dashboard.totals.total, amount: inUse.total, strong: true },
+  ]
+  const balances: { label: string; amounts: Amounts }[] = [
+    { label: t.dashboard.money.potPayments, amounts: totals.pot },
+    ...(totals.time_chip ? [{ label: t.dashboard.money.timeChipPayments, amounts: totals.time_chip }] : []),
   ]
   const money: [label: string, amount: string, strong?: boolean][] = [
     [t.dashboard.summary.payout, inUse.payout, true],
@@ -411,25 +429,63 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
       <section aria-label={t.dashboard.totals.label}>
         {/* With a large font, a tile that does not fit moves to a new line rather than cut its amounts short. */}
         <dl className="flex flex-wrap gap-2">
-          {tiles.map(({ label, amount, worked, discount, amounts, isManual }) => (
+          {tiles.map(({ label, amount, isManual }) => (
             <div key={label} className="min-w-36 flex-1 rounded-md bg-surface-sunken p-3">
               <dt className="text-xs font-semibold uppercase text-muted">
                 {label}
                 {isManual && <span className="ml-1 lowercase text-primary">({t.dashboard.manual.mark})</span>}
               </dt>
-              <dd>
-                <span className="block font-display text-xl font-extrabold tabular">{formatMoney(amount)}</span>
-                {isManual && <span className="block text-xs text-muted tabular">{t.dashboard.totals.calculated({ amount: formatMoney(worked) })}</span>}
-                {discount && <span className="block text-xs text-muted tabular">{t.dashboard.totals.houseOwnerDiscount({ amount: formatMoney(discount) })}</span>}
-                <span className="mt-1 block text-sm tabular">{t.dashboard.totals.paid({ amount: formatMoney(amounts.paid) })}</span>
-                <span className={`block text-sm tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
-                  {t.dashboard.totals.pending({ amount: formatMoney(amounts.pending) })}
-                </span>
+              <dd className="font-display text-2xl font-extrabold tabular">{formatMoney(amount)}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section aria-labelledby="dashboard-money">
+        <h2 id="dashboard-money" className="mb-2 font-display text-lg font-bold">{t.dashboard.money.title}</h2>
+        <dl className="divide-y divide-border/60 text-sm">
+          {sums.map(({ label, amount, worked, strong }) => (
+            <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
+              <dt className={strong ? 'font-semibold' : undefined}>{label}</dt>
+              <dd className={`text-right tabular ${strong ? 'font-semibold' : ''}`}>
+                {worked !== undefined && <span className="mr-2 text-xs text-muted">{t.dashboard.totals.calculated({ amount: formatMoney(worked) })}</span>}
+                {formatMoney(amount)}
               </dd>
             </div>
           ))}
         </dl>
-        <dl className="mt-3 divide-y divide-border/60 text-sm">
+        {/* A table, so that what was paid and what is pending line up in columns. */}
+        <table className="mt-3 w-full border-collapse border-t border-border text-sm">
+          <thead>
+            <tr className="text-xs text-muted">
+              <th scope="col"><span className="sr-only">{t.dashboard.money.title}</span></th>
+              <th scope="col" className="py-1.5 pl-3 text-right font-semibold">{t.dashboard.money.paid}</th>
+              <th scope="col" className="py-1.5 pl-3 text-right font-semibold">{t.dashboard.money.pending}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/60">
+            {balances.map(({ label, amounts }) => (
+              <tr key={label}>
+                <th scope="row" className="py-1.5 text-left font-normal">{label}</th>
+                <td className="py-1.5 pl-3 text-right tabular">{formatMoney(amounts.paid)}</td>
+                <td className={`py-1.5 pl-3 text-right tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
+                  {formatMoney(amounts.pending)}
+                </td>
+              </tr>
+            ))}
+            <tr>
+              <th scope="row" className="py-1.5 text-left font-semibold">{t.dashboard.money.totalPending}</th>
+              <td />
+              <td className={`py-1.5 pl-3 text-right tabular font-semibold ${Number(totals.total.pending) > 0 ? 'text-warning' : ''}`}>
+                {formatMoney(totals.total.pending)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section aria-label={t.dashboard.summary.payout}>
+        <dl className="divide-y divide-border/60 text-sm">
           {money.map(([label, amount, strong]) => (
             <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
               <dt className={strong ? 'font-semibold' : 'text-muted'}>{label}</dt>
