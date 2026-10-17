@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api"
+            "url": "http://localhost:8200/api"
         }
     ],
     "security": [
@@ -5873,6 +5873,54 @@
                 ],
                 "title": "RankedListResource"
             },
+            "RebuyStatisticsResource": {
+                "type": "object",
+                "properties": {
+                    "rebuy_count": {
+                        "type": "integer",
+                        "description": "How many rebuys the night dashboard recorded."
+                    },
+                    "rebuys": {
+                        "description": "Players by rebuys (`count`).",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    },
+                    "money_only_rebuy_count": {
+                        "type": "integer",
+                        "description": "How many of those rebuys were past the limit: money for the pot, with no points for the player."
+                    },
+                    "money_only_rebuys": {
+                        "description": "Players by rebuys past the limit (`count`).",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    },
+                    "time_chip_count": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "How many time chips late players owed. Null on a site with no time chip."
+                    },
+                    "time_chips": {
+                        "anyOf": [
+                            {
+                                "description": "Players by nights on which they arrived late (`count`). Null on a site with no time chip.",
+                                "$ref": "#/components/schemas/RankedListResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "rebuy_count",
+                    "rebuys",
+                    "money_only_rebuy_count",
+                    "money_only_rebuys",
+                    "time_chip_count",
+                    "time_chips"
+                ],
+                "title": "RebuyStatisticsResource"
+            },
             "RequestPasswordResetRequest": {
                 "type": "object",
                 "properties": {
@@ -6968,6 +7016,17 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "rebuys": {
+                        "anyOf": [
+                            {
+                                "description": "The rebuys and time chips the night dashboard recorded. Null on a site with no night dashboard.",
+                                "$ref": "#/components/schemas/RebuyStatisticsResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -6984,7 +7043,8 @@
                     "points_progress",
                     "wins_not_shown",
                     "position_table",
-                    "main_event"
+                    "main_event",
+                    "rebuys"
                 ],
                 "title": "StatisticsResource"
             },

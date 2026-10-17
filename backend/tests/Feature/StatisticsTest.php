@@ -2,6 +2,9 @@
 
 use Laravel\Sanctum\Sanctum;
 use PTSite\App\Models\Night;
+use PTSite\App\Models\NightPlayer;
+use PTSite\App\Models\NightPrice;
+use PTSite\App\Models\NightRebuy;
 use PTSite\App\Models\Place;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
@@ -93,6 +96,48 @@ it('leaves out archived nights and, over every season, archived seasons', functi
         ->assertJsonPath('data.pot_total', '300.00');
     // A season asked for by id is shown even when archived, as its standings are.
     $this->getJson("/api/v1/statistics?season={$this->seasonB->id}")->assertOk()->assertJsonPath('data.nights_count', 1);
+});
+
+it('counts the rebuys and the late players the night dashboard recorded', function () {
+    config(['ptsite.features' => ['nightDashboard' => true]]);
+    // Each night keeps the rebuys allowed when it was finished: 1 on night 1, then 2 on night 2.
+    NightPrice::query()->where('night_id', $this->night1->id)->update(['rebuys_allowed' => 1]);
+    NightPrice::query()->where('night_id', $this->night2->id)->update(['rebuys_allowed' => 2]);
+    $this->seasonA->forceFill(['rebuys_allowed' => 5])->save();
+    $rebuy = function (Night $night, Player $player, int $times) {
+        foreach (range(1, $times) as $ignored) {
+            NightRebuy::query()->create(['night_id' => $night->id, 'player_id' => $player->id]);
+        }
+    };
+    $rebuy($this->night1, $this->breno, 3);
+    $rebuy($this->night2, $this->breno, 1);
+    $rebuy($this->night2, $this->carla, 3);
+    NightPlayer::query()->create(['night_id' => $this->night1->id, 'player_id' => $this->carla->id, 'time_chip_at' => now()]);
+    NightPlayer::query()->create(['night_id' => $this->night1->id, 'player_id' => $this->ana->id]);
+
+    $this->getJson('/api/v1/statistics')->assertOk()
+        ->assertJsonPath('data.rebuys.rebuy_count', 7)
+        ->assertJsonPath('data.rebuys.rebuys.rows.0.player.id', $this->breno->id)
+        ->assertJsonPath('data.rebuys.rebuys.rows.0.count', 4)
+        ->assertJsonPath('data.rebuys.money_only_rebuy_count', 3)
+        ->assertJsonPath('data.rebuys.money_only_rebuys.rows.0.player.id', $this->breno->id)
+        ->assertJsonPath('data.rebuys.money_only_rebuys.rows.0.count', 2)
+        ->assertJsonPath('data.rebuys.money_only_rebuys.rows.1.player.id', $this->carla->id)
+        ->assertJsonPath('data.rebuys.money_only_rebuys.rows.1.count', 1)
+        ->assertJsonPath('data.rebuys.time_chip_count', 1)
+        ->assertJsonPath('data.rebuys.time_chips.rows.0.player.id', $this->carla->id);
+    $this->getJson("/api/v1/statistics?season={$this->seasonB->id}")->assertOk()
+        ->assertJsonPath('data.rebuys.rebuy_count', 0)
+        ->assertJsonPath('data.rebuys.rebuys.rows', []);
+
+    config(['ptsite.features' => ['nightDashboard' => true, 'timeChip' => false]]);
+    $this->getJson('/api/v1/statistics')->assertOk()
+        ->assertJsonPath('data.rebuys.rebuy_count', 7)
+        ->assertJsonPath('data.rebuys.time_chip_count', null)
+        ->assertJsonPath('data.rebuys.time_chips', null);
+
+    config(['ptsite.features' => ['nightDashboard' => false]]);
+    $this->getJson('/api/v1/statistics')->assertOk()->assertJsonPath('data.rebuys', null);
 });
 
 it('is empty before any night is finished', function () {

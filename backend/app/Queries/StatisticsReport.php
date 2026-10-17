@@ -34,5 +34,7 @@ final readonly class StatisticsReport
         public array $positionTable,
         /** Null on a site with no Main Event. */
         public ?MainEventStatisticsReport $mainEvent,
+        /** Null on a site with no night dashboard. */
+        public ?RebuyStatisticsReport $rebuys,
     ) {}
 }

@@ -1595,6 +1595,20 @@ export interface components {
             /** @description Lines left out that are tied with the last line. */
             tied_not_shown: number;
         };
+        /** RebuyStatisticsResource */
+        RebuyStatisticsResource: {
+            /** @description How many rebuys the night dashboard recorded. */
+            rebuy_count: number;
+            /** @description Players by rebuys (`count`). */
+            rebuys: components["schemas"]["RankedListResource"];
+            /** @description How many of those rebuys were past the limit: money for the pot, with no points for the player. */
+            money_only_rebuy_count: number;
+            /** @description Players by rebuys past the limit (`count`). */
+            money_only_rebuys: components["schemas"]["RankedListResource"];
+            /** @description How many time chips late players owed. Null on a site with no time chip. */
+            time_chip_count: number | null;
+            time_chips: components["schemas"]["RankedListResource"] | null;
+        };
         /** RequestPasswordResetRequest */
         RequestPasswordResetRequest: {
             /** @description The username or the email of the account. */
@@ -1922,6 +1936,7 @@ export interface components {
                 }[];
             }[];
             main_event: components["schemas"]["MainEventStatisticsResource"] | null;
+            rebuys: components["schemas"]["RebuyStatisticsResource"] | null;
         };
         /** SuggestedNightResource */
         SuggestedNightResource: {
