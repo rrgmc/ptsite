@@ -10,6 +10,8 @@ use PTSite\App\Actions\Nights\WriteNightResult;
 use PTSite\App\Enums\PlayerImageKind;
 use PTSite\App\Enums\Role;
 use PTSite\App\Models\Night;
+use PTSite\App\Models\NightPlayer;
+use PTSite\App\Models\NightRebuy;
 use PTSite\App\Models\Place;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\PlayerImage;
@@ -60,6 +62,8 @@ class DemoLeagueSeeder extends Seeder
     private const NO_NIGHT = ['2022-02-25', '2022-04-15', '2022-04-22', '2022-06-17'];
 
     private Randomizer $random;
+
+    private ?Randomizer $dashboardRandom = null;
 
     public function __construct(
         private readonly WriteNightResult $writeResult,
@@ -185,7 +189,8 @@ class DemoLeagueSeeder extends Seeder
                 'description' => $played === 0 ? $firstDescription : null,
                 'status' => 'open',
             ]);
-            $this->finish($night, $players);
+            // The season in play was run on the night dashboard.
+            $this->finish($night, $players, dashboard: ! $finished);
             $played++;
         }
 
@@ -221,19 +226,61 @@ class DemoLeagueSeeder extends Seeder
         }
     }
 
-    /** @param list<int> $players */
-    private function finish(Night $night, array $players): void
+    /**
+     * @param  list<int>  $players
+     * @param  bool  $dashboard  the night was run on the night dashboard, which recorded its participants
+     */
+    private function finish(Night $night, array $players, bool $dashboard): void
     {
         $present = $this->random->getInt(8, count($players));
         $rebuys = $this->random->getInt(0, 6);
         $order = array_slice($this->random->shuffleArray($players), 0, 6);
+        $late = $dashboard ? $this->recordDashboard($night, $players, $present, $rebuys, $order) : 0;
 
         ($this->writeResult)(
             $night,
             pot: number_format(($present + $rebuys) * 50, 2, '.', ''),
             mainEventPot: number_format($present * 10, 2, '.', ''),
-            timeChip: number_format($rebuys * 5, 2, '.', ''),
+            timeChip: number_format(($rebuys + $late) * 5, 2, '.', ''),
             playerByPosition: array_combine(range(1, 6), $order),
         );
+    }
+
+    /**
+     * What the night dashboard recorded for a night, all paid: the players present, their rebuys and who arrived
+     * late. A player past the season's 2 rebuys scores no points, so is never one of the scoring players. It draws
+     * from a randomizer of its own, so the results stay the same.
+     *
+     * @param  list<int>  $players
+     * @param  list<int>  $order  the scoring players, first place first
+     * @return int how many players arrived late
+     */
+    private function recordDashboard(Night $night, array $players, int $present, int $rebuys, array $order): int
+    {
+        $random = $this->dashboardRandom ??= new Randomizer(new Mt19937(2027));
+        $others = $random->shuffleArray(array_values(array_diff($players, $order)));
+        $here = [...$order, ...array_slice($others, 0, $present - count($order))];
+        $notScoring = array_values(array_diff($here, $order));
+
+        $counts = [];
+        for ($i = 0; $i < $rebuys; $i++) {
+            $player = $here[$random->getInt(0, count($here) - 1)];
+            if (in_array($player, $order, true) && ($counts[$player] ?? 0) >= 2) {
+                $player = $notScoring[$random->getInt(0, count($notScoring) - 1)];
+            }
+            $counts[$player] = ($counts[$player] ?? 0) + 1;
+            NightRebuy::query()->create(['night_id' => $night->id, 'player_id' => $player, 'paid_at' => $night->starts_at]);
+        }
+
+        $late = array_slice($random->shuffleArray($here), 0, $random->getInt(0, 2));
+        foreach ($here as $player) {
+            $isLate = in_array($player, $late, true);
+            NightPlayer::query()->create([
+                'night_id' => $night->id, 'player_id' => $player, 'buy_in_paid_at' => $night->starts_at,
+                'time_chip_at' => $isLate ? $night->starts_at : null, 'time_chip_paid_at' => $isLate ? $night->starts_at : null,
+            ]);
+        }
+
+        return count($late);
     }
 }

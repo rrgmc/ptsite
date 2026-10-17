@@ -36,6 +36,18 @@ export const statistics = {
   mainEventAppearances: 'Participações',
   mainEventAppearancesCaption: 'Jogadores por participações no Main Event',
 
+  // What the night dashboard recorded, on a site that has it
+  rebuysTab: 'Rebuys',
+  rebuys: 'Rebuys',
+  rebuysCaption: 'Jogadores por rebuys',
+  /** Rebuys past the season's limit: the money goes to the pot, and the player scores no points that night. */
+  moneyOnlyRebuys: 'Rebuys além do limite',
+  moneyOnlyRebuysCaption: 'Jogadores por rebuys além do limite, que não pontuam',
+  /** The time chips of players who arrived late, not the ones paid with a rebuy. */
+  timeChips: 'Time chips por atraso',
+  timeChipsCaption: 'Jogadores por eventos em que chegaram atrasados',
+  noneRecorded: 'Nenhum registrado no painel do evento.',
+
   // Charts
   pointsProgress: 'Pontos acumulados',
   viewTable: 'Ver dados em tabela',
