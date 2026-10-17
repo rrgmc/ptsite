@@ -58,7 +58,12 @@ describe('NightDashboardView', () => {
 
     expect(totals.getByText('Pote').closest('div')).toHaveTextContent('PoteR$ 450,00Desconto do dono da casa R$ 25,004 rebuysPago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
-    expect(totals.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
+    expect(totals.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chipR$ 450,00Pago R$ 295,00Falta R$ 155,00')
+  })
+
+  it('shows the payout: the total without the time chip, less the Main Event pot', () => {
+    view()
+    expect(within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Premiação R$ 340,00')).toBeInTheDocument()
   })
 
   it('says under the pot how many rebuys the night has, and nothing on a night with none', () => {
@@ -131,7 +136,7 @@ describe('NightDashboardView', () => {
     const split = within(screen.getByRole('region', { name: 'Valores do evento' }))
     expect(split.getByText('Em dinheiro R$ 190,00')).toBeInTheDocument()
     expect(split.getByText('Fora do dinheiro R$ 105,00')).toBeInTheDocument()
-    expect(split.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
+    expect(split.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chipR$ 450,00Pago R$ 295,00Falta R$ 155,00')
   })
 
   it('shows the field of the adjustment of what was not in cash only while it is marked, and takes a negative amount', async () => {
@@ -206,7 +211,10 @@ describe('NightDashboardView', () => {
     view({ ...nightDashboard, totals: { ...nightDashboard.totals, time_chip: null } })
 
     expect(screen.queryByRole('button', { name: 'Time chip' })).not.toBeInTheDocument()
-    expect(within(screen.getByRole('region', { name: 'Valores do evento' })).queryByText('Time chip')).not.toBeInTheDocument()
+    const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
+    expect(totals.queryByText('Time chip')).not.toBeInTheDocument()
+    // The total is only the pot, so its name says nothing of the time chip.
+    expect(totals.getByText('Total')).toBeInTheDocument()
   })
 
   it('changes the house owner and removes a rebuy from the menu of a player', async () => {
@@ -365,7 +373,7 @@ describe('NightDashboardView', () => {
 
     expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(Manual)R$ 600,00Calculado R$ 450,00Desconto do dono da casa R$ 25,004 rebuysPago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
-    expect(totals.getByText('Total').closest('div')).toHaveTextContent('Total(Manual)R$ 600,00Calculado R$ 450,00')
+    expect(totals.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chip(Manual)R$ 600,00Calculado R$ 450,00')
 
     expect(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' })).toBeChecked()
     expect(screen.getByRole('textbox', { name: 'Pote (R$)' })).toHaveValue('600,00')

@@ -372,8 +372,9 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
  * The night's amounts, always in sight at the foot of the screen: the pot, the time chip apart from it, and the
  * two added up. The pot is the pot for points; when the owner of the house pays less, a line says by how much, so
  * that what the players owe adds up. Once the night has a rebuy, a line under the pot says how many. An amount
- * typed by hand stands in for the one worked out, which is still shown below it. Each says what was paid and what is pending, of what the players owe. Once a payment was not in cash, a line below
- * says how much of what was paid is in cash, to check the money in hand. With a large font, a column that does
+ * typed by hand stands in for the one worked out, which is still shown below it. Each says what was paid and what is pending, of what the players owe. A line below
+ * says how much is paid out to the players. Once a payment was not in cash, it also says how much of what was paid
+ * is in cash, to check the money in hand. With a large font, a column that does
  * not fit moves to a new line rather than cut its amounts short.
  */
 export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
@@ -386,7 +387,7 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
     ...(totals.time_chip
       ? [{ label: t.dashboard.totals.timeChip, amount: inUse.timeChip!, worked: totals.time_chip.owed, amounts: totals.time_chip, isManual: manual.time_chip !== null }]
       : []),
-    { label: t.dashboard.totals.total, amount: inUse.total, worked: totals.total.owed, amounts: totals.total, isManual: manual.pot !== null || manual.time_chip !== null },
+    { label: totals.time_chip ? t.dashboard.totals.totalWithTimeChip : t.dashboard.totals.total, amount: inUse.total, worked: totals.total.owed, amounts: totals.total, isManual: manual.pot !== null || manual.time_chip !== null },
   ]
   return (
     <section
@@ -413,12 +414,15 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
           </div>
         ))}
       </dl>
-      {Number(received.non_cash) !== 0 && (
-        <p className="mt-1 flex flex-wrap gap-x-3 border-t border-border/60 pt-1 text-xs tabular">
-          <span className="font-semibold">{t.dashboard.totals.cash({ amount: formatMoney(received.cash) })}</span>
-          <span className="text-muted">{t.dashboard.totals.nonCash({ amount: formatMoney(received.non_cash) })}</span>
-        </p>
-      )}
+      <p className="mt-1 flex flex-wrap gap-x-3 border-t border-border/60 pt-1 text-xs tabular">
+        <span className="font-semibold">{t.dashboard.totals.payout({ amount: formatMoney(inUse.payout) })}</span>
+        {Number(received.non_cash) !== 0 && (
+          <>
+            <span className="font-semibold">{t.dashboard.totals.cash({ amount: formatMoney(received.cash) })}</span>
+            <span className="text-muted">{t.dashboard.totals.nonCash({ amount: formatMoney(received.non_cash) })}</span>
+          </>
+        )}
+      </p>
     </section>
   )
 }

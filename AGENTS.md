@@ -173,6 +173,7 @@ to map one to the other. The English texts of the screens are in `frontend/src/i
 | Jogador (no painel) | Participant (`NightPlayer`, `NightEntry`) | A player the night dashboard has a record of, or who answered ALL IN on the open night. Owes one buy-in |
 | Rebuy | Rebuy | Buying in again on the same night. A season says how many are allowed (`rebuys_allowed`) and whether more can be made (`allows_extra_rebuys`): a player who goes past the limit is not recorded in a scoring position of that night, and the money still goes to the pot |
 | Dono da casa | House owner (`house_owner_player_id`) | The owner of the house where a night is played, picked on the night dashboard, who may pay a smaller buy-in (`house_owner_buy_in`). The pot for points still counts the full buy-in |
+| Premiação | Payout (`payout`) | The money of a night paid out to the players, on the night dashboard: the total without the time chip, less the Main Event pot |
 | Pontuação | Percentage table | Each scoring position's share of the pot |
 | Pessoas pontuam por evento | Scoring positions | How many places earn points (6 so far) |
 | Pontos | Points | A player's share of the pot for a night |

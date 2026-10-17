@@ -74,8 +74,13 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
       the night has, paid or not, once it has one;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
       season says a rebuy also pays the time chip, one for each rebuy. A rebuy's time chip is paid with the rebuy;
-    - **"Total"**: the money of the two added up: the pot less the house owner's discount, and the time chip.
+    - **"Total com time chip"** (total with the time chip): the money of the two added up: the pot less the
+      house owner's discount, and the time chip. On a site without the time chip it is called **"Total"**.
     The time chip is never mixed into the pot.
+11b. **"Premiação"** (payout), on a line under the amounts: the money paid out to the players. It is the total
+    without the time chip, less the Main Event pot: the pot in use less the house owner's discount, less the Main
+    Event pot in use (rule 14). A season with no Main Event pot pays out all of that money. It changes neither the
+    night's result nor its points.
 11a. **What was paid is split by how**, so that the money in hand can be checked:
     - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
       each rebuy paid not in cash, with the time chip it pays; and the adjustment of rule 13c, when there is one;
@@ -152,6 +157,9 @@ house owner's buy-in:
   Élio owes R$ 25,00 of buy-in. Breno owes R$ 215,00 in all and has R$ 55,00 pending. The pot for points is
   R$ 450,00: the R$ 425,00 owed and the house owner's discount of R$ 25,00, shown under the pot. Under it too,
   "4 rebuys": Ana's one and Breno's three.
+- **The payout.** With a Main Event pot share of 20%, the Main Event pot is R$ 85,00 (rule 14). The payout is
+  R$ 340,00: the total of R$ 450,00 less the time chip of R$ 25,00 and the Main Event pot of R$ 85,00. With a
+  Main Event pot of R$ 90,00 set by hand, it is R$ 335,00.
 - **Not in cash.** On that night Ana paid her rebuy by bank transfer, and Breno his buy-in. Ana's rebuy is
   R$ 55,00, with the time chip it pays, and Breno's buy-in R$ 50,00: of the R$ 295,00 paid, R$ 105,00 are not in
   cash and R$ 190,00 are in cash. The pot and the time chip are the same.

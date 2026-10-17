@@ -103,13 +103,15 @@ export function recalculated(dashboard: NightDashboard): NightDashboard {
  * and else the ones worked out from the players. The pot is the pot for points, which counts the house owner's
  * buy-in in full; the total is money, so it leaves the house owner's discount out. `timeChip` is null on a site
  * without the time chip. The Main Event pot is the one set by hand, or else the season's share of the money; null
- * when the season sets none.
+ * when the season sets none. The payout is the money paid out to the players: the total without the time chip,
+ * less the Main Event pot.
  */
-export function amountsInUse(dashboard: NightDashboard): { pot: string; timeChip: string | null; total: string; mainEventPot: string | null } {
+export function amountsInUse(dashboard: NightDashboard): { pot: string; timeChip: string | null; total: string; mainEventPot: string | null; payout: string } {
   const pot = dashboard.manual.pot ?? dashboard.scoring_pot
   const timeChip = dashboard.totals.time_chip ? (dashboard.manual.time_chip ?? dashboard.totals.time_chip.owed) : null
   const mainEventPot = dashboard.main_event_pot ?? dashboard.suggested_main_event_pot
-  return { pot, timeChip, total: decimal(cents(pot) - cents(dashboard.house_owner_discount) + cents(timeChip ?? '0')), mainEventPot }
+  const money = cents(pot) - cents(dashboard.house_owner_discount)
+  return { pot, timeChip, total: decimal(money + cents(timeChip ?? '0')), mainEventPot, payout: decimal(money - cents(mainEventPot ?? '0')) }
 }
 
 const emptyLine = (player: Player): DashboardPlayer => ({

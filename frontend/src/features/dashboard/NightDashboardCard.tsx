@@ -22,7 +22,7 @@ export function NightDashboardCard({ nightId }: { nightId: number }) {
   const rows: [label: string, amount: string, amounts: Amounts][] = [
     [t.dashboard.totals.pot, inUse.pot, totals.pot],
     ...(totals.time_chip ? [[t.dashboard.totals.timeChip, inUse.timeChip!, totals.time_chip] as [string, string, Amounts]] : []),
-    [t.dashboard.totals.total, inUse.total, totals.total],
+    [totals.time_chip ? t.dashboard.totals.totalWithTimeChip : t.dashboard.totals.total, inUse.total, totals.total],
   ]
 
   return (

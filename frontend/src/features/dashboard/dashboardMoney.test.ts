@@ -187,7 +187,16 @@ describe('the pot for points', () => {
 describe('amountsInUse', () => {
   it('is what the dashboard works out, with the season\'s share of the pot as the Main Event pot', () => {
     // The pot for points counts the house owner's buy-in in full; the total is money.
-    expect(amountsInUse(nightDashboard)).toEqual({ pot: '450.00', timeChip: '25.00', total: '450.00', mainEventPot: '85.00' })
+    expect(amountsInUse(nightDashboard)).toEqual({ pot: '450.00', timeChip: '25.00', total: '450.00', mainEventPot: '85.00', payout: '340.00' })
+  })
+
+  it('pays out the total without the time chip, less the Main Event pot', () => {
+    // R$ 450,00 less the time chip of R$ 25,00 and the Main Event pot of R$ 90,00.
+    expect(amountsInUse({ ...nightDashboard, main_event_pot: '90.00' }).payout).toBe('335.00')
+    // A pot typed by hand: R$ 600,00 less the house owner's discount of R$ 25,00 and the Main Event pot.
+    expect(amountsInUse({ ...nightDashboard, manual: { pot: '600.00', time_chip: '40.00' }, suggested_main_event_pot: '115.00' }).payout).toBe('460.00')
+    // A season with no Main Event pot pays out all the money.
+    expect(amountsInUse({ ...nightDashboard, suggested_main_event_pot: null }).payout).toBe('425.00')
   })
 
   it('takes an amount typed by hand in place of the one worked out, one at a time', () => {

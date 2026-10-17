@@ -50,7 +50,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(totals(page)).toContainText('PoteR$ 100,001 rebuyPago R$ 50,00Falta R$ 50,00')
   await expect(totals(page)).toContainText('Time chipR$ 5,00Pago R$ 0,00Falta R$ 5,00')
   await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
-  await expect(totals(page)).toContainText('TotalR$ 105,00Pago R$ 105,00Falta R$ 0,00')
+  await expect(totals(page)).toContainText('Total com time chipR$ 105,00Pago R$ 105,00Falta R$ 0,00')
   await expect(totals(page)).not.toContainText('Em dinheiro')
   // One tap more says the rebuy was paid, but not in cash, with the time chip it pays: the foot of the screen
   // then says how much of what was paid is in hand
@@ -60,7 +60,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(totals(page)).toContainText('Fora do dinheiro R$ 55,00')
   await expect(page.getByRole('listitem').filter({ hasText: 'Jacobson' })).toContainText('Tudo pago (⇄ R$ 55,00)')
   await expect(page.getByText('Pago fora do dinheiro (transferência, Pix)')).toBeVisible()
-  await expect(totals(page)).toContainText('TotalR$ 105,00Pago R$ 105,00Falta R$ 0,00')
+  await expect(totals(page)).toContainText('Total com time chipR$ 105,00Pago R$ 105,00Falta R$ 0,00')
 
   // The owner of the house pays the smaller buy-in, and the pot for points counts the buy-in in full
   await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('duha')
