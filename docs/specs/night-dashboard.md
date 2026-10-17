@@ -98,6 +98,8 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 11b. **"Premiação"** (payout), under "Dinheiro": the money paid out to the players. It is the total
     without the time chip, less the Main Event pot: the pot in use less the house owner's discount, less the Main
     Event pot in use (rule 14). On a finished night, the Main Event pot is the one the night was finished with.
+    A finished night never shows a payout less than zero. When its pot is zero, as on a night of the past that was
+    finished without the dashboard, it shows no payout, no Main Event pot and no house owner's discount.
     A season with no Main Event pot pays out all of that money. It changes neither the night's result nor its
     points.
 11a. **What was paid is split by how**, so that the money in hand can be checked:

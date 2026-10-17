@@ -543,6 +543,20 @@ describe('NightDashboardView', () => {
     expect(screen.queryByRole('heading', { name: 'Posições' })).not.toBeInTheDocument()
   })
 
+  it('shows nothing worked out from the pot on a finished night without one', () => {
+    view({ ...finishedNightDashboard, players: [], scoring_pot: '0.00', house_owner_discount: '0.00', recorded: { pot: '840.00', main_event_pot: '160.00', time_chip: null } })
+
+    expect(screen.queryByRole('region', { name: 'Premiação' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/-R\$/)).not.toBeInTheDocument()
+  })
+
+  it('shows no payout less than zero on a finished night', () => {
+    view({ ...finishedNightDashboard, recorded: { pot: '430.00', main_event_pot: '9999.00', time_chip: '25.00' } })
+
+    expect(screen.queryByText('Premiação')).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Premiação' })).toHaveTextContent('Pote ME')
+  })
+
   it('says why a change was refused', () => {
     view(nightDashboard, { error: 'O limite é de 2 rebuys por jogador.' })
 

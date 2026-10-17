@@ -379,7 +379,9 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
  * is in cash and how much is not, to check the money in hand. Below them come what was paid and what is pending,
  * of the pot, of the time chip and of the total. A pot or time chip typed by hand shows the one worked out beside it.
  *
- * Then come the payout and the Main Event pot.
+ * Then come the payout and the Main Event pot. A finished night shows no amount less than zero, and when its pot is
+ * zero (a night of the past, finished without a dashboard) nothing worked out from the pot: no house owner's
+ * discount, no payout and no Main Event pot.
  *
  * "Pagamentos" counts the players, who owes nothing more, and how many buy-ins, rebuys and time chips were paid.
  * A finished night also shows the amounts it was finished with.
@@ -388,7 +390,9 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
   const { totals, manual, received } = dashboard
   const inUse = amountsInUse(dashboard)
   const counts = paymentCounts(dashboard)
-  const discount = Number(dashboard.house_owner_discount) !== 0 ? dashboard.house_owner_discount : null
+  const isFinished = dashboard.status === 'finished'
+  const hasPot = !isFinished || Number(inUse.pot) > 0
+  const discount = hasPot && Number(dashboard.house_owner_discount) !== 0 ? dashboard.house_owner_discount : null
   const tiles: { label: string; amount: string; isManual: boolean }[] = [
     { label: t.dashboard.totals.pot, amount: inUse.pot, isManual: manual.pot !== null },
     ...(totals.time_chip ? [{ label: t.dashboard.totals.timeChip, amount: inUse.timeChip!, isManual: manual.time_chip !== null }] : []),
@@ -416,8 +420,8 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
     { label: t.dashboard.money.potPayments, amounts: totals.pot },
     ...(totals.time_chip ? [{ label: t.dashboard.money.timeChipPayments, amounts: totals.time_chip }] : []),
   ]
-  const money: [label: string, amount: string, strong?: boolean][] = [
-    [t.dashboard.summary.payout, inUse.payout, true],
+  const money: [label: string, amount: string, strong?: boolean][] = !hasPot ? [] : [
+    ...(isFinished && Number(inUse.payout) < 0 ? [] : [[t.dashboard.summary.payout, inUse.payout, true] as [string, string, boolean]]),
     ...(inUse.mainEventPot !== null ? [[t.dashboard.summary.mainEventPot, inUse.mainEventPot] as [string, string]] : []),
   ]
   const payments: [label: string, paid: number, total: number][] = [
@@ -487,16 +491,18 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
         </table>
       </section>
 
-      <section aria-label={t.dashboard.summary.payout}>
-        <dl className="divide-y divide-border/60 text-sm">
-          {money.map(([label, amount, strong]) => (
-            <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
-              <dt className={strong ? 'font-semibold' : 'text-muted'}>{label}</dt>
-              <dd className={`tabular ${strong ? 'font-semibold' : 'text-muted'}`}>{formatMoney(amount)}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {money.length > 0 && (
+        <section aria-label={t.dashboard.summary.payout}>
+          <dl className="divide-y divide-border/60 text-sm">
+            {money.map(([label, amount, strong]) => (
+              <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
+                <dt className={strong ? 'font-semibold' : 'text-muted'}>{label}</dt>
+                <dd className={`tabular ${strong ? 'font-semibold' : 'text-muted'}`}>{formatMoney(amount)}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
       <section aria-labelledby="dashboard-payments">
         <h2 id="dashboard-payments" className="mb-2 font-display text-lg font-bold">{t.dashboard.summary.payments}</h2>
