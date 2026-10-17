@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.26.1] - 2026-10-17
+
+### Fixed
+
+- The payout ("Premiação") on the dashboard of a finished night subtracts the Main Event pot the night was
+  finished with.
+
+### Changed
+
+- A release updates the changelog first, through a pull request of its own.
+
 ## [1.26.0] - 2026-10-17
 
 ### Changed
@@ -97,7 +108,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.26.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.26.1...HEAD
+[1.26.1]: https://github.com/rrgmc/ptsite/compare/v1.26.0...v1.26.1
 [1.26.0]: https://github.com/rrgmc/ptsite/compare/v1.25.0...v1.26.0
 [1.25.0]: https://github.com/rrgmc/ptsite/compare/v1.24.0...v1.25.0
 [1.24.0]: https://github.com/rrgmc/ptsite/compare/v1.23.0...v1.24.0
