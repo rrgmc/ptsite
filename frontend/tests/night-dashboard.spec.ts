@@ -4,7 +4,6 @@ import { expectAccessible, login, logout, pickSeason } from './helpers'
 // On the summary tab, which is read here also while another tab is on show.
 const totals = (page: Page) => page.getByRole('region', { name: 'Valores do evento', includeHidden: true })
 const money = (page: Page) => page.getByRole('region', { name: 'Dinheiro', includeHidden: true })
-const payout = (page: Page) => page.getByRole('region', { name: 'Premiação', includeHidden: true })
 const marksOf = (page: Page, nickname: string) => page.getByRole('group', { name: `Pagamentos de ${nickname}` })
 // The dashboard's tabs: "Resumo", "Jogadores (n)" and "Valores". Only the one on show can be tapped.
 const openTab = (page: Page, name: string | RegExp) => page.getByRole('tab', { name }).click()
@@ -62,13 +61,13 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(money(page)).toContainText('Total com time chipR$ 105,00')
   await expect(money(page)).toContainText('Total que faltaR$ 0,00')
   await expect(page.getByRole('region', { name: 'Pagamentos', includeHidden: true })).toContainText('Rebuys pagos1 de 1')
-  await expect(payout(page)).not.toContainText('Em dinheiro')
+  await expect(money(page)).not.toContainText('Em dinheiro')
   // One tap more says the rebuy was paid, but not in cash, with the time chip it pays: the summary then says how
   // much of what was paid is in hand
   await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1 (fora do dinheiro)' })).toHaveAttribute('aria-pressed', 'true')
-  await expect(payout(page)).toContainText('Em dinheiroR$ 50,00')
-  await expect(payout(page)).toContainText('Fora do dinheiroR$ 55,00')
+  await expect(money(page)).toContainText('Em dinheiroR$ 50,00')
+  await expect(money(page)).toContainText('Fora do dinheiroR$ 55,00')
   await expect(page.getByRole('listitem').filter({ hasText: 'Jacobson' })).toContainText('Tudo pago (⇄ R$ 55,00)')
   await expect(page.getByText('Pago fora do dinheiro (transferência, Pix)')).toBeVisible()
   await expect(money(page)).toContainText('Total com time chipR$ 105,00')
@@ -115,8 +114,8 @@ test('players record the payments of an open night on its dashboard, and the kee
   await page.getByText('Ajustar o valor fora do dinheiro', { exact: true }).click()
   await page.getByLabel('Ajuste fora do dinheiro (R$)').fill('-5')
   await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(payout(page)).toContainText('Em dinheiroR$ 55,00')
-  await expect(payout(page)).toContainText('Fora do dinheiroR$ 50,00')
+  await expect(money(page)).toContainText('Em dinheiroR$ 55,00')
+  await expect(money(page)).toContainText('Fora do dinheiroR$ 50,00')
 
   // A position is saved when its player is picked, with the points it earns from the pot so far
   await page.getByRole('button', { name: /^6º lugar/ }).click()

@@ -162,13 +162,15 @@ describe('NightDashboardView', () => {
 
   it('says how much of what was paid is in cash, once a payment was not', () => {
     view()
-    expect(screen.getByRole('region', { name: 'Premiação' })).not.toHaveTextContent('Em dinheiro')
+    expect(screen.getByRole('region', { name: 'Dinheiro' })).not.toHaveTextContent('Em dinheiro')
     cleanup()
 
     view(applyChange(applyChange(nightDashboard, { type: 'markRebuy', player: ana, index: 0, id: 1, paid: true, non_cash: true }), { type: 'mark', player: breno, buy_in_non_cash: true }))
-    const split = within(screen.getByRole('region', { name: 'Premiação' }))
-    expect(split.getByText('Em dinheiro').closest('div')).toHaveTextContent('Em dinheiroR$ 190,00')
-    expect(split.getByText('Fora do dinheiro').closest('div')).toHaveTextContent('Fora do dinheiroR$ 105,00')
+    const split = within(screen.getByRole('region', { name: 'Dinheiro' }))
+    // They come right after the total
+    expect(split.getByText('Total com time chip').closest('div')!.nextElementSibling).toHaveTextContent('Em dinheiroR$ 190,00')
+    expect(split.getByText('Em dinheiro').closest('div')!.nextElementSibling).toHaveTextContent('Fora do dinheiroR$ 105,00')
+    expect(screen.getByRole('region', { name: 'Premiação' })).not.toHaveTextContent('Em dinheiro')
     expect(within(screen.getByRole('region', { name: 'Dinheiro' })).getByText('Total que falta').closest('tr')).toHaveTextContent('Total que faltaR$ 155,00')
   })
 
@@ -194,7 +196,7 @@ describe('NightDashboardView', () => {
     // A saved one is in use and in its field. Unmarking only closes the field, until "Salvar".
     const again = view(applyChange(nightDashboard, { type: 'nonCashAdjustment', amount: '-5.00' }))
     expect(field()).toHaveValue('-5,00')
-    expect(within(screen.getByRole('region', { name: 'Premiação' })).getByText('Fora do dinheiro').closest('div')).toHaveTextContent('-R$ 5,00')
+    expect(within(screen.getByRole('region', { name: 'Dinheiro' })).getByText('Fora do dinheiro').closest('div')).toHaveTextContent('-R$ 5,00')
     await userEvent.click(screen.getByRole('checkbox', { name: 'Ajustar o valor fora do dinheiro' }))
     expect(field()).toBeDisabled()
     expect(field()).toHaveValue('-5,00')
