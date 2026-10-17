@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { NightDashboard } from '@/api/client'
-import { nightDashboard, players } from '@/mocks/data'
+import { finishedNightDashboard, nightDashboard, players } from '@/mocks/data'
 import { amountsInUse, applyChange, hasPayments, nextPayment, recalculated } from './dashboardMoney'
 
 // The same rules as the API, so that a tap shows at once what the API will answer
@@ -212,6 +212,13 @@ describe('amountsInUse', () => {
   it('takes a Main Event pot set by hand, and has none when the season sets no share', () => {
     expect(amountsInUse({ ...nightDashboard, main_event_pot: '90.00' }).mainEventPot).toBe('90.00')
     expect(amountsInUse({ ...nightDashboard, suggested_main_event_pot: null }).mainEventPot).toBeNull()
+  })
+
+  it('takes the Main Event pot a finished night was finished with', () => {
+    // Finishing drops the one set by hand and the season's share: R$ 425,00 less the recorded R$ 85,00.
+    expect(amountsInUse(finishedNightDashboard)).toMatchObject({ mainEventPot: '85.00', payout: '340.00' })
+    // A night finished with no Main Event pot pays out all the money.
+    expect(amountsInUse({ ...finishedNightDashboard, recorded: { pot: '430.00', main_event_pot: null, time_chip: '25.00' } }).payout).toBe('425.00')
   })
 
   it('keeps no typed time chip on a site without it', () => {

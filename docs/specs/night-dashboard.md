@@ -79,8 +79,9 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     The time chip is never mixed into the pot.
 11b. **"Premiação"** (payout), on a line under the amounts: the money paid out to the players. It is the total
     without the time chip, less the Main Event pot: the pot in use less the house owner's discount, less the Main
-    Event pot in use (rule 14). A season with no Main Event pot pays out all of that money. It changes neither the
-    night's result nor its points.
+    Event pot in use (rule 14). On a finished night, the Main Event pot is the one the night was finished with.
+    A season with no Main Event pot pays out all of that money. It changes neither the night's result nor its
+    points.
 11a. **What was paid is split by how**, so that the money in hand can be checked:
     - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
       each rebuy paid not in cash, with the time chip it pays; and the adjustment of rule 13c, when there is one;
