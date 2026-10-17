@@ -2,6 +2,7 @@ import type { Night } from '@/api/client'
 import { useNightDashboard } from '@/api/queries'
 import { ErrorBox, Loading } from '@/components/Feedback'
 import { NightResultCard } from '../results/NightResultCard'
+import { paymentCounts } from './dashboardMoney'
 import { DashboardPlayersCard } from './DashboardPlayersCard'
 
 /**
@@ -11,10 +12,11 @@ import { DashboardPlayersCard } from './DashboardPlayersCard'
 export function FinishedNightDashboard({ night }: { night: Night }) {
   const dashboard = useNightDashboard(night.id)
   const data = dashboard.data
-  const counts = data && {
-    rebuys: data.players.reduce((count, line) => count + line.rebuys.length, 0),
+  const payments = data && paymentCounts(data)
+  const counts = data && payments && {
+    rebuys: payments.rebuys.total,
     // Only the players who arrived late: the time chip a rebuy pays is not counted.
-    lateArrivals: data.totals.time_chip !== null ? data.players.filter((line) => line.time_chip).length : null,
+    lateArrivals: data.totals.time_chip !== null ? payments.timeChips.total : null,
   }
 
   return (

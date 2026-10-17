@@ -211,7 +211,51 @@ it('has empty lists when no night is finished', function () {
         ->and($summary->totalPoints->rows)->toBe([])
         ->and($summary->positions)->toBe([])
         ->and($summary->progress->steps)->toBe([])
-        ->and($summary->winsNotShown)->toBe(0);
+        ->and($summary->winsNotShown)->toBe(0)
+        ->and($summary->rebuyCount)->toBe(0)
+        ->and($summary->rebuys->rows)->toBe([])
+        ->and($summary->timeChipCount)->toBe(0);
+});
+
+/**
+ * The rebuys and the late players the night dashboard recorded. Season A allows 2 rebuys; night 3 was not run on
+ * the night dashboard.
+ *
+ * @return list<NightRecord>
+ */
+function dashboardNights(): array
+{
+    $with = fn (NightRecord $n, array $rebuys, array $timeChips) => new NightRecord(
+        $n->nightId, $n->seasonId, $n->pot, $n->mainEventPot, $n->timeChip, $n->placeId, $n->lines, $rebuys, 2, $timeChips,
+    );
+    [$night1, $night2, $night3] = everySeason();
+
+    return [
+        $with($night1, [S_ANA => 1, S_BRENO => 3], [S_CARLA]),
+        $with($night2, [S_BRENO => 2, S_CARLA => 4], [S_ANA, S_CARLA]),
+        $night3,
+    ];
+}
+
+it('counts the rebuys of each player', function () {
+    $summary = (new Statistics)->summarise(dashboardNights());
+
+    expect($summary->rebuyCount)->toBe(10)
+        ->and(rows($summary->rebuys))->toBe([[1, S_BRENO, 5], [2, S_CARLA, 4], [3, S_ANA, 1]]);
+});
+
+it('counts the rebuys past the limit, which give no points', function () {
+    $summary = (new Statistics)->summarise(dashboardNights());
+
+    expect($summary->moneyOnlyRebuyCount)->toBe(3)
+        ->and(rows($summary->moneyOnlyRebuys))->toBe([[1, S_CARLA, 2], [2, S_BRENO, 1]]);
+});
+
+it('counts the time chips of late players, not the ones of rebuys', function () {
+    $summary = (new Statistics)->summarise(dashboardNights());
+
+    expect($summary->timeChipCount)->toBe(3)
+        ->and(rows($summary->timeChips))->toBe([[1, S_CARLA, 2], [2, S_ANA, 1]]);
 });
 
 it('counts the titles, the podiums and the appearances of the Main Events', function () {

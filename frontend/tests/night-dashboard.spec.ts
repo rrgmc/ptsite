@@ -1,8 +1,11 @@
 import { expect, type Page, test } from '@playwright/test'
 import { expectAccessible, login, logout, pickSeason } from './helpers'
 
-const totals = (page: Page) => page.getByRole('region', { name: 'Valores do evento' })
+// On the summary tab, which is read here also while another tab is on show.
+const totals = (page: Page) => page.getByRole('region', { name: 'Valores do evento', includeHidden: true })
 const marksOf = (page: Page, nickname: string) => page.getByRole('group', { name: `Pagamentos de ${nickname}` })
+// The dashboard's tabs: "Resumo", "Jogadores (n)" and "Valores". Only the one on show can be tapped.
+const openTab = (page: Page, name: string | RegExp) => page.getByRole('tab', { name }).click()
 
 // docs/specs/night-dashboard.md. Uses the E2E Parcial test season (backend/database/seeders/EndToEndSeeder.php),
 // so the night it opens does not block the other tests. That season has a buy-in of R$ 50,00, a rebuy of R$ 50,00
@@ -33,7 +36,9 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(page).toHaveURL(/\/nights\/\d+\/dashboard$/)
   await expect(page.getByRole('heading', { name: 'Painel do evento', level: 1 })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Menu' })).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Jogadores (0)' })).toBeVisible()
+  // It opens on the summary; the players are in a tab of their own
+  await expect(page.getByRole('tab', { name: 'Resumo' })).toHaveAttribute('aria-selected', 'true')
+  await openTab(page, 'Jogadores (0)')
 
   // One tap confirms a player who did not answer and marks the buy-in as paid
   // …found by a search: the dashboard lists nobody until someone searches, and creates no player
@@ -47,17 +52,18 @@ test('players record the payments of an open night on its dashboard, and the kee
 
   // A rebuy is owed until it is marked as paid, and adds its time chip, which is shown apart from the pot
   await marksOf(page, 'Jacobson').getByRole('button', { name: '+ Rebuy' }).click()
-  await expect(totals(page)).toContainText('PoteR$ 100,001 rebuyPago R$ 50,00Falta R$ 50,00')
+  await expect(totals(page)).toContainText('PoteR$ 100,00Pago R$ 50,00Falta R$ 50,00')
   await expect(totals(page)).toContainText('Time chipR$ 5,00Pago R$ 0,00Falta R$ 5,00')
   await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
   await expect(totals(page)).toContainText('Total com time chipR$ 105,00Pago R$ 105,00Falta R$ 0,00')
+  await expect(page.getByRole('region', { name: 'Pagamentos', includeHidden: true })).toContainText('Rebuys pagos1 de 1')
   await expect(totals(page)).not.toContainText('Em dinheiro')
-  // One tap more says the rebuy was paid, but not in cash, with the time chip it pays: the foot of the screen
-  // then says how much of what was paid is in hand
+  // One tap more says the rebuy was paid, but not in cash, with the time chip it pays: the summary then says how
+  // much of what was paid is in hand
   await marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1' }).click()
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Rebuy 1 (fora do dinheiro)' })).toHaveAttribute('aria-pressed', 'true')
-  await expect(totals(page)).toContainText('Em dinheiro R$ 50,00')
-  await expect(totals(page)).toContainText('Fora do dinheiro R$ 55,00')
+  await expect(totals(page)).toContainText('Em dinheiroR$ 50,00')
+  await expect(totals(page)).toContainText('Fora do dinheiroR$ 55,00')
   await expect(page.getByRole('listitem').filter({ hasText: 'Jacobson' })).toContainText('Tudo pago (⇄ R$ 55,00)')
   await expect(page.getByText('Pago fora do dinheiro (transferência, Pix)')).toBeVisible()
   await expect(totals(page)).toContainText('Total com time chipR$ 105,00Pago R$ 105,00Falta R$ 0,00')
@@ -68,9 +74,10 @@ test('players record the payments of an open night on its dashboard, and the kee
   await page.getByRole('button', { name: 'Mais ações de Duhamel' }).click()
   await page.getByRole('menuitem', { name: 'É o dono da casa' }).click()
   await expect(page.getByText('Dono da casa: Duhamel')).toBeVisible()
-  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,001 rebuyPago R$ 100,00Falta R$ 25,00')
+  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,00Pago R$ 100,00Falta R$ 25,00')
 
   // Each amount is in a closed field until it is marked "Manual". The Main Event pot is the season's share of the money
+  await openTab(page, 'Valores')
   await expect(page.getByLabel('Pote (R$)')).toBeDisabled()
   await expect(page.getByLabel('Pote (R$)')).toHaveValue('150,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
@@ -89,7 +96,7 @@ test('players record the payments of an open night on its dashboard, and the kee
   await expect(page.getByLabel('Pote (R$)')).toHaveValue('300,00')
   await expect(totals(page)).toContainText('Pote(Manual)R$ 300,00')
   await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,001 rebuyPago R$ 100,00Falta R$ 25,00')
+  await expect(totals(page)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,00Pago R$ 100,00Falta R$ 25,00')
   await expect(page.getByLabel('Pote ME (R$)')).toHaveValue('25,00')
   // An adjustment of what was not in cash, for anything out of the ordinary, takes a negative amount
   // …in a field that shows only once its mark is ticked
@@ -97,8 +104,8 @@ test('players record the payments of an open night on its dashboard, and the kee
   await page.getByText('Ajustar o valor fora do dinheiro', { exact: true }).click()
   await page.getByLabel('Ajuste fora do dinheiro (R$)').fill('-5')
   await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(totals(page)).toContainText('Em dinheiro R$ 55,00')
-  await expect(totals(page)).toContainText('Fora do dinheiro R$ 50,00')
+  await expect(totals(page)).toContainText('Em dinheiroR$ 55,00')
+  await expect(totals(page)).toContainText('Fora do dinheiroR$ 50,00')
 
   // A position is saved when its player is picked, with the points it earns from the pot so far
   await page.getByRole('button', { name: /^6º lugar/ }).click()
@@ -121,10 +128,12 @@ test('players record the payments of an open night on its dashboard, and the kee
   const keeper = await other.newPage()
   await login(keeper, 'dev-keeper')
   await keeper.goto(`${nightUrl}/dashboard`)
+  await openTab(keeper, /^Jogadores/)
   await expect(marksOf(keeper, 'Jacobson').getByRole('button', { name: 'Rebuy 1' })).toHaveAttribute('aria-pressed', 'true')
   await marksOf(keeper, 'Duhamel').getByRole('button', { name: 'Buy-in' }).click()
-  await expect(totals(keeper)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,001 rebuyPago R$ 125,00')
+  await expect(totals(keeper)).toContainText('PoteR$ 150,00Desconto do dono da casa R$ 25,00Pago R$ 125,00')
   // …which the player's dashboard shows by itself a few seconds later
+  await openTab(page, /^Jogadores/)
   await expect(marksOf(page, 'Duhamel').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'true', { timeout: 20_000 })
 
   // The dashboard does not finish a night. On the night's page, "Finalizar" starts from the dashboard: the pot, the
@@ -160,9 +169,12 @@ test('players record the payments of an open night on its dashboard, and the kee
   // A player sees a finished night's dashboard, and no longer changes it
   await page.reload()
   await expect(page.getByText('O evento foi finalizado. Só um administrador altera o painel.')).toBeVisible()
-  await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toBeDisabled()
+  // The summary shows what it was finished with; its amounts and positions have no tab any more
   await expect(page.getByRole('heading', { name: 'Resultado registrado' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Valores' })).toHaveCount(0)
   await expectAccessible(page)
+  await openTab(page, /^Jogadores/)
+  await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toBeDisabled()
 })
 
 // "Desfazer abertura" (docs/specs/seasons-and-nights.md, rule 8a), in the same season, whose night above is finished.
@@ -179,6 +191,7 @@ test('an admin undoes the opening of a night opened by mistake, and what its das
   await page.getByRole('button', { name: 'Abrir evento' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
   await page.getByRole('link', { name: 'Abrir o painel' }).click()
+  await openTab(page, /^Jogadores/)
   await page.getByRole('searchbox', { name: 'Adicionar jogador' }).fill('jacob')
   await page.getByRole('group', { name: 'Adicionar Jacobson' }).getByRole('button', { name: 'Buy-in pago' }).click()
   await expect(totals(page)).toContainText('PoteR$ 50,00Pago R$ 50,00')
@@ -204,6 +217,7 @@ test('an admin undoes the opening of a night opened by mistake, and what its das
   await page.getByRole('button', { name: 'Abrir evento' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Abrir evento' }).click()
   await page.getByRole('link', { name: 'Abrir o painel' }).click()
+  await openTab(page, /^Jogadores/)
   await expect(marksOf(page, 'Jacobson').getByRole('button', { name: 'Buy-in' })).toHaveAttribute('aria-pressed', 'false')
   // Undone again, so the season is left with no open night
   await page.goto(nightUrl)

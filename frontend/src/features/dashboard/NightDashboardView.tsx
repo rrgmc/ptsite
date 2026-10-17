@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Button as AriaButton, Disclosure, DisclosurePanel, Form, Heading } from 'react-aria-components'
+import { Form } from 'react-aria-components'
 import { Link } from 'react-router'
 import type { Night, NightDashboard, Player } from '@/api/client'
 import { Button } from '@/components/Button'
-import { Card } from '@/components/Card'
 import { Checkbox } from '@/components/Checkbox'
 import { Badge, Empty } from '@/components/Feedback'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
+import { TabBox } from '@/components/TabBox'
 import { TextField } from '@/components/TextField'
 import { ChipSign } from '@/components/ToggleChip'
 import { t } from '@/i18n'
@@ -18,7 +18,7 @@ import { currencySymbol } from '@/lib/site'
 import { usePageTitle } from '@/lib/usePageTitle'
 import { amountRows } from '../nights/amounts'
 import { FinishingOrderFields } from '../nights/FinishingOrderFields'
-import { type Amounts, amountsInUse, type DashboardChange } from './dashboardMoney'
+import { type Amounts, amountsInUse, type DashboardChange, paymentCounts } from './dashboardMoney'
 import { DashboardPlayerRow } from './DashboardPlayerRow'
 
 type Percentages = { position: number; percent: number }[]
@@ -29,7 +29,8 @@ const SEARCH_LIMIT = 8
 
 /**
  * "Painel do evento": a night's money and positions on one screen, made for a phone at the table
- * (docs/specs/night-dashboard.md). Every tap is one change, sent at once; only an amount typed by hand has a
+ * (docs/specs/night-dashboard.md). Three tabs split it: the summary, the players, and, on an open night, the
+ * amounts set by hand and the positions. Every tap is one change, sent at once; only an amount typed by hand has a
  * "Salvar". No player is created here: a first-timer is added in the site, by whoever may.
  */
 export function NightDashboardView({
@@ -80,104 +81,103 @@ export function NightDashboardView({
       {notice && <p role="status" className="rounded-md bg-surface-sunken p-3 text-sm">{notice}</p>}
       {error && <p role="alert" className="rounded-md border border-danger bg-danger-soft p-3 text-danger">{error}</p>}
 
-      {/* The players can be folded away, to reach the amounts and the positions on a night with many of them. */}
-      <Disclosure defaultExpanded className="rounded-lg bg-surface shadow-card">
-        <Heading>
-          <AriaButton slot="trigger" className="group flex min-h-touch w-full items-center justify-between gap-2 rounded-lg px-4 py-3 text-left font-display text-lg font-bold focus-visible:outline-3 focus-visible:outline-focus">
-            {t.dashboard.players.heading({ count: dashboard.players.length })}
-            <span aria-hidden className="text-muted transition-transform group-aria-expanded:rotate-180">▾</span>
-          </AriaButton>
-        </Heading>
-        <DisclosurePanel>
-          <div className="px-4 pb-4">
-            {canEdit && <AddPlayers players={players.filter((p) => !participantIds.includes(p.id))} onChange={onChange} />}
-            {dashboard.players.length === 0 ? (
-              <Empty>{t.dashboard.players.empty}</Empty>
-            ) : (
-              <ul className="-mx-2 divide-y divide-border/60">
-                {dashboard.players.map((line) => (
-                  <DashboardPlayerRow
-                    key={line.player.id}
-                    line={line}
-                    prices={dashboard.prices}
-                    hasTimeChip={dashboard.totals.time_chip !== null}
-                    canEdit={canEdit}
-                    onChange={onChange}
-                  />
-                ))}
-              </ul>
-            )}
-            {dashboard.players.length > 0 && (
-              // What the signs on a buy-in and on a rebuy mean, and how to get to the second one.
-              <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
-                <span className="inline-flex items-center gap-1"><ChipSign tone="done" swatch /> {t.dashboard.legend.cash}</span>
-                <span className="inline-flex items-center gap-1"><ChipSign tone="otherWay" swatch /> {t.dashboard.legend.nonCash}</span>
-                {canEdit && <span>{t.dashboard.legend.howTo}</span>}
-              </p>
-            )}
-          </div>
-        </DisclosurePanel>
-      </Disclosure>
-
-      {isOpen && (
-        <Card title={t.dashboard.manual.title}>
-          {canEdit ? (
-            <AmountsForm dashboard={dashboard} onChange={onChange} />
-          ) : (
-            <dl className="text-sm">
-              {amountRows({ pot: inUse.pot, mainEventPot: inUse.mainEventPot, timeChip: inUse.timeChip }).map(([label, amount]) => (
-                <div key={label} className="flex items-center justify-between py-0.5">
-                  <dt className="font-semibold">{label}</dt>
-                  <dd className="tabular">{formatMoney(amount)}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-        </Card>
-      )}
-
-      {isOpen && (
-        <Card title={t.dashboard.positions.title}>
-          {canEdit ? (
+      {/* Hidden tabs stay mounted: an amount typed or a search begun is still there on coming back. */}
+      <TabBox label={t.dashboard.tabs.label} keepMounted tabs={[
+        {
+          id: 'summary',
+          title: t.dashboard.tabs.summary,
+          content: <DashboardSummary dashboard={dashboard} />,
+        },
+        {
+          id: 'players',
+          title: t.dashboard.players.heading({ count: dashboard.players.length }),
+          content: (
             <>
-              <FinishingOrderFields
-                percentages={percentages}
-                players={players}
-                order={percentages.map((p) => dashboard.positions.find((line) => line.position === p.position)?.player ?? null)}
-                onChange={(order) => {
-                  // The picker gives the whole order back; only the position that changed is sent.
-                  percentages.forEach((p, i) => {
-                    const before = dashboard.positions.find((line) => line.position === p.position)?.player ?? null
-                    if (before?.id !== order[i]?.id) onChange({ type: 'position', position: p.position, player: order[i] })
-                  })
-                }}
-                pot={Number(inUse.pot) > 0 ? inUse.pot : null}
-                firstGroup={{ label: t.nights.confirmed, ids: participantIds }}
-                clearable
-              />
+              {canEdit && <AddPlayers players={players.filter((p) => !participantIds.includes(p.id))} onChange={onChange} />}
+              {dashboard.players.length === 0 ? (
+                <Empty>{t.dashboard.players.empty}</Empty>
+              ) : (
+                <ul className="-mx-2 divide-y divide-border/60">
+                  {dashboard.players.map((line) => (
+                    <DashboardPlayerRow
+                      key={line.player.id}
+                      line={line}
+                      prices={dashboard.prices}
+                      hasTimeChip={dashboard.totals.time_chip !== null}
+                      canEdit={canEdit}
+                      onChange={onChange}
+                    />
+                  ))}
+                </ul>
+              )}
+              {dashboard.players.length > 0 && (
+                // What the signs on a buy-in and on a rebuy mean, and how to get to the second one.
+                <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+                  <span className="inline-flex items-center gap-1"><ChipSign tone="done" swatch /> {t.dashboard.legend.cash}</span>
+                  <span className="inline-flex items-center gap-1"><ChipSign tone="otherWay" swatch /> {t.dashboard.legend.nonCash}</span>
+                  {canEdit && <span>{t.dashboard.legend.howTo}</span>}
+                </p>
+              )}
             </>
-          ) : (
-            <PositionsList positions={dashboard.positions} />
-          )}
-        </Card>
-      )}
-
-      {dashboard.recorded && (
-        <Card title={t.dashboard.recorded.title}>
-          <p className="mb-2 text-sm text-muted">{t.dashboard.recorded.help}</p>
-          <dl className="text-sm">
-            {amountRows({ pot: dashboard.recorded.pot, mainEventPot: dashboard.recorded.main_event_pot, timeChip: dashboard.recorded.time_chip }).map(([label, amount]) => (
-              <div key={label} className="flex items-center justify-between py-0.5">
-                <dt className="font-semibold">{label}</dt>
-                <dd className="tabular">{formatMoney(amount)}</dd>
-              </div>
-            ))}
-          </dl>
-        </Card>
-      )}
-
-      <DashboardTotals dashboard={dashboard} />
+          ),
+        },
+        // A finished night's amounts and positions are its result, changed on the night's page.
+        ...(isOpen
+          ? [{
+              id: 'values',
+              title: t.dashboard.manual.title,
+              content: (
+                <div className="flex flex-col gap-6">
+                  <section aria-labelledby="dashboard-amounts">
+                    <h2 id="dashboard-amounts" className="mb-3 font-display text-lg font-bold">{t.dashboard.manual.title}</h2>
+                    {canEdit ? (
+                      <AmountsForm dashboard={dashboard} onChange={onChange} />
+                    ) : (
+                      <AmountList amounts={{ pot: inUse.pot, mainEventPot: inUse.mainEventPot, timeChip: inUse.timeChip }} />
+                    )}
+                  </section>
+                  <section aria-labelledby="dashboard-positions">
+                    <h2 id="dashboard-positions" className="mb-3 font-display text-lg font-bold">{t.dashboard.positions.title}</h2>
+                    {canEdit ? (
+                      <FinishingOrderFields
+                        percentages={percentages}
+                        players={players}
+                        order={percentages.map((p) => dashboard.positions.find((line) => line.position === p.position)?.player ?? null)}
+                        onChange={(order) => {
+                          // The picker gives the whole order back; only the position that changed is sent.
+                          percentages.forEach((p, i) => {
+                            const before = dashboard.positions.find((line) => line.position === p.position)?.player ?? null
+                            if (before?.id !== order[i]?.id) onChange({ type: 'position', position: p.position, player: order[i] })
+                          })
+                        }}
+                        pot={Number(inUse.pot) > 0 ? inUse.pot : null}
+                        firstGroup={{ label: t.nights.confirmed, ids: participantIds }}
+                        clearable
+                      />
+                    ) : (
+                      <PositionsList positions={dashboard.positions} />
+                    )}
+                  </section>
+                </div>
+              ),
+            }]
+          : []),
+      ]} />
     </div>
+  )
+}
+
+/** The pot, the Main Event pot and the time chip, one to a line. */
+function AmountList({ amounts }: { amounts: Parameters<typeof amountRows>[0] }) {
+  return (
+    <dl className="text-sm">
+      {amountRows(amounts).map(([label, amount]) => (
+        <div key={label} className="flex items-center justify-between py-0.5">
+          <dt className="font-semibold">{label}</dt>
+          <dd className="tabular">{formatMoney(amount)}</dd>
+        </div>
+      ))}
+    </dl>
   )
 }
 
@@ -369,60 +369,102 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
 }
 
 /**
- * The night's amounts, always in sight at the foot of the screen: the pot, the time chip apart from it, and the
- * two added up. The pot is the pot for points; when the owner of the house pays less, a line says by how much, so
- * that what the players owe adds up. Once the night has a rebuy, a line under the pot says how many. An amount
- * typed by hand stands in for the one worked out, which is still shown below it. Each says what was paid and what is pending, of what the players owe. A line below
- * says how much is paid out to the players. Once a payment was not in cash, it also says how much of what was paid
- * is in cash, to check the money in hand. With a large font, a column that does
- * not fit moves to a new line rather than cut its amounts short.
+ * "Resumo", the first tab: the night at a glance.
+ *
+ * "Valores do evento" has the pot, the time chip apart from it, and the two added up, each with what was paid and
+ * what is pending, of what the players owe. The pot is the pot for points; when the owner of the house pays less,
+ * a line says by how much, so that what the players owe adds up. An amount typed by hand stands in for the one
+ * worked out, which is still shown below it. Under them come the payout, the Main Event pot and, once a payment
+ * was not in cash, how much of what was paid is in cash, to check the money in hand.
+ *
+ * "Pagamentos" counts the players, who owes nothing more, and how many buy-ins, rebuys and time chips were paid.
+ * A finished night also shows the amounts it was finished with.
  */
-export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
+function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
   const { totals, manual, received } = dashboard
   const inUse = amountsInUse(dashboard)
+  const counts = paymentCounts(dashboard)
   const discount = Number(dashboard.house_owner_discount) !== 0 ? dashboard.house_owner_discount : null
-  const rebuys = dashboard.players.reduce((count, line) => count + line.rebuys.length, 0)
-  const columns: { label: string; amount: string; worked: string; discount?: string | null; rebuys?: number; amounts: Amounts; isManual: boolean }[] = [
-    { label: t.dashboard.totals.pot, amount: inUse.pot, worked: dashboard.scoring_pot, discount, rebuys, amounts: totals.pot, isManual: manual.pot !== null },
+  const tiles: { label: string; amount: string; worked: string; discount?: string | null; amounts: Amounts; isManual: boolean }[] = [
+    { label: t.dashboard.totals.pot, amount: inUse.pot, worked: dashboard.scoring_pot, discount, amounts: totals.pot, isManual: manual.pot !== null },
     ...(totals.time_chip
       ? [{ label: t.dashboard.totals.timeChip, amount: inUse.timeChip!, worked: totals.time_chip.owed, amounts: totals.time_chip, isManual: manual.time_chip !== null }]
       : []),
     { label: totals.time_chip ? t.dashboard.totals.totalWithTimeChip : t.dashboard.totals.total, amount: inUse.total, worked: totals.total.owed, amounts: totals.total, isManual: manual.pot !== null || manual.time_chip !== null },
   ]
+  const money: [label: string, amount: string, strong?: boolean][] = [
+    [t.dashboard.summary.payout, inUse.payout, true],
+    ...(inUse.mainEventPot !== null ? [[t.dashboard.summary.mainEventPot, inUse.mainEventPot] as [string, string]] : []),
+    ...(Number(received.non_cash) !== 0
+      ? [[t.dashboard.summary.cash, received.cash, true] as [string, string, boolean], [t.dashboard.summary.nonCash, received.non_cash] as [string, string]]
+      : []),
+  ]
+  const payments: [label: string, paid: number, total: number][] = [
+    [t.dashboard.summary.settled, counts.settled, counts.players],
+    [t.dashboard.summary.buyIns, counts.buyIns.paid, counts.buyIns.total],
+    ...(counts.rebuys.total > 0 ? [[t.dashboard.summary.rebuys, counts.rebuys.paid, counts.rebuys.total] as [string, number, number]] : []),
+    ...(totals.time_chip && counts.timeChips.total > 0 ? [[t.dashboard.summary.timeChips, counts.timeChips.paid, counts.timeChips.total] as [string, number, number]] : []),
+  ]
+
   return (
-    <section
-      aria-label={t.dashboard.totals.label}
-      className="sticky bottom-0 z-10 -mx-4 mt-auto border-t border-border bg-surface px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-raised"
-    >
-      <dl className="flex flex-wrap gap-x-3 gap-y-2">
-        {columns.map(({ label, amount, worked, discount, rebuys, amounts, isManual }) => (
-          <div key={label} className="min-w-min flex-1">
-            <dt className="text-xs font-semibold uppercase text-muted">
-              {label}
-              {isManual && <span className="ml-1 lowercase text-primary">({t.dashboard.manual.mark})</span>}
-            </dt>
-            <dd>
-              <span className="block font-display text-lg font-extrabold tabular">{formatMoney(amount)}</span>
-              {isManual && <span className="block text-xs text-muted tabular">{t.dashboard.totals.calculated({ amount: formatMoney(worked) })}</span>}
-              {discount && <span className="block text-xs text-muted tabular">{t.dashboard.totals.houseOwnerDiscount({ amount: formatMoney(discount) })}</span>}
-              {rebuys ? <span className="block text-xs text-muted tabular">{t.dashboard.totals.rebuys({ count: rebuys })}</span> : null}
-              <span className="block text-xs text-muted tabular">{t.dashboard.totals.paid({ amount: formatMoney(amounts.paid) })}</span>
-              <span className={`block text-xs tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
-                {t.dashboard.totals.pending({ amount: formatMoney(amounts.pending) })}
-              </span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <p className="mt-1 flex flex-wrap gap-x-3 border-t border-border/60 pt-1 text-xs tabular">
-        <span className="font-semibold">{t.dashboard.totals.payout({ amount: formatMoney(inUse.payout) })}</span>
-        {Number(received.non_cash) !== 0 && (
-          <>
-            <span className="font-semibold">{t.dashboard.totals.cash({ amount: formatMoney(received.cash) })}</span>
-            <span className="text-muted">{t.dashboard.totals.nonCash({ amount: formatMoney(received.non_cash) })}</span>
-          </>
+    <div className="flex flex-col gap-6">
+      <section aria-label={t.dashboard.totals.label}>
+        {/* With a large font, a tile that does not fit moves to a new line rather than cut its amounts short. */}
+        <dl className="flex flex-wrap gap-2">
+          {tiles.map(({ label, amount, worked, discount, amounts, isManual }) => (
+            <div key={label} className="min-w-36 flex-1 rounded-md bg-surface-sunken p-3">
+              <dt className="text-xs font-semibold uppercase text-muted">
+                {label}
+                {isManual && <span className="ml-1 lowercase text-primary">({t.dashboard.manual.mark})</span>}
+              </dt>
+              <dd>
+                <span className="block font-display text-xl font-extrabold tabular">{formatMoney(amount)}</span>
+                {isManual && <span className="block text-xs text-muted tabular">{t.dashboard.totals.calculated({ amount: formatMoney(worked) })}</span>}
+                {discount && <span className="block text-xs text-muted tabular">{t.dashboard.totals.houseOwnerDiscount({ amount: formatMoney(discount) })}</span>}
+                <span className="mt-1 block text-sm tabular">{t.dashboard.totals.paid({ amount: formatMoney(amounts.paid) })}</span>
+                <span className={`block text-sm tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
+                  {t.dashboard.totals.pending({ amount: formatMoney(amounts.pending) })}
+                </span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <dl className="mt-3 divide-y divide-border/60 text-sm">
+          {money.map(([label, amount, strong]) => (
+            <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
+              <dt className={strong ? 'font-semibold' : 'text-muted'}>{label}</dt>
+              <dd className={`tabular ${strong ? 'font-semibold' : 'text-muted'}`}>{formatMoney(amount)}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section aria-labelledby="dashboard-payments">
+        <h2 id="dashboard-payments" className="mb-2 font-display text-lg font-bold">{t.dashboard.summary.payments}</h2>
+        {counts.players === 0 ? (
+          <p className="text-muted">{t.dashboard.summary.noPlayers}</p>
+        ) : (
+          <dl className="divide-y divide-border/60 text-sm">
+            {payments.map(([label, paid, total]) => (
+              <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
+                <dt className="font-semibold">{label}</dt>
+                <dd className="text-right tabular">
+                  {t.dashboard.summary.ofTotal({ paid, total })}
+                  {paid < total && <span className="ml-2 font-semibold text-warning">{t.dashboard.summary.missing({ count: total - paid })}</span>}
+                </dd>
+              </div>
+            ))}
+          </dl>
         )}
-      </p>
-    </section>
+      </section>
+
+      {dashboard.recorded && (
+        <section aria-labelledby="dashboard-recorded">
+          <h2 id="dashboard-recorded" className="font-display text-lg font-bold">{t.dashboard.recorded.title}</h2>
+          <p className="mb-2 text-sm text-muted">{t.dashboard.recorded.help}</p>
+          <AmountList amounts={{ pot: dashboard.recorded.pot, mainEventPot: dashboard.recorded.main_event_pot, timeChip: dashboard.recorded.time_chip }} />
+        </section>
+      )}
+    </div>
   )
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { NightDashboard } from '@/api/client'
 import { finishedNightDashboard, nightDashboard, players } from '@/mocks/data'
-import { amountsInUse, applyChange, hasPayments, nextPayment, recalculated } from './dashboardMoney'
+import { amountsInUse, applyChange, hasPayments, nextPayment, paymentCounts, recalculated } from './dashboardMoney'
 
 // The same rules as the API, so that a tap shows at once what the API will answer
 // (docs/specs/night-dashboard.md, the example "A night": Ana, Breno, Carlão, Dudu and Estela, at Estela's house).
@@ -181,6 +181,29 @@ describe('the pot for points', () => {
     const noOwner = applyChange(nightDashboard, { type: 'houseOwner', player: null })
     expect(noOwner).toMatchObject({ scoring_pot: '450.00', house_owner_discount: '0.00' })
     expect(noOwner.totals.pot.owed).toBe('450.00')
+  })
+})
+
+describe('paymentCounts', () => {
+  it('counts the buy-ins, the rebuys and the late players\' time chips, paid or not', () => {
+    // Ana and Estela owe nothing more; Breno owes a rebuy, Carlão and Dudu the buy-in.
+    expect(paymentCounts(nightDashboard)).toEqual({
+      players: 5,
+      settled: 2,
+      buyIns: { paid: 3, total: 5 },
+      rebuys: { paid: 3, total: 4 },
+      timeChips: { paid: 1, total: 1 },
+    })
+  })
+
+  it('counts nothing on a night with no players', () => {
+    expect(paymentCounts(recalculated({ ...nightDashboard, players: [] }))).toEqual({
+      players: 0,
+      settled: 0,
+      buyIns: { paid: 0, total: 0 },
+      rebuys: { paid: 0, total: 0 },
+      timeChips: { paid: 0, total: 0 },
+    })
   })
 })
 

@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 use PTSite\App\Models\Night;
 use PTSite\App\Models\NightResult;
 use PTSite\App\Models\Season;
+use PTSite\Domain\Features\Feature;
+use PTSite\Domain\Features\Features;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
 use PTSite\Domain\Statistics\NightRecord;
@@ -16,6 +18,8 @@ use PTSite\Domain\Statistics\NightRecord;
  */
 final class FinishedNights
 {
+    public function __construct(private readonly Features $features) {}
+
     /** @return Collection<int, Night> by night id, oldest first, with their results and season */
     public function __invoke(?Season $season): Collection
     {
@@ -23,7 +27,7 @@ final class FinishedNights
             ->finished()
             ->scoring()
             ->when($season, fn ($q) => $q->where('season_id', $season->id), fn ($q) => $q->whereHas('season', fn ($s) => $s->notArchived()))
-            ->with(['results', 'season:id,name'])
+            ->with(['results', 'season:id,name,rebuys_allowed'])
             ->orderBy('starts_at')
             ->orderBy('id')
             ->get()
@@ -49,10 +53,16 @@ final class FinishedNights
 
     /**
      * @param  Collection<int, Night>  $nights
+     * @param  bool  $withDashboard  with the rebuys and the late players the night dashboard recorded
      * @return list<NightRecord>
      */
-    public function records(Collection $nights): array
+    public function records(Collection $nights, bool $withDashboard = false): array
     {
+        if ($withDashboard) {
+            $nights->loadMissing(['rebuys', 'entries', 'prices']);
+        }
+        $timeChip = $this->features->enabled(Feature::TimeChip);
+
         return $nights->map(fn (Night $night) => new NightRecord(
             $night->id,
             $night->season_id,
@@ -61,6 +71,12 @@ final class FinishedNights
             Money::fromDecimal((string) ($night->time_chip ?? '0')),
             $night->place_id,
             $night->results->map(fn (NightResult $line) => new ScoreLine($line->player_id, Money::fromDecimal((string) $line->points), $line->position))->all(),
+            ...($withDashboard ? [
+                'rebuys' => $night->rebuys->countBy('player_id')->all(),
+                // The prices the night was finished with, or else its season's.
+                'rebuysAllowed' => (int) ($night->prices ?? $night->season)->rebuys_allowed,
+                'timeChips' => $timeChip ? $night->entries->whereNotNull('time_chip_at')->pluck('player_id')->values()->all() : [],
+            ] : []),
         ))->values()->all();
     }
 

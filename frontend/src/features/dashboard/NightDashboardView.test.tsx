@@ -41,7 +41,7 @@ describe('NightDashboardView', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Painel do evento' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Voltar ao site/ })).toHaveAttribute('href', '/nights/11')
     expect(screen.getByText(/Dono da casa:/)).toHaveTextContent('Dono da casa: Estela')
-    expect(screen.getByRole('heading', { name: 'Jogadores (5)' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Jogadores (5)' })).toBeInTheDocument()
   })
 
   it('says under each name when the player answered ALL IN, and nothing for a player with no answer', () => {
@@ -56,29 +56,43 @@ describe('NightDashboardView', () => {
     view()
     const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
 
-    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('PoteR$ 450,00Desconto do dono da casa R$ 25,004 rebuysPago R$ 275,00Falta R$ 150,00')
+    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('PoteR$ 450,00Desconto do dono da casa R$ 25,00Pago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
     expect(totals.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chipR$ 450,00Pago R$ 295,00Falta R$ 155,00')
   })
 
-  it('shows the payout: the total without the time chip, less the Main Event pot', () => {
+  it('shows the payout, the total without the time chip less the Main Event pot, and the Main Event pot', () => {
     view()
-    expect(within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Premiação R$ 340,00')).toBeInTheDocument()
+    const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
+    expect(totals.getByText('Premiação').closest('div')).toHaveTextContent('PremiaçãoR$ 340,00')
+    expect(totals.getByText('Pote ME').closest('div')).toHaveTextContent('Pote MER$ 85,00')
   })
 
-  it('says under the pot how many rebuys the night has, and nothing on a night with none', () => {
-    const withRebuys = (counts: number[]) => ({
-      ...nightDashboard,
-      players: nightDashboard.players.map((line, i) => ({ ...line, rebuys: Array.from({ length: counts[i] ?? 0 }, (_, id) => ({ id, paid: false, non_cash: false })) })),
-    })
-    const pot = () => within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Pote').closest('div')
+  it('opens on the summary, with the players and the amounts in tabs of their own', async () => {
+    view()
 
-    view(withRebuys([1]))
-    expect(pot()).toHaveTextContent('R$ 25,001 rebuyPago')
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Resumo', 'Jogadores (5)', 'Valores'])
+    expect(screen.getByRole('tab', { name: 'Resumo' })).toHaveAttribute('aria-selected', 'true')
+    await userEvent.click(screen.getByRole('tab', { name: 'Jogadores (5)' }))
+    expect(screen.getByRole('tabpanel')).toContainElement(screen.getByRole('group', { name: 'Pagamentos de Ana' }))
+    await userEvent.click(screen.getByRole('tab', { name: 'Valores' }))
+    expect(screen.getByRole('tabpanel')).toContainElement(screen.getByRole('checkbox', { name: 'Definir o pote manualmente' }))
+  })
+
+  it('counts in the summary the players who paid everything, and the buy-ins, rebuys and time chips paid', () => {
+    view()
+    const payments = within(screen.getByRole('region', { name: 'Pagamentos' }))
+
+    expect(payments.getByText('Jogadores com tudo pago').closest('div')).toHaveTextContent('2 de 5faltam 3')
+    expect(payments.getByText('Buy-ins pagos').closest('div')).toHaveTextContent('3 de 5faltam 2')
+    expect(payments.getByText('Rebuys pagos').closest('div')).toHaveTextContent('3 de 4falta 1')
+    expect(payments.getByText('Time chips pagos').closest('div')).toHaveTextContent('1 de 1')
+    expect(payments.getByText('Time chips pagos').closest('div')).not.toHaveTextContent('falta')
     cleanup()
 
-    view(withRebuys([]))
-    expect(pot()).not.toHaveTextContent('rebuy')
+    // A night with no rebuy and no late player counts neither.
+    view({ ...nightDashboard, players: nightDashboard.players.map((line) => ({ ...line, rebuys: [], time_chip: false, time_chip_paid: false })) })
+    expect(screen.getByRole('region', { name: 'Pagamentos' })).not.toHaveTextContent(/Rebuys|Time chips/)
   })
 
   it('marks a buy-in as paid in cash at one tap, as not in cash at another, and unmarks it at a third', async () => {
@@ -134,8 +148,8 @@ describe('NightDashboardView', () => {
 
     view(applyChange(applyChange(nightDashboard, { type: 'markRebuy', player: ana, index: 0, id: 1, paid: true, non_cash: true }), { type: 'mark', player: breno, buy_in_non_cash: true }))
     const split = within(screen.getByRole('region', { name: 'Valores do evento' }))
-    expect(split.getByText('Em dinheiro R$ 190,00')).toBeInTheDocument()
-    expect(split.getByText('Fora do dinheiro R$ 105,00')).toBeInTheDocument()
+    expect(split.getByText('Em dinheiro').closest('div')).toHaveTextContent('Em dinheiroR$ 190,00')
+    expect(split.getByText('Fora do dinheiro').closest('div')).toHaveTextContent('Fora do dinheiroR$ 105,00')
     expect(split.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chipR$ 450,00Pago R$ 295,00Falta R$ 155,00')
   })
 
@@ -161,7 +175,7 @@ describe('NightDashboardView', () => {
     // A saved one is in use and in its field. Unmarking only closes the field, until "Salvar".
     const again = view(applyChange(nightDashboard, { type: 'nonCashAdjustment', amount: '-5.00' }))
     expect(field()).toHaveValue('-5,00')
-    expect(within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Fora do dinheiro -R$ 5,00')).toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Fora do dinheiro').closest('div')).toHaveTextContent('-R$ 5,00')
     await userEvent.click(screen.getByRole('checkbox', { name: 'Ajustar o valor fora do dinheiro' }))
     expect(field()).toBeDisabled()
     expect(field()).toHaveValue('-5,00')
@@ -371,7 +385,7 @@ describe('NightDashboardView', () => {
     const onChange = view({ ...nightDashboard, manual: { pot: '600.00', time_chip: null }, main_event_pot: '90.00' })
     const totals = within(screen.getByRole('region', { name: 'Valores do evento' }))
 
-    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(Manual)R$ 600,00Calculado R$ 450,00Desconto do dono da casa R$ 25,004 rebuysPago R$ 275,00Falta R$ 150,00')
+    expect(totals.getByText('Pote').closest('div')).toHaveTextContent('Pote(Manual)R$ 600,00Calculado R$ 450,00Desconto do dono da casa R$ 25,00Pago R$ 275,00Falta R$ 150,00')
     expect(totals.getByText('Time chip').closest('div')).toHaveTextContent('Time chipR$ 25,00Pago R$ 20,00Falta R$ 5,00')
     expect(totals.getByText('Total com time chip').closest('div')).toHaveTextContent('Total com time chip(Manual)R$ 600,00Calculado R$ 450,00')
 
@@ -446,13 +460,14 @@ describe('NightDashboardView', () => {
     expect(screen.queryByRole('textbox', { name: 'Time chip (R$)' })).not.toBeInTheDocument()
   })
 
-  it('folds the players away, and brings them back', async () => {
+  it('keeps a search begun on the players while another tab is on show', async () => {
     view()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Jogadores (5)' }))
-    expect(screen.queryByRole('group', { name: 'Pagamentos de Ana' })).not.toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Jogadores (5)' }))
-    expect(screen.getByRole('group', { name: 'Pagamentos de Ana' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('tab', { name: 'Jogadores (5)' }))
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Adicionar jogador' }), 'Fau')
+    await userEvent.click(screen.getByRole('tab', { name: 'Resumo' }))
+    await userEvent.click(screen.getByRole('tab', { name: 'Jogadores (5)' }))
+    expect(screen.getByRole('searchbox', { name: 'Adicionar jogador' })).toHaveValue('Fau')
   })
 
   it('creates no player: a search that finds nobody says so', async () => {
@@ -482,9 +497,6 @@ describe('NightDashboardView', () => {
 
     const search = screen.getByRole('searchbox', { name: 'Adicionar jogador' })
     expect(search.compareDocumentPosition(screen.getByRole('group', { name: 'Pagamentos de Ana' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    // Folded away with them.
-    await userEvent.click(screen.getByRole('button', { name: 'Jogadores (5)' }))
-    expect(screen.queryByRole('searchbox', { name: 'Adicionar jogador' })).not.toBeInTheDocument()
   })
 
   it('lets someone who cannot change it only look', () => {

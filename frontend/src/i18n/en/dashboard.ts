@@ -1,5 +1,3 @@
-import { plural } from '../plural'
-
 // The night dashboard: who paid what on a night, on a screen of its own made for a phone.
 export const dashboard = {
   title: 'Night dashboard',
@@ -10,6 +8,29 @@ export const dashboard = {
   finishedAdmin: 'The night is finished. Changes go to the audit log and do not change the result.',
   houseOwnerIs: 'House owner: {name}',
   noHouseOwner: 'House owner: nobody',
+
+  // The tabs the dashboard is split into; the players' tab is titled by players.heading
+  tabs: {
+    label: 'Parts of the dashboard',
+    summary: 'Summary',
+  },
+
+  // The first tab: the night at a glance
+  summary: {
+    /** The money paid out to the players: the total without the time chip, less the Main Event pot. */
+    payout: 'Payout',
+    mainEventPot: 'Main Event pot',
+    cash: 'In cash',
+    nonCash: 'Not in cash',
+    payments: 'Payments',
+    noPlayers: 'No players yet.',
+    settled: 'Players with everything paid',
+    buyIns: 'Buy-ins paid',
+    rebuys: 'Rebuys paid',
+    timeChips: 'Time chips paid',
+    ofTotal: ({ paid, total }: { paid: number; total: number }) => `${paid} of ${total}`,
+    missing: ({ count }: { count: number }) => `${count} missing`,
+  },
 
   // Participants
   players: {
@@ -63,7 +84,7 @@ export const dashboard = {
   // The amounts, each worked out unless it is set by hand
   manual: {
     title: 'Amounts',
-    /** The mark beside each amount, and beside one set by hand at the foot of the screen. */
+    /** The mark beside each amount, and beside one set by hand in the summary. */
     mark: 'By hand',
     checkPot: 'Set the pot by hand',
     checkTimeChip: 'Set the time chip by hand',
@@ -90,11 +111,6 @@ export const dashboard = {
     paid: ({ amount }: { amount: string }) => `${amount} paid`,
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
     houseOwnerDiscount: ({ amount }: { amount: string }) => `${amount} house owner's discount`,
-    rebuys: ({ count }: { count: number }) => `${count} ${plural(count, { one: 'rebuy', other: 'rebuys' })}`,
-    /** The money paid out to the players: the total without the time chip, less the Main Event pot. */
-    payout: ({ amount }: { amount: string }) => `${amount} payout`,
-    cash: ({ amount }: { amount: string }) => `${amount} in cash`,
-    nonCash: ({ amount }: { amount: string }) => `${amount} not in cash`,
   },
   recorded: {
     title: 'Recorded result',

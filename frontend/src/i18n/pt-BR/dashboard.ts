@@ -11,6 +11,32 @@ export const dashboard = {
   houseOwnerIs: 'Dono da casa: {name}',
   noHouseOwner: 'Dono da casa: ninguém',
 
+  // The tabs the dashboard is split into; the players' tab is titled by players.heading
+  tabs: {
+    label: 'Partes do painel',
+    summary: 'Resumo',
+  },
+
+  // The first tab: the night at a glance
+  summary: {
+    /** The money paid out to the players: the total without the time chip, less the Main Event pot. */
+    payout: 'Premiação',
+    mainEventPot: 'Pote ME',
+    /** Of what was paid: what should be in hand, and what was paid another way, such as a bank transfer. */
+    cash: 'Em dinheiro',
+    nonCash: 'Fora do dinheiro',
+    payments: 'Pagamentos',
+    noPlayers: 'Nenhum jogador ainda.',
+    /** The participants who owe nothing more. */
+    settled: 'Jogadores com tudo pago',
+    buyIns: 'Buy-ins pagos',
+    rebuys: 'Rebuys pagos',
+    /** The late players' time chips. */
+    timeChips: 'Time chips pagos',
+    ofTotal: ({ paid, total }: { paid: number; total: number }) => `${paid} de ${total}`,
+    missing: ({ count }: { count: number }) => `${plural(count, { one: 'falta', other: 'faltam' })} ${count}`,
+  },
+
   // Participants
   players: {
     heading: ({ count }: { count: number }) => `Jogadores (${count})`,
@@ -67,7 +93,7 @@ export const dashboard = {
   // The amounts, each worked out unless it is set by hand
   manual: {
     title: 'Valores',
-    /** The mark beside each amount, and beside one set by hand at the foot of the screen. */
+    /** The mark beside each amount, and beside one set by hand in the summary. */
     mark: 'Manual',
     checkPot: 'Definir o pote manualmente',
     checkTimeChip: 'Definir o time chip manualmente',
@@ -97,13 +123,6 @@ export const dashboard = {
     pending: ({ amount }: { amount: string }) => `Falta ${amount}`,
     /** The pot for points counts the house owner's buy-in in full; the money owed is less by this much. */
     houseOwnerDiscount: ({ amount }: { amount: string }) => `Desconto do dono da casa ${amount}`,
-    /** How many rebuys the night has, paid or not. */
-    rebuys: ({ count }: { count: number }) => `${count} ${plural(count, { one: 'rebuy', other: 'rebuys' })}`,
-    /** The money paid out to the players: the total without the time chip, less the Main Event pot. */
-    payout: ({ amount }: { amount: string }) => `Premiação ${amount}`,
-    /** Of what was paid: what should be in hand, and what was paid another way, such as a bank transfer. */
-    cash: ({ amount }: { amount: string }) => `Em dinheiro ${amount}`,
-    nonCash: ({ amount }: { amount: string }) => `Fora do dinheiro ${amount}`,
   },
   recorded: {
     title: 'Resultado registrado',

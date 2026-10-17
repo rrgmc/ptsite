@@ -21,7 +21,7 @@ test('a player sees the statistics of a season and of every season', async ({ pa
 
   // The tabs. One season has one Main Event, which makes no list, so it has no tab.
   const tabs = page.getByRole('tablist', { name: 'Listas e gráficos' }).getByRole('tab')
-  await expect(tabs).toHaveText(['Posições', 'Jogadores', 'Eventos'])
+  await expect(tabs).toHaveText(['Posições', 'Jogadores', 'Eventos', 'Rebuys'])
 
   // "Posições" shows first: a line per player and a column per scoring position, the first ten, then everyone.
   const positions = page.getByRole('table', { name: 'Jogadores por vezes em cada posição' })
@@ -52,12 +52,26 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(pots.getByRole('link').first()).toHaveAttribute('href', /nights\/\d+$/)
   await expectAccessible(page)
 
+  // The demo's Liga 2022 was not run on the night dashboard, so it recorded no rebuys.
+  await tabs.filter({ hasText: 'Rebuys' }).click()
+  await expect(page.getByText('Nenhum registrado no painel do evento.')).toHaveCount(3)
+  await expect(page.getByRole('term').filter({ hasText: /^Rebuys$/ }).locator('xpath=..').getByRole('definition')).toHaveText('0')
+
   await page.getByRole('navigation', { name: 'Período' }).getByRole('link', { name: 'Geral' }).click()
   await expect(page).toHaveURL(/\/statistics\/all$/)
   await expect(page.getByText('Todas as temporadas')).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)
   await expect(page.getByRole('img', { name: /pontos acumulados.*por temporada/ })).toBeVisible()
-  await expect(tabs).toHaveText(['Posições', 'Jogadores', 'Eventos', 'Main Event'])
+  await expect(tabs).toHaveText(['Posições', 'Jogadores', 'Eventos', 'Rebuys', 'Main Event'])
+
+  // The rebuys and the late players the night dashboard recorded in the season in play.
+  await tabs.filter({ hasText: 'Rebuys' }).click()
+  for (const title of ['Rebuys', 'Rebuys além do limite', 'Time chips por atraso']) {
+    await expect(page.getByRole('heading', { name: title, level: 2, exact: true })).toBeVisible()
+  }
+  await expect(page.getByRole('table', { name: 'Jogadores por rebuys' }).getByRole('row').nth(1)).toBeVisible()
+  await expect(page.getByRole('table', { name: 'Jogadores por eventos em que chegaram atrasados' }).getByRole('row').nth(1)).toBeVisible()
+  await expectAccessible(page)
 
   // Over every season, the pots are added up by season and each of the biggest names its season.
   await tabs.filter({ hasText: 'Eventos' }).click()

@@ -353,6 +353,15 @@ export const statistics: Statistics = {
     podiums: playerList([[0, 1, 1], [2, 1, 1], [7, 1, 1]], 'count'),
     appearances: playerList([[0, 1, 1], [1, 1, 1], [2, 1, 1], [3, 1, 1], [7, 1, 1]], 'count'),
   },
+  // What the night dashboard recorded, with a tie in each list.
+  rebuys: {
+    rebuy_count: 17,
+    rebuys: playerList([[3, 1, 5], [1, 2, 4], [4, 2, 4], [0, 4, 2], [6, 5, 1], [8, 5, 1]], 'count'),
+    money_only_rebuy_count: 4,
+    money_only_rebuys: playerList([[3, 1, 2], [1, 2, 1], [4, 2, 1]], 'count'),
+    time_chip_count: 6,
+    time_chips: playerList([[5, 1, 3], [2, 2, 1], [6, 2, 1], [9, 2, 1]], 'count'),
+  },
 }
 
 /** Every season: one step per season, the season named under each pot, and first places left out of the list. */
@@ -410,6 +419,7 @@ export const statisticsEmpty: Statistics = {
   wins_not_shown: 0,
   position_table: [],
   main_event: null,
+  rebuys: null,
 }
 
 /** The memo an admin wrote about Ana, with a line break. */
