@@ -258,6 +258,16 @@ it('counts the time chips of late players, not the ones of rebuys', function () 
         ->and(rows($summary->timeChips))->toBe([[1, S_CARLA, 2], [2, S_ANA, 1]]);
 });
 
+it('counts the rebuys and the late time chips of each night, and of each season', function () {
+    $perNight = (new Statistics)->summarise(dashboardNights())->progress;
+    $perSeason = (new Statistics)->summarise(dashboardNights(), stepPerSeason: true)->progress;
+
+    expect($perNight->rebuys)->toBe([4, 6, 0])
+        ->and($perNight->timeChips)->toBe([1, 2, 0])
+        ->and($perSeason->rebuys)->toBe([10, 0])
+        ->and($perSeason->timeChips)->toBe([3, 0]);
+});
+
 it('counts the titles, the podiums and the appearances of the Main Events', function () {
     // Season A's Main Event: Ana, Breno, Carla, Dudu. Season B's: Breno, Ana, Dudu.
     $summary = (new MainEventStatistics)->summarise([[S_ANA, S_BRENO, S_CARLA, S_DUDU], [S_BRENO, S_ANA, S_DUDU]]);

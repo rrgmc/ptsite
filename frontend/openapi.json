@@ -5909,6 +5909,23 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "rebuys_per_step": {
+                        "type": "array",
+                        "description": "The rebuys of each step of `points_progress.steps`: of the night, or of the season's nights added up.",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "time_chips_per_step": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "description": "The time chips late players owed in each step of `points_progress.steps`. Null on a site with no time chip.",
+                        "items": {
+                            "type": "integer"
+                        }
                     }
                 },
                 "required": [
@@ -5917,7 +5934,9 @@
                     "money_only_rebuy_count",
                     "money_only_rebuys",
                     "time_chip_count",
-                    "time_chips"
+                    "time_chips",
+                    "rebuys_per_step",
+                    "time_chips_per_step"
                 ],
                 "title": "RebuyStatisticsResource"
             },

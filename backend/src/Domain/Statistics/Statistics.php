@@ -111,8 +111,8 @@ final class Statistics
     }
 
     /**
-     * The running total of the given players after each night, or after each season, and the pot of each of
-     * those steps.
+     * The running total of the given players after each night, or after each season, and the pot, the rebuys
+     * and the late time chips of each of those steps.
      *
      * @param  list<NightRecord>  $nights  oldest first
      * @param  list<int>  $leaders  player ids
@@ -120,11 +120,14 @@ final class Statistics
     public function progress(array $nights, array $leaders, bool $stepPerSeason): PointsProgress
     {
         $running = array_fill_keys($leaders, 0);
-        $steps = $pots = [];
+        $steps = $pots = $stepRebuys = $stepTimeChips = [];
         $totals = array_fill_keys($leaders, []);
         $pot = Money::zero();
+        $rebuys = $timeChips = 0;
         foreach ($nights as $index => $night) {
             $pot = $pot->plus($night->pot);
+            $rebuys += array_sum($night->rebuys);
+            $timeChips += count($night->timeChips);
             foreach ($night->lines as $line) {
                 if (isset($running[$line->playerId])) {
                     $running[$line->playerId] += $line->points->cents;
@@ -136,12 +139,15 @@ final class Statistics
             }
             $steps[] = $stepPerSeason ? $night->seasonId : $night->nightId;
             $pots[] = $pot;
+            $stepRebuys[] = $rebuys;
+            $stepTimeChips[] = $timeChips;
             $pot = Money::zero();
+            $rebuys = $timeChips = 0;
             foreach ($leaders as $playerId) {
                 $totals[$playerId][] = Money::cents($running[$playerId]);
             }
         }
 
-        return new PointsProgress($steps, $totals, $pots);
+        return new PointsProgress($steps, $totals, $pots, $stepRebuys, $stepTimeChips);
     }
 }
