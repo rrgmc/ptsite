@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.28.1] - 2026-10-17
+
+### Changed
+
+- The night dashboard's "Resumo" shows "Em dinheiro" and "Fora do dinheiro" in "Dinheiro", right after the
+  total, instead of under the payout.
+
 ## [1.28.0] - 2026-10-17
 
 ### Added
@@ -146,7 +153,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.28.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.28.1...HEAD
+[1.28.1]: https://github.com/rrgmc/ptsite/compare/v1.28.0...v1.28.1
 [1.28.0]: https://github.com/rrgmc/ptsite/compare/v1.27.1...v1.28.0
 [1.27.1]: https://github.com/rrgmc/ptsite/compare/v1.27.0...v1.27.1
 [1.27.0]: https://github.com/rrgmc/ptsite/compare/v1.26.1...v1.27.0
