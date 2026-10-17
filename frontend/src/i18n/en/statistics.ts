@@ -32,6 +32,16 @@ export const statistics: Messages['statistics'] = {
   mainEventAppearances: 'Appearances',
   mainEventAppearancesCaption: 'Players by Main Events played',
 
+  // What the night dashboard recorded, on a site that has it
+  rebuysTab: 'Rebuys',
+  rebuys: 'Rebuys',
+  rebuysCaption: 'Players by rebuys',
+  moneyOnlyRebuys: 'Rebuys past the limit',
+  moneyOnlyRebuysCaption: 'Players by rebuys past the limit, which score no points',
+  timeChips: 'Late time chips',
+  timeChipsCaption: 'Players by nights on which they arrived late',
+  noneRecorded: 'None recorded on the night dashboard.',
+
   // Charts
   pointsProgress: 'Accumulated points',
   viewTable: 'View data as a table',

@@ -70,11 +70,15 @@ function ListBlock({ title, children, className = '' }: { title: string; childre
   )
 }
 
-/** A top ten list of players by a count: nights scored, Main Events won. */
-function CountList({ title, caption, valueHeader, list }: { title: string; caption: string; valueHeader: string; list: RankedListData }) {
+/** A top ten list of players by a count: nights scored, Main Events won. `empty` is shown in place of a list with no lines. */
+function CountList({ title, caption, valueHeader, list, empty }: { title: string; caption: string; valueHeader: string; list: RankedListData; empty?: string }) {
   return (
     <ListBlock title={title}>
-      <RankedList compact caption={caption} labelHeader={t.common.player} valueHeader={valueHeader} rows={playerRows(list, (row) => row.count ?? 0)} tiedNotShown={list.tied_not_shown} />
+      {empty !== undefined && list.rows.length === 0 ? (
+        <Empty>{empty}</Empty>
+      ) : (
+        <RankedList compact caption={caption} labelHeader={t.common.player} valueHeader={valueHeader} rows={playerRows(list, (row) => row.count ?? 0)} tiedNotShown={list.tied_not_shown} />
+      )}
     </ListBlock>
   )
 }
@@ -157,6 +161,22 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
       },
     )
   }
+  const rebuys = hasNights ? statistics.rebuys : null
+  if (rebuys) {
+    tabs.push({
+      id: 'rebuys',
+      title: t.statistics.rebuysTab,
+      content: (
+        <div className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2 md:grid-cols-3">
+          <CountList title={t.statistics.rebuys} caption={t.statistics.rebuysCaption} valueHeader={t.statistics.times} list={rebuys.rebuys} empty={t.statistics.noneRecorded} />
+          <CountList title={t.statistics.moneyOnlyRebuys} caption={t.statistics.moneyOnlyRebuysCaption} valueHeader={t.statistics.times} list={rebuys.money_only_rebuys} empty={t.statistics.noneRecorded} />
+          {rebuys.time_chips && (
+            <CountList title={t.statistics.timeChips} caption={t.statistics.timeChipsCaption} valueHeader={t.statistics.times} list={rebuys.time_chips} empty={t.statistics.noneRecorded} />
+          )}
+        </div>
+      ),
+    })
+  }
   if (mainEvent) {
     tabs.push({
       id: 'main-event',
@@ -178,6 +198,13 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
           { label: t.common.nights, value: statistics.nights_count },
           ...amountRows({ pot: statistics.pot_total, mainEventPot: statistics.main_event_pot_total, timeChip: statistics.time_chip_total })
             .map(([label, amount]) => ({ label, value: formatMoney(amount) })),
+          ...(rebuys
+            ? [
+                { label: t.statistics.rebuys, value: rebuys.rebuy_count },
+                { label: t.statistics.moneyOnlyRebuys, value: rebuys.money_only_rebuy_count },
+                ...(rebuys.time_chip_count === null ? [] : [{ label: t.statistics.timeChips, value: rebuys.time_chip_count }]),
+              ]
+            : []),
         ]}
       />
       {hasNights && <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />}

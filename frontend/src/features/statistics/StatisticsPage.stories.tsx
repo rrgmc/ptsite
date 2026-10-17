@@ -16,6 +16,30 @@ export const Season: StoryObj = { render: () => <RouterStory path="/statistics" 
 /** One step per season on the line charts, the season under each pot, "Outros" under the bar chart, and the Main Event lists. */
 export const AllTime: StoryObj = { render: () => <RouterStory path="/statistics/all" url="/statistics/all" element={<AllTimeStatisticsPage />} /> }
 
+/** The "Rebuys" tab: the rebuys, the rebuys past the limit and the late time chips the night dashboard recorded. */
+export const Rebuys: StoryObj = {
+  parameters: { layout: 'padded' },
+  render: () => <RouterStory path="/" url="/" element={<StatisticsView statistics={statistics} />} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByRole('tab', { name: 'Rebuys' }))
+    await canvas.findByRole('table', { name: 'Jogadores por rebuys além do limite, que não pontuam' })
+  },
+}
+
+/** Nights not run on the night dashboard, on a site with no time chip: each list says nothing was recorded. */
+export const NoRebuysRecorded: StoryObj = {
+  parameters: { layout: 'padded' },
+  render: () => {
+    const none = { ...statistics.rebuys!.rebuys, rows: [] }
+    const rebuys = { rebuy_count: 0, rebuys: none, money_only_rebuy_count: 0, money_only_rebuys: none, time_chip_count: null, time_chips: null }
+    return <RouterStory path="/" url="/" element={<StatisticsView statistics={{ ...statistics, rebuys }} />} />
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByRole('tab', { name: 'Rebuys' }))
+    await canvas.findAllByText('Nenhum registrado no painel do evento.')
+  },
+}
+
 export const NoFinishedNight: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => <RouterStory path="/" url="/" element={<StatisticsView statistics={statisticsEmpty} />} />,

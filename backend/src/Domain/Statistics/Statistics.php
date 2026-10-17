@@ -7,7 +7,8 @@ use PTSite\Domain\Shared\Money;
 /**
  * The statistics of a set of finished nights: one season's, or every season's.
  *
- * Every list follows {@see Ranking}. The progress follows the eight players with the highest totals.
+ * Every list follows {@see Ranking}. The progress follows the eight players with the highest totals. The rebuys and
+ * the time chips count what the night dashboard recorded: a night it did not run has none.
  */
 final class Statistics
 {
@@ -21,7 +22,7 @@ final class Statistics
      */
     public function summarise(array $nights, bool $stepPerSeason = false): StatisticsSummary
     {
-        $points = $scored = $positions = $pots = $places = [];
+        $points = $scored = $positions = $pots = $places = $rebuys = $moneyOnlyRebuys = $timeChips = [];
         $potTotal = $mainEventPotTotal = $timeChipTotal = Money::zero();
         foreach ($nights as $night) {
             $potTotal = $potTotal->plus($night->pot);
@@ -30,6 +31,15 @@ final class Statistics
             $pots[$night->nightId] = $night->pot->cents;
             if ($night->placeId !== null) {
                 $places[$night->placeId] = ($places[$night->placeId] ?? 0) + 1;
+            }
+            foreach ($night->rebuys as $playerId => $count) {
+                $rebuys[$playerId] = ($rebuys[$playerId] ?? 0) + $count;
+                if ($count > $night->rebuysAllowed) {
+                    $moneyOnlyRebuys[$playerId] = ($moneyOnlyRebuys[$playerId] ?? 0) + $count - $night->rebuysAllowed;
+                }
+            }
+            foreach ($night->timeChips as $playerId) {
+                $timeChips[$playerId] = ($timeChips[$playerId] ?? 0) + 1;
             }
             foreach ($night->lines as $line) {
                 $points[$line->playerId] = ($points[$line->playerId] ?? 0) + $line->points->cents;
@@ -57,6 +67,12 @@ final class Statistics
             $this->progress($nights, $leaders, $stepPerSeason),
             array_sum($positions[1] ?? []) - $winsShown,
             $this->positionTable($positions),
+            array_sum($rebuys),
+            $this->ranking->top($rebuys),
+            array_sum($moneyOnlyRebuys),
+            $this->ranking->top($moneyOnlyRebuys),
+            array_sum($timeChips),
+            $this->ranking->top($timeChips),
         );
     }
 

@@ -72,6 +72,18 @@ Everyone logged in: players, results keepers and admins.
 
     "Temporada" has no such list: a season has one Main Event, and the "Main Event" screen shows it.
 
+14. **The rebuys and the time chips**, in both views, on a site with the night dashboard
+    ([night-dashboard.md](night-dashboard.md)). They count what the dashboard recorded on the nights of rule 2;
+    a night that was not run on the dashboard counts none. Each list shows the first 10, with ties as in rule 4:
+    - **"Rebuys"**: players by rebuys.
+    - **"Rebuys além do limite"**: players by rebuys past the season's limit
+      ([seasons-and-nights.md](seasons-and-nights.md) rule 5b). Their money goes to the pot, but the player
+      scores no points that night. The limit is the one the night was finished with.
+    - **"Time chips por atraso"**, on a site with the time chip: players by nights on which they arrived late
+      and owed a time chip. The time chip a rebuy pays is not counted: "Rebuys" already counts it.
+
+    The view adds up the three as well, beside its other totals (rule 7).
+
 The site stores only the scoring positions of a night, not everyone who played. So a player's page cannot say
 how many nights they played, only on how many they scored.
 
@@ -116,6 +128,12 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   3rd. Appearances: Ana 2, Breno 2 and Dudu 2 share 1st; Carla, with 1, is 4th.
 - **Only the champion.** An old Main Event recorded with Carla alone gives her one title, one podium and one
   appearance.
+- **The rebuys.** Season A allows 2 rebuys, and the dashboard recorded nights 1 and 2. On night 1 Ana made 1
+  rebuy and Breno 3; Carla arrived late. On night 2 Breno made 2 and Carla 4; Ana and Carla arrived late. Night 3
+  was not run on the dashboard. Rebuys: 10 in all; Breno 5, Carla 4, Ana 1.
+- **Past the limit.** Breno's third rebuy of night 1 and Carla's last two of night 2 are past the limit: 3 in all;
+  Carla 2, Breno 1.
+- **Late time chips.** 3 in all: Carla 2, Ana 1. The time chips Breno's and Carla's rebuys paid are not counted.
 - **A player, every season.** Ana is 1st with 288,00, scored on 3 nights and won 2. Her positions: 1st 2, 2nd 0,
   3rd 1.
 - **A player, one season.** In season A, Ana is 2nd with 174,00, scored on 2 nights and won 1.
@@ -147,6 +165,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   - **"Jogadores"**: "Pontuação Total" and "Eventos Pontuando", side by side except on a phone.
   - **"Eventos"**: "Pote por evento", "Maiores Potes" and "Locais". On a wide screen the two charts are one
     over the other, beside the list.
+  - **"Rebuys"**, on a site with the night dashboard: "Rebuys", "Rebuys além do limite" and "Time chips por
+    atraso", side by side, one under the other on a phone. A list with nothing recorded says "Nenhum registrado
+    no painel do evento.". The boxes at the top add "Rebuys", "Rebuys além do limite" and "Time chips por atraso".
   - **"Main Event"**, in "Geral": "Títulos", "Pódios" and "Participações", side by side, two across on a phone.
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, with the full width, below "Próximos

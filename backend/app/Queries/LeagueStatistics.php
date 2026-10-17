@@ -19,7 +19,8 @@ use PTSite\Domain\Statistics\TopList;
 /**
  * The statistics of one season, or of every season that is not archived, calculated from the finished,
  * non-archived nights. Nothing is stored: a corrected result changes them at once. On a site with the Main
- * Event, the finished Main Events of the same seasons give lists of their own.
+ * Event, the finished Main Events of the same seasons give lists of their own; on a site with the night dashboard,
+ * so do the rebuys and the time chips it recorded.
  */
 final class LeagueStatistics
 {
@@ -34,12 +35,15 @@ final class LeagueStatistics
     {
         $nights = ($this->finishedNights)($season);
 
-        $summary = $this->statistics->summarise($this->finishedNights->records($nights), stepPerSeason: $season === null);
+        $dashboard = $this->features->enabled(Feature::NightDashboard);
+        $timeChip = $dashboard && $this->features->enabled(Feature::TimeChip);
+        $summary = $this->statistics->summarise($this->finishedNights->records($nights, withDashboard: $dashboard), stepPerSeason: $season === null);
         $mainEvent = $this->features->enabled(Feature::MainEvent) ? $this->mainEvent($season) : null;
 
         $playerLists = [
             $summary->totalPoints, $summary->nightsScored, ...$summary->positions,
             ...($mainEvent ? [$mainEvent->titles, $mainEvent->podiums, $mainEvent->appearances] : []),
+            ...($dashboard ? [$summary->rebuys, $summary->moneyOnlyRebuys, $summary->timeChips] : []),
         ];
         $players = Player::query()->findMany([
             ...array_merge(...array_map(fn (TopList $list) => array_map(fn (RankedRow $row) => $row->id, $list->rows), $playerLists)),
@@ -92,6 +96,14 @@ final class LeagueStatistics
                 $counted($mainEvent->titles),
                 $counted($mainEvent->podiums),
                 $counted($mainEvent->appearances),
+            ) : null,
+            $dashboard ? new RebuyStatisticsReport(
+                $summary->rebuyCount,
+                $counted($summary->rebuys),
+                $summary->moneyOnlyRebuyCount,
+                $counted($summary->moneyOnlyRebuys),
+                $timeChip ? $summary->timeChipCount : null,
+                $timeChip ? $counted($summary->timeChips) : null,
             ) : null,
         );
     }
