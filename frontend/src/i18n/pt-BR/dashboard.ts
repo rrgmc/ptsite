@@ -90,6 +90,8 @@ export const dashboard = {
     houseOwnerDiscount: ({ amount }: { amount: string }) => `Desconto do dono da casa ${amount}`,
     /** How many rebuys the night has, paid or not. */
     rebuys: ({ count }: { count: number }) => `${count} ${plural(count, { one: 'rebuy', other: 'rebuys' })}`,
+    /** The money paid out to the players: the total without the time chip, less the Main Event pot. */
+    payout: ({ amount }: { amount: string }) => `Premiação ${amount}`,
     /** Of what was paid: what should be in hand, and what was paid another way, such as a bank transfer. */
     cash: ({ amount }: { amount: string }) => `Em dinheiro ${amount}`,
     nonCash: ({ amount }: { amount: string }) => `Fora do dinheiro ${amount}`,

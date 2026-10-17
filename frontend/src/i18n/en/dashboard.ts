@@ -84,6 +84,8 @@ export const dashboard = {
     pending: ({ amount }: { amount: string }) => `${amount} pending`,
     houseOwnerDiscount: ({ amount }: { amount: string }) => `${amount} house owner's discount`,
     rebuys: ({ count }: { count: number }) => `${count} ${plural(count, { one: 'rebuy', other: 'rebuys' })}`,
+    /** The money paid out to the players: the total without the time chip, less the Main Event pot. */
+    payout: ({ amount }: { amount: string }) => `${amount} payout`,
     cash: ({ amount }: { amount: string }) => `${amount} in cash`,
     nonCash: ({ amount }: { amount: string }) => `${amount} not in cash`,
   },

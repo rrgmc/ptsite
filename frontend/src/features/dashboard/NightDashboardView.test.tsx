@@ -61,6 +61,11 @@ describe('NightDashboardView', () => {
     expect(totals.getByText('Total').closest('div')).toHaveTextContent('TotalR$ 450,00Pago R$ 295,00Falta R$ 155,00')
   })
 
+  it('shows the payout: the total without the time chip, less the Main Event pot', () => {
+    view()
+    expect(within(screen.getByRole('region', { name: 'Valores do evento' })).getByText('Premiação R$ 340,00')).toBeInTheDocument()
+  })
+
   it('says under the pot how many rebuys the night has, and nothing on a night with none', () => {
     const withRebuys = (counts: number[]) => ({
       ...nightDashboard,
