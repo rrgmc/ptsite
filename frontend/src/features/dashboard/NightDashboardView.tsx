@@ -371,8 +371,8 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
 /**
  * The night's amounts, always in sight at the foot of the screen: the pot, the time chip apart from it, and the
  * two added up. The pot is the pot for points; when the owner of the house pays less, a line says by how much, so
- * that what the players owe adds up. An amount typed by hand stands in for the one worked out, which is still
- * shown below it. Each says what was paid and what is pending, of what the players owe. Once a payment was not in cash, a line below
+ * that what the players owe adds up. Once the night has a rebuy, a line under the pot says how many. An amount
+ * typed by hand stands in for the one worked out, which is still shown below it. Each says what was paid and what is pending, of what the players owe. Once a payment was not in cash, a line below
  * says how much of what was paid is in cash, to check the money in hand. With a large font, a column that does
  * not fit moves to a new line rather than cut its amounts short.
  */
@@ -380,8 +380,9 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
   const { totals, manual, received } = dashboard
   const inUse = amountsInUse(dashboard)
   const discount = Number(dashboard.house_owner_discount) !== 0 ? dashboard.house_owner_discount : null
-  const columns: { label: string; amount: string; worked: string; discount?: string | null; amounts: Amounts; isManual: boolean }[] = [
-    { label: t.dashboard.totals.pot, amount: inUse.pot, worked: dashboard.scoring_pot, discount, amounts: totals.pot, isManual: manual.pot !== null },
+  const rebuys = dashboard.players.reduce((count, line) => count + line.rebuys.length, 0)
+  const columns: { label: string; amount: string; worked: string; discount?: string | null; rebuys?: number; amounts: Amounts; isManual: boolean }[] = [
+    { label: t.dashboard.totals.pot, amount: inUse.pot, worked: dashboard.scoring_pot, discount, rebuys, amounts: totals.pot, isManual: manual.pot !== null },
     ...(totals.time_chip
       ? [{ label: t.dashboard.totals.timeChip, amount: inUse.timeChip!, worked: totals.time_chip.owed, amounts: totals.time_chip, isManual: manual.time_chip !== null }]
       : []),
@@ -393,7 +394,7 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
       className="sticky bottom-0 z-10 -mx-4 mt-auto border-t border-border bg-surface px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-raised"
     >
       <dl className="flex flex-wrap gap-x-3 gap-y-2">
-        {columns.map(({ label, amount, worked, discount, amounts, isManual }) => (
+        {columns.map(({ label, amount, worked, discount, rebuys, amounts, isManual }) => (
           <div key={label} className="min-w-min flex-1">
             <dt className="text-xs font-semibold uppercase text-muted">
               {label}
@@ -403,6 +404,7 @@ export function DashboardTotals({ dashboard }: { dashboard: NightDashboard }) {
               <span className="block font-display text-lg font-extrabold tabular">{formatMoney(amount)}</span>
               {isManual && <span className="block text-xs text-muted tabular">{t.dashboard.totals.calculated({ amount: formatMoney(worked) })}</span>}
               {discount && <span className="block text-xs text-muted tabular">{t.dashboard.totals.houseOwnerDiscount({ amount: formatMoney(discount) })}</span>}
+              {rebuys ? <span className="block text-xs text-muted tabular">{t.dashboard.totals.rebuys({ count: rebuys })}</span> : null}
               <span className="block text-xs text-muted tabular">{t.dashboard.totals.paid({ amount: formatMoney(amounts.paid) })}</span>
               <span className={`block text-xs tabular ${Number(amounts.pending) > 0 ? 'font-semibold text-warning' : 'text-muted'}`}>
                 {t.dashboard.totals.pending({ amount: formatMoney(amounts.pending) })}

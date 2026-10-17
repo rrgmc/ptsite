@@ -1,3 +1,5 @@
+import { plural } from '../plural'
+
 // The night dashboard ("Painel do evento"): who paid what on a night, on a screen of its own made for a phone.
 export const dashboard = {
   title: 'Painel do evento',
@@ -86,6 +88,8 @@ export const dashboard = {
     pending: ({ amount }: { amount: string }) => `Falta ${amount}`,
     /** The pot for points counts the house owner's buy-in in full; the money owed is less by this much. */
     houseOwnerDiscount: ({ amount }: { amount: string }) => `Desconto do dono da casa ${amount}`,
+    /** How many rebuys the night has, paid or not. */
+    rebuys: ({ count }: { count: number }) => `${count} ${plural(count, { one: 'rebuy', other: 'rebuys' })}`,
     /** Of what was paid: what should be in hand, and what was paid another way, such as a bank transfer. */
     cash: ({ amount }: { amount: string }) => `Em dinheiro ${amount}`,
     nonCash: ({ amount }: { amount: string }) => `Fora do dinheiro ${amount}`,
