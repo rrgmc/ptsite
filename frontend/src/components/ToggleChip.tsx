@@ -40,12 +40,13 @@ export function ToggleChip({ tone = 'done', children, ...props }: Omit<ToggleBut
 }
 
 /**
- * A chip that only shows a state, for a screen where nothing is changed. It looks like a `ToggleChip`, smaller and
- * not faded. `label` is what a screen reader says in its place, such as "Rebuy 1: pago em dinheiro".
+ * A chip that only shows a state, for a screen where nothing is changed. It has the colors of a `ToggleChip` and
+ * the size of a `Badge`, and is not faded. `label` is what a screen reader says in its place, such as "Rebuy 1: pago
+ * em dinheiro".
  */
 export function StatusChip({ tone = 'done', isSelected, label, children }: { tone?: keyof typeof selected; isSelected: boolean; label: string; children: ReactNode }) {
   return (
-    <span className={`inline-flex min-h-7 items-center gap-1 rounded-full border px-2 text-xs font-semibold ${isSelected ? swatch[tone] : 'border-border bg-surface text-muted'}`}>
+    <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-1.5 py-px text-xs font-semibold ${isSelected ? swatch[tone] : 'border-border bg-surface text-muted'}`}>
       <span aria-hidden className="inline-flex items-center gap-1">
         {isSelected && <ChipSign tone={tone} />}
         {children}

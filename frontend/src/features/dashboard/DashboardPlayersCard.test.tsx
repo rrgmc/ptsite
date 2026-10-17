@@ -37,6 +37,13 @@ describe('DashboardPlayersCard', () => {
     expect(marksOf(ana.player.nickname).queryByText(/^Time chip:/)).toBeNull()
   })
 
+  it('says what is pending, but not that a player paid it all', () => {
+    const [ana, breno] = finishedNightDashboard.players
+    view({ ...finishedNightDashboard, players: [{ ...ana, pending: '0.00' }, { ...breno, pending: '25.00' }] })
+    expect(screen.queryByText('Tudo pago')).toBeNull()
+    expect(screen.getByText('Falta R$ 25,00')).toBeTruthy()
+  })
+
   it('leaves the time chip out on a site without it', () => {
     const late = finishedNightDashboard.players[2]
     view({ ...finishedNightDashboard, totals: { ...finishedNightDashboard.totals, time_chip: null } })
