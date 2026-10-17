@@ -8,6 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.28.0] - 2026-10-17
+
+### Added
+
+- The statistics' "Eventos" tab has a chart, "Rebuys por evento", on a site with the night dashboard: the
+  rebuys of each night and, on a site with the time chip, the late players' time chips. In "Geral" it is
+  "Rebuys por temporada".
+
+### Changed
+
+- The night dashboard's "Resumo" shows two tiles, the pot and the time chip, one amount each. Below them,
+  "Dinheiro" adds the money up: the pot, the house owner's discount and the pot less it, the time chip and the
+  total. A table then shows what was paid and what is pending of the pot and of the time chip, and the total
+  pending. The payout follows in a section of its own.
+- A finished night's attendance heads its ALL IN list "Jogaram". The "Dono da casa" badge has a color of its own.
+
 ## [1.27.1] - 2026-10-17
 
 ### Changed
@@ -130,7 +146,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.27.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.28.0...HEAD
+[1.28.0]: https://github.com/rrgmc/ptsite/compare/v1.27.1...v1.28.0
 [1.27.1]: https://github.com/rrgmc/ptsite/compare/v1.27.0...v1.27.1
 [1.27.0]: https://github.com/rrgmc/ptsite/compare/v1.26.1...v1.27.0
 [1.26.1]: https://github.com/rrgmc/ptsite/compare/v1.26.0...v1.26.1
