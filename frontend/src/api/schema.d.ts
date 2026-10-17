@@ -1327,9 +1327,12 @@ export interface components {
             }[];
             /** @description The Main Event pot set by hand on the open night. Null: the suggested one is in use. */
             main_event_pot: string | null;
-            /** @description The season's share of the pot (the typed one, when there is one), rounded to a whole unit. Null when the season sets none. */
+            /** @description The season's share of the money: the pot in use (the typed one, when there is one) less `house_owner_discount`, rounded to a whole unit. Null when the season sets none. */
             suggested_main_event_pot: string | null;
-            /** @description The amounts worked out from the participants. `time_chip` is null on a site without the time chip. */
+            /**
+             * @description The amounts worked out from the participants, as money. `time_chip` is null on a site without the
+             *     time chip.
+             */
             totals: {
                 pot: {
                     owed: string;
@@ -1347,6 +1350,10 @@ export interface components {
                     pending: string;
                 };
             };
+            /** @description The pot for points: the pot owed with the house owner's buy-in counted in full. */
+            scoring_pot: string;
+            /** @description How much less than the buy-in the house owner owes: the gap between `scoring_pot` and the pot owed. "0.00" with no house owner. */
+            house_owner_discount: string;
             /**
              * @description The total paid, split by how: `cash` is what should be in hand, `non_cash` what was paid another way
              *     (a bank transfer, for instance). `non_cash` adds `non_cash_marked`, from the players' marks, and
@@ -1360,7 +1367,7 @@ export interface components {
             };
             /**
              * @description The pot and the time chip set by hand on an open night ("Manual"), which stand in
-             *     for the ones in `totals`. Null for an amount that was not typed.
+             *     for `scoring_pot` and the time chip in `totals`. Null for an amount that was not typed.
              */
             manual: {
                 pot: string | null;

@@ -65,6 +65,8 @@ final class NightDashboard
             })->all();
 
         $pot = $money->pot($entries);
+        $discount = $money->houseOwnerDiscount($entries);
+        $scoringPot = $money->scoringPot($entries);
         $timeChip = $money->timeChip($entries);
         $total = $pot->plus($timeChip);
         $nonCashMarked = $money->nonCash($entries);
@@ -72,9 +74,10 @@ final class NightDashboard
         $nonCash = $nonCashMarked->plus($nonCashAdjustment ?? Money::zero());
         $open = $night->status === NightStatus::Open->value;
         $partial = $open ? $night->partialResult()->with('positions.player')->first() : null;
-        // A pot typed by hand stands in for the one worked out, also for the Main Event pot it suggests.
+        // A pot typed by hand stands in for the pot for points, also for the Main Event pot it suggests, which is a
+        // share of the money: the pot less the house owner's discount.
         $manualPot = $partial?->pot;
-        $potInUse = $manualPot === null ? $pot->owed : Money::fromDecimal((string) $manualPot);
+        $potInUse = $manualPot === null ? $scoringPot : Money::fromDecimal((string) $manualPot);
 
         return new NightDashboardReport(
             nightId: $night->id,
@@ -94,8 +97,10 @@ final class NightDashboard
             players: $lines,
             positions: ($partial?->positions ?? collect())->map(fn ($line) => ['position' => $line->position, 'player' => $line->player])->values()->all(),
             mainEventPot: $partial?->main_event_pot,
-            suggestedMainEventPot: $open ? $money->suggestedMainEventPot($potInUse)?->toDecimal() : null,
+            suggestedMainEventPot: $open ? $money->suggestedMainEventPot($potInUse->minus($discount))?->toDecimal() : null,
             pot: $this->amounts($pot),
+            scoringPot: $scoringPot->toDecimal(),
+            houseOwnerDiscount: $discount->toDecimal(),
             timeChip: $this->features->enabled(Feature::TimeChip) ? $this->amounts($timeChip) : null,
             total: $this->amounts($total),
             received: [

@@ -121,6 +121,23 @@ it('charges the owner of the house the buy-in on a site without the house owner\
         ->and($money->pot(theNight())->owed->toDecimal())->toBe('450.00');
 });
 
+it('counts the buy-in of the owner of the house in full in the pot for points', function () {
+    $money = nightMoney();
+
+    expect($money->houseOwnerDiscount(theNight())->toDecimal())->toBe('25.00')
+        ->and($money->scoringPot(theNight())->toDecimal())->toBe('450.00')
+        ->and($money->pot(theNight())->owed->toDecimal())->toBe('425.00');
+});
+
+it('has no house owner\'s discount on a night with no house owner, or on a site without it', function () {
+    $noOwner = [...theNight(), 'elio' => new NightEntry(5, buyInPaid: true)];
+
+    expect(nightMoney()->houseOwnerDiscount($noOwner)->toDecimal())->toBe('0.00')
+        ->and(nightMoney()->scoringPot($noOwner)->toDecimal())->toBe('450.00')
+        ->and(nightMoney(features: [])->houseOwnerDiscount(theNight())->toDecimal())->toBe('0.00')
+        ->and(nightMoney(features: [])->scoringPot(theNight())->toDecimal())->toBe('450.00');
+});
+
 it('has no time chip on a site without the time chip', function () {
     $money = nightMoney(['houseOwnerBuyIn' => true, 'timeChip' => false]);
 

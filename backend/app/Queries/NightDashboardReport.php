@@ -14,7 +14,9 @@ final readonly class NightDashboardReport
      * @param  array{buy_in: string, house_owner_buy_in: string, rebuy_value: string, time_chip_value: string, rebuys_allowed: int, allows_extra_rebuys: bool, rebuy_charges_time_chip: bool, fixed: bool}  $prices
      * @param  list<array{player: Player, is_house_owner: bool, confirmed_at: string|null, buy_in: string, buy_in_paid: bool, buy_in_non_cash: bool, time_chip: bool, time_chip_paid: bool, rebuys: list<array{id: int, paid: bool, non_cash: bool}>, owed: string, paid: string, pending: string, non_cash: string}>  $players
      * @param  list<array{position: int, player: Player}>  $positions
-     * @param  array{owed: string, paid: string, pending: string}  $pot
+     * @param  array{owed: string, paid: string, pending: string}  $pot  the money of the pot
+     * @param  string  $scoringPot  the pot for points: the pot owed with the house owner's buy-in counted in full
+     * @param  string  $houseOwnerDiscount  how much less than the buy-in the house owner owes; "0.00" with none
      * @param  array{owed: string, paid: string, pending: string}|null  $timeChip  null on a site without the time chip
      * @param  array{owed: string, paid: string, pending: string}  $total
      * @param  array{cash: string, non_cash: string, non_cash_marked: string, non_cash_adjustment: string|null}  $received  the total paid, split by how
@@ -32,6 +34,8 @@ final readonly class NightDashboardReport
         public ?string $mainEventPot,
         public ?string $suggestedMainEventPot,
         public array $pot,
+        public string $scoringPot,
+        public string $houseOwnerDiscount,
         public ?array $timeChip,
         public array $total,
         public array $received,

@@ -77,6 +77,9 @@ it('works out the pot and the time chip of a night from what its players bought 
         ->assertJsonPath('data.totals.pot', ['owed' => '425.00', 'paid' => '275.00', 'pending' => '150.00'])
         ->assertJsonPath('data.totals.time_chip', ['owed' => '25.00', 'paid' => '20.00', 'pending' => '5.00'])
         ->assertJsonPath('data.totals.total', ['owed' => '450.00', 'paid' => '295.00', 'pending' => '155.00'])
+        // The pot for points counts Élio's buy-in in full; the Main Event pot is a share of the money.
+        ->assertJsonPath('data.scoring_pot', '450.00')
+        ->assertJsonPath('data.house_owner_discount', '25.00')
         ->assertJsonPath('data.suggested_main_event_pot', '85.00')
         ->assertJsonPath('data.house_owner.nickname', 'Élio')
         ->assertJsonPath('data.prices.buy_in', '50.00')
@@ -100,7 +103,9 @@ it('charges the owner of the house the buy-in on a site without the house owner\
 
     $this->getJson($this->url)
         ->assertJsonPath('data.players.4.buy_in', '50.00')
-        ->assertJsonPath('data.totals.pot.owed', '450.00');
+        ->assertJsonPath('data.totals.pot.owed', '450.00')
+        ->assertJsonPath('data.scoring_pot', '450.00')
+        ->assertJsonPath('data.house_owner_discount', '0.00');
 });
 
 it('has no time chip on a site without the time chip', function () {
@@ -479,8 +484,8 @@ it('takes a pot and a time chip typed by hand, and still works out its own', fun
         ->assertJsonPath('data.manual', ['pot' => '600.00', 'time_chip' => '40.00'])
         ->assertJsonPath('data.totals.pot.owed', '425.00')
         ->assertJsonPath('data.totals.time_chip.owed', '25.00')
-        // 20% of the typed pot.
-        ->assertJsonPath('data.suggested_main_event_pot', '120.00');
+        // 20% of the typed pot less the house owner's discount.
+        ->assertJsonPath('data.suggested_main_event_pot', '115.00');
     // The positions and the Main Event pot do not touch them.
     $this->putJson("{$this->url}/positions/6", ['player_id' => $this->breno->id])->assertOk()->assertJsonPath('data.manual.pot', '600.00');
     $this->putJson("{$this->url}/main-event-pot", ['amount' => '100'])->assertOk()->assertJsonPath('data.manual.time_chip', '40.00');
