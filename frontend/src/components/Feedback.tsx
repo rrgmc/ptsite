@@ -25,10 +25,11 @@ export function Empty({ children }: { children: ReactNode }) {
   return <p className="rounded-md border border-dashed border-border p-6 text-center text-muted">{children}</p>
 }
 
-export function Badge({ tone = 'neutral', children }: { tone?: 'neutral' | 'primary' | 'warning' | 'danger'; children: ReactNode }) {
+export function Badge({ tone = 'neutral', children }: { tone?: 'neutral' | 'primary' | 'info' | 'warning' | 'danger'; children: ReactNode }) {
   const tones = {
     neutral: 'bg-surface-sunken text-muted',
     primary: 'bg-primary-soft text-primary',
+    info: 'bg-info-soft text-info',
     warning: 'bg-warning-soft text-warning',
     danger: 'bg-danger-soft text-danger',
   }
