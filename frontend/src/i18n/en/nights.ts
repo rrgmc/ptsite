@@ -28,6 +28,8 @@ export const nights: Messages['nights'] = {
     potTotal: 'Total pot',
     mainEventPot: 'Main Event pot',
     timeChip: 'Time chip',
+    rebuys: 'Rebuys',
+    lateArrivals: 'Time chips (late arrivals)',
   },
 
   moneyFields: {

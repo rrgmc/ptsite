@@ -32,6 +32,9 @@ export const nights = {
     potTotal: 'Pote Total',
     mainEventPot: 'Pote ME',
     timeChip: 'Time chip',
+    /** On a finished night's page, from its dashboard: how many rebuys, and how many players arrived late. */
+    rebuys: 'Rebuys',
+    lateArrivals: 'Time chips (atrasos)',
   },
 
   /** The money fields of the results forms. */

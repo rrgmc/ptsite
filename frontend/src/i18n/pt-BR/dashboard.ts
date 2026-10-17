@@ -36,6 +36,13 @@ export const dashboard = {
     unsetHouseOwner: 'Não é o dono da casa',
     removeLastRebuy: 'Remover o último rebuy',
     removeFromNight: 'Remover do evento',
+    /** What a screen reader says for a chip on the night's page, where nothing is changed: "Rebuy 1: não pago". */
+    chipState: ({ payment, state }: { payment: string; state: string }) => `${payment}: ${state}`,
+    paid: 'pago',
+    paidCash: 'pago em dinheiro',
+    paidNonCash: 'pago fora do dinheiro',
+    unpaid: 'não pago',
+    lateArrival: 'chegou atrasado',
   },
 
   // Under the participants: what the signs on a buy-in and on a rebuy mean

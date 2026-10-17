@@ -15,6 +15,7 @@ import { formatTime, formatWeekday, titleOfNight } from '@/lib/format'
 import { plainText } from '@/lib/plainText'
 import { canEditNight } from './canEditNight'
 import { NightAttendance } from '../attendance/NightAttendance'
+import { FinishedNightDashboard } from '../dashboard/FinishedNightDashboard'
 import { NightDashboardCard } from '../dashboard/NightDashboardCard'
 import { usePathOfSeason } from '../layout/useSelectedSeason'
 import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
@@ -52,6 +53,9 @@ export function NightPage() {
   const resultPath = `/nights/${n.id}/${isMainEvent ? 'main-event-result' : 'result'}`
   // On a site with the night dashboard, a regular night that was opened has one; it holds the partial result.
   const hasDashboard = hasFeature('nightDashboard') && !isMainEvent && !n.archived && n.status !== 'scheduled'
+  const isFinished = n.status === 'finished'
+  // Only an admin changes a finished night's dashboard; everyone else sees its players beside the result.
+  const canEditFinishedDashboard = isFinished && hasDashboard && me.data?.abilities.edit_played_nights
 
   return (
     <>
@@ -81,6 +85,7 @@ export function NightPage() {
             {n.archived && <p className="text-muted">{t.nights.nightCancelled}</p>}
             {n.status === 'open' && <Link to={resultPath} className="inline-flex min-h-touch items-center justify-center rounded-md bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover">{t.nights.page.finishEnterResult}</Link>}
             {n.status === 'finished' && <Link to={resultPath} className={secondaryLink}>{t.nights.page.editResult}</Link>}
+            {canEditFinishedDashboard && <Link to={`/nights/${n.id}/dashboard`} className={secondaryLink}>{t.dashboard.card.open}</Link>}
             {canEdit && <Link to={`/nights/${n.id}/edit`} className={secondaryLink}>{t.nights.editNight}</Link>}
             {canUndoOpen && <Button variant="ghost" onPress={() => setUndoingOpen(true)}>{t.nights.page.undoOpen}</Button>}
           </div>
@@ -89,9 +94,12 @@ export function NightPage() {
         </Card>
       )}
 
-      <div className="mb-4">
-        <NightAttendance night={n} />
-      </div>
+      {/* On a finished night the result comes first, and the attendance is a small box under it. */}
+      {!isFinished && (
+        <div className="mb-4">
+          <NightAttendance night={n} />
+        </div>
+      )}
 
       {isMainEvent ? (
         n.status === 'finished' ? (
@@ -99,17 +107,22 @@ export function NightPage() {
         ) : (
           <Card><p className="text-muted">{t.mainEvent.resultPlaceholder}</p></Card>
         )
-      ) : n.status === 'finished' ? (
-        <div className="flex max-w-md flex-col gap-4">
-          <NightResultCard night={n} />
-          {hasDashboard && <NightDashboardCard nightId={n.id} />}
-        </div>
+      ) : isFinished && hasDashboard ? (
+        <FinishedNightDashboard night={n} />
+      ) : isFinished ? (
+        <div className="max-w-md"><NightResultCard night={n} /></div>
       ) : hasDashboard ? (
         <NightDashboardCard nightId={n.id} />
       ) : n.status === 'open' && !n.archived ? (
         <NightPartialResult night={n} />
       ) : (
         <Card><p className="text-muted">{t.nights.page.resultPlaceholder}</p></Card>
+      )}
+
+      {isFinished && (
+        <div className="mt-4">
+          <NightAttendance night={n} compact />
+        </div>
       )}
 
       <ConfirmDialog

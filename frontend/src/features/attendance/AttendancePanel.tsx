@@ -30,6 +30,7 @@ export function AttendancePanel({
   players,
   onAnswer,
   error,
+  compact = false,
 }: {
   attendances: Attendance[]
   /** The logged-in user's player; null for an account without a player. */
@@ -45,11 +46,24 @@ export function AttendancePanel({
   players: Player[]
   onAnswer: (player: Player, answer: Answer | null) => void
   error?: string
+  /** For a finished night: only who came and who folded, each list on a line. */
+  compact?: boolean
 }) {
   const coming = attendances.filter((a) => a.answer === 'all_in')
   const folded = attendances.filter((a) => a.answer === 'fold')
   const mine = attendances.find((a) => a.player.id === myPlayerId)?.answer ?? 'none'
   const [other, setOther] = useState<Player | null>(null)
+
+  if (compact) {
+    return (
+      <Card className="max-w-xl text-sm" title={t.attendance.panel.title}>
+        <div className="flex flex-col gap-2">
+          <CompactList id="attendance-coming" heading={t.attendance.panel.comingHeading({ count: coming.length })} attendances={coming} empty={t.attendance.panel.nobodyConfirmed} />
+          <CompactList id="attendance-fold" heading={t.attendance.panel.foldedHeading({ count: folded.length })} attendances={folded} empty={t.attendance.panel.nobody} />
+        </div>
+      </Card>
+    )
+  }
 
   return (
     <Card title={isOpen && myPlayerId !== null ? t.attendance.panel.titleOpen : t.attendance.panel.title}>
@@ -134,5 +148,26 @@ export function AttendancePanel({
         </div>
       )}
     </Card>
+  )
+}
+
+/** One list of the compact panel: its heading, then the players separated by commas. */
+function CompactList({ id, heading, attendances, empty }: { id: string; heading: string; attendances: Attendance[]; empty: string }) {
+  return (
+    <section aria-labelledby={id}>
+      <h3 id={id} className="font-bold">{heading}</h3>
+      {attendances.length === 0 ? (
+        <p className="text-muted">{empty}</p>
+      ) : (
+        <ul className="flex flex-wrap gap-x-1">
+          {attendances.map((a, i) => (
+            <li key={a.player.id}>
+              <PlayerLink player={a.player} className="underline" />
+              {i < attendances.length - 1 && <span aria-hidden>,</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }

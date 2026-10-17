@@ -19,5 +19,8 @@ export const Numbered: StoryObj<typeof meta> = { args: { number: 3 } }
 /** An extra night, such as a parallel table: it has no number and is marked. */
 export const Extra: StoryObj<typeof meta> = { args: { night: extraNight } }
 
+/** On a finished night's page with a dashboard: how many rebuys and late arrivals it had. */
+export const WithCounts: StoryObj<typeof meta> = { args: { counts: { rebuys: 4, lateArrivals: 1 } } }
+
 /** A site with no Main Event pot and no time chip shows the pot alone. */
 export const PotOnly: StoryObj<typeof meta> = { decorators: [withFeatures({ mainEventPot: false, timeChip: false })] }

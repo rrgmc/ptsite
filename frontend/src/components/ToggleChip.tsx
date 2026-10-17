@@ -39,6 +39,22 @@ export function ToggleChip({ tone = 'done', children, ...props }: Omit<ToggleBut
   )
 }
 
+/**
+ * A chip that only shows a state, for a screen where nothing is changed. It looks like a `ToggleChip`, smaller and
+ * not faded. `label` is what a screen reader says in its place, such as "Rebuy 1: pago em dinheiro".
+ */
+export function StatusChip({ tone = 'done', isSelected, label, children }: { tone?: keyof typeof selected; isSelected: boolean; label: string; children: ReactNode }) {
+  return (
+    <span className={`inline-flex min-h-7 items-center gap-1 rounded-full border px-2 text-xs font-semibold ${isSelected ? swatch[tone] : 'border-border bg-surface text-muted'}`}>
+      <span aria-hidden className="inline-flex items-center gap-1">
+        {isSelected && <ChipSign tone={tone} />}
+        {children}
+      </span>
+      <span className="sr-only">{label}</span>
+    </span>
+  )
+}
+
 /** The colors of a chip that is on, as in `selected`, for something that is no button. */
 const swatch: Record<keyof typeof selected, string> = {
   done: 'border-primary bg-primary text-on-primary',
