@@ -34,8 +34,10 @@ The API has its own version, in its path (`/api/v1`). A site repository pins the
    ```
 
    [`deploy/release.php`](deploy/release.php) refuses when the checkout is not on `master`, has changes, or is
-   not the `master` on GitHub, and when the number is not above the latest release. It then makes the tag and
-   pushes the tag only. With `--dry-run` it checks and changes nothing.
+   not the `master` on GitHub, and when the number is not above the latest release. It also refuses when a
+   check of the pull request that made `master`'s latest commit is still running or did not pass; that needs
+   `gh` signed in. It then makes the tag and pushes the tag only. With `--dry-run` it checks and changes
+   nothing.
 3. The tag starts [`release.yml`](.github/workflows/release.yml). It builds the deploy package with the tag as
    its version and publishes the GitHub release, with notes made from the merged PRs and `ptsite-vX.Y.Z.zip`
    attached. Follow it with `gh run watch`, then look at `gh release view v2.1.0`.
