@@ -159,7 +159,9 @@ for (const [position, search] of [['1st', 'jacobson'], ['2nd', 'duhamel'], ['3rd
 await shot('04-result-form', true)
 await page.getByRole('button', { name: 'Finish night' }).click()
 await page.getByText('Finished', { exact: true }).waitFor()
-await shot('05-night-finished')
+// The whole page: the result, what each player paid, and the attendance under them
+await page.getByRole('heading', { name: /^Players \(/ }).waitFor()
+await shot('05-night-finished', true)
 
 await page.goto('seasons/10/simulator')
 await page.getByLabel('Imagined pot (R$)').fill('840')
