@@ -114,6 +114,29 @@ export function amountsInUse(dashboard: NightDashboard): { pot: string; timeChip
   return { pot, timeChip, total: decimal(money + cents(timeChip ?? '0')), mainEventPot, payout: decimal(money - cents(mainEventPot ?? '0')) }
 }
 
+/**
+ * How many of the night's payments were made, for the summary: the buy-ins, the rebuys and the late players' time
+ * chips, each paid or not, and the participants who owe nothing more.
+ */
+export function paymentCounts(dashboard: NightDashboard): {
+  players: number
+  settled: number
+  buyIns: { paid: number; total: number }
+  rebuys: { paid: number; total: number }
+  timeChips: { paid: number; total: number }
+} {
+  const lines = dashboard.players
+  const rebuys = lines.flatMap((line) => line.rebuys)
+  const late = lines.filter((line) => line.time_chip)
+  return {
+    players: lines.length,
+    settled: lines.filter((line) => cents(line.pending) <= 0).length,
+    buyIns: { paid: lines.filter((line) => line.buy_in_paid).length, total: lines.length },
+    rebuys: { paid: rebuys.filter((rebuy) => rebuy.paid).length, total: rebuys.length },
+    timeChips: { paid: late.filter((line) => line.time_chip_paid).length, total: late.length },
+  }
+}
+
 const emptyLine = (player: Player): DashboardPlayer => ({
   player,
   is_house_owner: false,

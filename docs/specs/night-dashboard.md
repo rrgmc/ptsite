@@ -22,6 +22,17 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
    cancelled night and a Main Event night have none.
 2. **The dashboard is a screen of its own**, with no menu, made for a phone. "Voltar ao site" leads to the night's
    page. The night's page leads to it; the open night's banner does not.
+2a. **The dashboard is split into tabs**, under its title, and opens on the first:
+    - **"Resumo"** (summary): the night at a glance. It has the amounts (rules 11, 11a and 11b), the Main Event
+      pot in use, and "Pagamentos" (rule 2b). A finished night also shows the amounts it was finished with.
+    - **"Jogadores (n)"**: the participants, with the search for a player who is not on the night (rule 5a).
+    - **"Valores"**, on an open night only: the amounts set by hand (rule 13a) and the positions (rule 13). A
+      finished night has its result on the night's page instead.
+    Moving to another tab keeps what was typed in the one left, such as a search or an amount not saved yet.
+2b. **"Pagamentos" counts the payments**, each as how many were paid out of how many, and how many are missing:
+    the participants with everything paid, the buy-ins, the rebuys (once the night has one) and the late
+    players' time chips (on a site with the time chip, once a player is late). A rebuy's time chip goes with the
+    rebuy and is not counted apart.
 3. **It refreshes by itself** every few seconds, so several people can use it at once. A change is saved at the
    tap, with no "Salvar".
 4. **A participant** is a player the dashboard has a record of, or, while the night is open, a player who answered
@@ -33,8 +44,7 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
    and then shows eight at most. Each one found has "ALL IN" and "Buy-in pago". An inactive player is found
    too, and marked. **The dashboard creates no player**: a first-timer is added in the site first, by whoever
    may ([players.md](players.md)).
-5b. The participants ("Jogadores") can be folded away, with their search, to reach the amounts and the positions
-   on a night with many players. Their marks are small, so that a player's row fits a phone.
+5b. The participants' marks are small, so that a player's row fits a phone.
 6. **Whoever changes the dashboard can answer for any player** on the open night, also on the night's page. On a
    site without the dashboard only results keepers and admins can (rule 4 of [attendance.md](attendance.md)).
 7. Each participant has:
@@ -70,14 +80,13 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
 11. **The amounts**, each shown as owed, paid and pending:
     - **"Pote"**: the pot for points: the buy-ins, the house owner's counted in full (rule 9a), and every rebuy,
       also the ones past the limit. Its owed, paid and pending are money, so the owed is the pot less the house
-      owner's discount. A line under the pot shows the discount when there is one, and another how many rebuys
-      the night has, paid or not, once it has one;
+      owner's discount. A line under the pot shows the discount when there is one;
     - **"Time chip"**, on a site with the time chip: one time chip value for each late player and, when the
       season says a rebuy also pays the time chip, one for each rebuy. A rebuy's time chip is paid with the rebuy;
     - **"Total com time chip"** (total with the time chip): the money of the two added up: the pot less the
       house owner's discount, and the time chip. On a site without the time chip it is called **"Total"**.
     The time chip is never mixed into the pot.
-11b. **"Premiação"** (payout), on a line under the amounts: the money paid out to the players. It is the total
+11b. **"Premiação"** (payout), under the amounts: the money paid out to the players. It is the total
     without the time chip, less the Main Event pot: the pot in use less the house owner's discount, less the Main
     Event pot in use (rule 14). On a finished night, the Main Event pot is the one the night was finished with.
     A season with no Main Event pot pays out all of that money. It changes neither the night's result nor its
@@ -86,7 +95,7 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
       each rebuy paid not in cash, with the time chip it pays; and the adjustment of rule 13c, when there is one;
     - **"Em dinheiro"** (in cash): the total paid, less what was not in cash.
-    The foot of the screen shows both below the total paid, once anything is not in cash. A player's row says
+    The summary shows both under the payout, once anything is not in cash. A player's row says
     how much that player paid not in cash, beside what they have pending. Neither changes the pot, the time
     chip, what is pending or the night's result.
 12. **A participant with a mark or a rebuy cannot leave the night**: FOLD, removing the answer and "Remover do
@@ -104,7 +113,7 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     unmarked. Until then an unmarked field only closes, with its saved amount still in it. When someone else
     saves an amount meanwhile, the fields that were not touched show it, and the ones that were marked, unmarked
     or typed in stay as they were left.
-13b. An amount set by hand is used at the foot of the screen, for the points shown beside the positions, for the
+13b. An amount set by hand is used in the summary, for the points shown beside the positions, for the
     Main Event pot's share and at "Finalizar". A pot set by hand stands in for the pot for points. The amount worked out stays in sight beside it ("Calculado"),
     with what was paid and what is pending.
 13c. **"Valores" also has "Ajuste fora do dinheiro"**, for anything out of the ordinary: an amount that is added
@@ -156,8 +165,9 @@ house owner's buy-in:
   | Total | 450,00 | 295,00 | 155,00 |
 
   Élio owes R$ 25,00 of buy-in. Breno owes R$ 215,00 in all and has R$ 55,00 pending. The pot for points is
-  R$ 450,00: the R$ 425,00 owed and the house owner's discount of R$ 25,00, shown under the pot. Under it too,
-  "4 rebuys": Ana's one and Breno's three.
+  R$ 450,00: the R$ 425,00 owed and the house owner's discount of R$ 25,00, shown under the pot.
+- **The payments.** On that night "Pagamentos" says: participants with everything paid, 2 of 5 (Ana and Élio),
+  3 missing; buy-ins, 3 of 5, 2 missing; rebuys, 3 of 4, 1 missing (Breno's third); time chips, 1 of 1 (Carla's).
 - **The payout.** With a Main Event pot share of 20%, the Main Event pot is R$ 85,00 (rule 14). The payout is
   R$ 340,00: the total of R$ 450,00 less the time chip of R$ 25,00 and the Main Event pot of R$ 85,00. With a
   Main Event pot of R$ 90,00 set by hand, it is R$ 335,00.
@@ -180,7 +190,7 @@ house owner's buy-in:
   15% it gives R$ 64,00, from R$ 63,75. A season with no share gives none. Ana marks its "Manual" and saves
   R$ 90,00: the dashboard and "Finalizar" use R$ 90,00. She unmarks it and saves: R$ 85,00 again.
 - **Set by hand.** On another night nobody marks the rebuys. The pot's field is closed and shows R$ 450,00. Ana
-  marks its "Manual", types R$ 600,00 over it and taps "Salvar", leaving the time chip unmarked. The foot of the screen shows
+  marks its "Manual", types R$ 600,00 over it and taps "Salvar", leaving the time chip unmarked. The summary shows
   the pot R$ 600,00 with "Calculado R$ 450,00" below it, the time chip R$ 25,00 and the total R$ 600,00, without the discount. The
   Main Event pot is R$ 115,00, the 20% of the typed pot less the discount. "Finalizar" starts with R$ 600,00.
 - **No new player here.** Ana searches for "Estreante", who never played: nobody is found. A results keeper adds
