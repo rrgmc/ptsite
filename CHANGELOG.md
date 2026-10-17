@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.29.1] - 2026-10-17
+
+### Fixed
+
+- The night dashboard's "Resumo" shows no payout less than zero on a finished night. When the pot of a finished
+  night is zero, as on a night of the past finished without the dashboard, it shows no payout, no Main Event pot
+  and no house owner's discount.
+
 ## [1.29.0] - 2026-10-17
 
 ### Added
@@ -160,7 +168,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.29.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.29.1...HEAD
+[1.29.1]: https://github.com/rrgmc/ptsite/compare/v1.29.0...v1.29.1
 [1.29.0]: https://github.com/rrgmc/ptsite/compare/v1.28.1...v1.29.0
 [1.28.1]: https://github.com/rrgmc/ptsite/compare/v1.28.0...v1.28.1
 [1.28.0]: https://github.com/rrgmc/ptsite/compare/v1.27.1...v1.28.0
