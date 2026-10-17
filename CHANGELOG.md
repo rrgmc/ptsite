@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.27.1] - 2026-10-17
+
+### Changed
+
+- On a finished night's page, each player in "Jogadores" fits on one line: the name, the marks as small tags and
+  what is pending. "Tudo pago" is no longer shown there.
+
 ## [1.27.0] - 2026-10-17
 
 ### Added
@@ -123,7 +130,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.27.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.27.1...HEAD
+[1.27.1]: https://github.com/rrgmc/ptsite/compare/v1.27.0...v1.27.1
 [1.27.0]: https://github.com/rrgmc/ptsite/compare/v1.26.1...v1.27.0
 [1.26.1]: https://github.com/rrgmc/ptsite/compare/v1.26.0...v1.26.1
 [1.26.0]: https://github.com/rrgmc/ptsite/compare/v1.25.0...v1.26.0
