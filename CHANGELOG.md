@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.34.2] - 2026-10-20
+
 ### Changed
 
 - "Classificação por temporada" in "Estatísticas" shows the fifteen players with most points, not ten. The five
@@ -279,7 +281,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.34.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.34.2...HEAD
+[1.34.2]: https://github.com/rrgmc/ptsite/compare/v1.34.1...v1.34.2
 [1.34.1]: https://github.com/rrgmc/ptsite/compare/v1.34.0...v1.34.1
 [1.34.0]: https://github.com/rrgmc/ptsite/compare/v1.33.0...v1.34.0
 [1.33.0]: https://github.com/rrgmc/ptsite/compare/v1.32.1...v1.33.0
