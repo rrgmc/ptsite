@@ -28,13 +28,13 @@ export const OnlyTheChampion: StoryObj = {
   render: () => <RouterStory path="/" url="/" element={<Podium title="Main Event" caption="Classificação: Main Event" lines={[{ rank: 1, player: players[2] }]} />} />,
 }
 
-/** Compact, with a note on each line: the champions over every season in "Estatísticas". */
+/** Compact: the champions over every season in "Estatísticas". The six players tied in 3rd place share one line. */
 export const Compact: StoryObj = {
   render: () => (
     <RouterStory
       path="/"
       url="/"
-      element={<Podium compact title="Campeões das temporadas" caption="Jogadores por títulos" lines={[{ rank: 1, player: players[0], note: '3 títulos' }, { rank: 2, player: players[1], note: '2 títulos' }, { rank: 3, player: players[2], note: '1 título' }]} />}
+      element={<Podium compact title="Campeões das temporadas" caption="Jogadores por títulos" lines={[{ rank: 1, player: players[0], note: '3 títulos' }, { rank: 2, player: players[1], note: '2 títulos' }, ...players.slice(2, 8).map((player) => ({ rank: 3, player, note: '1 título' }))]} />}
     />
   ),
 }

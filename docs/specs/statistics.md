@@ -182,12 +182,16 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   in both views.
 - At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". In "Geral", two bands
   follow, as the box "Campeonato" of "Classificação" but shorter: **"Campeões das temporadas"**, the first three
-  of "Títulos" of rule 13a, and **"Campeões do Main Event"**, the first three of its "Títulos". Each player has a
-  medal, the place and the number of titles. Players with as many titles share the place, so a band can show more
-  than three. A band with no title is not shown. Then "Pontos acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the same
-  numbers as a table.
+  of "Títulos" of rule 13a, and **"Campeões do Main Event"**, the first three of its "Títulos". They are side by
+  side, one over the other on a phone. Each band has a line per place: its medal, the place and the number of
+  titles, then every player with that many titles, with a small photo. Here the places go by the number of
+  titles, so the next number after a tie is the next place: with 4, 2, 2, 2 and 1 titles, the bands show 1st,
+  2nd (three players) and 3rd (the players with 1 title). The lists keep the places of rule 4. A band with no title is not shown. Then
+  "Pontos acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the
+  same numbers as a table.
 - Under it, a box with **tabs**, drawn as the tabs of a folder: one tab shows at a time, and its title is filled
-  with the site's main color. "Posições" shows first. The tab on show is not in the address: opening the screen
+  with the site's main color. The tabs are in this order: "Posições", "Campeonatos", "Main Event", "Jogadores",
+  "Eventos" and "Rebuys", each when it has something to show. "Posições" shows first. The tab on show is not in the address: opening the screen
   again shows "Posições". The lists in the tabs are compact: short lines, the player's small photo and no
   header line.
   - **"Posições"**: the table of rule 3c, with the columns "1º", "2º" and so on, and "Vitórias". On a wide
@@ -203,7 +207,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
     no painel do evento.". The boxes at the top add "Rebuys", "Rebuys além do limite" and "Time chips por atraso".
   - **"Main Event"**, in "Geral": "Títulos", "Pódios" and "Participações", side by side, two across on a phone.
   - **"Campeonatos"**, in "Geral", once a season is finished: the lists of rule 13a, laid out as in "Main
-    Event". It comes before "Main Event".
+    Event".
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, with the full width, below "Próximos
   eventos" and above the finished nights. The box "Totais da temporada" adds up the season's three amounts:

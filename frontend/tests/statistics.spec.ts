@@ -69,7 +69,7 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(page.getByText('Todas as temporadas')).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)
   await expect(page.getByRole('img', { name: /pontos acumulados.*por temporada/ })).toBeVisible()
-  await expect(tabs).toHaveText(['Posições', 'Jogadores', 'Eventos', 'Rebuys', 'Campeonatos', 'Main Event'])
+  await expect(tabs).toHaveText(['Posições', 'Campeonatos', 'Main Event', 'Jogadores', 'Eventos', 'Rebuys'])
 
   // The rebuys and the late players the night dashboard recorded in the season in play.
   await tabs.filter({ hasText: 'Rebuys' }).click()
