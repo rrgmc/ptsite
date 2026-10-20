@@ -109,7 +109,7 @@ export const statistics = {
   rankBySeasonDescription: ({ nickname, best }: { nickname: string; best?: { label: string; rank: string } }) =>
     `Gráfico de linha: classificação de ${nickname} em cada temporada, com o Main Event contado como mais um evento. O 1º lugar fica no alto.${best ? ` A melhor é ${best.rank}, em ${best.label}.` : ''} Os números estão na tabela abaixo.`,
   rankProgressDescription: ({ count }: { count: number }) =>
-    `Gráfico de linhas: classificação dos ${count} jogadores com mais pontos em cada temporada, com o Main Event contado como mais um evento. O 1º lugar fica no alto. Os números estão na tabela abaixo.`,
+    `Gráficos de linhas, um por jogador: classificação dos ${count} jogadores com mais pontos em cada temporada, com o Main Event contado como mais um evento. O 1º lugar fica no alto. Os números estão na tabela abaixo.`,
   rankProgressCaption: 'Classificação em cada temporada, com o Main Event',
   rankBySeasonCaption:({ nickname }: { nickname: string }) => `Classificação de ${nickname} em cada temporada, com o Main Event`,
 }

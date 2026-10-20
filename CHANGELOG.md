@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- "Classificação por temporada" in "Estatísticas" is a small chart per player in place of one chart with ten
+  crossing lines: the player's line in their color, over the other players' lines in grey.
+
 ## [1.34.0] - 2026-10-20
 
 ### Added

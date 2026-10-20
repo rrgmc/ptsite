@@ -4,7 +4,7 @@ import type { Statistics } from '@/api/client'
 import { t } from '@/i18n'
 import { formatMoney, formatPoints, formatWhole, ordinal } from '@/lib/format'
 import { placesData, potsData, progressData, rankProgressData, rankTicks, rebuysData, SERIES_COLORS, winsData } from './chartData'
-import { cell, head, highestFirst, lowestFirst, tick, tooltip } from './chartStyle'
+import { cell, head, highestFirst, tick, tooltip } from './chartStyle'
 
 /** The title of one list or chart inside a box that holds several. */
 export const subtitle = 'mb-2 text-xs font-bold uppercase text-muted'
@@ -97,32 +97,33 @@ export function PointsProgressChart({ progress, perSeason, className }: { progre
   )
 }
 
+/** A season under a small chart of "Classificação por temporada": the first one starts at its point, the last one ends at it. */
+function SeasonTick({ x, y, index, payload }: { x?: number | string; y?: number | string; index?: number; payload?: { value?: string } }) {
+  return (
+    <text x={x} y={Number(y) + 12} textAnchor={index === 0 ? 'start' : 'end'} fill={tick.fill} fontSize={10}>
+      {payload?.value}
+    </text>
+  )
+}
+
 /**
  * "Classificação por temporada", over every season: the position of the players of "Pontos acumulados" in each
  * season, 1st at the top, with the Main Event counted for fun. A season in which a player did not score is a gap.
+ * Ten lines on one chart cross too often to follow, so each player has a small chart of their own: their line in
+ * their color, over the other players' lines in the border color, on the same axes.
  */
 export function RankProgressChart({ steps, rankProgress, className }: { steps: Statistics['points_progress']['steps']; rankProgress: NonNullable<Statistics['rank_progress']>; className?: string }) {
   const { series, points } = rankProgressData(steps, rankProgress)
   const worst = Math.max(2, ...rankProgress.flatMap((s) => s.ranks.filter((rank) => rank !== null)))
-  const ticks = rankTicks(worst)
+  // Three ticks are enough for a small chart: 1st, one in the middle and one near the bottom.
+  const ticks = rankTicks(worst).filter((_, i, all) => i % Math.ceil(all.length / 3) === 0)
+  const seasons = points.length > 1 ? [points[0].label, points[points.length - 1].label] : []
   return (
     <Figure
       className={className}
       title={t.statistics.rankBySeason}
       description={t.statistics.rankProgressDescription({ count: series.length })}
-      legend={
-        <>
-          <p className="mb-2 text-sm text-muted">{t.statistics.rankBySeasonNote}</p>
-          <ul aria-label={t.statistics.legend} className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            {series.map((s) => (
-              <li key={s.key} className="flex items-center gap-2">
-                <span aria-hidden className="inline-block h-1 w-5 rounded-full" style={{ background: s.color }} />
-                {s.nickname}
-              </li>
-            ))}
-          </ul>
-        </>
-      }
+      legend={<p className="mb-3 text-sm text-muted">{t.statistics.rankBySeasonNote}</p>}
       table={
         <table className="w-full border-collapse">
           <caption className="sr-only">{t.statistics.rankProgressCaption}</caption>
@@ -143,30 +144,43 @@ export function RankProgressChart({ steps, rankProgress, className }: { steps: S
         </table>
       }
     >
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
-            <CartesianGrid stroke="var(--color-border)" vertical={false} />
-            <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />
-            {/* Reversed, so 1st is at the top and a rising line means a better season. */}
-            <YAxis reversed domain={[1, worst]} ticks={ticks} interval={0} tick={tick} tickLine={false} axisLine={false} width={40} tickFormatter={(rank: number) => ordinal(rank)} />
-            <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} itemSorter={lowestFirst} formatter={(value) => ordinal(Number(value))} />
-            {series.map((s) => (
-              <Line
-                key={s.key}
-                dataKey={s.key}
-                name={s.nickname}
-                type="linear"
-                stroke={s.color}
-                strokeWidth={2}
-                // Always dotted: a season between two gaps is a dot alone.
-                dot={{ r: 3, fill: s.color, stroke: 'var(--color-surface)', strokeWidth: 1 }}
-                activeDot={{ r: 5, stroke: 'var(--color-surface)', strokeWidth: 2 }}
-                isAnimationActive={false}
-              />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 lg:grid-cols-5">
+        {series.map((s) => (
+          <div key={s.key} data-testid="rank-panel" className="min-w-0">
+            <p className="mb-1 flex items-center gap-2 text-sm font-semibold">
+              <span aria-hidden className="inline-block h-1 w-4 shrink-0 rounded-full" style={{ background: s.color }} />
+              <span className="truncate">{s.nickname}</span>
+            </p>
+            <div className="h-32">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={points} accessibilityLayer={false} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+                  <CartesianGrid stroke="var(--color-border)" strokeOpacity={0.6} vertical={false} />
+                  {/* Only the first and the last season, each kept inside the chart: the first starts at its point, the last ends at it. */}
+                  <XAxis dataKey="label" ticks={seasons} interval={0} tick={SeasonTick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} />
+                  {/* Reversed, so 1st is at the top and a rising line means a better season. */}
+                  <YAxis reversed domain={[1, worst]} ticks={ticks} interval={0} tick={{ ...tick, fontSize: 10 }} tickLine={false} axisLine={false} width={28} tickFormatter={(rank: number) => ordinal(rank)} />
+                  {/* A smaller box than on the other charts, so it covers less of a small chart. */}
+                  <Tooltip {...tooltip} contentStyle={{ ...tooltip.contentStyle, padding: '4px 8px', fontSize: 12 }} cursor={{ stroke: 'var(--color-muted)' }} formatter={(value) => [ordinal(Number(value)), s.nickname]} />
+                  {/* The other players first, so this player's line is drawn over them. They have no tooltip. */}
+                  {series.filter((other) => other.key !== s.key).map((other) => (
+                    <Line key={other.key} dataKey={other.key} type="linear" stroke="var(--color-border)" strokeWidth={1} dot={false} activeDot={false} tooltipType="none" isAnimationActive={false} />
+                  ))}
+                  <Line
+                    dataKey={s.key}
+                    name={s.nickname}
+                    type="linear"
+                    stroke={s.color}
+                    strokeWidth={2}
+                    // Always dotted: a season between two gaps is a dot alone.
+                    dot={{ r: 2.5, fill: s.color, stroke: 'var(--color-surface)', strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: 'var(--color-surface)', strokeWidth: 2 }}
+                    isAnimationActive={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        ))}
       </div>
     </Figure>
   )
