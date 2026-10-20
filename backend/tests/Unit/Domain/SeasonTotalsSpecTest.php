@@ -2,7 +2,7 @@
 
 /*
  * Mirrors the examples in docs/specs/season-totals.md: "Temporada antiga" (season 1, 3 rounds) and "Temporada nova"
- * (season 2, one night). Players: Ana = 1, Breno = 2, Carla = 3, Davi = 4, Elisa = 5, Fábio = 6, Gabi = 7.
+ * (season 2, one night). Players: Ana = 1, Breno = 2, Carla = 3, Davi = 4, Elisa = 5, Flora = 6, Gabi = 7.
  */
 
 use PTSite\Domain\Scoring\PercentageTable;

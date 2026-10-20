@@ -50,7 +50,7 @@ lines:
 | Carla | 120.00 | 0 | 1 | 1 | 0 | 0 | 1 |
 | Davi | 90.00 | 0 | 1 | 1 | 0 | 0 | 0 |
 | Elisa | 60.00 | 0 | 0 | 1 | 1 | 1 | 0 |
-| Fábio | 30.00 | 0 | 0 | 0 | 1 | 0 | 1 |
+| Flora | 30.00 | 0 | 0 | 0 | 1 | 0 | 1 |
 | Gabi | 12.50 | 0 | 0 | 0 | 0 | 1 | 1 |
 
 Each column adds up to 3, the rounds, but that is not required (rule 3).
