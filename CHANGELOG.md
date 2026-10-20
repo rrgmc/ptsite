@@ -8,13 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.31.0] - 2026-10-20
+
 ### Added
 
 - A season can be known only by its final standings ("Só totais"): for each player, the total points and how
   often the player finished in each position, with no night. Admins save them with
-  `PUT /api/v1/seasons/{season}/totals`. The
-  seasons lists show the badge "Só totais", and "Classificação" and "Resultados" say there are no results per
-  night ([docs/specs/season-totals.md](docs/specs/season-totals.md)).
+  `PUT /api/v1/seasons/{season}/totals`. The seasons lists show the badge "Só totais", and "Classificação" and
+  "Resultados" say there are no results per night ([docs/specs/season-totals.md](docs/specs/season-totals.md)).
 
 ### Changed
 
@@ -197,7 +198,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.30.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.31.0...HEAD
+[1.31.0]: https://github.com/rrgmc/ptsite/compare/v1.30.0...v1.31.0
 [1.30.0]: https://github.com/rrgmc/ptsite/compare/v1.29.1...v1.30.0
 [1.29.1]: https://github.com/rrgmc/ptsite/compare/v1.29.0...v1.29.1
 [1.29.0]: https://github.com/rrgmc/ptsite/compare/v1.28.1...v1.29.0
