@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.30.0] - 2026-10-20
+
+### Added
+
+- "Estatísticas" in "Geral" has a tab "Campeonatos": players by titles, podiums and appearances in the final
+  standings of the finished seasons. Players who share the 1st place of a season each count a title.
+- "Classificação" of a finished season shows its first three with a medal each, in a box "Campeonato" above
+  the Main Event box.
+
+### Changed
+
+- "Estatísticas" opens on "Geral", which comes first in the switch "Geral / Temporada".
+- The specs say that a season has two champions, the season's by points and the Main Event's, and that each
+  wins a trophy.
+
 ## [1.29.1] - 2026-10-17
 
 ### Fixed
@@ -168,7 +183,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.29.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.30.0...HEAD
+[1.30.0]: https://github.com/rrgmc/ptsite/compare/v1.29.1...v1.30.0
 [1.29.1]: https://github.com/rrgmc/ptsite/compare/v1.29.0...v1.29.1
 [1.29.0]: https://github.com/rrgmc/ptsite/compare/v1.28.1...v1.29.0
 [1.28.1]: https://github.com/rrgmc/ptsite/compare/v1.28.0...v1.28.1
