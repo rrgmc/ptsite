@@ -199,6 +199,7 @@ it('shows one player\'s statistics over every season', function () {
         ->assertJsonPath('data.seasons.0', [
             'season_id' => $this->seasonB->id, 'season_name' => $this->seasonB->name,
             'rank' => 1, 'points' => '114.00', 'nights_scored' => 1, 'wins' => 1, 'rank_with_main_event' => 1,
+            'main_event_position' => null,
         ])
         ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
         ->assertJsonPath('data.seasons.1.rank', 2)
@@ -240,6 +241,24 @@ it('ranks a player in each season with its Main Event counted as one more night,
     $this->getJson("/api/v1/players/{$this->breno->id}/statistics")->assertOk()
         ->assertJsonPath('data.seasons.0.rank', 1)
         ->assertJsonPath('data.seasons.0.rank_with_main_event', 2);
+});
+
+it('gives a player\'s position in each season\'s Main Event, and none for a season whose Main Event they did not play', function () {
+    $mainEvent = Night::factory()->for($this->seasonA)->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'finished', 'starts_at' => '2026-04-03 13:00:00']);
+    $mainEvent->mainEventPositions()->createMany([['position' => 1, 'player_id' => $this->breno->id], ['position' => 2, 'player_id' => $this->ana->id]]);
+
+    // Season B, newest first, has no Main Event.
+    $this->getJson("/api/v1/players/{$this->ana->id}/statistics")->assertOk()
+        ->assertJsonPath('data.seasons.0.main_event_position', null)
+        ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
+        ->assertJsonPath('data.seasons.1.main_event_position', 2);
+    $this->getJson("/api/v1/players/{$this->breno->id}/statistics?season={$this->seasonA->id}")->assertOk()
+        ->assertJsonPath('data.seasons.0.main_event_position', 1);
+    // Carla scored in season A and did not play its Main Event.
+    $this->getJson("/api/v1/players/{$this->carla->id}/statistics")->assertOk()
+        ->assertJsonPath('data.seasons.0.main_event_position', null)
+        ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
+        ->assertJsonPath('data.seasons.1.main_event_position', null);
 });
 
 it('follows the leaders\' position season by season over every season, with the Main Event counted', function () {

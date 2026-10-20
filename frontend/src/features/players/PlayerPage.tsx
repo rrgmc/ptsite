@@ -8,6 +8,7 @@ import { PeriodSwitch } from '@/components/PeriodSwitch'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
 import { StatTiles } from '@/components/StatTiles'
 import { t } from '@/i18n'
+import { hasFeature } from '@/lib/features'
 import { formatDate, formatPoints, fullNameIfDifferent, nightTitle, ordinal } from '@/lib/format'
 import { playerImageUrl } from '@/lib/playerImages'
 import { useSeasonPath } from '@/lib/seasonPath'
@@ -150,6 +151,8 @@ const td = 'py-2 text-right tabular'
 /** One view of a player's statistics: the numbers, each season, the charts and the nights scored. */
 export function PlayerStatisticsView({ statistics, nickname }: { statistics: PlayerStatistics; nickname: string }) {
   const allTime = statistics.season_id === null
+  // The column of the Main Event, on a site that has it and once the player played one.
+  const mainEvent = hasFeature('mainEvent') && statistics.seasons.some((row) => row.main_event_position !== null)
 
   return (
     <div className="flex flex-col gap-4">
@@ -177,6 +180,11 @@ export function PlayerStatisticsView({ statistics, nickname }: { statistics: Pla
                       <th scope="col" className={th}>{t.common.position}</th>
                       <th scope="col" className={`${th} hidden sm:table-cell`}>{t.players.scored}</th>
                       <th scope="col" className={`${th} hidden sm:table-cell`}>{t.players.wins}</th>
+                      {mainEvent && (
+                        <th scope="col" className={`${th} hidden sm:table-cell`}>
+                          <abbr title={t.players.mainEvent} className="no-underline">{t.players.mainEventShort}</abbr>
+                        </th>
+                      )}
                       <th scope="col" className={`${th} pr-2`}>{t.common.points}</th>
                     </tr>
                   </thead>
@@ -188,10 +196,16 @@ export function PlayerStatisticsView({ statistics, nickname }: { statistics: Pla
                           <span className="block text-xs text-muted sm:hidden">
                             {t.players.nightsAndWins({ nights: row.nights_scored, wins: row.wins })}
                           </span>
+                          {mainEvent && row.main_event_position !== null && (
+                            <span className="block text-xs text-muted sm:hidden">
+                              {t.players.mainEventPosition({ position: ordinal(row.main_event_position) })}
+                            </span>
+                          )}
                         </th>
                         <td className={td}>{ordinal(row.rank)}</td>
                         <td className={`${td} hidden sm:table-cell`}>{row.nights_scored}</td>
                         <td className={`${td} hidden sm:table-cell`}>{row.wins}</td>
+                        {mainEvent && <td className={`${td} hidden sm:table-cell`}>{row.main_event_position === null ? '—' : ordinal(row.main_event_position)}</td>}
                         <td className={`${td} pr-2 font-bold`}>{formatPoints(row.points)}</td>
                       </tr>
                     ))}

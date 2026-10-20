@@ -1566,6 +1566,8 @@ export interface components {
              * @description The player's line in the standings of each season in which they scored, newest first.
              *     `rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the
              *     average pot of the season's nights: a statistic for fun, which the standings never use.
+             *     `main_event_position` is the player's position in the season's finished Main Event, or null when
+             *     they did not play it.
              */
             seasons: {
                 season_id: number;
@@ -1575,6 +1577,7 @@ export interface components {
                 nights_scored: number;
                 wins: number;
                 rank_with_main_event: number;
+                main_event_position: number | null;
             }[];
             /** @description The nights on which the player scored, newest first. */
             results: {

@@ -512,7 +512,7 @@ export const playerStatistics: PlayerStatistics = {
   nights_scored: 4,
   wins: 2,
   positions: [2, 1, 0, 1, 0, 0].map((count, i) => ({ position: i + 1, count })),
-  seasons: [{ season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1 }],
+  seasons: [{ season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1, main_event_position: null }],
   results: [
     playerResult(5, '2026-05-29', 1, 'Liga 2026', 4, '152.30'),
     playerResult(4, '2026-05-15', 1, 'Liga 2026', 2, '207.00'),
@@ -531,9 +531,9 @@ export const playerStatisticsAllTime: PlayerStatistics = {
   wins: 14,
   positions: [14, 12, 11, 9, 8, 7].map((count, i) => ({ position: i + 1, count })),
   seasons: [
-    { season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1 },
-    { season_id: 2, season_name: 'Liga 2025', rank: 2, points: '4769.70', nights_scored: 29, wins: 7, rank_with_main_event: 1 },
-    { season_id: 3, season_name: 'Liga 2024', rank: 1, points: '5210.40', nights_scored: 28, wins: 5, rank_with_main_event: 3 },
+    { season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1, main_event_position: null },
+    { season_id: 2, season_name: 'Liga 2025', rank: 2, points: '4769.70', nights_scored: 29, wins: 7, rank_with_main_event: 1, main_event_position: 2 },
+    { season_id: 3, season_name: 'Liga 2024', rank: 1, points: '5210.40', nights_scored: 28, wins: 5, rank_with_main_event: 3, main_event_position: 1 },
   ],
   results: [
     ...playerStatistics.results,

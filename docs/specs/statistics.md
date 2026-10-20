@@ -59,7 +59,9 @@ Everyone logged in: players, results keepers and admins.
    - **"Posições"**: how often the player finished in each scoring position. A position the player never
      reached shows 0.
 10. **"Por temporada"**, in "Geral" only: one line for each season in which the player scored, newest first, with
-    the player's position in that season's standings, points, nights scored and first places.
+    the player's position in that season's standings, points, nights scored and first places. On a site with the
+    Main Event, once the player played one, it also shows **"ME"**: the player's position in the season's finished
+    Main Event, or "—" for a season whose Main Event the player did not play.
 11. **"Resultados"**: the nights on which the player scored, newest first, with the finishing position and the
     points. Each line links to the night. "Geral" also names the season.
 12. The player's **charts**: **"Pontos acumulados"**, a line of the player's running total, with one step per
@@ -178,6 +180,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - **A player, one season.** In season A, Ana is 2nd with 174,00, scored on 2 nights and won 1.
 - **A player, season by season.** Ana: season B, 1st, 114,00, 1 night, 1 win; then season A, 2nd, 174,00, 2
   nights, 1 win. Breno has only season A: 1st, 221,00, 2 nights, 1 win.
+- **A player's Main Event.** Season A's Main Event ends Breno, Ana. Ana's "Por temporada" shows "—" under "ME"
+  for season B, which has no Main Event, and 2nd for season A. Carla did not play it: "—" for both seasons.
 - **A player's results.** Ana: night 3, 1st, 114,00; night 2, 3rd, 60,00; night 1, 1st, 114,00.
 - **A player's points.** Ana in season A: 114,00 then 174,00. Ana in "Geral": 174,00 then 288,00. Breno in
   "Geral": 221,00 then 221,00, because he did not play in season B.
