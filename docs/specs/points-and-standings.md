@@ -82,6 +82,12 @@ standings and of the simulator ([main-event.md](main-event.md)). The Main Event 
 give no points either. An extra night scores like any other ([seasons-and-nights.md](seasons-and-nights.md),
 rule 28).
 
+## Seasons known only by their final standings
+
+A season played before the league used the site may keep only its final standings: each player's total points
+and finishes in each position, with no night. They rank like any season's
+([season-totals.md](season-totals.md)).
+
 ## Open questions
 
 - **Ties.** There is no tie-breaker. The standings show tied players with the same rank (1, 2, 2, 4) and lists them in a fixed order. Should there be a

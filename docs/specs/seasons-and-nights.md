@@ -94,6 +94,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    and time chip are the totals the keeper enters (rule 9), and a night records no rebuys.
 5f. A setting of a feature the site does not have is not shown, and the API refuses it. A value recorded before
    the feature was turned off stays in the database.
+5g. A season can be known only by its final standings, with no night ("Só totais"): see
+   [season-totals.md](season-totals.md). Such a season takes no regular night.
 
 ### Game nights ("Evento")
 

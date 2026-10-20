@@ -53,6 +53,8 @@ class SeasonResource extends JsonResource
             'percentages' => $this->whenLoaded('percentages', fn () => $this->percentages
                 ->map(fn ($p) => ['position' => $p->position, 'percent' => $p->percent])->values()),
             'nights_count' => $this->whenCounted('nights'),
+            /** The season is known only by its final standings: it has no nights, and its rounds are the nights it had. */
+            'totals_only' => $this->whenHas('totals_exists', fn ($exists) => (bool) $exists),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }

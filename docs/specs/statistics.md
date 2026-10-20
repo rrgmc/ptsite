@@ -103,6 +103,10 @@ Everyone logged in: players, results keepers and admins.
 The site stores only the scoring positions of a night, not everyone who played. So a player's page cannot say
 how many nights they played, only on how many they scored.
 
+A season known only by its final standings counts in the points, the nights and the positions, and in "Geral" it
+is a step of the progress. It has no pot, no place and no night of its own, so the lists and charts of nights
+leave it out ([season-totals.md](season-totals.md), rule 8).
+
 ## Examples
 
 Ana, Breno and Carla. Season A has two nights and season B has one. A R$ 300,00 pot pays 114,00 / 69,00 / 45,00

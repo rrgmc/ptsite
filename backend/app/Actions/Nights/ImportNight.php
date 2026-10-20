@@ -8,6 +8,7 @@ use PTSite\App\Models\Night;
 use PTSite\App\Models\Season;
 use PTSite\App\Models\User;
 use PTSite\App\Support\AuditLogger;
+use PTSite\Domain\Seasons\SeasonTotalsRules;
 use PTSite\Domain\Shared\RuleViolation;
 
 /**
@@ -19,6 +20,7 @@ final class ImportNight
     public function __construct(
         private readonly WriteNightResult $writeResult,
         private readonly AuditLogger $audit,
+        private readonly SeasonTotalsRules $totalsRules,
     ) {}
 
     /** @param array<int, int> $playerByPosition position => player id */
@@ -28,6 +30,7 @@ final class ImportNight
         if ($season->isArchived()) {
             throw new RuleViolation('season.not_open');
         }
+        $this->totalsRules->assertTakesRegularNights($season->isTotalsOnly());
 
         return DB::transaction(function () use ($user, $season, $startsAt, $placeId, $pot, $mainEventPot, $timeChip, $playerByPosition, $isExtra) {
             $night = $season->nights()->create([

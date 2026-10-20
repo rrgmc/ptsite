@@ -5,6 +5,7 @@ namespace PTSite\App\Queries;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
 use PTSite\Domain\Scoring\PercentageTable;
+use PTSite\Domain\Seasons\SeasonTotalsRules;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\RankingSimulator;
 
@@ -16,6 +17,7 @@ final class SimulateRanking
     public function __construct(
         private readonly SeasonStandings $standings,
         private readonly RankingSimulator $simulator,
+        private readonly SeasonTotalsRules $totalsRules,
     ) {}
 
     /**
@@ -24,6 +26,8 @@ final class SimulateRanking
      */
     public function __invoke(Season $season, string $pot, array $playerByPosition): array
     {
+        // A season known only by its final standings has no next night.
+        $this->totalsRules->assertTakesRegularNights($season->isTotalsOnly());
         $rows = $this->simulator->simulate(
             $this->standings->scoreLines($season),
             Money::fromDecimal($pot),

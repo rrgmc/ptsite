@@ -10,6 +10,7 @@ use PTSite\App\Models\User;
 use PTSite\App\Support\AuditLogger;
 use PTSite\Domain\Nights\NightRules;
 use PTSite\Domain\Nights\NightType;
+use PTSite\Domain\Seasons\SeasonTotalsRules;
 use PTSite\Domain\Shared\RuleViolation;
 
 /**
@@ -23,6 +24,7 @@ final class ScheduleNight
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly NightRules $rules,
+        private readonly SeasonTotalsRules $totalsRules,
     ) {}
 
     /** @param string $type a NightType value */
@@ -33,6 +35,9 @@ final class ScheduleNight
             throw new RuleViolation('season.not_open');
         }
         $type = NightType::from($type);
+        if ($type === NightType::Regular) {
+            $this->totalsRules->assertTakesRegularNights($season->isTotalsOnly());
+        }
         if ($type === NightType::MainEvent) {
             Gate::forUser($user)->authorize('update', $season);
         }

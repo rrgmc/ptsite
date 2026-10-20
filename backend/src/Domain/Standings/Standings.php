@@ -5,7 +5,8 @@ namespace PTSite\Domain\Standings;
 use PTSite\Domain\Shared\Money;
 
 /**
- * Ranks players by their total points, highest first. Only players who have scored appear.
+ * Ranks players by their total points, highest first. Only players who have scored appear. A {@see TotalsLine}
+ * counts as the result lines it stands for.
  *
  * There is no tie-breaker: players with the same total share the same rank, and the next rank
  * skips accordingly (1, 2, 2, 4). Tied players are listed by player id so the order is stable.
@@ -15,7 +16,7 @@ final class Standings
     public const int TOP = 10;
 
     /**
-     * @param  iterable<ScoreLine>  $lines  result lines of the season's finished nights
+     * @param  iterable<ScoreLine|TotalsLine>  $lines  result lines of the season's finished nights, or its final lines
      * @return list<StandingRow>
      */
     public function rank(iterable $lines): array
@@ -24,14 +25,15 @@ final class Standings
         $totals = [];
         $lastPosition = 0;
         foreach ($lines as $line) {
+            $times = $line instanceof TotalsLine ? $line->positions : [$line->position => 1];
             $total = $totals[$line->playerId] ?? ['points' => Money::zero(), 'nights' => 0, 'wins' => 0, 'positions' => []];
             $total['points'] = $total['points']->plus($line->points);
-            $total['nights']++;
-            $total['positions'][$line->position] = ($total['positions'][$line->position] ?? 0) + 1;
-            $lastPosition = max($lastPosition, $line->position);
-            if ($line->position === 1) {
-                $total['wins']++;
+            foreach ($times as $position => $count) {
+                $total['nights'] += $count;
+                $total['positions'][$position] = ($total['positions'][$position] ?? 0) + $count;
+                $lastPosition = max($lastPosition, $position);
             }
+            $total['wins'] += $times[1] ?? 0;
             $totals[$line->playerId] = $total;
         }
 

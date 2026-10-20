@@ -14,6 +14,7 @@ import { formatDate, moneyText, ordinal, parseMoneyInput } from '@/lib/format'
 import { hasFeature } from '@/lib/features'
 import { currencySymbol } from '@/lib/site'
 import { EVERY_WEEKS, WEEKDAYS } from './weekdays'
+import { playedRounds } from '../seasons/totalsOnly'
 
 const STANDARD = [38, 23, 15, 11, 8, 5]
 
@@ -24,12 +25,16 @@ export function SeasonsAdmin() {
   if (seasons.isPending) return <Loading />
   if (seasons.error) return <ErrorBox error={seasons.error} />
 
-  const status = (s: Season) =>
-    s.is_finished ? <Badge>{t.admin.seasons.finished}</Badge> : s.is_open ? <Badge tone="primary">{t.admin.seasons.open}</Badge> : <Badge tone="warning">{t.admin.seasons.closed}</Badge>
+  const status = (s: Season) => (
+    <>
+      {s.is_finished ? <Badge>{t.admin.seasons.finished}</Badge> : s.is_open ? <Badge tone="primary">{t.admin.seasons.open}</Badge> : <Badge tone="warning">{t.admin.seasons.closed}</Badge>}
+      {s.totals_only && <Badge>{t.seasons.totalsOnly}</Badge>}
+    </>
+  )
   const actionLink = 'inline-flex min-h-touch items-center rounded-md px-3 font-semibold whitespace-nowrap text-primary hover:bg-primary-soft'
   const actions = (s: Season) => (
     <>
-      {!s.is_finished && hasFeature('seasonPlanner') && (
+      {!s.is_finished && !s.totals_only && hasFeature('seasonPlanner') && (
         <Link to={`/admin/seasons/${s.id}/plan`} className={actionLink}>{t.admin.seasons.planDates}</Link>
       )}
       {hasFeature('mainEvent') && (
@@ -65,7 +70,7 @@ export function SeasonsAdmin() {
                   <th scope="row" className="px-2 py-2 text-left font-semibold wrap-anywhere">{s.name}</th>
                   <td className="px-2 py-2 whitespace-nowrap tabular">{formatDate(s.starts_on)}</td>
                   <td className="hidden px-2 py-2 text-right tabular sm:table-cell">{s.nights_planned ?? 0}</td>
-                  <td className="hidden px-2 py-2 text-right tabular sm:table-cell">{s.nights_count ?? 0}</td>
+                  <td className="hidden px-2 py-2 text-right tabular sm:table-cell">{playedRounds(s)}</td>
                   <td className="hidden px-2 py-2 sm:table-cell">{status(s)}</td>
                   <td className="hidden py-1 sm:table-cell">
                     <span className="flex flex-wrap items-center justify-end gap-x-2">{actions(s)}</span>

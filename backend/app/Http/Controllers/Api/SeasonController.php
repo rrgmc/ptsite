@@ -6,9 +6,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use PTSite\App\Actions\Seasons\SaveSeason;
+use PTSite\App\Actions\Seasons\SaveSeasonTotals;
 use PTSite\App\Http\Controllers\Controller;
 use PTSite\App\Http\Requests\PlanNightsRequest;
 use PTSite\App\Http\Requests\SaveSeasonRequest;
+use PTSite\App\Http\Requests\SaveSeasonTotalsRequest;
 use PTSite\App\Http\Requests\SimulateRequest;
 use PTSite\App\Http\Requests\UpdateSeasonRequest;
 use PTSite\App\Http\Resources\CalendarEntryResource;
@@ -36,7 +38,7 @@ class SeasonController extends Controller
             ->when(! $request->user()->isAdmin(), fn ($q) => $q->notArchived())
             ->when($request->query('updated_since'), fn ($q, $since) => $q->where('updated_at', '>', $since))
             ->with(['defaultPlace', 'percentages'])
-            ->withCount(self::counts())
+            ->withCount(self::counts())->withExists('totals')
             ->orderByDesc('starts_on')
             ->get();
 
@@ -46,7 +48,7 @@ class SeasonController extends Controller
     /** The current season: the newest one that is open and not finished. */
     public function current(): SeasonResource|JsonResponse
     {
-        $season = Season::query()->current()->with(['defaultPlace', 'percentages'])->withCount(self::counts())->first();
+        $season = Season::query()->current()->with(['defaultPlace', 'percentages'])->withCount(self::counts())->withExists('totals')->first();
 
         return $season ? new SeasonResource($season) : response()->json(['message' => 'Nenhuma temporada aberta.'], 404);
     }
@@ -60,7 +62,7 @@ class SeasonController extends Controller
         $seasons = Season::query()
             ->notArchived()
             ->with(['defaultPlace', 'percentages'])
-            ->withCount(self::counts())
+            ->withCount(self::counts())->withExists('totals')
             ->orderByDesc('starts_on')
             ->orderByDesc('id')
             ->get();
@@ -70,7 +72,7 @@ class SeasonController extends Controller
 
     public function show(Season $season): SeasonResource
     {
-        return new SeasonResource($season->load(['defaultPlace', 'percentages'])->loadCount(self::counts()));
+        return new SeasonResource($season->load(['defaultPlace', 'percentages'])->loadCount(self::counts())->loadExists('totals'));
     }
 
     /** Standings of the season, highest total first. Players with the same total share a rank. */
@@ -136,16 +138,28 @@ class SeasonController extends Controller
         );
     }
 
+    /**
+     * Saves the final standings of a season known only by them (admins): for each player, the total points and how
+     * often the player finished in each scoring position. In each position, the players' finishes add up to the
+     * season's rounds. They replace the season's final lines; an empty list clears them. Returns the standings.
+     */
+    public function saveTotals(SaveSeasonTotalsRequest $request, Season $season, SaveSeasonTotals $save, SeasonStandings $standings): AnonymousResourceCollection
+    {
+        $save($request->user(), $season, $request->lines());
+
+        return StandingResource::collection($standings($season));
+    }
+
     public function store(SaveSeasonRequest $request, SaveSeason $save): JsonResponse
     {
         $season = $save($request->user(), null, $request->seasonData());
 
-        return (new SeasonResource($season->load(['defaultPlace', 'percentages'])->loadCount(self::counts())))->response()->setStatusCode(201);
+        return (new SeasonResource($season->load(['defaultPlace', 'percentages'])->loadCount(self::counts())->loadExists('totals')))->response()->setStatusCode(201);
     }
 
     public function update(UpdateSeasonRequest $request, Season $season, SaveSeason $save): SeasonResource
     {
-        return new SeasonResource($save($request->user(), $season, $request->seasonData())->load(['defaultPlace', 'percentages'])->loadCount(self::counts()));
+        return new SeasonResource($save($request->user(), $season, $request->seasonData())->load(['defaultPlace', 'percentages'])->loadCount(self::counts())->loadExists('totals'));
     }
 
     /**

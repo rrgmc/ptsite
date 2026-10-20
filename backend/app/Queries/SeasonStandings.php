@@ -8,10 +8,12 @@ use PTSite\App\Models\Season;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
 use PTSite\Domain\Standings\Standings;
+use PTSite\Domain\Standings\TotalsLine;
 
 /**
- * The standings of a season, calculated from the results of its finished, non-archived nights.
- * Nothing is stored: a corrected result changes the standings at once.
+ * The standings of a season, calculated from the results of its finished, non-archived nights, or from its final
+ * lines when it is known only by its final standings. Nothing is stored: a corrected result changes the standings
+ * at once.
  */
 final class SeasonStandings
 {
@@ -20,7 +22,7 @@ final class SeasonStandings
     /** @return list<StandingEntry> */
     public function __invoke(Season $season): array
     {
-        $rows = $this->standings->rank($this->scoreLines($season));
+        $rows = $this->standings->rank([...$this->scoreLines($season), ...$this->totalsLines($season)]);
         $players = Player::query()->findMany(array_map(fn ($r) => $r->playerId, $rows))->keyBy('id');
 
         return array_map(fn ($row) => new StandingEntry(
@@ -31,6 +33,12 @@ final class SeasonStandings
             $row->wins,
             StandingEntry::positions($row),
         ), $rows);
+    }
+
+    /** @return list<TotalsLine> */
+    public function totalsLines(Season $season): array
+    {
+        return $season->totals()->get()->map(TotalsLines::of(...))->all();
     }
 
     /** @return list<ScoreLine> */

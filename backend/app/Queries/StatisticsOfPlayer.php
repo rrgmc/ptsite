@@ -23,9 +23,10 @@ final class StatisticsOfPlayer
     public function __invoke(Player $player, ?Season $season): PlayerStatisticsReport
     {
         $nights = ($this->finishedNights)($season);
-        $seasonNames = $nights->pluck('season.name', 'season_id');
+        $totalsSeasons = $this->finishedNights->totalsSeasons($season);
+        $seasonNames = $nights->pluck('season.name', 'season_id')->union($totalsSeasons->pluck('name', 'id'));
 
-        $summary = $this->statistics->summarise($player->id, $this->finishedNights->records($nights), stepPerSeason: $season === null);
+        $summary = $this->statistics->summarise($player->id, $this->finishedNights->records($nights, totalsSeasons: $totalsSeasons), stepPerSeason: $season === null);
 
         return new PlayerStatisticsReport(
             $season?->id,
@@ -50,7 +51,7 @@ final class StatisticsOfPlayer
                 'position' => $result->position,
                 'points' => $result->points->toDecimal(),
             ], $summary->results),
-            $this->finishedNights->steps($summary->progressSteps, $nights, $season === null),
+            $this->finishedNights->steps($summary->progressSteps, $nights, $season === null, $totalsSeasons),
             array_map(fn (Money $total) => $total->toDecimal(), $summary->progress),
         );
     }

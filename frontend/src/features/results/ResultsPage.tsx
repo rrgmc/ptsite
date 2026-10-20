@@ -46,10 +46,11 @@ export function ResultsPage() {
   // A finished season has nothing to come. An open one shows its next nights only; the calendar has them all.
   const toCome = season.is_finished ? [] : all.filter((n) => n.status !== 'finished')
   const upcoming = toCome.slice(0, UPCOMING)
-  const canRun = me.data?.abilities.run_nights && !season.is_finished
+  // A season known only by its final standings takes no night.
+  const canRun = me.data?.abilities.run_nights && !season.is_finished && !season.totals_only
   const showUpcoming = upcoming.length > 0 || canRun
   // A season with no finished night has no totals and no chart.
-  const totals = statistics.data && statistics.data.nights_count > 0 ? statistics.data : undefined
+  const totals = statistics.data && statistics.data.nights_count > 0 && !season.totals_only ? statistics.data : undefined
 
   return (
     <>
@@ -118,7 +119,7 @@ export function ResultsPage() {
       {nights.isPending ? (
         <Loading />
       ) : finished.length === 0 ? (
-        <Empty>{t.results.noFinished}</Empty>
+        <Empty>{season.totals_only ? t.seasons.totalsOnlyNote : t.results.noFinished}</Empty>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {finished.map(({ night, number }) =>

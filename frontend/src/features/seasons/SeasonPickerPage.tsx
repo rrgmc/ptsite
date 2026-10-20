@@ -6,6 +6,7 @@ import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { t } from '@/i18n'
 import { formatDate } from '@/lib/format'
 import { SeasonBadge } from './SeasonBadge'
+import { playedRounds } from './totalsOnly'
 import { usePickSeason } from './usePickSeason'
 
 /**
@@ -73,7 +74,7 @@ export function SeasonPickerPage() {
                     </th>
                     <td className="px-2 py-1 whitespace-nowrap tabular">{formatDate(s.starts_on)}</td>
                     <td className="hidden px-2 py-1 text-right tabular sm:table-cell">{s.nights_planned ?? 0}</td>
-                    <td className="hidden px-2 py-1 text-right tabular sm:table-cell">{s.nights_count ?? 0}</td>
+                    <td className="hidden px-2 py-1 text-right tabular sm:table-cell">{playedRounds(s)}</td>
                     <td className="px-2 py-1">
                       <span className="flex flex-wrap items-center gap-x-2">{status(s)}</span>
                     </td>

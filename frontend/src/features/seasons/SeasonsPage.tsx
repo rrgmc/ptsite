@@ -8,6 +8,7 @@ import { t } from '@/i18n'
 import { hasFeature } from '@/lib/features'
 import { formatDate } from '@/lib/format'
 import { SeasonBadge } from './SeasonBadge'
+import { playedRounds } from './totalsOnly'
 import { SeasonTopTen } from './SeasonTopTen'
 import { usePickSeason } from './usePickSeason'
 
@@ -48,7 +49,7 @@ export function SeasonsPage() {
               }
             >
               <p className="-mt-2 mb-2 text-sm text-muted">
-                {t.seasons.started({ date: formatDate(season.starts_on), count: season.nights_count ?? 0 })}
+                {t.seasons.started({ date: formatDate(season.starts_on), count: playedRounds(season) })}
               </p>
               {hasFeature('mainEvent') && champion && (
                 // A box in the site's color, so it does not read as one more row of the list under it.

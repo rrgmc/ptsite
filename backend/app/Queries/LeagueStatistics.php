@@ -7,6 +7,7 @@ use PTSite\App\Models\Night;
 use PTSite\App\Models\Place;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
+use PTSite\App\Models\SeasonTotal;
 use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
 use PTSite\Domain\Shared\Money;
@@ -42,12 +43,13 @@ final class LeagueStatistics
     public function __invoke(?Season $season): StatisticsReport
     {
         $nights = ($this->finishedNights)($season);
+        $totalsSeasons = $this->finishedNights->totalsSeasons($season);
 
         $dashboard = $this->features->enabled(Feature::NightDashboard);
         $timeChip = $dashboard && $this->features->enabled(Feature::TimeChip);
-        $summary = $this->statistics->summarise($this->finishedNights->records($nights, withDashboard: $dashboard), stepPerSeason: $season === null);
+        $summary = $this->statistics->summarise($this->finishedNights->records($nights, withDashboard: $dashboard, totalsSeasons: $totalsSeasons), stepPerSeason: $season === null);
         $mainEvent = $this->features->enabled(Feature::MainEvent) ? $this->mainEvent($season) : null;
-        $championships = $season === null ? $this->championships($nights) : null;
+        $championships = $season === null ? $this->championships($nights, $totalsSeasons) : null;
 
         $playerLists = [
             $summary->totalPoints, $summary->nightsScored, ...$summary->positions,
@@ -88,7 +90,7 @@ final class LeagueStatistics
                 array_map(fn (RankedRow $row) => new RankedEntry($row->rank, place: $places[$row->id], count: $row->value), $summary->places->rows),
                 $summary->places->tiedNotShown,
             ),
-            $this->finishedNights->steps($summary->progress->steps, $nights, $season === null),
+            $this->finishedNights->steps($summary->progress->steps, $nights, $season === null, $totalsSeasons),
             array_map(
                 fn (int $playerId, array $totals) => ['player' => $players[$playerId], 'points' => array_map(fn (Money $m) => $m->toDecimal(), $totals)],
                 array_keys($summary->progress->totals),
@@ -127,12 +129,13 @@ final class LeagueStatistics
     }
 
     /**
-     * The final standings of the finished seasons among the nights counted. A finished season with no finished
-     * night has no standings, so it does not count.
+     * The final standings of the finished seasons among the nights counted, and of the finished seasons known only
+     * by their final standings. A finished season with no finished night has no standings, so it does not count.
      *
      * @param  Collection<int, Night>  $nights  the result of FinishedNights, with their results and season
+     * @param  Collection<int, Season>  $totalsSeasons  the result of FinishedNights::totalsSeasons()
      */
-    private function championships(Collection $nights): ChampionshipSummary
+    private function championships(Collection $nights, Collection $totalsSeasons): ChampionshipSummary
     {
         $lines = [];
         foreach ($nights as $night) {
@@ -140,6 +143,12 @@ final class LeagueStatistics
                 foreach ($night->results as $line) {
                     $lines[$night->season_id][] = new ScoreLine($line->player_id, Money::fromDecimal((string) $line->points), $line->position);
                 }
+            }
+        }
+        foreach ($totalsSeasons->where('is_finished', true) as $totalsSeason) {
+            foreach ($totalsSeason->totals as $total) {
+                /** @var SeasonTotal $total */
+                $lines[$totalsSeason->id][] = TotalsLines::of($total);
             }
         }
 

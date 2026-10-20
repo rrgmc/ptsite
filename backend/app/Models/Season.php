@@ -67,6 +67,18 @@ class Season extends Model
         return $this->hasMany(Night::class);
     }
 
+    /** @return HasMany<SeasonTotal, $this> the final lines of a season known only by its final standings */
+    public function totals(): HasMany
+    {
+        return $this->hasMany(SeasonTotal::class);
+    }
+
+    /** Whether the season is known only by its final standings: it has final lines and no regular night. */
+    public function isTotalsOnly(): bool
+    {
+        return $this->totals_exists ?? $this->totals()->exists();
+    }
+
     /** @return array<int, int> position => percent */
     public function percentByPosition(): array
     {
