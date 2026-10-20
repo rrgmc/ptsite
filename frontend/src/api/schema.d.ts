@@ -730,8 +730,9 @@ export interface paths {
         };
         /**
          * Players, each with the memo: active first, then inactive, by nickname ignoring capitals and accents. Archived
-         *     players only for admins with archived=1.
-         *     Filters: status (active|inactive), search (nickname or name), updated_since (ISO 8601)
+         *     players only for admins with archived=1, or for everyone with with_memo=1, which lists only the players who
+         *     have a memo ("Detalhado").
+         *     Filters: status (active|inactive), search (nickname or name), updated_since (ISO 8601), with_memo
          */
         get: operations["player.index"];
         put?: never;
@@ -3556,6 +3557,7 @@ export interface operations {
     "player.index": {
         parameters: {
             query?: {
+                with_memo?: boolean;
                 status?: string;
                 search?: string;
                 updated_since?: string;

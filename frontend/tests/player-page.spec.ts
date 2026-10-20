@@ -73,7 +73,14 @@ test('an admin writes a player\'s memo, and a player reads it but cannot write t
   const card = rows.filter({ has: page.getByRole('heading', { name: nickname, level: 2 }) })
   await expect(card.getByText('Fundador da mesa.')).toBeVisible()
   // The imported players have no memo.
-  expect(await rows.count()).toBeLessThan(total)
+  const cards = rows.filter({ has: page.getByRole('heading', { level: 2 }) })
+  expect(await cards.count()).toBeLessThan(total)
+  // A button for each card leads to it.
+  const jumpList = page.getByRole('navigation', { name: 'Ir para o jogador' })
+  await expect(jumpList.getByRole('button')).toHaveCount(await cards.count())
+  await jumpList.getByRole('button', { name: nickname, exact: true }).click()
+  await expect(card).toBeFocused()
+  await expect(card).toBeInViewport()
   await expectAccessible(page)
   await views.getByRole('link', { name: 'Lista' }).click()
   await expect(page).toHaveURL(/\/players$/)

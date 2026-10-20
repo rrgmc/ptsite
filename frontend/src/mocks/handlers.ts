@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightDashboard, nightPlan, openMainEventNight, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
+import { archivedWithMemo, attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightDashboard, nightPlan, openMainEventNight, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
 
 const withArchived = (request: Request) => new URL(request.url).searchParams.get('archived') === '1'
 
@@ -78,7 +78,12 @@ export const handlers = [
     return HttpResponse.json({ data: { ...mainEventNight, main_event_positions: player_ids.map((id, i) => ({ position: i + 1, player: players.find((p) => p.id === id) ?? players[0] })) } })
   }),
   http.post('/api/v1/seasons/:id/main-event/import', () => HttpResponse.json({ data: mainEventNight }, { status: 201 })),
-  http.get('/api/v1/players', () => HttpResponse.json({ data: players.map((p) => ({ ...p, memo: memos[p.id] ?? null })) })),
+  http.get('/api/v1/players', ({ request }) => {
+    const all = players.map((p) => ({ ...p, memo: memos[p.id] ?? null }))
+    // With with_memo, as the API: only the players with a memo, archived ones too.
+    const withMemo = new URL(request.url).searchParams.has('with_memo')
+    return HttpResponse.json({ data: withMemo ? [...all.filter((p) => p.memo), archivedWithMemo] : all })
+  }),
   // One handler per kind of image. MSW cannot read a pattern such as `:kind(thumbnail|photo)`: it throws on every
   // request, and then no story renders.
   ...(['thumbnail', 'photo'] as const).map((kind) =>

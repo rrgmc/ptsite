@@ -21,7 +21,8 @@ seconds, at the table, on a phone.
    - **Inactive** players are not playing for now, for example someone taking a year off. They keep all their
      history and can be made active again at any time.
 3. A player can also be **archived**. Archiving is for mistakes, such as a duplicate or a player created by
-   accident. Archived players are hidden everywhere except in "Administração", where they can be restored.
+   accident. Archived players are hidden everywhere except in "Administração", where they can be restored, and
+   in the detailed view of the players list when they have a memo (rule 13).
    Archiving asks for confirmation first; restoring does not.
 4. **Picking a player for results** shows active players first. It can search all players. Inactive players
    are marked as such, so that an old night can be corrected even if a player from it is now inactive.
@@ -81,9 +82,14 @@ seconds, at the table, on a phone.
 13. **The players list has two views**, chosen with "Lista" and "Detalhado" at the top of the page.
     - **"Lista"** is the view the page opens with. It shows every player: the thumbnail, the nickname and the
       full name.
-    - **"Detalhado"** shows only the players who have a memo. Each one has the photo or thumbnail, the nickname
-      and the memo.
-    - Both views keep the order of rule 8 and mark inactive players. The search works in both.
+    - **"Detalhado"** shows only the players who have a memo, the inactive and archived ones too. Each one has
+      the photo or thumbnail with the full name under it, the nickname and the memo.
+    - "Lista" keeps the order of rule 8. "Detalhado" follows "Posições" over every season
+      ([statistics.md](statistics.md), rule 3c); the players who are not in it come after, in the order of
+      rule 8.
+    - "Detalhado" starts with a button for each of its players, in the same order. The button scrolls to the
+      player's card. On a wide screen the cards go two to a line.
+    - Both views mark inactive players; "Detalhado" also marks archived ones. The search works in both.
     - Each view has its own address (`/players` and `/players?view=detailed`), so it can be linked to.
 
 ## Examples
@@ -120,6 +126,9 @@ Names are invented.
   then saves an empty memo, and Ana's page no longer has one.
 - **Detailed view.** Ana has a memo and Breno has none. The players list opens in "Lista", with both of them and
   no memo. In "Detalhado" it shows Ana with her photo and her memo, and does not show Breno.
+- **Detailed view order.** Ana, Breno, Carlão and the archived Dudu have a memo. Over every season, "Posições"
+  lists Ana, then Carlão, then Breno; Dudu never scored. "Detalhado" shows Ana, Carlão, Breno, then Dudu, marked
+  "Arquivado", with a button for each at the top. Tapping "Breno" scrolls to Breno's card.
 - **Not their own memo.** Ana sends a memo for herself, together with a new full name. The site refuses, and
   neither the memo nor the name is saved.
 - **Duplicate.** Someone quick-adds "Dudu" although "Dudú" already exists. The admin moves the results to the

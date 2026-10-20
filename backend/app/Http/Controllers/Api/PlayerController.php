@@ -26,16 +26,19 @@ class PlayerController extends Controller
 {
     /**
      * Players, each with the memo: active first, then inactive, by nickname ignoring capitals and accents. Archived
-     * players only for admins with archived=1.
-     * Filters: status (active|inactive), search (nickname or name), updated_since (ISO 8601).
+     * players only for admins with archived=1, or for everyone with with_memo=1, which lists only the players who
+     * have a memo ("Detalhado").
+     * Filters: status (active|inactive), search (nickname or name), updated_since (ISO 8601), with_memo.
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $withArchived = $request->boolean('archived') && $request->user()->can('viewArchived', Player::class);
+        $withMemo = $request->boolean('with_memo');
+        $withArchived = $withMemo || ($request->boolean('archived') && $request->user()->can('viewArchived', Player::class));
 
         $players = Player::query()
             ->when($request->user()->isAdmin(), fn ($q) => $q->with('user'))
             ->when(! $withArchived, fn ($q) => $q->notArchived())
+            ->when($withMemo, fn ($q) => $q->whereNotNull('memo')->where('memo', '<>', ''))
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
             ->when($request->query('search'), fn ($q, $search) => $q->where(fn ($q) => $q
                 ->where('nickname', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%")))
