@@ -21,6 +21,15 @@ export const AllTime: StoryObj = {
   render: () => <RouterStory path="/players/:playerId/all" url="/players/1/all" element={<AllTimePlayerPage />} />,
 }
 
+/** "Resultados" opened over every season: the nights load then, each with its season's name. */
+export const AllTimeResults: StoryObj = {
+  render: () => <RouterStory path="/players/:playerId/all" url="/players/1/all" element={<AllTimePlayerPage />} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByText('Resultados'))
+    await canvas.findByRole('table', { name: /^Eventos em que/ })
+  },
+}
+
 /** An inactive player with no image and no memo, who did not score. */
 export const NeverScored: StoryObj = { render: () => season(12) }
 

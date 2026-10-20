@@ -6,7 +6,6 @@ use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Statistics\NightRecord;
-use PTSite\Domain\Statistics\PlayerResult;
 use PTSite\Domain\Statistics\PlayerSeasonRow;
 use PTSite\Domain\Statistics\PlayerStatistics;
 
@@ -49,14 +48,6 @@ final class StatisticsOfPlayer
                 'rank_with_main_event' => $ranksWithMainEvent[$row->seasonId] ?? $row->rank,
                 'main_event_position' => $mainEventPositions[$row->seasonId] ?? null,
             ], $summary->seasons),
-            array_map(fn (PlayerResult $result) => [
-                'night_id' => $result->nightId,
-                'starts_at' => $nights[$result->nightId]->starts_at->toIso8601String(),
-                'season_id' => $result->seasonId,
-                'season_name' => $seasonNames[$result->seasonId],
-                'position' => $result->position,
-                'points' => $result->points->toDecimal(),
-            ], $summary->results),
             $this->finishedNights->steps($summary->progressSteps, $nights, $season === null, $totalsSeasons),
             array_map(fn (Money $total) => $total->toDecimal(), $summary->progress),
         );

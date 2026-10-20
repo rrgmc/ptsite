@@ -13,6 +13,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - "ME" in "Por temporada" on the player's page: the player's position in each season's Main Event
   ([docs/specs/statistics.md](docs/specs/statistics.md), rule 10). Each season of
   `GET /api/v1/players/{id}/statistics` has `main_event_position`.
+- `GET /api/v1/players/{id}/results`: the nights on which a player scored, of one season or of every season.
+
+### Changed
+
+- "Resultados" on the player's page starts closed, and its nights load only when it is opened
+  ([docs/specs/statistics.md](docs/specs/statistics.md), rule 11).
+
+### Removed
+
+- `results` from `GET /api/v1/players/{id}/statistics`. Use `GET /api/v1/players/{id}/results`.
 
 ## [1.34.0] - 2026-10-20
 

@@ -19,6 +19,7 @@ export const keys = {
   statistics: (seasonId: number | null) => ['statistics', seasonId] as const,
   /** Starts with "statistics", so a changed result refreshes it with the league's. */
   playerStatistics: (playerId: number, seasonId: number | null) => ['statistics', 'player', playerId, seasonId] as const,
+  playerResults: (playerId: number, seasonId: number | null) => ['statistics', 'player', playerId, seasonId, 'results'] as const,
   nights: (id: number) => ['seasons', id, 'nights'] as const,
   suggestions: (id: number) => ['seasons', id, 'night-suggestions'] as const,
   night: (id: number) => ['nights', id] as const,
@@ -171,6 +172,16 @@ export function usePlayerStatistics(playerId: number, seasonId: number | null | 
     enabled: seasonId !== undefined,
     queryFn: async () =>
       (await unwrap(api.GET('/v1/players/{player}/statistics', { params: { path: { player: playerId }, query: seasonId ? { season: seasonId } : {} } }))).data,
+  })
+}
+
+/** The nights a player scored. `enabled` is false until the list is opened: it can be long. */
+export function usePlayerResults(playerId: number, seasonId: number | null, enabled: boolean) {
+  return useQuery({
+    queryKey: keys.playerResults(playerId, seasonId),
+    enabled,
+    queryFn: async () =>
+      (await unwrap(api.GET('/v1/players/{player}/results', { params: { path: { player: playerId }, query: seasonId ? { season: seasonId } : {} } }))).data,
   })
 }
 

@@ -204,15 +204,7 @@ it('shows one player\'s statistics over every season', function () {
         ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
         ->assertJsonPath('data.seasons.1.rank', 2)
         ->assertJsonPath('data.seasons.1.points', '174.00')
-        ->assertJsonPath('data.results.0', [
-            'night_id' => $this->night3->id, 'starts_at' => $this->night3->starts_at->toIso8601String(),
-            'season_id' => $this->seasonB->id, 'season_name' => $this->seasonB->name,
-            'position' => 1, 'points' => '114.00',
-        ])
-        ->assertJsonPath('data.results.1.night_id', $this->night2->id)
-        ->assertJsonPath('data.results.1.position', 3)
-        ->assertJsonPath('data.results.1.points', '60.00')
-        ->assertJsonCount(3, 'data.results')
+        ->assertJsonMissingPath('data.results')
         ->assertJsonPath('data.points_progress.steps.0.season_id', $this->seasonA->id)
         ->assertJsonPath('data.points_progress.steps.0.night_id', null)
         ->assertJsonPath('data.points_progress.points', ['174.00', '288.00']);
@@ -287,9 +279,28 @@ it('shows one player\'s statistics in one season, to any logged-in user', functi
         ->assertJsonPath('data.nights_scored', 2)
         ->assertJsonPath('data.wins', 1)
         ->assertJsonCount(1, 'data.seasons')
-        ->assertJsonCount(2, 'data.results')
         ->assertJsonPath('data.points_progress.steps.0.night_id', $this->night1->id)
         ->assertJsonPath('data.points_progress.points', ['114.00', '174.00']);
+});
+
+it('lists the nights on which a player scored, newest first, apart from the statistics', function () {
+    $this->getJson("/api/v1/players/{$this->ana->id}/results")->assertOk()
+        ->assertJsonPath('data.0', [
+            'night_id' => $this->night3->id, 'starts_at' => $this->night3->starts_at->toIso8601String(),
+            'season_id' => $this->seasonB->id, 'season_name' => $this->seasonB->name,
+            'position' => 1, 'points' => '114.00',
+        ])
+        ->assertJsonPath('data.1.night_id', $this->night2->id)
+        ->assertJsonPath('data.1.position', 3)
+        ->assertJsonPath('data.1.points', '60.00')
+        ->assertJsonPath('data.2.night_id', $this->night1->id)
+        ->assertJsonCount(3, 'data');
+
+    $this->getJson("/api/v1/players/{$this->ana->id}/results?season={$this->seasonA->id}")->assertOk()
+        ->assertJsonPath('data.0.night_id', $this->night2->id)
+        ->assertJsonCount(2, 'data');
+
+    $this->getJson('/api/v1/players/'.Player::factory()->create()->id.'/results')->assertOk()->assertJsonPath('data', []);
 });
 
 it('shows zeros for a player who never scored', function () {
@@ -301,7 +312,6 @@ it('shows zeros for a player who never scored', function () {
         ->assertJsonPath('data.nights_scored', 0)
         ->assertJsonPath('data.positions.0', ['position' => 1, 'count' => 0])
         ->assertJsonPath('data.seasons', [])
-        ->assertJsonPath('data.results', [])
         ->assertJsonPath('data.points_progress.points', ['0.00', '0.00']);
 });
 
@@ -311,14 +321,17 @@ it('leaves archived nights and archived seasons out of a player\'s statistics', 
 
     $this->getJson("/api/v1/players/{$this->ana->id}/statistics")->assertOk()
         ->assertJsonPath('data.points', '114.00')
-        ->assertJsonCount(1, 'data.results')
         ->assertJsonCount(1, 'data.seasons');
+    $this->getJson("/api/v1/players/{$this->ana->id}/results")->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.night_id', $this->night1->id);
 });
 
 it('needs a login for a player\'s statistics', function () {
     $this->app['auth']->forgetGuards();
 
     $this->getJson("/api/v1/players/{$this->ana->id}/statistics")->assertUnauthorized();
+    $this->getJson("/api/v1/players/{$this->ana->id}/results")->assertUnauthorized();
 });
 
 it('refuses a season that does not exist', function () {

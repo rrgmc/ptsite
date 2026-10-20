@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { archivedWithMemo, attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightDashboard, nightPlan, openMainEventNight, openNight, places, players, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
+import { archivedWithMemo, attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightDashboard, nightPlan, openMainEventNight, openNight, places, players, playerResults, playerResultsAllTime, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
 
 const withArchived = (request: Request) => new URL(request.url).searchParams.get('archived') === '1'
 
@@ -112,6 +112,9 @@ export const handlers = [
         login: { username: 'ana', role: 'player', last_login_at: null },
       },
     }),
+  ),
+  http.get('/api/v1/players/:id/results', ({ request }) =>
+    HttpResponse.json({ data: new URL(request.url).searchParams.has('season') ? playerResults : playerResultsAllTime }),
   ),
   http.get('/api/v1/players/:id/statistics', ({ params, request }) => {
     if (Number(params.id) === 12) return HttpResponse.json({ data: playerStatisticsEmpty })

@@ -63,7 +63,8 @@ Everyone logged in: players, results keepers and admins.
     Main Event, once the player played one, it also shows **"ME"**: the player's position in the season's finished
     Main Event, or "—" for a season whose Main Event the player did not play.
 11. **"Resultados"**: the nights on which the player scored, newest first, with the finishing position and the
-    points. Each line links to the night. "Geral" also names the season.
+    points. Each line links to the night. "Geral" also names the season. The list can be long, so it starts
+    closed, and its nights load only when it is opened.
 12. The player's **charts**: **"Pontos acumulados"**, a line of the player's running total, with one step per
     night in "Temporada" and one per season in "Geral"; and **"Posições"**, a bar for each scoring position. The
     line stays flat on a night or season in which the player did not score.
@@ -235,7 +236,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   night has neither the chart nor the box.
 - **The player's page** has its own "Temporada" / "Geral" switch, each with its own address. Under it: the
   numbers, "Por temporada" (in "Geral"), "Classificação por temporada" (in "Geral", full width), the two charts
-  with "Ver dados em tabela", then "Resultados". A player who did not score sees "Ainda não pontuou" in place of
+  with "Ver dados em tabela", then "Resultados", closed. A player who did not score sees "Ainda não pontuou" in place of
   the charts and lists.
 
 ## Open questions

@@ -31,8 +31,6 @@ class PlayerStatisticsResource extends JsonResource
              * they did not play it.
              */
             'seasons' => $this->seasons,
-            /** The nights on which the player scored, newest first. */
-            'results' => $this->results,
             /** The player's running total: per night in a season, per season otherwise. */
             'points_progress' => [
                 /** Oldest first. `night_id` and `starts_at` are null when the step is a season. */
