@@ -8,6 +8,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.34.0] - 2026-10-20
+
+### Added
+
+- "Classificação por temporada" on the player's page, in "Geral": the player's position in each season, 1st at
+  the top, for a player of two seasons or more.
+- "Classificação por temporada" in "Estatísticas", in "Geral", below the box with tabs: the same chart for the
+  ten players with most points, with a gap where a player did not score.
+- Both charts count each season's Main Event as one more night of it, for fun, on the average pot of its nights.
+  A season known only by its final standings uses its points over its rounds. The standings never count it
+  ([docs/specs/statistics.md](docs/specs/statistics.md), rules 5a and 12).
+- `GET /api/v1/statistics` has `rank_progress`, and each season of `GET /api/v1/players/{id}/statistics` has
+  `rank_with_main_event`.
+
+### Changed
+
+- The player's page opens on "Geral": every nickname links to `/players/<id>/all`, and "Geral" comes first in
+  the switch ([docs/specs/players.md](docs/specs/players.md), rule 11).
+- "Pontos acumulados" follows the ten players with most points instead of eight, with two more chart colors
+  ([ADR 0023](docs/decisions/0023-ten-chart-colors.md)). The pie of "Locais" keeps eight.
+
 ## [1.33.0] - 2026-10-20
 
 ### Added
@@ -244,7 +265,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.33.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.34.0...HEAD
+[1.34.0]: https://github.com/rrgmc/ptsite/compare/v1.33.0...v1.34.0
 [1.33.0]: https://github.com/rrgmc/ptsite/compare/v1.32.1...v1.33.0
 [1.32.1]: https://github.com/rrgmc/ptsite/compare/v1.32.0...v1.32.1
 [1.32.0]: https://github.com/rrgmc/ptsite/compare/v1.31.1...v1.32.0
