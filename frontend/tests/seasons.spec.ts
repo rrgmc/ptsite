@@ -70,10 +70,14 @@ test('a picked season has its own address, which the menu keeps until the user g
   await expect(seasonNotice(page)).toBeVisible()
 })
 
-test('a player opened from a season shows that season, at the season\'s address', async ({ page }) => {
+test('a player opened from a season shows that season in "Temporada", at the season\'s address', async ({ page }) => {
   await login(page, 'dev-player')
   await pickSeason(page, 'Liga 2022')
   await page.getByRole('table').getByRole('row').nth(1).getByRole('link').first().click()
+  // The player's page opens on "Geral", which has no season.
+  await expect(page).toHaveURL(/\/app\/players\/\d+\/all$/)
+  await expect(seasonNotice(page)).toHaveCount(0)
+  await page.getByRole('navigation', { name: 'Período' }).getByRole('link', { name: 'Temporada' }).click()
   await expect(page).toHaveURL(/\/seasons\/\d+\/players\/\d+$/)
   await expect(seasonNotice(page)).toContainText('Liga 2022')
 
@@ -109,7 +113,7 @@ test('"Temporadas" shows the first ten of every season, and makes one the select
   const rows = season.getByRole('list', { name: 'Os dez primeiros de Liga 2022' }).getByRole('listitem')
   await expect(rows).toHaveCount(10)
   await expect(rows.first()).toContainText(/^1/)
-  await expect(rows.first().getByRole('link')).toHaveAttribute('href', /\/players\/\d+$/)
+  await expect(rows.first().getByRole('link')).toHaveAttribute('href', /\/players\/\d+\/all$/)
 
   // The current season is the selected one, so it has no button.
   const current = page.locator('section').filter({ hasText: 'Atual' })
