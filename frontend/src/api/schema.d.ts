@@ -854,11 +854,31 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * One player's statistics over the finished nights: totals, finishing positions, each season, each night
-         *     scored and the running total.
+         * One player's statistics over the finished nights: totals, finishing positions, each season and the running
+         *     total. The nights scored are apart, at `results`.
          *     With `season`, one season; without it, every season that is not archived
          */
         get: operations["playerStatistics.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/players/{player}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The nights on which one player scored, newest first.
+         *     With `season`, one season; without it, every season that is not archived
+         */
+        get: operations["playerStatistics.results"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1520,6 +1540,16 @@ export interface components {
             /** @description A free text about the player. Everyone logged in reads it; only admins write it. */
             memo: string | null;
         };
+        /** PlayerNightResultResource */
+        PlayerNightResultResource: {
+            night_id: number;
+            starts_at: string;
+            season_id: number;
+            season_name: string;
+            /** @description The player's finishing position on the night. */
+            position: number;
+            points: string;
+        };
         /** PlayerResource */
         PlayerResource: {
             id: number;
@@ -1566,6 +1596,8 @@ export interface components {
              * @description The player's line in the standings of each season in which they scored, newest first.
              *     `rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the
              *     average pot of the season's nights: a statistic for fun, which the standings never use.
+             *     `main_event_position` is the player's position in the season's finished Main Event, or null when
+             *     they did not play it.
              */
             seasons: {
                 season_id: number;
@@ -1575,15 +1607,7 @@ export interface components {
                 nights_scored: number;
                 wins: number;
                 rank_with_main_event: number;
-            }[];
-            /** @description The nights on which the player scored, newest first. */
-            results: {
-                night_id: number;
-                starts_at: string;
-                season_id: number;
-                season_name: string;
-                position: number;
-                points: string;
+                main_event_position: number | null;
             }[];
             /** @description The player's running total: per night in a season, per season otherwise. */
             points_progress: {
@@ -3876,6 +3900,37 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["PlayerStatisticsResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "playerStatistics.results": {
+        parameters: {
+            query?: {
+                /** @description Leave out for every season. */
+                season?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The player ID */
+                player: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `PlayerNightResultResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PlayerNightResultResource"][];
                     };
                 };
             };

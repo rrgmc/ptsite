@@ -88,6 +88,7 @@ Route::prefix('v1')->group(function () {
         Route::post('players/quick-add', [PlayerController::class, 'quickAdd']);
         Route::get('players/{player}', [PlayerController::class, 'show']);
         Route::get('players/{player}/statistics', [PlayerStatisticsController::class, 'show']);
+        Route::get('players/{player}/results', [PlayerStatisticsController::class, 'results']);
         Route::get('players/{player}/thumbnail', [PlayerController::class, 'thumbnail']);
         Route::get('players/{player}/photo', [PlayerController::class, 'photo']);
         // POST, not PUT: PHP reads an uploaded file only from a POST. The photo routes change the thumbnail too.

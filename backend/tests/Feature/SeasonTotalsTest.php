@@ -181,9 +181,10 @@ it('lists a season known only by its final standings on a player\'s page, with n
         ->assertJsonPath('data.seasons.1.season_name', 'Temporada antiga')
         ->assertJsonPath('data.seasons.1.rank', 1)
         ->assertJsonPath('data.seasons.1.points', '250.50')
-        ->assertJsonPath('data.seasons.1.nights_scored', 3)
-        ->assertJsonCount(1, 'data.results')
-        ->assertJsonPath('data.results.0.night_id', $night->id);
+        ->assertJsonPath('data.seasons.1.nights_scored', 3);
+    $this->getJson("/api/v1/players/{$this->ana->id}/results")->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.night_id', $night->id);
 });
 
 it('shows a season known only by its final standings among the seasons\' top standings, and leaves it out once archived', function () {

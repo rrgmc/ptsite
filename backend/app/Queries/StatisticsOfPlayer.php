@@ -6,7 +6,6 @@ use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Statistics\NightRecord;
-use PTSite\Domain\Statistics\PlayerResult;
 use PTSite\Domain\Statistics\PlayerSeasonRow;
 use PTSite\Domain\Statistics\PlayerStatistics;
 
@@ -30,6 +29,7 @@ final class StatisticsOfPlayer
         $records = $this->finishedNights->records($nights, totalsSeasons: $totalsSeasons);
         $summary = $this->statistics->summarise($player->id, $records, stepPerSeason: $season === null);
         $ranksWithMainEvent = $this->ranksWithMainEvent($player, $season, $records);
+        $mainEventPositions = $this->mainEventPositions($player, $season);
 
         return new PlayerStatisticsReport(
             $season?->id,
@@ -46,18 +46,29 @@ final class StatisticsOfPlayer
                 'nights_scored' => $row->nightsScored,
                 'wins' => $row->wins,
                 'rank_with_main_event' => $ranksWithMainEvent[$row->seasonId] ?? $row->rank,
+                'main_event_position' => $mainEventPositions[$row->seasonId] ?? null,
             ], $summary->seasons),
-            array_map(fn (PlayerResult $result) => [
-                'night_id' => $result->nightId,
-                'starts_at' => $nights[$result->nightId]->starts_at->toIso8601String(),
-                'season_id' => $result->seasonId,
-                'season_name' => $seasonNames[$result->seasonId],
-                'position' => $result->position,
-                'points' => $result->points->toDecimal(),
-            ], $summary->results),
             $this->finishedNights->steps($summary->progressSteps, $nights, $season === null, $totalsSeasons),
             array_map(fn (Money $total) => $total->toDecimal(), $summary->progress),
         );
+    }
+
+    /**
+     * The player's position in each season's finished Main Event, for the seasons whose Main Event they played.
+     *
+     * @return array<int, int> season id => position
+     */
+    private function mainEventPositions(Player $player, ?Season $season): array
+    {
+        $positions = [];
+        foreach ($this->finishedNights->mainEvents($season) as $night) {
+            $line = $night->mainEventPositions->firstWhere('player_id', $player->id);
+            if ($line !== null) {
+                $positions[$night->season_id] = $line->position;
+            }
+        }
+
+        return $positions;
     }
 
     /**

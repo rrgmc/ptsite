@@ -3203,7 +3203,7 @@
         "/v1/players/{player}/statistics": {
             "get": {
                 "operationId": "playerStatistics.show",
-                "summary": "One player's statistics over the finished nights: totals, finishing positions, each season, each night\nscored and the running total.\nWith `season`, one season; without it, every season that is not archived",
+                "summary": "One player's statistics over the finished nights: totals, finishing positions, each season and the running\ntotal. The nights scored are apart, at `results`.\nWith `season`, one season; without it, every season that is not archived",
                 "tags": [
                     "PlayerStatistics"
                 ],
@@ -3236,6 +3236,66 @@
                                     "properties": {
                                         "data": {
                                             "$ref": "#/components/schemas/PlayerStatisticsResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/players/{player}/results": {
+            "get": {
+                "operationId": "playerStatistics.results",
+                "summary": "The nights on which one player scored, newest first.\nWith `season`, one season; without it, every season that is not archived",
+                "tags": [
+                    "PlayerStatistics"
+                ],
+                "parameters": [
+                    {
+                        "name": "player",
+                        "in": "path",
+                        "required": true,
+                        "description": "The player ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "season",
+                        "in": "query",
+                        "description": "Leave out for every season.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `PlayerNightResultResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PlayerNightResultResource"
+                                            }
                                         }
                                     },
                                     "required": [
@@ -5560,6 +5620,39 @@
                 ],
                 "title": "PlayerDetailResource"
             },
+            "PlayerNightResultResource": {
+                "type": "object",
+                "properties": {
+                    "night_id": {
+                        "type": "integer"
+                    },
+                    "starts_at": {
+                        "type": "string"
+                    },
+                    "season_id": {
+                        "type": "integer"
+                    },
+                    "season_name": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "description": "The player's finishing position on the night."
+                    },
+                    "points": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "night_id",
+                    "starts_at",
+                    "season_id",
+                    "season_name",
+                    "position",
+                    "points"
+                ],
+                "title": "PlayerNightResultResource"
+            },
             "PlayerResource": {
                 "type": "object",
                 "properties": {
@@ -5707,7 +5800,7 @@
                     },
                     "seasons": {
                         "type": "array",
-                        "description": "The player's line in the standings of each season in which they scored, newest first.\n`rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the\naverage pot of the season's nights: a statistic for fun, which the standings never use.",
+                        "description": "The player's line in the standings of each season in which they scored, newest first.\n`rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the\naverage pot of the season's nights: a statistic for fun, which the standings never use.\n`main_event_position` is the player's position in the season's finished Main Event, or null when\nthey did not play it.",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -5731,6 +5824,12 @@
                                 },
                                 "rank_with_main_event": {
                                     "type": "integer"
+                                },
+                                "main_event_position": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
                                 }
                             },
                             "required": [
@@ -5740,42 +5839,8 @@
                                 "points",
                                 "nights_scored",
                                 "wins",
-                                "rank_with_main_event"
-                            ]
-                        }
-                    },
-                    "results": {
-                        "type": "array",
-                        "description": "The nights on which the player scored, newest first.",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "night_id": {
-                                    "type": "integer"
-                                },
-                                "starts_at": {
-                                    "type": "string"
-                                },
-                                "season_id": {
-                                    "type": "integer"
-                                },
-                                "season_name": {
-                                    "type": "string"
-                                },
-                                "position": {
-                                    "type": "integer"
-                                },
-                                "points": {
-                                    "type": "string"
-                                }
-                            },
-                            "required": [
-                                "night_id",
-                                "starts_at",
-                                "season_id",
-                                "season_name",
-                                "position",
-                                "points"
+                                "rank_with_main_event",
+                                "main_event_position"
                             ]
                         }
                     },
@@ -5838,7 +5903,6 @@
                     "wins",
                     "positions",
                     "seasons",
-                    "results",
                     "points_progress"
                 ],
                 "title": "PlayerStatisticsResource"

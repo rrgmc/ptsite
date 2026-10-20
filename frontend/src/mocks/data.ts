@@ -1,4 +1,4 @@
-import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, NightDashboard, PartialResult, Player, PlayerStatistics, PlannedDate, RankedList, Season, SeasonTopStandings, Standing, Statistics, User } from '@/api/client'
+import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, NightDashboard, PartialResult, Player, PlayerNightResult, PlayerStatistics, PlannedDate, RankedList, Season, SeasonTopStandings, Standing, Statistics, User } from '@/api/client'
 import { recalculated } from '@/features/dashboard/dashboardMoney'
 
 // Invented data for Storybook and component tests. The development database has the demo league (backend/database/seeders/DemoLeagueSeeder.php).
@@ -477,7 +477,7 @@ export const archivedWithMemo: Player & { memo: string } = {
   memo: 'Mudou de cidade em 2024.',
 }
 
-const playerResult = (nightId: number, day: string, seasonId: number, seasonName: string, position: number, points: string) => ({
+const playerResult = (nightId: number, day: string, seasonId: number, seasonName: string, position: number, points: string): PlayerNightResult => ({
   night_id: nightId,
   starts_at: `${day}T21:30:00-03:00`,
   season_id: seasonId,
@@ -512,15 +512,17 @@ export const playerStatistics: PlayerStatistics = {
   nights_scored: 4,
   wins: 2,
   positions: [2, 1, 0, 1, 0, 0].map((count, i) => ({ position: i + 1, count })),
-  seasons: [{ season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1 }],
-  results: [
-    playerResult(5, '2026-05-29', 1, 'Liga 2026', 4, '152.30'),
-    playerResult(4, '2026-05-15', 1, 'Liga 2026', 2, '207.00'),
-    playerResult(3, '2026-05-01', 1, 'Liga 2026', 1, '307.80'),
-    playerResult(1, '2026-04-03', 1, 'Liga 2026', 1, '319.20'),
-  ],
+  seasons: [{ season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1, main_event_position: null }],
   points_progress: { steps: statistics.points_progress.steps, points: statistics.points_progress.series[0].points },
 }
+
+/** The nights Ana scored in that season, loaded when "Resultados" is opened. */
+export const playerResults: PlayerNightResult[] = [
+  playerResult(5, '2026-05-29', 1, 'Liga 2026', 4, '152.30'),
+  playerResult(4, '2026-05-15', 1, 'Liga 2026', 2, '207.00'),
+  playerResult(3, '2026-05-01', 1, 'Liga 2026', 1, '307.80'),
+  playerResult(1, '2026-04-03', 1, 'Liga 2026', 1, '319.20'),
+]
 
 /** Ana over every season: a line for each season, and the season named under each night. */
 export const playerStatisticsAllTime: PlayerStatistics = {
@@ -531,17 +533,19 @@ export const playerStatisticsAllTime: PlayerStatistics = {
   wins: 14,
   positions: [14, 12, 11, 9, 8, 7].map((count, i) => ({ position: i + 1, count })),
   seasons: [
-    { season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1 },
-    { season_id: 2, season_name: 'Liga 2025', rank: 2, points: '4769.70', nights_scored: 29, wins: 7, rank_with_main_event: 1 },
-    { season_id: 3, season_name: 'Liga 2024', rank: 1, points: '5210.40', nights_scored: 28, wins: 5, rank_with_main_event: 3 },
-  ],
-  results: [
-    ...playerStatistics.results,
-    playerResult(78, '2025-11-28', 2, 'Liga 2025', 1, '342.00'),
-    playerResult(40, '2024-12-06', 3, 'Liga 2024', 3, '120.00'),
+    { season_id: 1, season_name: 'Liga 2026', rank: 1, points: '986.30', nights_scored: 4, wins: 2, rank_with_main_event: 1, main_event_position: null },
+    { season_id: 2, season_name: 'Liga 2025', rank: 2, points: '4769.70', nights_scored: 29, wins: 7, rank_with_main_event: 1, main_event_position: 2 },
+    { season_id: 3, season_name: 'Liga 2024', rank: 1, points: '5210.40', nights_scored: 28, wins: 5, rank_with_main_event: 3, main_event_position: 1 },
   ],
   points_progress: { steps: statisticsAllTime.points_progress.steps, points: statisticsAllTime.points_progress.series[0].points },
 }
+
+/** The nights Ana scored over every season, each with its season's name. */
+export const playerResultsAllTime: PlayerNightResult[] = [
+  ...playerResults,
+  playerResult(78, '2025-11-28', 2, 'Liga 2025', 1, '342.00'),
+  playerResult(40, '2024-12-06', 3, 'Liga 2024', 3, '120.00'),
+]
 
 /** A player who did not score: zeros, no position and a flat line. */
 export const playerStatisticsEmpty: PlayerStatistics = {
@@ -552,6 +556,5 @@ export const playerStatisticsEmpty: PlayerStatistics = {
   wins: 0,
   positions: [1, 2, 3, 4, 5, 6].map((position) => ({ position, count: 0 })),
   seasons: [],
-  results: [],
   points_progress: { steps: statistics.points_progress.steps, points: statistics.points_progress.steps.map(() => '0.00') },
 }

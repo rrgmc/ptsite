@@ -31,6 +31,11 @@ export const players = {
   /** The nights and wins of a season, under its name at phone width. */
   nightsAndWins: ({ nights, wins }: { nights: number; wins: number }) =>
     `${nights} ${nights === 1 ? 'evento' : 'eventos'} · ${wins} ${wins === 1 ? 'vitória' : 'vitórias'}`,
+  /** The column of the player's position in each season's Main Event, and its full name. */
+  mainEventShort: 'ME',
+  mainEvent: 'Main Event',
+  /** The player's position in the Main Event, under the season's name at phone width. */
+  mainEventPosition: ({ position }: { position: string }) => `Main Event: ${position}`,
   loadingCharts: 'Carregando gráficos…',
   results: 'Resultados',
   resultsCaption: ({ nickname }: { nickname: string }) => `Eventos em que ${nickname} pontuou, do mais recente ao mais antigo`,

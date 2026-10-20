@@ -27,10 +27,10 @@ class PlayerStatisticsResource extends JsonResource
              * The player's line in the standings of each season in which they scored, newest first.
              * `rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the
              * average pot of the season's nights: a statistic for fun, which the standings never use.
+             * `main_event_position` is the player's position in the season's finished Main Event, or null when
+             * they did not play it.
              */
             'seasons' => $this->seasons,
-            /** The nights on which the player scored, newest first. */
-            'results' => $this->results,
             /** The player's running total: per night in a season, per season otherwise. */
             'points_progress' => [
                 /** Oldest first. `night_id` and `starts_at` are null when the step is a season. */
