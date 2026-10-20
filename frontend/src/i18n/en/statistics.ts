@@ -93,7 +93,7 @@ export const statistics: Messages['statistics'] = {
   rankBySeasonDescription: ({ nickname, best }) =>
     `Line chart: rank of ${nickname} in each season, with the Main Event counted as one more night. 1st place is at the top.${best ? ` The best is ${best.rank}, in ${best.label}.` : ''} The numbers are in the table below.`,
   rankProgressDescription: ({ count }) =>
-    `Line chart: rank of the ${count} players with most points in each season, with the Main Event counted as one more night. 1st place is at the top. The numbers are in the table below.`,
+    `Line charts, one per player: rank of the ${count} players with most points in each season, with the Main Event counted as one more night. 1st place is at the top. The numbers are in the table below.`,
   rankProgressCaption: 'Rank in each season, with the Main Event',
   rankBySeasonCaption:({ nickname }) => `Rank of ${nickname} in each season, with the Main Event`,
 }
