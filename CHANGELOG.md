@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.33.0] - 2026-10-20
+
+### Added
+
+- "Detalhado", in the players list, starts with a button for each player, which scrolls to the player's card.
+  Each card shows the full name under the photo.
+- `GET /api/v1/players?with_memo=1` lists only the players who have a memo, archived ones too.
+
+### Changed
+
+- "Detalhado" follows "Posições" over every season; the players who are not in it come after, alphabetically.
+  It also lists inactive and archived players who have a memo, marked as such
+  ([docs/specs/players.md](docs/specs/players.md), rule 13).
+
 ## [1.32.1] - 2026-10-20
 
 ### Changed
@@ -230,7 +244,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.32.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.33.0...HEAD
+[1.33.0]: https://github.com/rrgmc/ptsite/compare/v1.32.1...v1.33.0
 [1.32.1]: https://github.com/rrgmc/ptsite/compare/v1.32.0...v1.32.1
 [1.32.0]: https://github.com/rrgmc/ptsite/compare/v1.31.1...v1.32.0
 [1.31.1]: https://github.com/rrgmc/ptsite/compare/v1.31.0...v1.31.1
