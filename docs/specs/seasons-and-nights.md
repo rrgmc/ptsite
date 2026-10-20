@@ -226,8 +226,9 @@ The selected season, in the demo league (the current season, and Liga 2022, whic
   and `/seasons/10/simulator`, and a reload shows 2022 again. Each of those screens shows the notice.
 - **A screen with no season.** From there the player opens "Jogadores" (`/players`). It has no notice, its header
   still names Liga 2022, and "Resultados" in its menu leads back to `/seasons/10/results`.
-- **A player's page.** From the standings of Liga 2022 the player opens the champion: `/seasons/10/players/3`,
-  with the champion's numbers of 2022 and the notice. "Voltar para a atual" opens `/players/3`.
+- **A player's page.** From the standings of Liga 2022 the player opens the champion. The page opens on "Geral",
+  `/players/3/all`. "Temporada" opens `/seasons/10/players/3`, with the champion's numbers of 2022 and the
+  notice. "Voltar para a atual" opens `/players/3`.
 - **A finished season.** A results keeper at the results of Liga 2022 sees no "+ Agendar". "Voltar para a atual"
   opens `/results`: the notice is gone and "+ Agendar" is back. The browser's "back" returns to
   `/seasons/10/results`.

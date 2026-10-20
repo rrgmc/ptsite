@@ -60,14 +60,16 @@ seconds, at the table, on a phone.
     - The same page changes the account's password
       ([accounts-and-roles.md](accounts-and-roles.md), rule 11).
     - An account with no player, such as an admin who does not play, has only the password there.
-11. **The player's page.** Every player has a page of their own, at `/players/<id>`. Everyone logged in can
+11. **The player's page.** Every player has a page of their own. Everyone logged in can
     open it. A nickname in the standings, the results, a night, the statistics, the simulator and the players
     list links to it.
     - It shows the photo or thumbnail, the nickname, the full name, the memo (rule 12) and the player's
       statistics ([statistics.md](statistics.md), rules 8 to 12).
-    - It is a season screen ([seasons-and-nights.md](seasons-and-nights.md), rule 3a): `/players/<id>` shows the
-      current season's statistics and `/seasons/<season>/players/<id>` another season's. A nickname on a season
-      screen links to the page for that season.
+    - It opens on "Geral", the statistics of every season, at `/players/<id>/all`. Every nickname links there,
+      and "Geral" comes first in the switch at the top.
+    - "Temporada" shows one season, as a season screen ([seasons-and-nights.md](seasons-and-nights.md),
+      rule 3a): `/players/<id>` shows the current season's statistics and `/seasons/<season>/players/<id>`
+      another season's. It shows the season picked on the site.
     - The email and the birthday are shown only to the player and to admins, as in rule 10.
     - An inactive player's page says "Inativo". It shows the same history.
     - An admin sees "Editar", which opens the player in "Administração". The player themself sees "Meu perfil".

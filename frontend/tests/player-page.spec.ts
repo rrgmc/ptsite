@@ -4,15 +4,28 @@ import { expectAccessible, login, logout, pickSeason, seasonNotice } from './hel
 // A player's page and the detailed players list (docs/specs/players.md, rules 11 to 13; docs/specs/statistics.md, rules 8 to 12), on the demo
 // imported data.
 
-test('a nickname in the standings opens the player\'s page, with the statistics of a season and of every season', async ({ page }) => {
+test('a nickname in the standings opens the player\'s page on every season, and "Temporada" shows the season', async ({ page }) => {
   await login(page, 'dev-player')
   await pickSeason(page, 'Liga 2022')
   const leader = page.getByRole('table').first().getByRole('row').nth(1).getByRole('link')
   const nickname = (await leader.textContent())!
   await leader.click()
 
-  await expect(page).toHaveURL(/\/players\/\d+$/)
+  // The page opens on "Geral", which comes first in the switch.
+  await expect(page).toHaveURL(/\/players\/\d+\/all$/)
   await expect(page.getByRole('heading', { name: nickname, level: 1 })).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Período' }).getByRole('link')).toHaveText(['Geral', 'Temporada'])
+  await expect(page.getByText('Todas as temporadas')).toBeVisible()
+  await expect(seasonNotice(page)).toHaveCount(0)
+  const seasons = page.getByRole('table', { name: /^Classificação de/ })
+  await expect(seasons.getByRole('link', { name: 'Liga 2022' })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Gráfico de linha: pontos acumulados de .*, por temporada/ })).toBeVisible()
+  // Over every season, each night names its season.
+  await expect(page.getByRole('table', { name: /^Eventos em que/ }).getByRole('row').nth(1)).toContainText('Liga')
+  await expectAccessible(page)
+
+  await page.getByRole('navigation', { name: 'Período' }).getByRole('link', { name: 'Temporada' }).click()
+  await expect(page).toHaveURL(/\/players\/\d+$/)
   await expect(page.getByRole('heading', { name: 'Estatísticas', level: 2 })).toBeVisible()
   // The leader of the season is first, and the page says which season it shows.
   await expect(page.getByRole('term').filter({ hasText: 'Posição' }).locator('xpath=following-sibling::dd')).toHaveText('1º')
@@ -23,17 +36,6 @@ test('a nickname in the standings opens the player\'s page, with the statistics 
   // A night in "Resultados" opens the night.
   const results = page.getByRole('table', { name: /^Eventos em que/ })
   await expect(results.getByRole('link').first()).toHaveAttribute('href', /nights\/\d+$/)
-  await expectAccessible(page)
-
-  await page.getByRole('navigation', { name: 'Período' }).getByRole('link', { name: 'Geral' }).click()
-  await expect(page).toHaveURL(/\/players\/\d+\/all$/)
-  await expect(page.getByText('Todas as temporadas')).toBeVisible()
-  await expect(seasonNotice(page)).toHaveCount(0)
-  const seasons = page.getByRole('table', { name: /^Classificação de/ })
-  await expect(seasons.getByRole('link', { name: 'Liga 2022' })).toBeVisible()
-  await expect(page.getByRole('img', { name: /por temporada/ })).toBeVisible()
-  // Over every season, each night names its season.
-  await expect(page.getByRole('table', { name: /^Eventos em que/ }).getByRole('row').nth(1)).toContainText('Liga')
   await expectAccessible(page)
 })
 
