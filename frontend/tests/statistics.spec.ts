@@ -10,7 +10,13 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   if ((await link.count()) === 0) await page.getByRole('button', { name: 'Menu' }).click()
   await link.first().click()
   await expect(page.getByRole('heading', { name: 'Estatísticas', level: 1 })).toBeVisible()
+  // "Geral" is the first view, and the one the menu opens.
+  await expect(page).toHaveURL(/\/statistics\/all$/)
+  const period = page.getByRole('navigation', { name: 'Período' }).getByRole('link')
+  await expect(period).toHaveText(['Geral', 'Temporada'])
 
+  await period.filter({ hasText: 'Temporada' }).click()
+  await expect(page).toHaveURL(/\/statistics$/)
   await pickSeason(page, 'Liga 2022')
   await expect(page).toHaveURL(/\/statistics$/)
   // The totals: the nights counted and their pot.
@@ -58,12 +64,12 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(page.getByText('Nenhum registrado no painel do evento.')).toHaveCount(3)
   await expect(page.getByRole('term').filter({ hasText: /^Rebuys$/ }).locator('xpath=..').getByRole('definition')).toHaveText('0')
 
-  await page.getByRole('navigation', { name: 'Período' }).getByRole('link', { name: 'Geral' }).click()
+  await period.filter({ hasText: 'Geral' }).click()
   await expect(page).toHaveURL(/\/statistics\/all$/)
   await expect(page.getByText('Todas as temporadas')).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)
   await expect(page.getByRole('img', { name: /pontos acumulados.*por temporada/ })).toBeVisible()
-  await expect(tabs).toHaveText(['Posições', 'Jogadores', 'Eventos', 'Rebuys', 'Main Event'])
+  await expect(tabs).toHaveText(['Posições', 'Jogadores', 'Eventos', 'Rebuys', 'Campeonatos', 'Main Event'])
 
   // The rebuys and the late players the night dashboard recorded in the season in play.
   await tabs.filter({ hasText: 'Rebuys' }).click()
@@ -79,6 +85,14 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(page.getByRole('img', { name: /^Gráfico de linha: pote por temporada/ })).toBeVisible()
   await expect(page.getByRole('table', { name: 'Eventos por pote' }).getByRole('row').nth(1)).toContainText('Liga')
   await expect(page.getByRole('img', { name: /^Gráfico de linhas: rebuys e time chips por atraso por temporada/ })).toBeVisible()
+
+  // The final standings of the finished seasons: who won, who was in the first three and who scored.
+  await tabs.filter({ hasText: 'Campeonatos' }).click()
+  for (const title of ['Títulos', 'Pódios', 'Participações']) {
+    await expect(page.getByRole('heading', { name: title, level: 2 })).toBeVisible()
+  }
+  await expect(page.getByRole('table', { name: 'Jogadores por temporadas terminadas em 1º lugar' }).getByRole('row').nth(1)).toContainText('1')
+  await expectAccessible(page)
 
   // The Main Events of every season: who won, who was in the first three and who played.
   await tabs.filter({ hasText: 'Main Event' }).click()

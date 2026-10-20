@@ -32,6 +32,15 @@ export const statistics: Messages['statistics'] = {
   mainEventAppearances: 'Appearances',
   mainEventAppearancesCaption: 'Players by Main Events played',
 
+  // The final standings of the finished seasons
+  championships: 'Championships',
+  championshipTitles: 'Titles',
+  championshipTitlesCaption: 'Players by seasons finished in 1st place',
+  championshipPodiums: 'Podiums',
+  championshipPodiumsCaption: 'Players by seasons finished in the first three',
+  championshipAppearances: 'Appearances',
+  championshipAppearancesCaption: 'Players by seasons in which they scored',
+
   // What the night dashboard recorded, on a site that has it
   rebuysTab: 'Rebuys',
   rebuys: 'Rebuys',

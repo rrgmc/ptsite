@@ -1,14 +1,15 @@
 import { Button as AriaButton, Dialog, DialogTrigger, Modal, ModalOverlay } from 'react-aria-components'
-import { NavLink } from 'react-router'
+import { NavLink, useLocation } from 'react-router'
 import { Button } from '@/components/Button'
 import { t } from '@/i18n'
 import { useSeasonPath } from '@/lib/seasonPath'
-import type { NavItem } from './navigation'
+import { isAlsoActive, type NavItem } from './navigation'
 import { site } from '@/lib/site'
 
 /** The left menu: every place of the site, then the user and "Sair". Opens from the "Menu" button in the header. */
 export function NavDrawer({ items, userName, onLogout, defaultOpen }: { items: NavItem[]; userName: string; onLogout: () => void; defaultOpen?: boolean }) {
   const to = useSeasonPath()
+  const { pathname } = useLocation()
   return (
     <DialogTrigger defaultOpen={defaultOpen}>
       <AriaButton
@@ -36,7 +37,7 @@ export function NavDrawer({ items, userName, onLogout, defaultOpen }: { items: N
                       end={item.end}
                       onClick={close}
                       className={({ isActive }) =>
-                        `flex min-h-touch items-center gap-3 rounded-md px-3 py-2 font-semibold wrap-anywhere ${isActive ? 'bg-primary-soft text-primary' : 'text-text hover:bg-surface-sunken'}`
+                        `flex min-h-touch items-center gap-3 rounded-md px-3 py-2 font-semibold wrap-anywhere ${isActive || isAlsoActive(item, pathname) ? 'bg-primary-soft text-primary' : 'text-text hover:bg-surface-sunken'}`
                       }
                     >
                       <span aria-hidden className="text-lg">{item.icon}</span>

@@ -353,6 +353,8 @@ export const statistics: Statistics = {
     podiums: playerList([[0, 1, 1], [2, 1, 1], [7, 1, 1]], 'count'),
     appearances: playerList([[0, 1, 1], [1, 1, 1], [2, 1, 1], [3, 1, 1], [7, 1, 1]], 'count'),
   },
+  // Only over every season.
+  championships: null,
   // What the night dashboard recorded, with a tie in each list.
   rebuys: {
     rebuy_count: 17,
@@ -406,6 +408,13 @@ export const statisticsAllTime: Statistics = {
     podiums: playerList([[0, 1, 3], [2, 1, 3], [7, 3, 2], [1, 4, 1]], 'count'),
     appearances: playerList([[0, 1, 3], [2, 1, 3], [7, 1, 3], [1, 4, 2], [3, 4, 2], [4, 4, 2], [5, 7, 1], [6, 7, 1], [8, 7, 1], [9, 7, 1]], 'count', { tied_not_shown: 1 }),
   },
+  // The final standings of Liga 2024 and Liga 2025; Liga 2026 is still open. Two champions share the titles.
+  championships: {
+    count: 2,
+    titles: playerList([[0, 1, 1], [2, 1, 1]], 'count'),
+    podiums: playerList([[0, 1, 2], [2, 1, 2], [1, 3, 1], [7, 3, 1]], 'count'),
+    appearances: playerList([[0, 1, 2], [1, 1, 2], [2, 1, 2], [4, 1, 2], [5, 1, 2], [6, 1, 2], [7, 1, 2], [3, 8, 1]], 'count'),
+  },
 }
 
 export const statisticsEmpty: Statistics = {
@@ -423,6 +432,7 @@ export const statisticsEmpty: Statistics = {
   wins_not_shown: 0,
   position_table: [],
   main_event: null,
+  championships: null,
   rebuys: null,
 }
 

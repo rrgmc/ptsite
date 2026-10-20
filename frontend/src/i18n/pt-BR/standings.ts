@@ -5,6 +5,10 @@ export const standings = {
   noSeason: 'Nenhuma temporada cadastrada.',
   nobodyScored: 'Ninguém pontuou ainda nesta temporada.',
   tableCaption: ({ season }: { season: string }) => `Classificação da temporada ${season}`,
+  /** A finished season's first three, above the table: the season champion and the next two. */
+  championship: 'Campeonato',
+  /** For screen readers: what the list of the first three is. */
+  championshipCaption: ({ season }: { season: string }) => `Classificação final: ${season}`,
 
   // Table
   nightsCount: ({ count }: { count: number }) => `${count} ${count === 1 ? 'evento' : 'eventos'}`,

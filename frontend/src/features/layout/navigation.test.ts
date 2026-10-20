@@ -1,6 +1,6 @@
 import { afterEach, expect, it } from 'vitest'
 import { overrideFeatures } from '@/lib/features'
-import { navItemsFor } from './navigation'
+import { isAlsoActive, navItemsFor } from './navigation'
 
 let restore = () => {}
 afterEach(() => restore())
@@ -10,13 +10,13 @@ const bar = (flag: 'tab' | 'top') => navItemsFor('player').filter((item) => item
 
 it('has "Meu perfil" on both bars, the last one, and the simulator only in the left menu', () => {
   expect(bar('tab')).toEqual(['/', '/results', '/calendar', '/players', '/profile'])
-  expect(bar('top')).toEqual(['/', '/results', '/calendar', '/statistics', '/players', '/seasons', '/profile'])
+  expect(bar('top')).toEqual(['/', '/results', '/calendar', '/statistics/all', '/players', '/seasons', '/profile'])
   expect(paths('player')).toContain('/simulator')
 })
 
 it('keeps the screens of a season together, before "Jogadores" and "Temporadas"', () => {
   restore = overrideFeatures({ mainEvent: true })
-  expect(paths('player')).toEqual(['/', '/results', '/calendar', '/simulator', '/main-event', '/statistics', '/players', '/seasons', '/profile'])
+  expect(paths('player')).toEqual(['/', '/results', '/calendar', '/simulator', '/main-event', '/statistics/all', '/players', '/seasons', '/profile'])
 })
 
 it('lists "Main Event" only on a site that has it', () => {
@@ -26,6 +26,14 @@ it('lists "Main Event" only on a site that has it', () => {
   restore()
   restore = overrideFeatures({ mainEvent: true })
   expect(paths('player')).toContain('/main-event')
+})
+
+it('opens "Estatísticas" on "Geral", and marks it on "Temporada" too, in any season', () => {
+  const statistics = navItemsFor('player').find((item) => item.to === '/statistics/all')!
+  expect(isAlsoActive(statistics, '/statistics')).toBe(true)
+  expect(isAlsoActive(statistics, '/seasons/7/statistics')).toBe(true)
+  expect(isAlsoActive(statistics, '/results')).toBe(false)
+  expect(isAlsoActive(navItemsFor('player')[0], '/statistics')).toBe(false)
 })
 
 it('lists the admin section only for an admin', () => {

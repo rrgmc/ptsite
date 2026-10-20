@@ -6,15 +6,24 @@ import { PositionTable } from './PositionTable'
 import { PlacesChart, PointsProgressChart, PotsChart, WinsChart } from './StatisticsCharts'
 import { AllTimeStatisticsPage, StatisticsPage, StatisticsView } from './StatisticsPage'
 
-// "Estatísticas": the totals, the charts and the top ten lists in tabs, for the selected season
-// ("Temporada") or every season ("Geral").
+// "Estatísticas": the totals, the charts and the top ten lists in tabs, for every season ("Geral", the first view)
+// or the selected season ("Temporada").
 const meta = { title: 'Screens/Statistics', parameters: { layout: 'fullscreen' } } satisfies Meta
 export default meta
 
 export const Season: StoryObj = { render: () => <RouterStory path="/statistics" url="/statistics" element={<StatisticsPage />} /> }
 
-/** One step per season on the line charts, the season under each pot, "Outros" under the bar chart, and the Main Event lists. */
+/** One step per season on the line charts, the season under each pot, "Outros" under the bar chart, and the championship and Main Event lists. */
 export const AllTime: StoryObj = { render: () => <RouterStory path="/statistics/all" url="/statistics/all" element={<AllTimeStatisticsPage />} /> }
+
+/** "Campeonatos", over every season: the titles, the podiums and the appearances in the final standings of the finished seasons. */
+export const Championships: StoryObj = {
+  render: () => <RouterStory path="/statistics/all" url="/statistics/all" element={<AllTimeStatisticsPage />} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByRole('tab', { name: 'Campeonatos' }))
+    await canvas.findByRole('table', { name: 'Jogadores por temporadas terminadas em 1º lugar' })
+  },
+}
 
 /** The "Rebuys" tab: the rebuys, the rebuys past the limit and the late time chips the night dashboard recorded. */
 export const Rebuys: StoryObj = {

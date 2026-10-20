@@ -6,7 +6,7 @@ import { t } from '@/i18n'
 import { isSeasonScreen, splitSeasonPath, useSeasonPath } from '@/lib/seasonPath'
 import { setSelectedSeasonId } from '@/lib/selectedSeason'
 import { NavDrawer } from './NavDrawer'
-import { navItemsFor } from './navigation'
+import { isAlsoActive, navItemsFor } from './navigation'
 import { SeasonNotice } from './SeasonNotice'
 import { SiteFooter } from './SiteFooter'
 import { useSelectedSeason } from './useSelectedSeason'
@@ -49,7 +49,7 @@ export function AppLayout() {
           <nav aria-label={t.layout.mainNav} className="hidden flex-wrap gap-1 sm:flex">
             {items.filter((item) => item.top).map((item) => (
               // Words only: with the menu button and the season name, the icons do not fit the top bar.
-              <NavLink key={item.to} to={to(item.to)} end={item.end} className={linkClass}>
+              <NavLink key={item.to} to={to(item.to)} end={item.end} className={({ isActive }) => linkClass({ isActive: isActive || isAlsoActive(item, location.pathname) })}>
                 {item.label}
               </NavLink>
             ))}
@@ -76,7 +76,7 @@ export function AppLayout() {
 
       <nav aria-label={t.layout.mainNav} className="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden">
         {items.filter((item) => item.tab).map((item) => (
-          <NavLink key={item.to} to={to(item.to)} end={item.end} className={linkClass}>
+          <NavLink key={item.to} to={to(item.to)} end={item.end} className={({ isActive }) => linkClass({ isActive: isActive || isAlsoActive(item, location.pathname) })}>
             <span aria-hidden className="text-lg">{item.icon}</span>
             <span className="max-w-full truncate font-medium tracking-tight">{item.label}</span>
           </NavLink>

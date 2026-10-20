@@ -6,6 +6,8 @@ export const standings: Messages['standings'] = {
   noSeason: 'No seasons yet.',
   nobodyScored: 'Nobody has scored yet this season.',
   tableCaption: ({ season }) => `Standings of the season ${season}`,
+  championship: 'Championship',
+  championshipCaption: ({ season }) => `Final standings: ${season}`,
 
   // Table
   nightsCount: ({ count }) => `${count} ${count === 1 ? 'night' : 'nights'}`,
