@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- "Resultado final", in "Administração › Temporadas", types the final standings of a season with no night: each
+  player's points and times in each position. It shows each position's total against the rounds
+  ([docs/specs/season-totals.md](docs/specs/season-totals.md)).
+- "Estatísticas" in "Geral" shows the first three of "Campeões das temporadas" and "Campeões do Main Event" by
+  titles, with a medal each, above "Pontos acumulados".
+
+### Changed
+
+- A season's final lines may keep a player archived after they were saved, so an imported season can be edited.
+
 ## [1.31.1] - 2026-10-20
 
 ### Changed

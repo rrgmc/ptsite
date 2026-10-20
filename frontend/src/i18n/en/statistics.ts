@@ -1,4 +1,5 @@
 import type { Messages } from '..'
+import { plural } from '../plural'
 
 export const statistics: Messages['statistics'] = {
   title: 'Statistics',
@@ -25,6 +26,9 @@ export const statistics: Messages['statistics'] = {
 
   // The Main Events of every season, on a site that has the Main Event
   mainEvent: 'Main Event',
+  seasonChampions: 'Season champions',
+  mainEventChampions: 'Main Event champions',
+  titlesCount: ({ count }) => `${count} ${plural(count, { one: 'title', other: 'titles' })}`,
   mainEventTitles: 'Titles',
   mainEventTitlesCaption: 'Players by Main Events won',
   mainEventPodiums: 'Podiums',

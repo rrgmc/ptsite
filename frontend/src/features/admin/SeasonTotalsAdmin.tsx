@@ -99,9 +99,10 @@ function TotalsForm({ season, standings }: { season: Season; standings: Standing
           <ol className="flex flex-col gap-3">
             {lines.map((line, index) => (
               <li key={line.player.id} className="rounded-md border border-border p-3">
-                <fieldset>
+                {/* A group named after its player, so each field reads as "Pontos" or "1º" of that player. */}
+                <div role="group" aria-labelledby={`totals-line-${line.player.id}`}>
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                    <legend className="font-semibold">{index + 1}. {line.player.nickname}</legend>
+                    <span id={`totals-line-${line.player.id}`} className="font-semibold">{index + 1}. {line.player.nickname}</span>
                     <Button
                       variant="ghost"
                       aria-label={t.admin.seasonTotals.remove({ name: line.player.nickname })}
@@ -129,7 +130,6 @@ function TotalsForm({ season, standings }: { season: Season; standings: Standing
                       <TextField
                         key={i}
                         label={ordinal(i + 1)}
-                        aria-label={t.admin.seasonTotals.times({ position: ordinal(i + 1) })}
                         inputMode="numeric"
                         value={count}
                         onChange={(text) => change(index, { counts: line.counts.map((c, j) => (j === i ? text : c)) })}
@@ -137,7 +137,7 @@ function TotalsForm({ season, standings }: { season: Season; standings: Standing
                       />
                     ))}
                   </div>
-                </fieldset>
+                </div>
               </li>
             ))}
           </ol>

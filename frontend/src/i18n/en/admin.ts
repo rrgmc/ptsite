@@ -211,7 +211,6 @@ export const admin: Messages['admin'] = {
     hasNights: 'This season has nights: its final standings come from them.',
     empty: 'No player yet. Add the players of the final standings.',
     points: 'Points',
-    times: ({ position }) => `Times ${position}`,
     remove: ({ name }) => `Remove ${name}`,
     add: 'Add a player',
     sums: 'Total per position',
