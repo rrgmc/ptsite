@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.35.0] - 2026-10-20
+
 ### Added
 
 - "ME" in "Por temporada" on the player's page: the player's position in each season's Main Event
@@ -297,7 +299,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.34.2...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.35.0...HEAD
+[1.35.0]: https://github.com/rrgmc/ptsite/compare/v1.34.2...v1.35.0
 [1.34.2]: https://github.com/rrgmc/ptsite/compare/v1.34.1...v1.34.2
 [1.34.1]: https://github.com/rrgmc/ptsite/compare/v1.34.0...v1.34.1
 [1.34.0]: https://github.com/rrgmc/ptsite/compare/v1.33.0...v1.34.0
