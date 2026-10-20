@@ -7,6 +7,7 @@ import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { PeriodSwitch } from '@/components/PeriodSwitch'
 import { PlayerLink } from '@/components/PlayerLink'
 import { PlayerThumbnail } from '@/components/PlayerThumbnail'
+import { Podium } from '@/components/Podium'
 import { RankedList, type RankedRow } from '@/components/RankedList'
 import { StatTiles } from '@/components/StatTiles'
 import { TabBox, type TabBoxTab } from '@/components/TabBox'
@@ -58,6 +59,25 @@ function playerRows(list: RankedListData, value: (row: RankedListData['rows'][nu
     ),
     value: value(row),
   }))
+}
+
+/**
+ * Over every season, the first three by titles: of the seasons' final standings, then of the Main Event. Players
+ * with as many titles share a place, as in the lists.
+ */
+function ChampionPodiums({ championships, mainEvent }: { championships: Statistics['championships']; mainEvent: Statistics['main_event'] }) {
+  const lines = (list: RankedListData) =>
+    list.rows.map((row) => ({ rank: row.rank, player: row.player!, note: t.statistics.titlesCount({ count: row.count ?? 0 }) }))
+  return (
+    <div className="flex flex-col gap-3">
+      {championships && (
+        <Podium compact title={t.statistics.seasonChampions} caption={t.statistics.championshipTitlesCaption} lines={lines(championships.titles)} />
+      )}
+      {mainEvent && (
+        <Podium compact title={t.statistics.mainEventChampions} caption={t.statistics.mainEventTitlesCaption} lines={lines(mainEvent.titles)} />
+      )}
+    </div>
+  )
 }
 
 /** One list inside a tab that holds several, under its own small title. */
@@ -229,6 +249,7 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
             : []),
         ]}
       />
+      {allTime && (championships || mainEvent) && <ChampionPodiums championships={championships} mainEvent={mainEvent} />}
       {hasNights && nightsKnown && <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />}
       <TabBox label={t.statistics.tabs} tabs={tabs} />
     </div>

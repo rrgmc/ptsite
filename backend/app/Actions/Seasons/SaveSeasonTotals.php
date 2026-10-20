@@ -16,7 +16,8 @@ use PTSite\Domain\Standings\TotalsLine;
 /**
  * Saves the final standings of a season known only by them (admins): for each player, the total points and how
  * often the player finished in each scoring position. They replace the season's final lines, so saving the same
- * lines twice changes nothing; no line clears them.
+ * lines twice changes nothing; no line clears them. A player added to the lines must not be archived; one already
+ * in them may be, since a league archives its former players.
  */
 final class SaveSeasonTotals
 {
@@ -32,7 +33,9 @@ final class SaveSeasonTotals
         Gate::forUser($user)->authorize('update', $season);
         $this->rules->assertCanSaveTotals($season->nights()->notArchived()->scoring()->exists(), $season->isArchived());
         $this->rules->assertValidTotals($lines, PercentageTable::of($season->percentByPosition()));
-        $this->players->assertExist(array_map(fn (TotalsLine $line) => $line->playerId, $lines), 'season.totals.unknown_player', 'rows');
+        $kept = $season->totals()->pluck('player_id')->all();
+        $added = array_diff(array_map(fn (TotalsLine $line) => $line->playerId, $lines), $kept);
+        $this->players->assertExist(array_values($added), 'season.totals.unknown_player', 'rows');
 
         DB::transaction(function () use ($user, $season, $lines) {
             $before = $this->snapshot($season);

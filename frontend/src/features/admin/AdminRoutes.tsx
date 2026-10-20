@@ -10,6 +10,7 @@ import { PlaceEditPage, PlacesAdmin } from './PlacesAdmin'
 import { PlayerEditPage, PlayersAdmin } from './PlayersAdmin'
 import { hasFeature } from '@/lib/features'
 import { SeasonPlanner } from './SeasonPlanner'
+import { SeasonTotalsAdmin } from './SeasonTotalsAdmin'
 import { SeasonEditPage, SeasonsAdmin } from './SeasonsAdmin'
 import { SettingsAdmin } from './SettingsAdmin'
 
@@ -39,6 +40,7 @@ export function AdminRoutes() {
         <Route path="seasons/:seasonId" element={<SeasonEditPage />} />
         {hasFeature('seasonPlanner') && <Route path="seasons/:seasonId/plan" element={<SeasonPlanner />} />}
         {hasFeature('mainEvent') && <Route path="seasons/:seasonId/main-event" element={<MainEventAdmin />} />}
+        <Route path="seasons/:seasonId/totals" element={<SeasonTotalsAdmin />} />
         <Route path="holidays" element={<HolidaysPage />} />
         <Route path="players" element={<PlayersAdmin />} />
         <Route path="players/:playerId" element={<PlayerEditPage />} />

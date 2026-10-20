@@ -326,3 +326,18 @@ it('has empty championship lists when no season is finished', function () {
 
     expect($summary->count)->toBe(0)->and($summary->titles->rows)->toBe([])->and($summary->appearances->rows)->toBe([]);
 });
+
+it('lists every player with a Main Event title or a season title, past the first 10', function () {
+    $winners = range(101, 112);
+    $mainEvents = (new MainEventStatistics)->summarise(array_map(fn (int $id) => [$id, 1], $winners));
+    $seasons = (new ChampionshipStatistics)->summarise(array_map(
+        fn (int $id) => [new StandingRow(1, $id, Money::fromDecimal('100.00'), 1, 1, [1 => 1])],
+        $winners,
+    ));
+
+    expect($mainEvents->titles->rows)->toHaveCount(12)
+        ->and($mainEvents->titles->tiedNotShown)->toBe(0)
+        ->and($mainEvents->appearances->rows)->toHaveCount(10)
+        ->and($seasons->titles->rows)->toHaveCount(12)
+        ->and($seasons->podiums->rows)->toHaveCount(10);
+});

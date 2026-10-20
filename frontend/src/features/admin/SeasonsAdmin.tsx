@@ -37,6 +37,10 @@ export function SeasonsAdmin() {
       {!s.is_finished && !s.totals_only && hasFeature('seasonPlanner') && (
         <Link to={`/admin/seasons/${s.id}/plan`} className={actionLink}>{t.admin.seasons.planDates}</Link>
       )}
+      {/* A season with no night can be known only by its final standings. */}
+      {(s.totals_only || (s.nights_planned ?? 0) === 0) && (
+        <Link to={`/admin/seasons/${s.id}/totals`} aria-label={t.admin.seasonTotals.linkLabel({ season: s.name })} className={actionLink}>{t.admin.seasons.totals}</Link>
+      )}
       {hasFeature('mainEvent') && (
         <Link to={`/admin/seasons/${s.id}/main-event`} aria-label={t.admin.mainEvent.linkLabel({ season: s.name })} className={actionLink}>{t.admin.seasons.mainEvent}</Link>
       )}

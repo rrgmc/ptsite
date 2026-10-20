@@ -1,3 +1,5 @@
+import { plural } from '../plural'
+
 // "Estatísticas": the top ten lists and the charts, for one season or every season.
 export const statistics = {
   title: 'Estatísticas',
@@ -29,6 +31,10 @@ export const statistics = {
 
   // The Main Events of every season, on a site that has the Main Event
   mainEvent: 'Main Event',
+  /** Above "Pontos acumulados" in "Geral": the first three by titles. */
+  seasonChampions: 'Campeões das temporadas',
+  mainEventChampions: 'Campeões do Main Event',
+  titlesCount: ({ count }: { count: number }) => `${count} ${plural(count, { one: 'título', other: 'títulos' })}`,
   mainEventTitles: 'Títulos',
   mainEventTitlesCaption: 'Jogadores por títulos do Main Event',
   mainEventPodiums: 'Pódios',

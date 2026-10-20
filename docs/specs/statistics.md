@@ -64,7 +64,7 @@ Everyone logged in: players, results keepers and admins.
 
 13. **The Main Event lists**, in "Geral" only, on a site with the Main Event ([main-event.md](main-event.md)).
     They count the finished Main Events of the seasons that are not archived. Each shows the first 10, with
-    ties as in rule 4:
+    ties as in rule 4, but "Títulos" shows every player with a title:
     - **"Títulos"**: players by Main Events won.
     - **"Pódios"**: players by times in the first three of a Main Event.
     - **"Participações"**: players by Main Events played. A Main Event of which only some players
@@ -75,7 +75,8 @@ Everyone logged in: players, results keepers and admins.
 13a. **The championship lists** ("Campeonatos"), in "Geral" only. They count the **final standings of the
     finished seasons** that are not archived ([points-and-standings.md](points-and-standings.md), rules 8 and
     9). An open season does not count: its standings are not final. A finished season with no finished night
-    has no standings, so it does not count either. Each list shows the first 10, with ties as in rule 4:
+    has no standings, so it does not count either. Each list shows the first 10, with ties as in rule 4, but
+    "Títulos" shows every player with a title:
     - **"Títulos"**: players by seasons finished in 1st place. Players who share the 1st place of a season
       each count a title.
     - **"Pódios"**: players by seasons finished in the first three.
@@ -179,8 +180,11 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - A switch **"Geral" / "Temporada"**, in that order. Each view has its own address, so it can be shared.
   "Geral" is at `/statistics/all`, and "Estatísticas" in the menu leads there; the menu marks "Estatísticas"
   in both views.
-- At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then "Pontos
-  acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the same
+- At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". In "Geral", two bands
+  follow, as the box "Campeonato" of "Classificação" but shorter: **"Campeões das temporadas"**, the first three
+  of "Títulos" of rule 13a, and **"Campeões do Main Event"**, the first three of its "Títulos". Each player has a
+  medal, the place and the number of titles. Players with as many titles share the place, so a band can show more
+  than three. A band with no title is not shown. Then "Pontos acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the same
   numbers as a table.
 - Under it, a box with **tabs**, drawn as the tabs of a folder: one tab shows at a time, and its title is filled
   with the site's main color. "Posições" shows first. The tab on show is not in the address: opening the screen

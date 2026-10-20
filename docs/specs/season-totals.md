@@ -11,7 +11,8 @@ statistics, with nothing invented.
 
 ## Who
 
-Admins save the final standings, through the API. Everyone sees them like any season's standings.
+Admins type the final standings in "Administração › Temporadas › Resultado final", or save them through the
+API. Everyone sees them like any season's standings.
 
 ## Rules
 
@@ -19,7 +20,8 @@ Admins save the final standings, through the API. Everyone sees them like any se
    and how many times the player finished in each scoring position. It has no regular night. Its rounds
    ("Rodadas") are the nights it had.
 2. **Each player is listed once.** Each line gives a count, zero or more, for every scoring position of the
-   season's percentage table, and points of zero or more.
+   season's percentage table, and points of zero or more. A player added to the lines must not be archived; a
+   player already in them may be, since a league archives its former players.
 3. **The final standings are kept as the league recorded them.** The counts of a position need not add up to the
    season's rounds: a hand-kept table may miss a finish or have an extra night, and the site does not correct
    it.
@@ -83,7 +85,12 @@ Each column adds up to 3, the rounds, but that is not required (rule 3).
 - The seasons lists show the badge "Só totais".
 - Admins see no button to add, import or plan nights for such a season.
 - Its statistics have no progress, pots or biggest pots.
+- **"Resultado final"**, in "Administração", at `/admin/seasons/<id>/totals`, for a season with no night. It has
+  a line for each player: the player, the points and the times in each scoring position, with a button to
+  remove it. A picker adds a player. Under the lines, each position's total is shown against the rounds, and a
+  total that does not match is marked, without stopping the save. "Salvar" replaces the lines; saving none
+  clears them. The seasons list links to it for a season with no night.
 
 ## Open questions
 
-- There is no screen to type the final lines in: an importer saves them through the API.
+None.

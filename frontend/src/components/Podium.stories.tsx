@@ -27,3 +27,14 @@ export const SharedFirstPlace: StoryObj = {
 export const OnlyTheChampion: StoryObj = {
   render: () => <RouterStory path="/" url="/" element={<Podium title="Main Event" caption="Classificação: Main Event" lines={[{ rank: 1, player: players[2] }]} />} />,
 }
+
+/** Compact, with a note on each line: the champions over every season in "Estatísticas". */
+export const Compact: StoryObj = {
+  render: () => (
+    <RouterStory
+      path="/"
+      url="/"
+      element={<Podium compact title="Campeões das temporadas" caption="Jogadores por títulos" lines={[{ rank: 1, player: players[0], note: '3 títulos' }, { rank: 2, player: players[1], note: '2 títulos' }, { rank: 3, player: players[2], note: '1 título' }]} />}
+    />
+  ),
+}
