@@ -66,34 +66,28 @@ it('gives players with the same total points of a season known only by its final
     expect(array_map(fn ($row) => [$row->playerId, $row->rank], $rows))->toBe([[1, 1], [2, 2], [3, 3], [4, 3], [5, 5], [6, 6], [7, 7]]);
 });
 
-it('accepts final lines whose counts add up to the rounds in each position', function () {
-    (new SeasonTotalsRules)->assertValidTotals(oldSeason(), 3, PercentageTable::standard());
+it('accepts final lines', function () {
+    (new SeasonTotalsRules)->assertValidTotals(oldSeason(), PercentageTable::standard());
 })->throwsNoExceptions();
 
-it('refuses final lines whose counts in a position do not add up to the rounds', function () {
-    try {
-        (new SeasonTotalsRules)->assertValidTotals(oldSeason(brenoWins: 2), 3, PercentageTable::standard());
-        $this->fail('no violation');
-    } catch (RuleViolation $e) {
-        expect($e->rule)->toBe('season.totals.position_sum')
-            ->and($e->context)->toBe(['position' => 1, 'rounds' => 3, 'count' => 4]);
-    }
-});
+it('accepts final lines whose counts in a position do not add up to the rounds', function () {
+    (new SeasonTotalsRules)->assertValidTotals(oldSeason(brenoWins: 2), PercentageTable::standard());
+})->throwsNoExceptions();
 
 it('refuses a player listed twice in the final lines', function () {
-    (new SeasonTotalsRules)->assertValidTotals([...oldSeason(), totalsLine(1, '1.00', [0, 0, 0, 0, 0, 0])], 3, PercentageTable::standard());
+    (new SeasonTotalsRules)->assertValidTotals([...oldSeason(), totalsLine(1, '1.00', [0, 0, 0, 0, 0, 0])], PercentageTable::standard());
 })->throws(RuleViolation::class, 'season.totals.duplicate_player');
 
 it('refuses a final line without a count for every scoring position', function () {
-    (new SeasonTotalsRules)->assertValidTotals([totalsLine(1, '1.00', [1, 0, 0])], 1, PercentageTable::standard());
+    (new SeasonTotalsRules)->assertValidTotals([totalsLine(1, '1.00', [1, 0, 0])], PercentageTable::standard());
 })->throws(RuleViolation::class, 'season.totals.positions');
 
 it('refuses a negative count in a final line', function () {
-    (new SeasonTotalsRules)->assertValidTotals([totalsLine(1, '1.00', [1, 0, 0, 0, 0, -1])], 1, PercentageTable::standard());
+    (new SeasonTotalsRules)->assertValidTotals([totalsLine(1, '1.00', [1, 0, 0, 0, 0, -1])], PercentageTable::standard());
 })->throws(RuleViolation::class, 'season.totals.positions');
 
 it('accepts no final line, which clears them', function () {
-    (new SeasonTotalsRules)->assertValidTotals([], 3, PercentageTable::standard());
+    (new SeasonTotalsRules)->assertValidTotals([], PercentageTable::standard());
 })->throwsNoExceptions();
 
 it('refuses final lines for a season with a regular night', function () {
@@ -108,8 +102,8 @@ it('refuses a regular night in a season known only by its final standings', func
     (new SeasonTotalsRules)->assertTakesRegularNights(true);
 })->throws(RuleViolation::class, 'season.totals_only');
 
-it('refuses to change the rounds of a season known only by its final standings', function () {
-    (new SeasonTotalsRules)->assertCanChangeShape(totalsOnly: true, roundsChanged: true, tableChanged: false);
+it('refuses to change the percentages of a season known only by its final standings', function () {
+    (new SeasonTotalsRules)->assertCanChangeTable(totalsOnly: true, tableChanged: true);
 })->throws(RuleViolation::class, 'season.totals.locked');
 
 it('counts a season known only by its final standings in the statistics of every season, but not in the pots', function () {

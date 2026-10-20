@@ -31,7 +31,7 @@ final class SaveSeasonTotals
     {
         Gate::forUser($user)->authorize('update', $season);
         $this->rules->assertCanSaveTotals($season->nights()->notArchived()->scoring()->exists(), $season->isArchived());
-        $this->rules->assertValidTotals($lines, (int) $season->rounds, PercentageTable::of($season->percentByPosition()));
+        $this->rules->assertValidTotals($lines, PercentageTable::of($season->percentByPosition()));
         $this->players->assertExist(array_map(fn (TotalsLine $line) => $line->playerId, $lines), 'season.totals.unknown_player', 'rows');
 
         DB::transaction(function () use ($user, $season, $lines) {

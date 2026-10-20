@@ -75,11 +75,10 @@ it('lets only an admin save the final standings', function () {
     $this->putJson($this->url, ['rows' => ($this->rows)()])->assertForbidden();
 });
 
-it('refuses final lines whose counts in a position do not add up to the rounds', function () {
-    $this->putJson($this->url, ['rows' => ($this->rows)(brenoWins: 2)])->assertUnprocessable()
-        ->assertJsonPath('rule', 'season.totals.position_sum')
-        ->assertJsonPath('message', 'A posição 1 soma 4 vezes, mas a temporada tem 3 rodadas.');
-    expect(SeasonTotal::query()->count())->toBe(0);
+it('keeps final lines whose counts in a position do not add up to the rounds, as the league recorded them', function () {
+    $this->putJson($this->url, ['rows' => ($this->rows)(brenoWins: 2)])->assertOk()
+        ->assertJsonPath('data.1.wins', 2)
+        ->assertJsonPath('data.1.nights_scored', 4);
 });
 
 it('refuses a player listed twice, and an archived player', function () {
@@ -119,10 +118,9 @@ it('takes no regular night and no simulation in a season known only by its final
     expect(Night::query()->where('season_id', $this->old->id)->count())->toBe(1);
 });
 
-it('refuses to change the rounds or the percentages of a season known only by its final standings', function () {
+it('refuses to change the percentages of a season known only by its final standings', function () {
     $this->putJson($this->url, ['rows' => ($this->rows)()])->assertOk();
 
-    $this->patchJson("/api/v1/seasons/{$this->old->id}", ['rounds' => 4])->assertUnprocessable()->assertJsonPath('rule', 'season.totals.locked');
     $this->patchJson("/api/v1/seasons/{$this->old->id}", ['percentages' => array_map(
         fn (int $position, int $percent) => ['position' => $position, 'percent' => $percent], range(1, 6), [40, 23, 15, 10, 8, 4],
     )])->assertUnprocessable()->assertJsonPath('rule', 'season.totals.locked');

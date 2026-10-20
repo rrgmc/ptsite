@@ -20,14 +20,15 @@ Admins save the final standings, through the API. Everyone sees them like any se
    ("Rodadas") are the nights it had.
 2. **Each player is listed once.** Each line gives a count, zero or more, for every scoring position of the
    season's percentage table, and points of zero or more.
-3. **Every round filled each scoring position once.** So, in each position, the players' counts add up to the
-   season's rounds.
+3. **The final standings are kept as the league recorded them.** The counts of a position need not add up to the
+   season's rounds: a hand-kept table may miss a finish or have an extra night, and the site does not correct
+   it.
 4. **Saving the final lines replaces the ones saved before.** Saving the same lines twice changes nothing.
    Saving none clears them, and the season is an ordinary season again.
 5. **A season with a regular night takes no final lines**, and an archived season takes none either. A season
    with final lines takes no regular night, and has no "Simulação". Its Main Event can still be recorded.
-6. **The rounds and the percentage table of such a season cannot change** while it has final lines, because the
-   lines were checked against them.
+6. **The percentage table of such a season cannot change** while it has final lines, because it gives the
+   positions of the lines.
 7. **The standings** follow [points-and-standings.md](points-and-standings.md): the players are ranked by their
    total points, and tied players share a rank. The nights scored are the finishes added up, and the wins are
    the 1st places.
@@ -52,13 +53,13 @@ lines:
 | Fábio | 30.00 | 0 | 0 | 0 | 1 | 0 | 1 |
 | Gabi | 12.50 | 0 | 0 | 0 | 0 | 1 | 1 |
 
-Each column adds up to 3, the rounds.
+Each column adds up to 3, the rounds, but that is not required (rule 3).
 
 1. **Standings.** Ana is 1st with 250.50 points, 3 nights scored and 2 wins. Gabi is 7th with 12.50 points and
    2 nights scored.
 2. **A tie.** With Davi at 120.00 points too, Carla and Davi share the 3rd place, and Elisa is 5th.
-3. **A column that does not add up.** With Breno at 2 wins instead of 1, the 1st places add up to 4: the site
-   refuses the lines with "A posição 1 soma 4 vezes, mas a temporada tem 3 rodadas."
+3. **A column that does not add up.** With Breno at 2 wins instead of 1, the 1st places add up to 4 in 3
+   rounds. The site keeps the lines, and Breno has 2 wins and 4 nights scored.
 4. **A player twice.** Two lines for Ana are refused: "Este jogador aparece duas vezes."
 5. **No night.** Scheduling or importing a regular night in "Temporada antiga" is refused: "Esta temporada tem
    só o resultado final: não recebe eventos." Saving final lines for a season with a finished night is refused:

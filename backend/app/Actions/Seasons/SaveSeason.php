@@ -50,9 +50,8 @@ final class SaveSeason
         );
         $this->assertValidMoney($season, $data);
         if ($season !== null) {
-            $this->totalsRules->assertCanChangeShape(
+            $this->totalsRules->assertCanChangeTable(
                 $season->isTotalsOnly(),
-                isset($data['rounds']) && (int) $data['rounds'] !== $season->rounds,
                 $table !== null && $table->percentByPosition != $season->percentByPosition(),
             );
         }

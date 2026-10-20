@@ -24,17 +24,16 @@ final class SeasonTotalsRules
     }
 
     /**
-     * Each player once, a count of zero or more for each scoring position, points of zero or more, and in each
-     * position as many finishes as the season has rounds: every round filled each scoring position once. No line
-     * at all is allowed, and clears the season's final lines.
+     * Each player once, a count of zero or more for each scoring position, and points of zero or more. The counts
+     * of a position need not add up to the rounds: the final standings are kept as the league recorded them. No
+     * line at all is allowed, and clears the season's final lines.
      *
      * @param  list<TotalsLine>  $lines
      */
-    public function assertValidTotals(array $lines, int $rounds, PercentageTable $table): void
+    public function assertValidTotals(array $lines, PercentageTable $table): void
     {
         $positions = $table->scoringPositions();
         $seen = [];
-        $sums = array_fill(1, $positions, 0);
         foreach ($lines as $index => $line) {
             if (isset($seen[$line->playerId])) {
                 throw new RuleViolation('season.totals.duplicate_player', "rows.{$index}.player_id");
@@ -45,17 +44,6 @@ final class SeasonTotalsRules
             }
             if ($line->points->cents < 0) {
                 throw new RuleViolation('season.totals.points_negative', "rows.{$index}.points");
-            }
-            foreach ($line->positions as $position => $count) {
-                $sums[$position] += $count;
-            }
-        }
-        if ($lines === []) {
-            return;
-        }
-        foreach ($sums as $position => $sum) {
-            if ($sum !== $rounds) {
-                throw new RuleViolation('season.totals.position_sum', 'rows', ['position' => $position, 'rounds' => $rounds, 'count' => $sum]);
             }
         }
     }
@@ -68,10 +56,10 @@ final class SeasonTotalsRules
         }
     }
 
-    /** The rounds and the percentage table of a season known only by its final standings are part of those lines. */
-    public function assertCanChangeShape(bool $totalsOnly, bool $roundsChanged, bool $tableChanged): void
+    /** The percentage table of a season known only by its final standings gives the positions of its lines. */
+    public function assertCanChangeTable(bool $totalsOnly, bool $tableChanged): void
     {
-        if ($totalsOnly && ($roundsChanged || $tableChanged)) {
+        if ($totalsOnly && $tableChanged) {
             throw new RuleViolation('season.totals.locked');
         }
     }
