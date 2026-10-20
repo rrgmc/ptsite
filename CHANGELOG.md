@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- A season can be known only by its final standings ("Só totais"): for each player, the total points and how
+  often the player finished in each position, with no night. Admins save them with
+  `PUT /api/v1/seasons/{season}/totals`; in each position, the finishes add up to the season's rounds. The
+  seasons lists show the badge "Só totais", and "Classificação" and "Resultados" say there are no results per
+  night ([docs/specs/season-totals.md](docs/specs/season-totals.md)).
+
+### Changed
+
+- The standings, the statistics, "Campeonatos" and the players' pages count a season known only by its final
+  standings. The pots, the places and the progress night by night leave it out. Such a season takes no regular
+  night and has no "Simulação", and its rounds and percentages cannot change.
+
 ## [1.30.0] - 2026-10-20
 
 ### Added

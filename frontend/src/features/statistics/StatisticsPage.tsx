@@ -91,6 +91,8 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
   // The final standings of the finished seasons; a season's own are on "Classificação".
   const championships = statistics.championships && statistics.championships.count > 0 ? statistics.championships : null
   const hasNights = statistics.nights_count > 0
+  // A season known only by its final standings has no night of its own: no pot, no place and no progress.
+  const nightsKnown = statistics.points_progress.steps.length > 0
   if (!hasNights && !mainEvent) return <Empty>{t.statistics.noNights}</Empty>
 
   const rebuys = hasNights ? statistics.rebuys : null
@@ -127,6 +129,10 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
           </div>
         ),
       },
+    )
+  }
+  if (hasNights && nightsKnown) {
+    tabs.push(
       {
         id: 'nights',
         title: t.common.nights,
@@ -223,7 +229,7 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
             : []),
         ]}
       />
-      {hasNights && <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />}
+      {hasNights && nightsKnown && <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />}
       <TabBox label={t.statistics.tabs} tabs={tabs} />
     </div>
   )

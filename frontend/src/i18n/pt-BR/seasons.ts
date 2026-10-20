@@ -27,4 +27,6 @@ export const seasons = {
   finished: 'Finalizada',
   open: 'Aberta',
   closed: 'Fechada',
+  totalsOnly: 'Só totais',
+  totalsOnlyNote: 'Só o resultado final: não há resultados por evento.',
 }

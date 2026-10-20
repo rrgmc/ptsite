@@ -23,4 +23,6 @@ export const seasons: Messages['seasons'] = {
   finished: 'Finished',
   open: 'Open',
   closed: 'Closed',
+  totalsOnly: 'Totals only',
+  totalsOnlyNote: 'Final standings only: there are no results per night.',
 }

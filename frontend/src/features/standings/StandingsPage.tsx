@@ -38,8 +38,9 @@ export function StandingsPage() {
       <OpenNightAttendance />
       <PageHeader
         title={t.standings.title}
-        subtitle={t.standings.subtitle({ season: season.name, count: finished.filter((n) => !n.is_extra).length })}
+        subtitle={t.standings.subtitle({ season: season.name, count: season.totals_only ? season.rounds : finished.filter((n) => !n.is_extra).length })}
       />
+      {season.totals_only && <p className="mb-4 text-muted">{t.seasons.totalsOnlyNote}</p>}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_20rem]">
         <div className="flex min-w-0 flex-col gap-4">
@@ -80,9 +81,10 @@ export function StandingsPage() {
               </Link>
             </Card>
           )}
-          <Link to={to('/simulator')} className="rounded-lg border-2 border-dashed border-border p-4 text-center font-semibold text-primary hover:bg-primary-soft">
+          {/* A season known only by its final standings has no next night to imagine. */}
+          {!season.totals_only && <Link to={to('/simulator')} className="rounded-lg border-2 border-dashed border-border p-4 text-center font-semibold text-primary hover:bg-primary-soft">
             {t.standings.simulate}
-          </Link>
+          </Link>}
         </div>
       </div>
     </>
