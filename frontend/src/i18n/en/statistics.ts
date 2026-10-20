@@ -89,6 +89,7 @@ export const statistics: Messages['statistics'] = {
     `Bar chart: times ${nickname} finished in each position.${best ? ` The most frequent is ${best.label}: ${best.count}.` : ''} The numbers are in the table below.`,
   playerPositionsCaption: ({ nickname }) => `Times ${nickname} finished in each position`,
   rankBySeason: 'Rank by season',
+  rankOrWorse: (rank) => `${rank}+`,
   rankBySeasonNote: 'For fun, the Main Event counts as one more night of the season.',
   rankBySeasonDescription: ({ nickname, best }) =>
     `Line chart: rank of ${nickname} in each season, with the Main Event counted as one more night. 1st place is at the top.${best ? ` The best is ${best.rank}, in ${best.label}.` : ''} The numbers are in the table below.`,

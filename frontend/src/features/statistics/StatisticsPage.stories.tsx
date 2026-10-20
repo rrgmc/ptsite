@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { http, HttpResponse } from 'msw'
-import { statistics, statisticsEmpty } from '@/mocks/data'
+import { statistics, statisticsAllTime, statisticsEmpty } from '@/mocks/data'
 import { RouterStory } from '@/mocks/RouterStory'
 import { PositionTable } from './PositionTable'
-import { PlacesChart, PointsProgressChart, PotsChart, WinsChart } from './StatisticsCharts'
+import { PlacesChart, PointsProgressChart, PotsChart, RankProgressChart, WinsChart } from './StatisticsCharts'
 import { AllTimeStatisticsPage, StatisticsPage, StatisticsView } from './StatisticsPage'
 
 // "Estatísticas": the totals, the charts and the top ten lists in tabs, for every season ("Geral", the first view)
@@ -85,6 +85,17 @@ export const OneNight: StoryObj = {
 export const OneWinner: StoryObj = {
   parameters: { layout: 'padded' },
   render: () => <WinsChart statistics={{ ...statistics, positions: [{ ...statistics.positions[0], rows: statistics.positions[0].rows.slice(0, 1) }] }} />,
+}
+
+/** Positions below 15th: the axis stops there, and they are drawn on its bottom line, "15º+". */
+export const RanksBelowFifteen: StoryObj = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <RankProgressChart
+      steps={statisticsAllTime.points_progress.steps}
+      rankProgress={statisticsAllTime.rank_progress!.map((s, i) => (i < 7 ? s : { ...s, ranks: s.ranks.map((rank) => rank && rank * 2 + 4) }))}
+    />
+  ),
 }
 
 /** The pot of each night of a season. */

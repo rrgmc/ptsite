@@ -89,6 +89,14 @@ describe('rankProgressData', () => {
     expect(points[0]).not.toHaveProperty('p4')
     expect(points[1]).not.toHaveProperty('p7')
   })
+
+  it('draws the players after the ten colors in the text color', () => {
+    const extra = [11, 12, 13].map((id) => ({ player: { ...statisticsAllTime.rank_progress![0].player, id, nickname: `P${id}` }, ranks: [12, 14, 20] }))
+    const { series } = rankProgressData(statisticsAllTime.points_progress.steps, [...statisticsAllTime.rank_progress!, ...extra])
+    expect(series).toHaveLength(13)
+    expect(series[9].color).toBe(SERIES_COLORS[9])
+    expect(series[10]).toEqual({ key: 'p11', nickname: 'P11', color: 'var(--color-text)' })
+  })
 })
 
 describe('rankTicks', () => {

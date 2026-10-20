@@ -9,7 +9,8 @@ use PTSite\Domain\Standings\TotalsLine;
 /**
  * The statistics of a set of finished nights: one season's, or every season's.
  *
- * Every list follows {@see Ranking}. The progress follows the ten players with the highest totals. The rebuys and
+ * Every list follows {@see Ranking}. The progress follows the ten players with the highest totals, and the rank by
+ * season the fifteen with the highest totals. The rebuys and
  * the time chips count what the night dashboard recorded: a night it did not run has none. A season known only by
  * its final standings counts in the points, the nights and the positions, and in a progress with one step per
  * season; it has no pot, no place and no night of its own.
@@ -17,6 +18,8 @@ use PTSite\Domain\Standings\TotalsLine;
 final class Statistics
 {
     public const int PROGRESS_PLAYERS = 10;
+
+    public const int RANK_PLAYERS = 15;
 
     public function __construct(
         private readonly Ranking $ranking = new Ranking,
@@ -88,6 +91,7 @@ final class Statistics
             $this->ranking->top($moneyOnlyRebuys),
             array_sum($timeChips),
             $this->ranking->top($timeChips),
+            array_map(fn (RankedRow $row) => $row->id, $this->ranking->top($points, self::RANK_PLAYERS)->rows),
         );
     }
 

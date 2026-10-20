@@ -51,12 +51,14 @@ export function progressData(progress: Pick<Statistics['points_progress'], 'step
 /**
  * The leaders' position in each season as chart points, with the same series, keys and colors as
  * {@link progressData}. A season in which a player did not score has no value for them: their line has a gap.
+ * The API sends fifteen players: the five after the ten colors are drawn in the text color, never a color of
+ * their own, since their small charts are named.
  */
 export function rankProgressData(steps: Statistics['points_progress']['steps'], rankProgress: NonNullable<Statistics['rank_progress']>): ProgressData {
-  const series = rankProgress.slice(0, SERIES_COLORS.length).map((s, i) => ({
+  const series = rankProgress.map((s, i) => ({
     key: `p${s.player.id}`,
     nickname: s.player.nickname,
-    color: SERIES_COLORS[i],
+    color: SERIES_COLORS[i] ?? 'var(--color-text)',
   }))
   const points = steps.map((step, i) => {
     const point: ProgressData['points'][number] = { label: step.season_name }
