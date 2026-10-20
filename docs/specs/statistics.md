@@ -12,9 +12,9 @@ Everyone logged in: players, results keepers and admins.
 
 ## Rules
 
-1. **"Estatísticas"** has two views: **"Temporada"** (the selected season, see
-   [seasons-and-nights.md](seasons-and-nights.md) rule 3a) and **"Geral"** (every season). Both show the same lists
-   and charts.
+1. **"Estatísticas"** has two views: **"Geral"** (every season) and **"Temporada"** (the selected season, see
+   [seasons-and-nights.md](seasons-and-nights.md) rule 3a). Both show the same lists and charts. **"Geral" comes
+   first and opens by default**: "Estatísticas" in the menu leads to it.
 2. Only **finished nights** count. Archived nights do not count, and "Geral" also leaves out archived seasons.
    A Main Event night has no pot and no points, so it does not count ([main-event.md](main-event.md)). An extra
    night counts like any other. The Main Events have lists of their own (rule 13).
@@ -71,6 +71,18 @@ Everyone logged in: players, results keepers and admins.
       were recorded counts those players only.
 
     "Temporada" has no such list: a season has one Main Event, and the "Main Event" screen shows it.
+
+13a. **The championship lists** ("Campeonatos"), in "Geral" only. They count the **final standings of the
+    finished seasons** that are not archived ([points-and-standings.md](points-and-standings.md), rules 8 and
+    9). An open season does not count: its standings are not final. A finished season with no finished night
+    has no standings, so it does not count either. Each list shows the first 10, with ties as in rule 4:
+    - **"Títulos"**: players by seasons finished in 1st place. Players who share the 1st place of a season
+      each count a title.
+    - **"Pódios"**: players by seasons finished in the first three.
+    - **"Participações"**: players by seasons in whose standings they are, that is, seasons in which they
+      scored.
+
+    "Temporada" has no such list: the season's own standings are on "Classificação".
 
 14. **The rebuys and the time chips**, in both views, on a site with the night dashboard
     ([night-dashboard.md](night-dashboard.md)). They count what the dashboard recorded on the nights of rule 2;
@@ -132,6 +144,11 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   3rd. Appearances: Ana 2, Breno 2 and Dudu 2 share 1st; Carla, with 1, is 4th.
 - **Only the champion.** An old Main Event recorded with Carla alone gives her one title, one podium and one
   appearance.
+- **The championships.** Seasons A and B are finished. Season A ends Breno, Ana, Carla, and season B ends Ana,
+  Carla. Titles: Ana 1 and Breno 1 share 1st. Podiums: Ana 2 and Carla 2 share 1st; Breno, with 1, is 3rd.
+  Appearances: Ana 2 and Carla 2 share 1st; Breno, with 1, is 3rd.
+- **A shared title.** A season ends with Ana and Breno on the same points. Each counts one title.
+- **An open season.** Season B is still open. Only season A counts: Breno has the only title.
 - **The rebuys.** Season A allows 2 rebuys, and the dashboard recorded nights 1 and 2. On night 1 Ana made 1
   rebuy and Breno 3; Carla arrived late. On night 2 Breno made 2 and Carla 4; Ana and Carla arrived late. Night 3
   was not run on the dashboard. Rebuys: 10 in all; Breno 5, Carla 4, Ana 1.
@@ -155,7 +172,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 
 - **"📊 Estatísticas"** in the menu, after "Main Event" and before "Jogadores": the last of the season's screens. It is not on the phone's bottom bar,
   which is full.
-- A switch **"Temporada" / "Geral"**. Each view has its own address, so it can be shared.
+- A switch **"Geral" / "Temporada"**, in that order. Each view has its own address, so it can be shared.
+  "Geral" is at `/statistics/all`, and "Estatísticas" in the menu leads there; the menu marks "Estatísticas"
+  in both views.
 - At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". Then "Pontos
   acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the same
   numbers as a table.
@@ -175,6 +194,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
     atraso", side by side, one under the other on a phone. A list with nothing recorded says "Nenhum registrado
     no painel do evento.". The boxes at the top add "Rebuys", "Rebuys além do limite" and "Time chips por atraso".
   - **"Main Event"**, in "Geral": "Títulos", "Pódios" and "Participações", side by side, two across on a phone.
+  - **"Campeonatos"**, in "Geral", once a season is finished: the lists of rule 13a, laid out as in "Main
+    Event". It comes before "Main Event".
 - "Maiores Potes" links to each night; in "Geral" it also names the season.
 - **"Resultados"** also shows the season's "Pontos acumulados" chart, with the full width, below "Próximos
   eventos" and above the finished nights. The box "Totais da temporada" adds up the season's three amounts:
@@ -188,7 +209,6 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 
 ## Open questions
 
-- Which view opens first. It is "Temporada" for now, like the other season screens.
 - New lists such as podiums and averages were offered and not chosen for now.
 - Should a player's "Pontos acumulados" in "Geral" start at the player's first season, instead of showing a flat
   line at zero for the seasons before it?

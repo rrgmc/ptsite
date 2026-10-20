@@ -178,6 +178,7 @@ to map one to the other. The English texts of the screens are in `frontend/src/i
 | Pessoas pontuam por evento | Scoring positions | How many places earn points (6 so far) |
 | Pontos | Points | A player's share of the pot for a night |
 | Classificação | Standings | The season ranking by total points |
+| Campeão, "Campeonato" | Season champion | The 1st place of a finished season's standings. A season has two champions, this one and the Main Event's, and each wins a trophy |
 | Posições | Finishing positions | How often each player finished in each place |
 | Simulação | Ranking simulator | "What if" standings for the next night |
 | Estatísticas | Statistics | Top ten lists and charts, for one season ("Temporada") or every season ("Geral") |

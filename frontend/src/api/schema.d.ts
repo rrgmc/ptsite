@@ -1136,6 +1136,17 @@ export interface components {
             cancelled: boolean;
             exception_id: number | null;
         };
+        /** ChampionshipStatisticsResource */
+        ChampionshipStatisticsResource: {
+            /** @description How many finished seasons count. */
+            count: number;
+            /** @description Players by seasons finished in 1st place of the standings (`count`). Players who share the 1st place each count a title. */
+            titles: components["schemas"]["RankedListResource"];
+            /** @description Players by seasons finished in the first three of the standings (`count`). */
+            podiums: components["schemas"]["RankedListResource"];
+            /** @description Players by seasons in whose standings they are, that is, in which they scored (`count`). */
+            appearances: components["schemas"]["RankedListResource"];
+        };
         /** ChangeOwnPasswordRequest */
         ChangeOwnPasswordRequest: {
             current_password: string;
@@ -1940,6 +1951,7 @@ export interface components {
                 }[];
             }[];
             main_event: components["schemas"]["MainEventStatisticsResource"] | null;
+            championships: components["schemas"]["ChampionshipStatisticsResource"] | null;
             rebuys: components["schemas"]["RebuyStatisticsResource"] | null;
         };
         /** SuggestedNightResource */

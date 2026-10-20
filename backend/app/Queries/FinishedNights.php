@@ -27,7 +27,7 @@ final class FinishedNights
             ->finished()
             ->scoring()
             ->when($season, fn ($q) => $q->where('season_id', $season->id), fn ($q) => $q->whereHas('season', fn ($s) => $s->notArchived()))
-            ->with(['results', 'season:id,name,rebuys_allowed'])
+            ->with(['results', 'season:id,name,rebuys_allowed,is_finished'])
             ->orderBy('starts_at')
             ->orderBy('id')
             ->get()

@@ -31,6 +31,18 @@ Everyone sees points and standings. Nobody enters points by hand: they are alway
 7. The **ranking simulator** ("Simulação") takes an imagined pot and finishing order for the next night, and
    shows the current and simulated standings side by side, with how many places each player moves. Nothing is
    saved.
+8. **A season has two champions**, and in the league each wins a trophy:
+   - the **season champion** ("Campeão"), the 1st place of the season's final standings, by points;
+   - the **Main Event champion**, the 1st place of the season's Main Event, on a site with the Main Event
+     ([main-event.md](main-event.md)).
+
+   Players who share the 1st place of the final standings are all season champions. An open season has no
+   champion yet: its standings are not final.
+9. **"Campeonato"**: once a season is finished, "Classificação" shows the **first three of its final standings**
+   in a box above the standings table, with a medal each (🥇, 🥈, 🥉). It looks like the Main Event box
+   ([main-event.md](main-event.md), rule 10a) and comes before it. Players who share a place share its medal,
+   so the box can show more than three players. A season that is not finished, or that has no finished night,
+   has no box. The statistics count the seasons' titles ([statistics.md](statistics.md), rule 13a).
 
 ## Examples
 
@@ -56,6 +68,12 @@ Names and figures are invented. All examples use the percentage table **38, 23, 
   114.00. The standings change without any other step.
 - **Simulator.** After the correction, a simulated R$ 400 pot where Breno finishes 1st (152.00) and Ana
   doesn't score shows Breno 266.00 ahead of Ana 228.00, with Breno moving up one place. Nothing is saved.
+- **Two champions.** Liga 2025 is finished. Its standings end Breno 221.00, Ana 174.00, Carla 137.00 and Dudu
+  100.00, and Carla wins its Main Event. Breno is the season champion and Carla the Main Event champion.
+  "Classificação" shows the box "Campeonato" with 🥇 Breno, 🥈 Ana and 🥉 Carla, and the Main Event box under it.
+- **A shared 1st place.** A finished season ends Ana 228.00, Breno 228.00 and Carla 137.00. Ana and Breno are
+  both season champions. The box shows 🥇 1º Ana, 🥇 1º Breno and 🥉 3º Carla.
+- **Not finished yet.** While Liga 2026 is open, Breno leads its standings. It has no "Campeonato" box.
 
 ## Main Event
 
