@@ -41,6 +41,19 @@ it('shows archived players only to admins who ask for them', function () {
     $this->getJson('/api/v1/players?archived=1')->assertJsonCount(1, 'data');
 });
 
+it('lists only the players who have a memo with with_memo, the inactive and archived ones too, for everyone', function () {
+    Player::factory()->create(['nickname' => 'Ana', 'memo' => 'Fundadora da mesa.']);
+    Player::factory()->create(['nickname' => 'Breno']);
+    Player::factory()->inactive()->create(['nickname' => 'Carlão', 'memo' => 'Voltou em 2025.']);
+    Player::factory()->archived()->create(['nickname' => 'Dudu', 'memo' => 'Mudou de cidade.']);
+    Player::factory()->archived()->create(['nickname' => 'Estela']);
+
+    Sanctum::actingAs(User::factory()->create());
+    $this->getJson('/api/v1/players?with_memo=1')->assertOk()
+        ->assertJsonPath('data.*.nickname', ['Ana', 'Dudu', 'Carlão'])
+        ->assertJsonPath('data.1.archived', true);
+});
+
 it('quick-adds a first-timer by nickname as an active player', function () {
     Sanctum::actingAs(User::factory()->resultsKeeper()->create());
 

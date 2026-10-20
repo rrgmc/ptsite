@@ -2,6 +2,8 @@
 export const players = {
   // Players list
   listSubtitle: 'Ativos primeiro, depois inativos',
+  detailedSubtitle: 'Na ordem das posições de todas as temporadas',
+  jumpLabel: 'Ir para o jogador',
   viewLabel: 'Modo de exibição',
   viewList: 'Lista',
   viewDetailed: 'Detalhado',

@@ -13,7 +13,10 @@ const page = (url: string) => <RouterStory path="/players" url={url} element={<P
 
 export const List: StoryObj = { render: () => page('/players') }
 
-/** Ana has a photo, Carlão only a thumbnail, and Lia, who is inactive, no image. The other players have no memo. */
+/**
+ * In the order of "Posições": Ana, Carlão, Breno and Lia, then Mário, who is archived and never scored. Ana and Breno
+ * have a photo, Carlão only a thumbnail, and Lia, who is inactive, and Mário no image. The other players have no memo.
+ */
 export const Detailed: StoryObj = { render: () => page('/players?view=detailed') }
 
 export const DetailedEmpty: StoryObj = {

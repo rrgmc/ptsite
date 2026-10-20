@@ -407,7 +407,8 @@ export function useNight(id: number) {
   })
 }
 
-export function usePlayers(filters: { search?: string; status?: 'active' | 'inactive'; archived?: boolean } = {}) {
+/** The players. With `withMemo`, only the ones who have a memo, archived ones too. */
+export function usePlayers(filters: { search?: string; status?: 'active' | 'inactive'; archived?: boolean; withMemo?: boolean } = {}) {
   return useQuery({
     queryKey: keys.players(filters),
     placeholderData: keepPreviousData,
@@ -415,7 +416,9 @@ export function usePlayers(filters: { search?: string; status?: 'active' | 'inac
       (
         await unwrap(
           api.GET('/v1/players', {
-            params: { query: { ...filters, archived: filters.archived ? 1 : undefined } as never },
+            params: {
+              query: { search: filters.search, status: filters.status, archived: filters.archived ? 1 : undefined, with_memo: filters.withMemo ? 1 : undefined } as never,
+            },
           }),
         )
       ).data,

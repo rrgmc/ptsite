@@ -2697,11 +2697,19 @@
         "/v1/players": {
             "get": {
                 "operationId": "player.index",
-                "summary": "Players, each with the memo: active first, then inactive, by nickname ignoring capitals and accents. Archived\nplayers only for admins with archived=1.\nFilters: status (active|inactive), search (nickname or name), updated_since (ISO 8601)",
+                "summary": "Players, each with the memo: active first, then inactive, by nickname ignoring capitals and accents. Archived\nplayers only for admins with archived=1, or for everyone with with_memo=1, which lists only the players who\nhave a memo (\"Detalhado\").\nFilters: status (active|inactive), search (nickname or name), updated_since (ISO 8601), with_memo",
                 "tags": [
                     "Player"
                 ],
                 "parameters": [
+                    {
+                        "name": "with_memo",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
                     {
                         "name": "status",
                         "in": "query",
