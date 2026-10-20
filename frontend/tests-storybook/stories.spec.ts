@@ -1,11 +1,31 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
 const index = JSON.parse(readFileSync(new URL('../storybook-static/index.json', import.meta.url), 'utf8')) as {
   entries: Record<string, { id: string; type: string; title: string; name: string }>
 }
 const stories = Object.values(index.entries).filter((e) => e.type === 'story')
+
+/**
+ * Runs axe on the story. Storybook's a11y addon runs axe in the same page once the story renders, and on a slow
+ * story (many charts) that run can still be going: axe refuses a second run until it ends, so this waits and
+ * tries again.
+ */
+async function analyze(page: Page) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await new AxeBuilder({ page })
+        .include('#storybook-root')
+        .exclude('[data-live-announcer]')
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+        .analyze()
+    } catch (error) {
+      if (attempt === 10 || !String(error).includes('Axe is already running')) throw error
+      await page.waitForTimeout(500)
+    }
+  }
+}
 
 for (const story of stories) {
   test(`${story.title} › ${story.name}`, async ({ page }) => {
@@ -21,11 +41,7 @@ for (const story of stories) {
     // "Agendar" bar over the days), which depends on nothing but the layout above it.
     await page.addStyleTag({ content: '.sticky { position: static !important; }' })
 
-    const results = await new AxeBuilder({ page })
-      .include('#storybook-root')
-      .exclude('[data-live-announcer]')
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-      .analyze()
+    const results = await analyze(page)
     expect(results.violations.map((v) => `${v.id}: ${v.help} → ${v.nodes.map((n) => n.html).join(' | ')}`)).toEqual([])
   })
 }
