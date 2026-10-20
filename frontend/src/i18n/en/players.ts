@@ -3,6 +3,8 @@ import type { Messages } from '..'
 export const players: Messages['players'] = {
   // Players list
   listSubtitle: 'Active first, then inactive',
+  detailedSubtitle: 'In the order of the positions over every season',
+  jumpLabel: 'Go to player',
   viewLabel: 'View mode',
   viewList: 'List',
   viewDetailed: 'Detailed',

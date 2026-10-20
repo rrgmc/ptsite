@@ -457,11 +457,24 @@ export const statisticsEmpty: Statistics = {
 /** The memo an admin wrote about Ana, with a line break. */
 export const memo = 'Fundadora da mesa, joga desde 2009.\nNunca recusa um all-in antes do intervalo.'
 
-/** The memos in the players list, by player: Ana (1), Carlão (3) and Lia (12). The other players have none. */
+/** The memos in the players list, by player: Ana (1), Breno (2), Carlão (3) and Lia (12). The other players have none. */
 export const memos: Record<number, string> = {
   1: memo,
+  2: 'Abre a casa toda sexta.',
   3: 'Joga todas as mãos e reclama de todas.',
   12: 'Prometeu voltar em 2019. A cadeira continua guardada.',
+}
+
+/** An archived player with a memo. Only "Detalhado" lists archived players, and only the ones with a memo. */
+export const archivedWithMemo: Player & { memo: string } = {
+  ...players[0],
+  id: 13,
+  nickname: 'Mário',
+  name: 'Mário Souza',
+  archived: true,
+  thumbnail_version: null,
+  photo_version: null,
+  memo: 'Mudou de cidade em 2024.',
 }
 
 const playerResult = (nightId: number, day: string, seasonId: number, seasonName: string, position: number, points: string) => ({
