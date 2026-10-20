@@ -17,6 +17,7 @@ import { useSeasonPath } from '@/lib/seasonPath'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { amountRows } from '../nights/amounts'
 import { PositionTable } from './PositionTable'
+import { titlePlaces } from './titlePlaces'
 import { PlacesChart, PointsProgressChart, PotsChart, RebuysChart, subtitle, WinsChart } from './StatisticsCharts'
 
 /** "Estatísticas" of the selected season (docs/specs/statistics.md). */
@@ -62,12 +63,13 @@ function playerRows(list: RankedListData, value: (row: RankedListData['rows'][nu
 }
 
 /**
- * Over every season, the first three by titles: of the seasons' final standings, then of the Main Event. Players
- * with as many titles share a place, as in the lists.
+ * Over every season, the first three places by titles: of the seasons' final standings, then of the Main Event.
+ * Players with as many titles share a place, and the next number of titles is the next place ({@link titlePlaces}).
  */
 function ChampionPodiums({ championships, mainEvent }: { championships: Statistics['championships']; mainEvent: Statistics['main_event'] }) {
   const lines = (list: RankedListData) =>
-    list.rows.map((row) => ({ rank: row.rank, player: row.player!, note: t.statistics.titlesCount({ count: row.count ?? 0 }) }))
+    titlePlaces(list.rows.map((row) => ({ player: row.player!, count: row.count ?? 0 })))
+      .map((row) => ({ rank: row.rank, player: row.player, note: t.statistics.titlesCount({ count: row.count }) }))
   return (
     // Side by side from a tablet's width up, one over the other on a phone.
     <div className={`grid grid-cols-1 items-start gap-3 ${championships && mainEvent ? 'md:grid-cols-2' : ''}`}>

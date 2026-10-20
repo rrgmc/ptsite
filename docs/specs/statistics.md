@@ -184,7 +184,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   follow, as the box "Campeonato" of "Classificação" but shorter: **"Campeões das temporadas"**, the first three
   of "Títulos" of rule 13a, and **"Campeões do Main Event"**, the first three of its "Títulos". They are side by
   side, one over the other on a phone. Each band has a line per place: its medal, the place and the number of
-  titles, then every player with that many titles, with a small photo. A band with no title is not shown. Then
+  titles, then every player with that many titles, with a small photo. Here the places go by the number of
+  titles, so the next number after a tie is the next place: with 4, 2, 2, 2 and 1 titles, the bands show 1st,
+  2nd (three players) and 3rd (the players with 1 title). The lists keep the places of rule 4. A band with no title is not shown. Then
   "Pontos acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the
   same numbers as a table.
 - Under it, a box with **tabs**, drawn as the tabs of a folder: one tab shows at a time, and its title is filled
