@@ -953,6 +953,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/seasons/{season}/totals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Saves the final standings of a season known only by them (admins): for each player, the total points and how
+         *     often the player finished in each scoring position. In each position, the players' finishes add up to the
+         *     season's rounds. They replace the season's final lines; an empty list clears them. Returns the standings
+         */
+        put: operations["season.saveTotals"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/seasons/{season}/night-suggestions": {
         parameters: {
             query?: never;
@@ -1748,6 +1769,17 @@ export interface components {
                 percent: number;
             }[];
         };
+        /** SaveSeasonTotalsRequest */
+        SaveSeasonTotalsRequest: {
+            /** @description Every player of the final standings, once. An empty list clears them. */
+            rows: {
+                player_id: number;
+                /** @description The player's total points for the season. */
+                points: string;
+                /** @description How often the player finished in each scoring position, the 1st place first. */
+                positions: number[];
+            }[];
+        };
         /** ScheduleNightRequest */
         ScheduleNightRequest: {
             /** Format: date-time */
@@ -1813,6 +1845,8 @@ export interface components {
                 percent: number;
             }[];
             nights_count?: number;
+            /** @description The season is known only by its final standings: it has no nights, and its rounds are the nights it had. */
+            totals_only?: boolean;
             updated_at: string | null;
         };
         /** SeasonTopStandingsResource */
@@ -4027,6 +4061,38 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "season.saveTotals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The season ID */
+                season: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveSeasonTotalsRequest"];
+            };
+        };
+        responses: {
+            /** @description Array of `StandingResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["StandingResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "season.nightSuggestions": {

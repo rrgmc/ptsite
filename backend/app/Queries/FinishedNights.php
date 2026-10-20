@@ -14,7 +14,8 @@ use PTSite\Domain\Statistics\NightRecord;
 
 /**
  * The nights the statistics count: the finished, non-archived nights of one season, or of every season that is
- * not archived. A Main Event night has no pot and no points, so it is left out; an extra night is counted.
+ * not archived. A Main Event night has no pot and no points, so it is left out; an extra night is counted. A season
+ * known only by its final standings has no night: totalsSeasons() gives it, and records() puts it among the nights.
  */
 final class FinishedNights
 {
@@ -32,6 +33,22 @@ final class FinishedNights
             ->orderBy('id')
             ->get()
             ->keyBy('id');
+    }
+
+    /**
+     * The seasons known only by their final standings, among the same seasons, oldest first, with their final lines.
+     *
+     * @return Collection<int, Season>
+     */
+    public function totalsSeasons(?Season $season): Collection
+    {
+        return Season::query()
+            ->whereHas('totals')
+            ->when($season, fn ($q) => $q->whereKey($season->id), fn ($q) => $q->notArchived())
+            ->with('totals')
+            ->orderBy('starts_on')
+            ->orderBy('id')
+            ->get();
     }
 
     /**
@@ -54,9 +71,36 @@ final class FinishedNights
     /**
      * @param  Collection<int, Night>  $nights
      * @param  bool  $withDashboard  with the rebuys and the late players the night dashboard recorded
+     * @param  ?Collection<int, Season>  $totalsSeasons  the result of totalsSeasons(): each is one record, placed
+     *                                                   by its start date among the nights
      * @return list<NightRecord>
      */
-    public function records(Collection $nights, bool $withDashboard = false): array
+    public function records(Collection $nights, bool $withDashboard = false, ?Collection $totalsSeasons = null): array
+    {
+        $records = $this->nightRecords($nights, $withDashboard);
+        if ($totalsSeasons === null || $totalsSeasons->isEmpty()) {
+            return $records;
+        }
+
+        $dated = [];
+        foreach (array_values($nights->all()) as $index => $night) {
+            $dated[] = [$night->starts_at->getTimestamp(), 1, $records[$index]];
+        }
+        foreach ($totalsSeasons as $season) {
+            $lines = $season->totals->sortBy('player_id')->map(TotalsLines::of(...))->values()->all();
+            $dated[] = [$season->starts_on->getTimestamp(), 0, NightRecord::seasonTotals($season->id, (int) $season->rounds, $lines)];
+        }
+        // Oldest first; a season starting the day of a night comes before it. usort keeps equal items in order.
+        usort($dated, fn (array $a, array $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
+
+        return array_map(fn (array $item) => $item[2], $dated);
+    }
+
+    /**
+     * @param  Collection<int, Night>  $nights
+     * @return list<NightRecord>
+     */
+    private function nightRecords(Collection $nights, bool $withDashboard): array
     {
         if ($withDashboard) {
             $nights->loadMissing(['rebuys', 'entries', 'prices']);
@@ -85,12 +129,13 @@ final class FinishedNights
      *
      * @param  list<int>  $ids  night ids, or season ids when there is one step per season
      * @param  Collection<int, Night>  $nights
+     * @param  ?Collection<int, Season>  $totalsSeasons  the seasons known only by their final standings among the steps
      * @return list<array{night_id: ?int, starts_at: ?string, season_id: int, season_name: string}>
      */
-    public function steps(array $ids, Collection $nights, bool $perSeason): array
+    public function steps(array $ids, Collection $nights, bool $perSeason, ?Collection $totalsSeasons = null): array
     {
         if ($perSeason) {
-            $names = $nights->pluck('season.name', 'season_id');
+            $names = $nights->pluck('season.name', 'season_id')->union($totalsSeasons?->pluck('name', 'id') ?? []);
 
             return array_map(fn (int $id) => ['night_id' => null, 'starts_at' => null, 'season_id' => $id, 'season_name' => $names[$id]], $ids);
         }

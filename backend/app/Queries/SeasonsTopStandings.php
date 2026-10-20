@@ -8,6 +8,7 @@ use PTSite\App\Models\NightMainEventPosition;
 use PTSite\App\Models\NightResult;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
+use PTSite\App\Models\SeasonTotal;
 use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
 use PTSite\Domain\Shared\Money;
@@ -41,6 +42,12 @@ final class SeasonsTopStandings
             foreach ($night->results as $line) {
                 /** @var NightResult $line */
                 $lines[$night->season_id][] = new ScoreLine($line->player_id, Money::fromDecimal((string) $line->points), $line->position);
+            }
+        }
+        foreach ($this->finishedNights->totalsSeasons(null) as $season) {
+            foreach ($season->totals as $total) {
+                /** @var SeasonTotal $total */
+                $lines[$season->id][] = TotalsLines::of($total);
             }
         }
 

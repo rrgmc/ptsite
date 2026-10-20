@@ -12,6 +12,7 @@ use PTSite\Domain\Features\Features;
 use PTSite\Domain\Nights\SchedulePattern;
 use PTSite\Domain\Scoring\PercentageTable;
 use PTSite\Domain\Seasons\SeasonMoney;
+use PTSite\Domain\Seasons\SeasonTotalsRules;
 use PTSite\Domain\Shared\Money;
 
 /**
@@ -20,7 +21,11 @@ use PTSite\Domain\Shared\Money;
  */
 final class SaveSeason
 {
-    public function __construct(private readonly AuditLogger $audit, private readonly Features $features) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly Features $features,
+        private readonly SeasonTotalsRules $totalsRules,
+    ) {}
 
     /**
      * @param array{name?: string, starts_on?: string, default_place_id?: ?int, description?: ?string,
@@ -44,6 +49,13 @@ final class SaveSeason
             (int) ($data['schedule_every_weeks'] ?? $season?->schedule_every_weeks ?? $standard->everyWeeks),
         );
         $this->assertValidMoney($season, $data);
+        if ($season !== null) {
+            $this->totalsRules->assertCanChangeShape(
+                $season->isTotalsOnly(),
+                isset($data['rounds']) && (int) $data['rounds'] !== $season->rounds,
+                $table !== null && $table->percentByPosition != $season->percentByPosition(),
+            );
+        }
         if ($season === null && $table === null) {
             $table = PercentageTable::standard();
         }

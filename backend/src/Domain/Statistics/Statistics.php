@@ -3,12 +3,15 @@
 namespace PTSite\Domain\Statistics;
 
 use PTSite\Domain\Shared\Money;
+use PTSite\Domain\Standings\TotalsLine;
 
 /**
  * The statistics of a set of finished nights: one season's, or every season's.
  *
  * Every list follows {@see Ranking}. The progress follows the eight players with the highest totals. The rebuys and
- * the time chips count what the night dashboard recorded: a night it did not run has none.
+ * the time chips count what the night dashboard recorded: a night it did not run has none. A season known only by
+ * its final standings counts in the points, the nights and the positions, and in a progress with one step per
+ * season; it has no pot, no place and no night of its own.
  */
 final class Statistics
 {
@@ -24,7 +27,20 @@ final class Statistics
     {
         $points = $scored = $positions = $pots = $places = $rebuys = $moneyOnlyRebuys = $timeChips = [];
         $potTotal = $mainEventPotTotal = $timeChipTotal = Money::zero();
+        $nightsCount = 0;
         foreach ($nights as $night) {
+            $nightsCount += $night->rounds ?? 1;
+            foreach ($night->lines as $line) {
+                $times = $line instanceof TotalsLine ? $line->positions : [$line->position => 1];
+                $points[$line->playerId] = ($points[$line->playerId] ?? 0) + $line->points->cents;
+                foreach (array_filter($times) as $position => $count) {
+                    $scored[$line->playerId] = ($scored[$line->playerId] ?? 0) + $count;
+                    $positions[$position][$line->playerId] = ($positions[$position][$line->playerId] ?? 0) + $count;
+                }
+            }
+            if ($night->isSeasonTotals()) {
+                continue;
+            }
             $potTotal = $potTotal->plus($night->pot);
             $mainEventPotTotal = $mainEventPotTotal->plus($night->mainEventPot);
             $timeChipTotal = $timeChipTotal->plus($night->timeChip);
@@ -41,11 +57,6 @@ final class Statistics
             foreach ($night->timeChips as $playerId) {
                 $timeChips[$playerId] = ($timeChips[$playerId] ?? 0) + 1;
             }
-            foreach ($night->lines as $line) {
-                $points[$line->playerId] = ($points[$line->playerId] ?? 0) + $line->points->cents;
-                $scored[$line->playerId] = ($scored[$line->playerId] ?? 0) + 1;
-                $positions[$line->position][$line->playerId] = ($positions[$line->position][$line->playerId] ?? 0) + 1;
-            }
         }
         ksort($positions);
 
@@ -55,7 +66,7 @@ final class Statistics
         $leaders = array_map(fn (RankedRow $row) => $row->id, array_slice($totalPoints->rows, 0, self::PROGRESS_PLAYERS));
 
         return new StatisticsSummary(
-            count($nights),
+            $nightsCount,
             $potTotal,
             $mainEventPotTotal,
             $timeChipTotal,
@@ -112,7 +123,8 @@ final class Statistics
 
     /**
      * The running total of the given players after each night, or after each season, and the pot, the rebuys
-     * and the late time chips of each of those steps.
+     * and the late time chips of each of those steps. A season known only by its final standings is a step only
+     * when there is one step per season: it has no night to be a step of its own.
      *
      * @param  list<NightRecord>  $nights  oldest first
      * @param  list<int>  $leaders  player ids
@@ -124,6 +136,9 @@ final class Statistics
         $totals = array_fill_keys($leaders, []);
         $pot = Money::zero();
         $rebuys = $timeChips = 0;
+        if (! $stepPerSeason) {
+            $nights = array_values(array_filter($nights, fn (NightRecord $night) => ! $night->isSeasonTotals()));
+        }
         foreach ($nights as $index => $night) {
             $pot = $pot->plus($night->pot);
             $rebuys += array_sum($night->rebuys);

@@ -6,11 +6,13 @@ use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
 use PTSite\Domain\Standings\StandingRow;
 use PTSite\Domain\Standings\Standings;
+use PTSite\Domain\Standings\TotalsLine;
 
 /**
  * One player's statistics over a set of finished nights: one season's, or every season's.
  *
- * Ranks follow {@see Standings}: players with the same total share a rank.
+ * Ranks follow {@see Standings}: players with the same total share a rank. A season known only by its final
+ * standings counts like its nights, with no result of a night.
  */
 final class PlayerStatistics
 {
@@ -31,9 +33,11 @@ final class PlayerStatistics
                 $lines[] = $line;
                 $bySeason[$night->seasonId][] = $line;
                 // Every scoring position of these nights is counted, so the ones the player never reached show 0.
-                $positions[$line->position] ??= 0;
-                if ($line->playerId === $playerId) {
-                    $positions[$line->position]++;
+                $times = $line instanceof TotalsLine ? $line->positions : [$line->position => 1];
+                foreach ($times as $position => $count) {
+                    $positions[$position] = ($positions[$position] ?? 0) + ($line->playerId === $playerId ? $count : 0);
+                }
+                if ($line->playerId === $playerId && $line instanceof ScoreLine) {
                     $results[] = new PlayerResult($night->nightId, $night->seasonId, $line->position, $line->points);
                 }
             }
@@ -64,7 +68,7 @@ final class PlayerStatistics
         );
     }
 
-    /** @param  list<ScoreLine>  $lines */
+    /** @param  list<ScoreLine|TotalsLine>  $lines */
     private function rowOf(int $playerId, array $lines): ?StandingRow
     {
         foreach ($this->standings->rank($lines) as $row) {

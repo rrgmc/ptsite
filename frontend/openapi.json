@@ -3625,6 +3625,68 @@
                 }
             }
         },
+        "/v1/seasons/{season}/totals": {
+            "put": {
+                "operationId": "season.saveTotals",
+                "summary": "Saves the final standings of a season known only by them (admins): for each player, the total points and how\noften the player finished in each scoring position. In each position, the players' finishes add up to the\nseason's rounds. They replace the season's final lines; an empty list clears them. Returns the standings",
+                "tags": [
+                    "Season"
+                ],
+                "parameters": [
+                    {
+                        "name": "season",
+                        "in": "path",
+                        "required": true,
+                        "description": "The season ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaveSeasonTotalsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Array of `StandingResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/StandingResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/seasons/{season}/night-suggestions": {
             "get": {
                 "operationId": "season.nightSuggestions",
@@ -6405,6 +6467,49 @@
                 ],
                 "title": "SaveSeasonRequest"
             },
+            "SaveSeasonTotalsRequest": {
+                "type": "object",
+                "properties": {
+                    "rows": {
+                        "type": "array",
+                        "description": "Every player of the final standings, once. An empty list clears them.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "player_id": {
+                                    "type": "integer"
+                                },
+                                "points": {
+                                    "type": "string",
+                                    "description": "The player's total points for the season.",
+                                    "pattern": "^\\d{1,10}(\\.\\d{1,2})?$"
+                                },
+                                "positions": {
+                                    "type": "array",
+                                    "description": "How often the player finished in each scoring position, the 1st place first.",
+                                    "items": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "maximum": 9999
+                                    },
+                                    "minItems": 1,
+                                    "maxItems": 20
+                                }
+                            },
+                            "required": [
+                                "player_id",
+                                "points",
+                                "positions"
+                            ]
+                        },
+                        "maxItems": 500
+                    }
+                },
+                "required": [
+                    "rows"
+                ],
+                "title": "SaveSeasonTotalsRequest"
+            },
             "ScheduleNightRequest": {
                 "type": "object",
                 "properties": {
@@ -6596,6 +6701,10 @@
                     },
                     "nights_count": {
                         "type": "integer"
+                    },
+                    "totals_only": {
+                        "type": "boolean",
+                        "description": "The season is known only by its final standings: it has no nights, and its rounds are the nights it had."
                     },
                     "updated_at": {
                         "type": [
