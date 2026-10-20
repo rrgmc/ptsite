@@ -53,8 +53,7 @@ export function PlayersPage() {
         ) : (
           <>
             <PlayerJumpList players={withMemo} />
-            {/* Two cards a line on a wide screen, where the memo still has room beside the photo. Each card keeps its own height. */}
-            <ul className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+            <ul className="flex flex-col gap-4">
               {withMemo.map((p) => (
                 <li key={p.id} id={`p${p.id}`} tabIndex={-1} className="scroll-mt-28 rounded-lg outline-none">
                   <PlayerMemoCard player={p} />

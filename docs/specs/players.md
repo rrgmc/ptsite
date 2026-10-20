@@ -88,7 +88,7 @@ seconds, at the table, on a phone.
       ([statistics.md](statistics.md), rule 3c); the players who are not in it come after, in the order of
       rule 8.
     - "Detalhado" starts with a button for each of its players, in the same order. The button scrolls to the
-      player's card. On a wide screen the cards go two to a line.
+      player's card.
     - Both views mark inactive players; "Detalhado" also marks archived ones. The search works in both.
     - Each view has its own address (`/players` and `/players?view=detailed`), so it can be linked to.
 
