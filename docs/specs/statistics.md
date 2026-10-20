@@ -41,10 +41,13 @@ Everyone logged in: players, results keepers and admins.
 5. **"Pontos acumulados"** is a line chart of the running total of the **ten players with most points**: one step
    per night in "Temporada", one step per season in "Geral". The box of a point lists the players by their total
    at that point, highest first.
-5a. **"Classificação por temporada"**, in "Geral" only, is a line chart of the same ten players' position in each
-   season, oldest first, with 1st at the top. It counts each season's Main Event as rule 12 says. A player has no
-   point in a season in which they did not score, and their line has a gap there. The box of a point lists the
-   players by position, best first. It is below the box with tabs, by itself.
+5a. **"Classificação por temporada"**, in "Geral" only, shows the position in each season of the **fifteen
+   players with most points**, oldest first, with 1st at the top. Each player has a small line chart of their own,
+   named above it: their line, over the other players' lines in grey, on the same axes. The first ten keep their
+   color from "Pontos acumulados"; the other five are drawn in the text color. The axis goes down to 15th at
+   most: a worse position is drawn on the bottom line, named "15º+", and its box and the table give the real one. It counts each season's Main Event as rule 12 says. A player has no
+   point in a season in which they did not score, and their line has a gap there. The box of a point gives that player's
+   position. It is below the box with tabs, by itself.
 6. **"Vitórias"** is a bar chart of the ten players with most 1st places, with the first places of everyone
    else added up as "Outros".
 7. The view also shows how many nights it counts and their total pot. The Main Event pots and the time chips of

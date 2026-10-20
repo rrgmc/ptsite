@@ -53,7 +53,7 @@ final class LeagueStatistics
         $seasonRanks = $season === null ? $this->statistics->seasonRanks(
             [...$records, ...$this->finishedNights->mainEventRecords(null, $records)],
             $summary->progress->steps,
-            array_keys($summary->progress->totals),
+            $summary->rankLeaders,
         ) : null;
         $mainEvent = $this->features->enabled(Feature::MainEvent) ? $this->mainEvent($season) : null;
         $championships = $season === null ? $this->championships($nights, $totalsSeasons) : null;
@@ -67,6 +67,7 @@ final class LeagueStatistics
         $players = Player::query()->findMany([
             ...array_merge(...array_map(fn (TopList $list) => array_map(fn (RankedRow $row) => $row->id, $list->rows), $playerLists)),
             ...array_keys($summary->progress->totals),
+            ...($seasonRanks === null ? [] : $summary->rankLeaders),
             ...array_map(fn (PositionTableRow $row) => $row->playerId, $summary->positionTable),
         ])->keyBy('id');
         $places = Place::query()->findMany(array_map(fn (RankedRow $row) => $row->id, $summary->places->rows))->keyBy('id');

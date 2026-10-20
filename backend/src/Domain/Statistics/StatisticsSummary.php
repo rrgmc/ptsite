@@ -17,6 +17,7 @@ final readonly class StatisticsSummary
      * @param  TopList  $rebuys  players by rebuys
      * @param  TopList  $moneyOnlyRebuys  players by rebuys past the limit: money for the pot, with no points for the player
      * @param  TopList  $timeChips  players by nights on which they arrived late and owed a time chip
+     * @param  list<int>  $rankLeaders  the players with most points, at most {@see Statistics::RANK_PLAYERS}, most first
      */
     public function __construct(
         public int $nightsCount,
@@ -37,5 +38,6 @@ final readonly class StatisticsSummary
         public TopList $moneyOnlyRebuys,
         public int $timeChipCount,
         public TopList $timeChips,
+        public array $rankLeaders,
     ) {}
 }

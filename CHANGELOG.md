@@ -24,6 +24,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - `results` from `GET /api/v1/players/{id}/statistics`. Use `GET /api/v1/players/{id}/results`.
 
+## [1.34.2] - 2026-10-20
+
+### Changed
+
+- "Classificação por temporada" in "Estatísticas" shows the fifteen players with most points, not ten. The five
+  after the ten of "Pontos acumulados" are drawn in the text color.
+- "Classificação por temporada" in "Estatísticas" goes down to 15th at most. A worse position is drawn on the
+  bottom line, "15º+"; its box and the table still give the real position.
+
+## [1.34.1] - 2026-10-20
+
+### Changed
+
+- "Classificação por temporada" in "Estatísticas" is a small chart per player in place of one chart with ten
+  crossing lines: the player's line in their color, over the other players' lines in grey.
+
 ## [1.34.0] - 2026-10-20
 
 ### Added
@@ -281,7 +297,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.34.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.34.2...HEAD
+[1.34.2]: https://github.com/rrgmc/ptsite/compare/v1.34.1...v1.34.2
+[1.34.1]: https://github.com/rrgmc/ptsite/compare/v1.34.0...v1.34.1
 [1.34.0]: https://github.com/rrgmc/ptsite/compare/v1.33.0...v1.34.0
 [1.33.0]: https://github.com/rrgmc/ptsite/compare/v1.32.1...v1.33.0
 [1.32.1]: https://github.com/rrgmc/ptsite/compare/v1.32.0...v1.32.1
