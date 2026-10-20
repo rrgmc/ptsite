@@ -39,8 +39,8 @@ final readonly class StatisticsReport
         /** Null on a site with no night dashboard. */
         public ?RebuyStatisticsReport $rebuys,
         /**
-         * The same players as $progressSeries, with their position in each season of $progressSteps, the Main
-         * Event counted. Null for one season.
+         * The fifteen players with most points, the ten of $progressSeries first, with their position in each
+         * season of $progressSteps, the Main Event counted. Null for one season.
          *
          * @var ?list<array{player: Player, ranks: list<?int>}>
          */

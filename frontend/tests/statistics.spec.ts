@@ -72,9 +72,9 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(seasonNotice(page)).toHaveCount(0)
   await expect(page.getByRole('img', { name: /pontos acumulados.*por temporada/ })).toBeVisible()
   // Below the box with tabs, by itself: the same ten players' position in each season.
-  const ranks = page.getByRole('figure').filter({ has: page.getByRole('img', { name: /^Gráficos de linhas, um por jogador: classificação dos 10 jogadores com mais pontos em cada temporada/ }) })
+  const ranks = page.getByRole('figure').filter({ has: page.getByRole('img', { name: /^Gráficos de linhas, um por jogador: classificação dos 15 jogadores com mais pontos em cada temporada/ }) })
   await expect(ranks).toBeVisible()
-  await expect(ranks.getByTestId('rank-panel')).toHaveCount(10)
+  await expect(ranks.getByTestId('rank-panel')).toHaveCount(15)
   await expect(tabs).toHaveText(['Posições', 'Campeonatos', 'Main Event', 'Jogadores', 'Eventos', 'Rebuys'])
 
   // The rebuys and the late players the night dashboard recorded in the season in play.

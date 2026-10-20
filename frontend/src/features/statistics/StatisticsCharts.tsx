@@ -97,6 +97,9 @@ export function PointsProgressChart({ progress, perSeason, className }: { progre
   )
 }
 
+/** The lowest position "Classificação por temporada" draws: a worse one is drawn on this line. */
+const RANK_FLOOR = 15
+
 /** A season under a small chart of "Classificação por temporada": the first one starts at its point, the last one ends at it. */
 function SeasonTick({ x, y, index, payload }: { x?: number | string; y?: number | string; index?: number; payload?: { value?: string } }) {
   return (
@@ -110,13 +113,18 @@ function SeasonTick({ x, y, index, payload }: { x?: number | string; y?: number 
  * "Classificação por temporada", over every season: the position of the players of "Pontos acumulados" in each
  * season, 1st at the top, with the Main Event counted for fun. A season in which a player did not score is a gap.
  * Ten lines on one chart cross too often to follow, so each player has a small chart of their own: their line in
- * their color, over the other players' lines in the border color, on the same axes.
+ * their color, over the other players' lines in the border color, on the same axes. The axis stops at 15th: a
+ * worse season is drawn on its bottom line, "15º+", and the tooltip and the table give the real position.
  */
 export function RankProgressChart({ steps, rankProgress, className }: { steps: Statistics['points_progress']['steps']; rankProgress: NonNullable<Statistics['rank_progress']>; className?: string }) {
   const { series, points } = rankProgressData(steps, rankProgress)
   const worst = Math.max(2, ...rankProgress.flatMap((s) => s.ranks.filter((rank) => rank !== null)))
-  // Three ticks are enough for a small chart: 1st, one in the middle and one near the bottom.
-  const ticks = rankTicks(worst).filter((_, i, all) => i % Math.ceil(all.length / 3) === 0)
+  const floor = Math.min(worst, RANK_FLOOR)
+  const capped = worst > RANK_FLOOR
+  // A few ticks are enough for a small chart: 1st, then down to the bottom line.
+  const ticks = capped ? [1, 5, 10, RANK_FLOOR] : rankTicks(worst).filter((_, i, all) => i % Math.ceil(all.length / 3) === 0)
+  const shown = points.map((point) => Object.fromEntries(Object.entries(point).map(([key, value]) => [key, typeof value === 'number' ? Math.min(value, floor) : value])))
+  const real = new Map(points.map((point) => [point.label, point]))
   const seasons = points.length > 1 ? [points[0].label, points[points.length - 1].label] : []
   return (
     <Figure
@@ -153,14 +161,14 @@ export function RankProgressChart({ steps, rankProgress, className }: { steps: S
             </p>
             <div className="h-32">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={points} accessibilityLayer={false} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+                <LineChart data={shown} accessibilityLayer={false} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
                   <CartesianGrid stroke="var(--color-border)" strokeOpacity={0.6} vertical={false} />
                   {/* Only the first and the last season, each kept inside the chart: the first starts at its point, the last ends at it. */}
                   <XAxis dataKey="label" ticks={seasons} interval={0} tick={SeasonTick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} />
                   {/* Reversed, so 1st is at the top and a rising line means a better season. */}
-                  <YAxis reversed domain={[1, worst]} ticks={ticks} interval={0} tick={{ ...tick, fontSize: 10 }} tickLine={false} axisLine={false} width={28} tickFormatter={(rank: number) => ordinal(rank)} />
+                  <YAxis reversed domain={[1, floor]} ticks={ticks} interval={0} tick={{ ...tick, fontSize: 10 }} tickLine={false} axisLine={false} width={32} tickFormatter={(rank: number) => (capped && rank === floor ? t.statistics.rankOrWorse(ordinal(rank)) : ordinal(rank))} />
                   {/* A smaller box than on the other charts, so it covers less of a small chart. */}
-                  <Tooltip {...tooltip} contentStyle={{ ...tooltip.contentStyle, padding: '4px 8px', fontSize: 12 }} cursor={{ stroke: 'var(--color-muted)' }} formatter={(value) => [ordinal(Number(value)), s.nickname]} />
+                  <Tooltip {...tooltip} contentStyle={{ ...tooltip.contentStyle, padding: '4px 8px', fontSize: 12 }} cursor={{ stroke: 'var(--color-muted)' }} formatter={(_value, _name, item) => [ordinal(Number(real.get(item.payload.label)?.[s.key])), s.nickname]} />
                   {/* The other players first, so this player's line is drawn over them. They have no tooltip. */}
                   {series.filter((other) => other.key !== s.key).map((other) => (
                     <Line key={other.key} dataKey={other.key} type="linear" stroke="var(--color-border)" strokeWidth={1} dot={false} activeDot={false} tooltipType="none" isAnimationActive={false} />

@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- "Classificação por temporada" in "Estatísticas" shows the fifteen players with most points, not ten. The five
+  after the ten of "Pontos acumulados" are drawn in the text color.
+- "Classificação por temporada" in "Estatísticas" goes down to 15th at most. A worse position is drawn on the
+  bottom line, "15º+"; its box and the table still give the real position.
+
 ## [1.34.1] - 2026-10-20
 
 ### Changed

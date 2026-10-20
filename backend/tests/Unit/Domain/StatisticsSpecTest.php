@@ -147,6 +147,15 @@ it('cuts a list at ten and says how many tied lines it left out', function () {
         ->and($summary->winsNotShown)->toBe(2);
 });
 
+it('follows ten players in the progress and fifteen in the rank by season', function () {
+    // Player n wins n nights alone, so the more wins, the more points.
+    $nights = array_merge(...array_map(fn (int $n) => array_map(fn (int $i) => statsNight($n * 100 + $i, 1, '300.00', 1, [$n]), range(1, $n)), range(1, 17)));
+    $summary = (new Statistics)->summarise($nights);
+
+    expect(array_keys($summary->progress->totals))->toBe(range(17, 8))
+        ->and($summary->rankLeaders)->toBe(range(17, 3));
+});
+
 it('sums up one player over every season', function () {
     $ana = (new PlayerStatistics)->summarise(S_ANA, everySeason(), stepPerSeason: true);
 
