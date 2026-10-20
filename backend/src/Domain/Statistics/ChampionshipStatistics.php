@@ -35,7 +35,8 @@ final class ChampionshipStatistics
 
         return new ChampionshipSummary(
             count($standings),
-            $this->ranking->top($titles),
+            // Every player with a title: there are few, and each is a champion.
+            $this->ranking->top($titles, Ranking::ALL),
             $this->ranking->top($podiums),
             $this->ranking->top($appearances),
         );

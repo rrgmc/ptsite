@@ -64,7 +64,7 @@ Everyone logged in: players, results keepers and admins.
 
 13. **The Main Event lists**, in "Geral" only, on a site with the Main Event ([main-event.md](main-event.md)).
     They count the finished Main Events of the seasons that are not archived. Each shows the first 10, with
-    ties as in rule 4:
+    ties as in rule 4, but "Títulos" shows every player with a title:
     - **"Títulos"**: players by Main Events won.
     - **"Pódios"**: players by times in the first three of a Main Event.
     - **"Participações"**: players by Main Events played. A Main Event of which only some players
@@ -75,7 +75,8 @@ Everyone logged in: players, results keepers and admins.
 13a. **The championship lists** ("Campeonatos"), in "Geral" only. They count the **final standings of the
     finished seasons** that are not archived ([points-and-standings.md](points-and-standings.md), rules 8 and
     9). An open season does not count: its standings are not final. A finished season with no finished night
-    has no standings, so it does not count either. Each list shows the first 10, with ties as in rule 4:
+    has no standings, so it does not count either. Each list shows the first 10, with ties as in rule 4, but
+    "Títulos" shows every player with a title:
     - **"Títulos"**: players by seasons finished in 1st place. Players who share the 1st place of a season
       each count a title.
     - **"Pódios"**: players by seasons finished in the first three.

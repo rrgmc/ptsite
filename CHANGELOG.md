@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - A season's final lines may keep a player archived after they were saved, so an imported season can be edited.
+- "Títulos" in "Campeonatos" and in "Main Event", in "Estatísticas", lists every player with a title, not only
+  the first 10.
 
 ## [1.31.1] - 2026-10-20
 

@@ -12,6 +12,9 @@ final class Ranking
 {
     public const int LIMIT = 10;
 
+    /** No cut: every row is kept. */
+    public const int ALL = PHP_INT_MAX;
+
     /** @param  array<int, int>  $valueById  a count or an amount in cents, by player, night or place id */
     public function top(array $valueById, int $limit = self::LIMIT): TopList
     {
