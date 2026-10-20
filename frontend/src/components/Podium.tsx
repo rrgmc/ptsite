@@ -28,11 +28,12 @@ export function Podium({ title, caption, action, lines, compact = false }: { tit
                 <span className="text-sm font-bold text-muted tabular"><span aria-hidden="true">{medals[place[0].rank - 1]} </span>{ordinal(place[0].rank)}</span>
                 {place[0].note && <span className="text-xs text-muted tabular">{place[0].note}</span>}
               </span>
-              <ul className="flex min-w-0 flex-wrap gap-x-4 gap-y-1">
+              {/* Equal columns, so the players who share a place line up as in a table. */}
+              <ul className="grid min-w-0 flex-1 grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-x-3 gap-y-1">
                 {place.map((line) => (
                   <li key={line.player.id} className="flex min-w-0 items-center gap-1.5">
                     <PlayerThumbnail player={line.player} size="xs" />
-                    <PlayerLink player={line.player} className={`min-w-0 ${line.rank === 1 ? 'font-bold' : 'font-semibold'}`} />
+                    <PlayerLink player={line.player} className={`min-w-0 truncate ${line.rank === 1 ? 'font-bold' : 'font-semibold'}`} />
                   </li>
                 ))}
               </ul>
