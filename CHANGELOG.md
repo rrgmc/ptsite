@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.32.0] - 2026-10-20
+
 ### Added
 
 - "Resultado final", in "Administração › Temporadas", types the final standings of a season with no night: each
@@ -218,7 +220,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.31.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.32.0...HEAD
+[1.32.0]: https://github.com/rrgmc/ptsite/compare/v1.31.1...v1.32.0
 [1.31.1]: https://github.com/rrgmc/ptsite/compare/v1.31.0...v1.31.1
 [1.31.0]: https://github.com/rrgmc/ptsite/compare/v1.30.0...v1.31.0
 [1.30.0]: https://github.com/rrgmc/ptsite/compare/v1.29.1...v1.30.0
