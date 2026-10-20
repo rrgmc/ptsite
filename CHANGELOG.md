@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.32.1] - 2026-10-20
+
 ### Changed
 
 - "Estatísticas" in "Geral": "Campeões das temporadas" and "Campeões do Main Event" are side by side, with one
@@ -228,7 +230,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.32.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.32.1...HEAD
+[1.32.1]: https://github.com/rrgmc/ptsite/compare/v1.32.0...v1.32.1
 [1.32.0]: https://github.com/rrgmc/ptsite/compare/v1.31.1...v1.32.0
 [1.31.1]: https://github.com/rrgmc/ptsite/compare/v1.31.0...v1.31.1
 [1.31.0]: https://github.com/rrgmc/ptsite/compare/v1.30.0...v1.31.0
