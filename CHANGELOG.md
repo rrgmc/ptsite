@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- "Estatísticas" in "Geral": "Campeões das temporadas" and "Campeões do Main Event" are side by side, with one
+  line per place holding every player who shares it, so ties take little room.
+- The tabs of "Estatísticas" are in the order "Posições", "Campeonatos", "Main Event", "Jogadores", "Eventos"
+  and "Rebuys".
+
 ## [1.32.0] - 2026-10-20
 
 ### Added
