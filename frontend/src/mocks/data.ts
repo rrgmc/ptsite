@@ -297,6 +297,7 @@ const potNight = (id: number, day: string, seasonName: string) => ({ id, starts_
 /** One season: five nights, with ties in the lists and a cut tie in "Posição: 3º". */
 export const statistics: Statistics = {
   season_id: 1,
+  rank_progress: null,
   nights_count: 5,
   pot_total: '4145.00',
   main_event_pot_total: '300.00',
@@ -395,9 +396,25 @@ export const statisticsAllTime: Statistics = {
       { player: players[4], points: ['2210.00', '3640.50', '3941.90'] },
       { player: players[5], points: ['1980.75', '2890.00', '3138.00'] },
       { player: players[6], points: ['1400.00', '1400.00', '1590.20'] },
+      { player: players[8], points: ['980.00', '1310.40', '1420.00'] },
+      { player: players[9], points: ['0.00', '1105.00', '1250.60'] },
     ],
     pots: ['27300.00', '29875.00', '4145.00'],
   },
+  // The same players' position in each season, the Main Event counted. Dudu and Joana did not score in Liga 2024,
+  // and Guga not in Liga 2025.
+  rank_progress: [
+    { player: players[0], ranks: [1, 2, 1] },
+    { player: players[2], ranks: [2, 1, 3] },
+    { player: players[7], ranks: [3, 4, 2] },
+    { player: players[1], ranks: [4, 3, 5] },
+    { player: players[3], ranks: [null, 5, 4] },
+    { player: players[4], ranks: [5, 7, 6] },
+    { player: players[5], ranks: [6, 9, 8] },
+    { player: players[6], ranks: [7, null, 9] },
+    { player: players[8], ranks: [9, 10, 12] },
+    { player: players[9], ranks: [null, 11, 10] },
+  ],
   // The night dashboard came in the last season: the first one has nothing recorded.
   rebuys: { ...statistics.rebuys!, rebuys_per_step: [0, 41, 17], time_chips_per_step: [0, 12, 6] },
   wins_not_shown: 8,
@@ -419,6 +436,7 @@ export const statisticsAllTime: Statistics = {
 
 export const statisticsEmpty: Statistics = {
   season_id: 1,
+  rank_progress: null,
   nights_count: 0,
   pot_total: '0.00',
   main_event_pot_total: '0.00',

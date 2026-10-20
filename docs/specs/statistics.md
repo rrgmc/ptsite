@@ -38,9 +38,13 @@ Everyone logged in: players, results keepers and admins.
 4. **Ties** work as in the standings ([points-and-standings.md](points-and-standings.md)): equal values share a
    position and the next one skips (1, 2, 2, 4). When the 10th line is tied with lines that do not fit, the list
    says how many: "e mais 2 empatados".
-5. **"Pontos acumulados"** is a line chart of the running total of the **eight players with most points**: one step
+5. **"Pontos acumulados"** is a line chart of the running total of the **ten players with most points**: one step
    per night in "Temporada", one step per season in "Geral". The box of a point lists the players by their total
    at that point, highest first.
+5a. **"Classificação por temporada"**, in "Geral" only, is a line chart of the same ten players' position in each
+   season, oldest first, with 1st at the top. It counts each season's Main Event as rule 12 says. A player has no
+   point in a season in which they did not score, and their line has a gap there. The box of a point lists the
+   players by position, best first. It is below the box with tabs, by itself.
 6. **"Vitórias"** is a bar chart of the ten players with most 1st places, with the first places of everyone
    else added up as "Outros".
 7. The view also shows how many nights it counts and their total pot. The Main Event pots and the time chips of
@@ -64,8 +68,10 @@ Everyone logged in: players, results keepers and admins.
     - In "Geral", a player who scored in two seasons or more also has **"Classificação por temporada"**: a line
       of the player's position in each season of "Por temporada", oldest first, with 1st at the top. For fun, it
       counts each season's Main Event ([main-event.md](main-event.md)) as one more night of that season: its
-      players get the points of their positions, on the average pot of the season's nights. Only this chart
-      counts it. The standings and "Por temporada" do not. A season with no Main Event keeps its position.
+      players get the points of their positions, on the average pot of the season's nights. A season known only
+      by its final standings has no pot of its own: its average pot is the points it paid, added up, over its
+      rounds. Only this chart and rule 5a count the Main Event. The standings and "Por temporada" do not. A
+      season with no Main Event keeps its position.
 
 13. **The Main Event lists**, in "Geral" only, on a site with the Main Event ([main-event.md](main-event.md)).
     They count the finished Main Events of the seasons that are not archived. Each shows the first 10, with

@@ -3,21 +3,25 @@
 namespace PTSite\Domain\Statistics;
 
 use PTSite\Domain\Shared\Money;
+use PTSite\Domain\Standings\Standings;
 use PTSite\Domain\Standings\TotalsLine;
 
 /**
  * The statistics of a set of finished nights: one season's, or every season's.
  *
- * Every list follows {@see Ranking}. The progress follows the eight players with the highest totals. The rebuys and
+ * Every list follows {@see Ranking}. The progress follows the ten players with the highest totals. The rebuys and
  * the time chips count what the night dashboard recorded: a night it did not run has none. A season known only by
  * its final standings counts in the points, the nights and the positions, and in a progress with one step per
  * season; it has no pot, no place and no night of its own.
  */
 final class Statistics
 {
-    public const int PROGRESS_PLAYERS = 8;
+    public const int PROGRESS_PLAYERS = 10;
 
-    public function __construct(private readonly Ranking $ranking = new Ranking) {}
+    public function __construct(
+        private readonly Ranking $ranking = new Ranking,
+        private readonly Standings $standings = new Standings,
+    ) {}
 
     /**
      * @param  list<NightRecord>  $nights  oldest first
@@ -164,5 +168,36 @@ final class Statistics
         }
 
         return new PointsProgress($steps, $totals, $pots, $stepRebuys, $stepTimeChips);
+    }
+
+    /**
+     * The position of the given players in each of the given seasons' standings, or null in a season in which a
+     * player did not score. Ties share a position, as in {@see Standings}.
+     *
+     * @param  list<NightRecord>  $nights  any order
+     * @param  list<int>  $seasonIds
+     * @param  list<int>  $players  player ids
+     * @return array<int, list<?int>> by player id, one position per season, in the order of the seasons given
+     */
+    public function seasonRanks(array $nights, array $seasonIds, array $players): array
+    {
+        $bySeason = array_fill_keys($seasonIds, []);
+        foreach ($nights as $night) {
+            if (isset($bySeason[$night->seasonId])) {
+                array_push($bySeason[$night->seasonId], ...$night->lines);
+            }
+        }
+        $ranks = array_fill_keys($players, []);
+        foreach ($bySeason as $lines) {
+            $inSeason = [];
+            foreach ($this->standings->rank($lines) as $row) {
+                $inSeason[$row->playerId] = $row->rank;
+            }
+            foreach ($players as $playerId) {
+                $ranks[$playerId][] = $inSeason[$playerId] ?? null;
+            }
+        }
+
+        return $ranks;
     }
 }

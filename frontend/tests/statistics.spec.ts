@@ -23,7 +23,9 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   const nights = page.getByRole('term').filter({ hasText: 'Eventos' }).locator('xpath=..')
   await expect(nights.getByRole('definition')).toHaveText('24')
   await expect(page.getByRole('term').filter({ hasText: 'Pote Total' }).locator('xpath=..').getByRole('definition')).toHaveText(/^R\$/)
-  await expect(page.getByRole('img', { name: /^Gráfico de linhas: pontos acumulados dos 8 jogadores com mais pontos, por evento/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Gráfico de linhas: pontos acumulados dos 10 jogadores com mais pontos, por evento/ })).toBeVisible()
+  // "Classificação por temporada" is only over every season.
+  await expect(page.getByRole('img', { name: /^Gráfico de linhas: classificação dos/ })).toHaveCount(0)
 
   // The tabs. One season has one Main Event, which makes no list, so it has no tab.
   const tabs = page.getByRole('tablist', { name: 'Listas e gráficos' }).getByRole('tab')
@@ -69,6 +71,10 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(page.getByText('Todas as temporadas')).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)
   await expect(page.getByRole('img', { name: /pontos acumulados.*por temporada/ })).toBeVisible()
+  // Below the box with tabs, by itself: the same ten players' position in each season.
+  const ranks = page.getByRole('figure').filter({ has: page.getByRole('img', { name: /^Gráfico de linhas: classificação dos 10 jogadores com mais pontos em cada temporada/ }) })
+  await expect(ranks).toBeVisible()
+  await expect(ranks.getByRole('list', { name: 'Legenda' }).getByRole('listitem')).toHaveCount(10)
   await expect(tabs).toHaveText(['Posições', 'Campeonatos', 'Main Event', 'Jogadores', 'Eventos', 'Rebuys'])
 
   // The rebuys and the late players the night dashboard recorded in the season in play.

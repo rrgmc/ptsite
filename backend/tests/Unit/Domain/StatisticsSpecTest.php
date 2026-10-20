@@ -217,6 +217,16 @@ it('counts each Main Event as one more night of its season, on the average pot, 
         ->and($asNight->record(12, 3, $nights, [S_ANA], PercentageTable::standard()))->toBeNull();
 });
 
+it('gives the leaders\' position in each season, with the Main Events counted and a gap where they did not score', function () {
+    $nights = everySeason();
+    $asNight = new MainEventAsNight;
+    $mainEvents = [$asNight->record(10, 1, $nights, [S_ANA, S_BRENO, S_CARLA, S_DUDU], PercentageTable::standard())];
+
+    // Season A: Ana 307,00, Breno 301,50, Carla 189,50. Season B has no Main Event and Breno did not play it.
+    expect((new Statistics)->seasonRanks([...$nights, ...$mainEvents], [1, 2], [S_ANA, S_BRENO, S_CARLA]))
+        ->toBe([S_ANA => [1, 1], S_BRENO => [2, null], S_CARLA => [3, 2]]);
+});
+
 it('shows zeros and no rank for a player who never scored', function () {
     $dudu = (new PlayerStatistics)->summarise(9, everySeason(), stepPerSeason: true);
 

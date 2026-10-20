@@ -242,6 +242,22 @@ it('ranks a player in each season with its Main Event counted as one more night,
         ->assertJsonPath('data.seasons.0.rank_with_main_event', 2);
 });
 
+it('follows the leaders\' position season by season over every season, with the Main Event counted', function () {
+    $mainEvent = Night::factory()->for($this->seasonA)->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'finished', 'starts_at' => '2026-04-03 13:00:00']);
+    $mainEvent->mainEventPositions()->createMany([['position' => 1, 'player_id' => $this->ana->id], ['position' => 2, 'player_id' => $this->breno->id]]);
+
+    $response = $this->getJson('/api/v1/statistics')->assertOk()
+        ->assertJsonPath('data.points_progress.steps.0.season_id', $this->seasonA->id)
+        ->assertJsonPath('data.rank_progress.0.player.id', $this->ana->id)
+        // Ana is 2nd in season A's standings; its Main Event lifts her to 1st.
+        ->assertJsonPath('data.rank_progress.0.ranks', [1, 1]);
+    $breno = collect($response->json('data.rank_progress'))->firstWhere('player.id', $this->breno->id);
+    // Breno did not play in season B: no position there.
+    expect($breno['ranks'])->toBe([2, null]);
+
+    $this->getJson("/api/v1/statistics?season={$this->seasonA->id}")->assertOk()->assertJsonPath('data.rank_progress', null);
+});
+
 it('shows one player\'s statistics in one season, to any logged-in user', function () {
     Sanctum::actingAs(User::factory()->create());
 

@@ -2,12 +2,9 @@
 
 namespace PTSite\App\Queries;
 
-use PTSite\App\Models\Night;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
-use PTSite\Domain\Scoring\PercentageTable;
 use PTSite\Domain\Shared\Money;
-use PTSite\Domain\Statistics\MainEventAsNight;
 use PTSite\Domain\Statistics\NightRecord;
 use PTSite\Domain\Statistics\PlayerResult;
 use PTSite\Domain\Statistics\PlayerSeasonRow;
@@ -22,7 +19,6 @@ final class StatisticsOfPlayer
     public function __construct(
         private readonly PlayerStatistics $statistics,
         private readonly FinishedNights $finishedNights,
-        private readonly MainEventAsNight $mainEventAsNight,
     ) {}
 
     public function __invoke(Player $player, ?Season $season): PlayerStatisticsReport
@@ -72,17 +68,7 @@ final class StatisticsOfPlayer
      */
     private function ranksWithMainEvent(Player $player, ?Season $season, array $records): array
     {
-        $mainEvents = $this->finishedNights->mainEvents($season)->load('season.percentages')
-            ->map(fn (Night $night) => $this->mainEventAsNight->record(
-                $night->id,
-                $night->season_id,
-                $records,
-                $night->mainEventPositions->pluck('player_id')->all(),
-                PercentageTable::of($night->season->percentByPosition()),
-            ))
-            ->filter()
-            ->values()
-            ->all();
+        $mainEvents = $this->finishedNights->mainEventRecords($season, $records);
         if ($mainEvents === []) {
             return [];
         }

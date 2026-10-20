@@ -2,7 +2,7 @@ import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, ResponsiveCon
 import type { PlayerStatistics } from '@/api/client'
 import { t } from '@/i18n'
 import { formatPoints, formatWhole, ordinal } from '@/lib/format'
-import { type PlayerRankPoint, playerProgressData, playerRankData, positionsData, SERIES_COLORS } from './chartData'
+import { type PlayerRankPoint, playerProgressData, playerRankData, positionsData, rankTicks, SERIES_COLORS } from './chartData'
 import { cell, head, tick, tooltip } from './chartStyle'
 import { Figure } from './StatisticsCharts'
 
@@ -25,10 +25,8 @@ export function PlayerCharts({ statistics, nickname }: { statistics: PlayerStati
 export function PlayerRankChart({ seasons, nickname, className }: { seasons: PlayerStatistics['seasons']; nickname: string; className?: string }) {
   const points = playerRankData(seasons)
   const best = points.reduce<PlayerRankPoint | undefined>((top, point) => (point.rank < (top?.rank ?? Infinity) ? point : top), undefined)
-  // 1st always has a tick at the top, then about six more down to the worst position.
   const worst = Math.max(2, ...points.map((point) => point.rank))
-  const step = Math.ceil((worst - 1) / 6)
-  const ticks = Array.from({ length: Math.floor((worst - 1) / step) + 1 }, (_, i) => 1 + i * step)
+  const ticks = rankTicks(worst)
   return (
     <Figure
       className={className}

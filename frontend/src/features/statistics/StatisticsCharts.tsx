@@ -2,9 +2,9 @@ import type { ReactNode } from 'react'
 import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { Statistics } from '@/api/client'
 import { t } from '@/i18n'
-import { formatMoney, formatPoints, formatWhole } from '@/lib/format'
-import { placesData, potsData, progressData, rebuysData, SERIES_COLORS, winsData } from './chartData'
-import { cell, head, highestFirst, tick, tooltip } from './chartStyle'
+import { formatMoney, formatPoints, formatWhole, ordinal } from '@/lib/format'
+import { placesData, potsData, progressData, rankProgressData, rankTicks, rebuysData, SERIES_COLORS, winsData } from './chartData'
+import { cell, head, highestFirst, lowestFirst, tick, tooltip } from './chartStyle'
 
 /** The title of one list or chart inside a box that holds several. */
 export const subtitle = 'mb-2 text-xs font-bold uppercase text-muted'
@@ -86,6 +86,81 @@ export function PointsProgressChart({ progress, perSeason, className }: { progre
                 stroke={s.color}
                 strokeWidth={2}
                 dot={points.length <= 12 ? { r: 4, fill: s.color, stroke: 'var(--color-surface)', strokeWidth: 2 } : false}
+                activeDot={{ r: 5, stroke: 'var(--color-surface)', strokeWidth: 2 }}
+                isAnimationActive={false}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Figure>
+  )
+}
+
+/**
+ * "Classificação por temporada", over every season: the position of the players of "Pontos acumulados" in each
+ * season, 1st at the top, with the Main Event counted for fun. A season in which a player did not score is a gap.
+ */
+export function RankProgressChart({ steps, rankProgress, className }: { steps: Statistics['points_progress']['steps']; rankProgress: NonNullable<Statistics['rank_progress']>; className?: string }) {
+  const { series, points } = rankProgressData(steps, rankProgress)
+  const worst = Math.max(2, ...rankProgress.flatMap((s) => s.ranks.filter((rank) => rank !== null)))
+  const ticks = rankTicks(worst)
+  return (
+    <Figure
+      className={className}
+      title={t.statistics.rankBySeason}
+      description={t.statistics.rankProgressDescription({ count: series.length })}
+      legend={
+        <>
+          <p className="mb-2 text-sm text-muted">{t.statistics.rankBySeasonNote}</p>
+          <ul aria-label={t.statistics.legend} className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            {series.map((s) => (
+              <li key={s.key} className="flex items-center gap-2">
+                <span aria-hidden className="inline-block h-1 w-5 rounded-full" style={{ background: s.color }} />
+                {s.nickname}
+              </li>
+            ))}
+          </ul>
+        </>
+      }
+      table={
+        <table className="w-full border-collapse">
+          <caption className="sr-only">{t.statistics.rankProgressCaption}</caption>
+          <thead>
+            <tr>
+              <th scope="col" className={`${head} text-left`}>{t.common.season}</th>
+              {series.map((s) => <th key={s.key} scope="col" className={head}>{s.nickname}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {points.map((point) => (
+              <tr key={point.label} className="even:bg-surface-stripe">
+                <th scope="row" className={`${cell} text-left font-semibold`}>{point.label}</th>
+                {series.map((s) => <td key={s.key} className={cell}>{point[s.key] === undefined ? '–' : ordinal(Number(point[s.key]))}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      }
+    >
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
+            <CartesianGrid stroke="var(--color-border)" vertical={false} />
+            <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />
+            {/* Reversed, so 1st is at the top and a rising line means a better season. */}
+            <YAxis reversed domain={[1, worst]} ticks={ticks} interval={0} tick={tick} tickLine={false} axisLine={false} width={40} tickFormatter={(rank: number) => ordinal(rank)} />
+            <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} itemSorter={lowestFirst} formatter={(value) => ordinal(Number(value))} />
+            {series.map((s) => (
+              <Line
+                key={s.key}
+                dataKey={s.key}
+                name={s.nickname}
+                type="linear"
+                stroke={s.color}
+                strokeWidth={2}
+                // Always dotted: a season between two gaps is a dot alone.
+                dot={{ r: 3, fill: s.color, stroke: 'var(--color-surface)', strokeWidth: 1 }}
                 activeDot={{ r: 5, stroke: 'var(--color-surface)', strokeWidth: 2 }}
                 isAnimationActive={false}
               />

@@ -8,8 +8,10 @@ use PTSite\App\Models\NightResult;
 use PTSite\App\Models\Season;
 use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
+use PTSite\Domain\Scoring\PercentageTable;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
+use PTSite\Domain\Statistics\MainEventAsNight;
 use PTSite\Domain\Statistics\NightRecord;
 
 /**
@@ -19,7 +21,10 @@ use PTSite\Domain\Statistics\NightRecord;
  */
 final class FinishedNights
 {
-    public function __construct(private readonly Features $features) {}
+    public function __construct(
+        private readonly Features $features,
+        private readonly MainEventAsNight $mainEventAsNight = new MainEventAsNight,
+    ) {}
 
     /** @return Collection<int, Night> by night id, oldest first, with their results and season */
     public function __invoke(?Season $season): Collection
@@ -66,6 +71,28 @@ final class FinishedNights
             ->orderBy('starts_at')
             ->orderBy('id')
             ->get();
+    }
+
+    /**
+     * The finished Main Events of the same seasons as records of one more night of their season, for the ranks by
+     * season that count them, for fun ({@see MainEventAsNight}). A season with no night with a pot gives none.
+     *
+     * @param  list<NightRecord>  $records  the result of records()
+     * @return list<NightRecord>
+     */
+    public function mainEventRecords(?Season $season, array $records): array
+    {
+        return $this->mainEvents($season)->load('season.percentages')
+            ->map(fn (Night $night) => $this->mainEventAsNight->record(
+                $night->id,
+                $night->season_id,
+                $records,
+                $night->mainEventPositions->pluck('player_id')->all(),
+                PercentageTable::of($night->season->percentByPosition()),
+            ))
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /**

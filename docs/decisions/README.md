@@ -54,9 +54,10 @@ Each option with the reason it lost.
 | [0016](0016-server-side-player-photos.md) | Player photos are cut and resized on the server | Proposed |
 | [0017](0017-email-for-password-reset.md) | Email for the password reset, through the host's mailbox | Proposed |
 | [0018](0018-releases-and-versions.md) | Releases are git tags, and the tag is the version | Proposed |
-| [0020](0020-eight-chart-colors.md) | Eight chart colors, for a line chart of eight players | Proposed |
+| [0020](0020-eight-chart-colors.md) | Eight chart colors, for a line chart of eight players | Proposed; its eight-color limit is replaced by 0023 |
 | [0021](0021-feature-flags.md) | A site turns features off in its `site.json` | Proposed |
 | [0022](0022-polling-for-the-night-dashboard.md) | The night dashboard refreshes by asking again every 10 seconds | Proposed |
+| [0023](0023-ten-chart-colors.md) | Ten chart colors, for line charts of ten players | Proposed |
 
 ## Not yet decided
 

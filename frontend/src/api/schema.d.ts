@@ -1958,7 +1958,7 @@ export interface components {
             biggest_pots: components["schemas"]["RankedListResource"];
             /** @description Places by number of nights (`count`). */
             places: components["schemas"]["RankedListResource"];
-            /** @description The running total of the eight players with most points: per night in a season, per season otherwise. */
+            /** @description The running total of the ten players with most points: per night in a season, per season otherwise. */
             points_progress: {
                 /** @description Oldest first. `night_id` and `starts_at` are null when the step is a season. */
                 steps: {
@@ -1975,6 +1975,16 @@ export interface components {
                 /** @description The pot of each step, as decimal strings: of the night, or of the season's nights added up. */
                 pots: string[];
             };
+            /**
+             * @description Over every season, the players of `points_progress.series`, in the same order, with their position in
+             *     each season of `points_progress.steps`: null in a season in which they did not score. For fun, each
+             *     season's Main Event counts as one more night of it, on the average pot of its nights; the standings
+             *     never count it. Null for one season.
+             */
+            rank_progress: {
+                player: components["schemas"]["PlayerResource"];
+                ranks: (number | null)[];
+            }[] | null;
             /** @description First places of the players who are not in the first "Posição" list ("Outros"). */
             wins_not_shown: number;
             /**

@@ -14,7 +14,7 @@
 | Forms | React state with React Aria `Form`; field errors come from the API. React Hook Form and Zod (planned in 0004) were not needed yet |
 | Components | React Aria Components, styled with Tailwind and `tailwindcss-react-aria-components` (state variants such as `selected:` and `pressed:`) |
 | Design tokens | CSS variables in `src/tokens/tokens.css`, owned by the designer |
-| Charts | Recharts, only in `src/features/statistics` ([0015](../decisions/0015-chart-library.md)): colors from the `chart-1` to `chart-8` tokens ([0020](../decisions/0020-eight-chart-colors.md)), a table of the same numbers under each chart |
+| Charts | Recharts, only in `src/features/statistics` ([0015](../decisions/0015-chart-library.md)): colors from the `chart-1` to `chart-10` tokens ([0023](../decisions/0023-ten-chart-colors.md)), a table of the same numbers under each chart |
 | Component workshop | Storybook, with the API mocked by MSW (`src/mocks`). It is not published with the site |
 | Tests | Vitest (units), Playwright (end to end, phone and desktop), axe (accessibility) |
 | Install | PWA manifest with PNG icons and a minimal service worker (no offline data); see [Installing on a phone](#installing-on-a-phone) |
