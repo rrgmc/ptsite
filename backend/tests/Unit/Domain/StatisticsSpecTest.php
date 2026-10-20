@@ -7,6 +7,9 @@
 
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
+use PTSite\Domain\Standings\StandingRow;
+use PTSite\Domain\Standings\Standings;
+use PTSite\Domain\Statistics\ChampionshipStatistics;
 use PTSite\Domain\Statistics\MainEventStatistics;
 use PTSite\Domain\Statistics\NightRecord;
 use PTSite\Domain\Statistics\PlayerStatistics;
@@ -288,6 +291,38 @@ it('counts a Main Event of which only the champion is known', function () {
 
 it('has empty Main Event lists when no Main Event is finished', function () {
     $summary = (new MainEventStatistics)->summarise([]);
+
+    expect($summary->count)->toBe(0)->and($summary->titles->rows)->toBe([])->and($summary->appearances->rows)->toBe([]);
+});
+
+/** @return list<StandingRow> the final standings of the season of the given nights */
+function finalStandings(array $nights): array
+{
+    return (new Standings)->rank(array_merge(...array_map(fn (NightRecord $night) => $night->lines, $nights)));
+}
+
+it('counts the titles, the podiums and the appearances of the finished seasons', function () {
+    // Season A ends Breno, Ana, Carla. Season B ends Ana, Carla.
+    $summary = (new ChampionshipStatistics)->summarise([finalStandings(seasonA()), finalStandings([everySeason()[2]])]);
+
+    expect($summary->count)->toBe(2)
+        ->and(rows($summary->titles))->toBe([[1, S_ANA, 1], [1, S_BRENO, 1]])
+        ->and(rows($summary->podiums))->toBe([[1, S_ANA, 2], [1, S_CARLA, 2], [3, S_BRENO, 1]])
+        ->and(rows($summary->appearances))->toBe([[1, S_ANA, 2], [1, S_CARLA, 2], [3, S_BRENO, 1]]);
+});
+
+it('gives a title to each player who shares the 1st place of a season', function () {
+    // Ana and Breno each win one night of the same pot, and so end the season with the same points.
+    $summary = (new ChampionshipStatistics)->summarise([finalStandings([
+        statsNight(1, 1, '300.00', 1, [S_ANA, S_BRENO]),
+        statsNight(2, 1, '300.00', 1, [S_BRENO, S_ANA]),
+    ])]);
+
+    expect(rows($summary->titles))->toBe([[1, S_ANA, 1], [1, S_BRENO, 1]]);
+});
+
+it('has empty championship lists when no season is finished', function () {
+    $summary = (new ChampionshipStatistics)->summarise([]);
 
     expect($summary->count)->toBe(0)->and($summary->titles->rows)->toBe([])->and($summary->appearances->rows)->toBe([]);
 });

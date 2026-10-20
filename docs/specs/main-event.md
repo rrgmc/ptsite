@@ -5,7 +5,8 @@ Status: **Draft** for designer review.
 ## Goal
 
 A league may end each season with a **Main Event**: a final game for the season's best players. So a season
-has two champions, the one of its standings and the one of its Main Event. The Main Event gives no points. The
+has two champions, the one of its standings and the one of its Main Event, and each wins a trophy
+([points-and-standings.md](points-and-standings.md), rule 8). The Main Event gives no points. The
 league only wants to know who played it and in which order they finished.
 
 The Main Event is still a gathering like any other: it has a date and a place, players confirm that they are
@@ -55,7 +56,8 @@ A site has the Main Event only if it turns it on (`mainEvent` in `features`, see
 10. **"Temporadas"** shows the **Main Event champion** of each season that has a finished Main Event.
 10a. **"Classificação"** shows the **first three of the season's Main Event**, once it is finished, in a box
     above the standings table, with the link "Ver Main Event" to the "Main Event" screen. The box shows fewer
-    players when fewer were recorded. A season with no finished Main Event has no box.
+    players when fewer were recorded. A season with no finished Main Event has no box. On a finished season it
+    comes after the box of the final standings ([points-and-standings.md](points-and-standings.md), rule 9).
 11. On "Resultados", the calendar, the next night's card and the attendance banner, a Main Event night is marked
     **"Main Event"**. On "Resultados" its card lists the players in order, with no amounts and no number.
 12. **The points of the day are not the Main Event's.** When the players of a Main Event also score in a round,

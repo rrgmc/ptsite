@@ -2,6 +2,7 @@
 
 namespace PTSite\App\Queries;
 
+use Illuminate\Support\Collection;
 use PTSite\App\Models\Night;
 use PTSite\App\Models\Place;
 use PTSite\App\Models\Player;
@@ -9,6 +10,10 @@ use PTSite\App\Models\Season;
 use PTSite\Domain\Features\Feature;
 use PTSite\Domain\Features\Features;
 use PTSite\Domain\Shared\Money;
+use PTSite\Domain\Standings\ScoreLine;
+use PTSite\Domain\Standings\Standings;
+use PTSite\Domain\Statistics\ChampionshipStatistics;
+use PTSite\Domain\Statistics\ChampionshipSummary;
 use PTSite\Domain\Statistics\MainEventStatistics;
 use PTSite\Domain\Statistics\MainEventSummary;
 use PTSite\Domain\Statistics\PositionTableRow;
@@ -20,7 +25,8 @@ use PTSite\Domain\Statistics\TopList;
  * The statistics of one season, or of every season that is not archived, calculated from the finished,
  * non-archived nights. Nothing is stored: a corrected result changes them at once. On a site with the Main
  * Event, the finished Main Events of the same seasons give lists of their own; on a site with the night dashboard,
- * so do the rebuys and the time chips it recorded.
+ * so do the rebuys and the time chips it recorded. Over every season, the final standings of the finished seasons
+ * give the "Campeonatos" lists.
  */
 final class LeagueStatistics
 {
@@ -28,6 +34,8 @@ final class LeagueStatistics
         private readonly Statistics $statistics,
         private readonly FinishedNights $finishedNights,
         private readonly MainEventStatistics $mainEventStatistics,
+        private readonly ChampionshipStatistics $championshipStatistics,
+        private readonly Standings $standings,
         private readonly Features $features,
     ) {}
 
@@ -39,10 +47,12 @@ final class LeagueStatistics
         $timeChip = $dashboard && $this->features->enabled(Feature::TimeChip);
         $summary = $this->statistics->summarise($this->finishedNights->records($nights, withDashboard: $dashboard), stepPerSeason: $season === null);
         $mainEvent = $this->features->enabled(Feature::MainEvent) ? $this->mainEvent($season) : null;
+        $championships = $season === null ? $this->championships($nights) : null;
 
         $playerLists = [
             $summary->totalPoints, $summary->nightsScored, ...$summary->positions,
             ...($mainEvent ? [$mainEvent->titles, $mainEvent->podiums, $mainEvent->appearances] : []),
+            ...($championships ? [$championships->titles, $championships->podiums, $championships->appearances] : []),
             ...($dashboard ? [$summary->rebuys, $summary->moneyOnlyRebuys, $summary->timeChips] : []),
         ];
         $players = Player::query()->findMany([
@@ -97,6 +107,12 @@ final class LeagueStatistics
                 $counted($mainEvent->podiums),
                 $counted($mainEvent->appearances),
             ) : null,
+            $championships ? new ChampionshipStatisticsReport(
+                $championships->count,
+                $counted($championships->titles),
+                $counted($championships->podiums),
+                $counted($championships->appearances),
+            ) : null,
             $dashboard ? new RebuyStatisticsReport(
                 $summary->rebuyCount,
                 $counted($summary->rebuys),
@@ -108,6 +124,26 @@ final class LeagueStatistics
                 $timeChip ? $summary->progress->timeChips : null,
             ) : null,
         );
+    }
+
+    /**
+     * The final standings of the finished seasons among the nights counted. A finished season with no finished
+     * night has no standings, so it does not count.
+     *
+     * @param  Collection<int, Night>  $nights  the result of FinishedNights, with their results and season
+     */
+    private function championships(Collection $nights): ChampionshipSummary
+    {
+        $lines = [];
+        foreach ($nights as $night) {
+            if ($night->season->is_finished) {
+                foreach ($night->results as $line) {
+                    $lines[$night->season_id][] = new ScoreLine($line->player_id, Money::fromDecimal((string) $line->points), $line->position);
+                }
+            }
+        }
+
+        return $this->championshipStatistics->summarise(array_values(array_map(fn (array $season) => $this->standings->rank($season), $lines)));
     }
 
     private function mainEvent(?Season $season): MainEventSummary

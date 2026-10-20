@@ -4239,6 +4239,34 @@
                 ],
                 "title": "CalendarHolidayResource"
             },
+            "ChampionshipStatisticsResource": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "description": "How many finished seasons count."
+                    },
+                    "titles": {
+                        "description": "Players by seasons finished in 1st place of the standings (`count`). Players who share the 1st place each count a title.",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    },
+                    "podiums": {
+                        "description": "Players by seasons finished in the first three of the standings (`count`).",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    },
+                    "appearances": {
+                        "description": "Players by seasons in whose standings they are, that is, in which they scored (`count`).",
+                        "$ref": "#/components/schemas/RankedListResource"
+                    }
+                },
+                "required": [
+                    "count",
+                    "titles",
+                    "podiums",
+                    "appearances"
+                ],
+                "title": "ChampionshipStatisticsResource"
+            },
             "ChangeOwnPasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -7036,6 +7064,17 @@
                             }
                         ]
                     },
+                    "championships": {
+                        "anyOf": [
+                            {
+                                "description": "The lists of the final standings of the finished seasons (\"Campeonatos\"). Null for one season.",
+                                "$ref": "#/components/schemas/ChampionshipStatisticsResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "rebuys": {
                         "anyOf": [
                             {
@@ -7063,6 +7102,7 @@
                     "wins_not_shown",
                     "position_table",
                     "main_event",
+                    "championships",
                     "rebuys"
                 ],
                 "title": "StatisticsResource"

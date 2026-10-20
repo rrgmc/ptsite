@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { useAttendance, useMe, useSeasonNights, useStandings } from '@/api/queries'
 import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
+import { Podium } from '@/components/Podium'
 import { hasFeature } from '@/lib/features'
 import { formatDate, formatMoney, formatWeekday } from '@/lib/format'
 import { t } from '@/i18n'
@@ -42,6 +43,10 @@ export function StandingsPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_20rem]">
         <div className="flex min-w-0 flex-col gap-4">
+          {/* A finished season has two champions: its own, by points, then its Main Event's. */}
+          {season.is_finished && standings.data && standings.data.length > 0 && (
+            <Podium title={t.standings.championship} caption={t.standings.championshipCaption({ season: season.name })} lines={standings.data} />
+          )}
           {mainEvent && <MainEventPodium night={mainEvent} />}
           {/* On a phone the table needs the width more than the card needs its padding. */}
           <Card className="max-sm:p-2">

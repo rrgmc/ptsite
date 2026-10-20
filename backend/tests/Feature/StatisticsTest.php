@@ -146,6 +146,35 @@ it('counts the rebuys and the late players the night dashboard recorded', functi
     $this->getJson('/api/v1/statistics')->assertOk()->assertJsonPath('data.rebuys', null);
 });
 
+it('counts the titles, the podiums and the appearances of the finished seasons', function () {
+    $this->seasonA->update(['is_finished' => true]);
+    $this->seasonB->update(['is_finished' => true]);
+
+    $this->getJson('/api/v1/statistics')->assertOk()
+        ->assertJsonPath('data.championships.count', 2)
+        ->assertJsonCount(2, 'data.championships.titles.rows')
+        ->assertJsonPath('data.championships.titles.rows.0.player.id', $this->ana->id)
+        ->assertJsonPath('data.championships.titles.rows.1.player.id', $this->breno->id)
+        ->assertJsonPath('data.championships.titles.rows.1.rank', 1)
+        ->assertJsonPath('data.championships.podiums.rows.0.player.id', $this->ana->id)
+        ->assertJsonPath('data.championships.podiums.rows.0.count', 2)
+        ->assertJsonPath('data.championships.podiums.rows.1.player.id', $this->carla->id)
+        ->assertJsonPath('data.championships.podiums.rows.2.player.id', $this->breno->id)
+        ->assertJsonPath('data.championships.podiums.rows.2.rank', 3)
+        ->assertJsonPath('data.championships.appearances.rows.0.count', 2);
+    // One season has no such lists.
+    $this->getJson("/api/v1/statistics?season={$this->seasonA->id}")->assertOk()->assertJsonPath('data.championships', null);
+});
+
+it('leaves the open seasons out of the championship lists', function () {
+    $this->seasonA->update(['is_finished' => true]);
+
+    $this->getJson('/api/v1/statistics')->assertOk()
+        ->assertJsonPath('data.championships.count', 1)
+        ->assertJsonCount(1, 'data.championships.titles.rows')
+        ->assertJsonPath('data.championships.titles.rows.0.player.id', $this->breno->id);
+});
+
 it('is empty before any night is finished', function () {
     $season = Season::factory()->create();
 

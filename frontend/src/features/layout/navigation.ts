@@ -1,5 +1,6 @@
 import { t } from '@/i18n'
 import { hasFeature } from '@/lib/features'
+import { splitSeasonPath } from '@/lib/seasonPath'
 import type { FeatureName } from '@/site/features'
 
 /**
@@ -12,6 +13,8 @@ export interface NavItem {
   icon: string
   /** Active only on this exact path. */
   end?: boolean
+  /** Also active on this season screen, in any season: "Estatísticas" opens on "Geral" and is active on "Temporada" too. */
+  alsoActiveOn?: string
   tab?: boolean
   top?: boolean
   adminOnly?: boolean
@@ -26,12 +29,17 @@ export const navItems: NavItem[] = [
   { to: '/calendar', label: t.layout.nav.calendar, icon: '📅', tab: true, top: true },
   { to: '/simulator', label: t.layout.nav.simulator, icon: '🔮' },
   { to: '/main-event', label: t.layout.nav.mainEvent, icon: '🏅', feature: 'mainEvent' },
-  { to: '/statistics', label: t.layout.nav.statistics, icon: '📊', top: true },
+  { to: '/statistics/all', alsoActiveOn: '/statistics', label: t.layout.nav.statistics, icon: '📊', top: true },
   { to: '/players', label: t.layout.nav.players, icon: '👥', tab: true, top: true },
   { to: '/seasons', label: t.layout.nav.seasons, icon: '🗂️', end: true, top: true },
   { to: '/profile', label: t.layout.nav.profile, icon: '👤', tab: true, top: true },
   { to: '/admin', label: t.layout.nav.admin, icon: '⚙️', top: true, adminOnly: true },
 ]
+
+/** Whether a menu item is active on a path beyond what its link matches (`alsoActiveOn`). */
+export function isAlsoActive(item: NavItem, pathname: string): boolean {
+  return item.alsoActiveOn !== undefined && splitSeasonPath(pathname).screen === item.alsoActiveOn
+}
 
 export function navItemsFor(role: string | undefined): NavItem[] {
   return navItems.filter((item) => (!item.adminOnly || role === 'admin') && (!item.feature || hasFeature(item.feature)))

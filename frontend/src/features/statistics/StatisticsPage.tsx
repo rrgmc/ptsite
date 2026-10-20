@@ -40,7 +40,7 @@ function StatisticsScreen({ subtitle, allTime, query }: { subtitle: string; allT
   return (
     <>
       <PageHeader title={t.statistics.title} subtitle={subtitle} />
-      <PeriodSwitch seasonTo={to('/statistics')} allTimeTo="/statistics/all" allTime={allTime} />
+      <PeriodSwitch seasonTo={to('/statistics')} allTimeTo="/statistics/all" allTime={allTime} allTimeFirst />
       {query.isPending ? <Loading /> : query.error ? <ErrorBox error={query.error} /> : <StatisticsView statistics={query.data!} />}
     </>
   )
@@ -88,6 +88,8 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
   const allTime = statistics.season_id === null
   // One season has one Main Event, which makes no list: the Main Event lists are of every season.
   const mainEvent = allTime && statistics.main_event && statistics.main_event.count > 0 ? statistics.main_event : null
+  // The final standings of the finished seasons; a season's own are on "Classificação".
+  const championships = statistics.championships && statistics.championships.count > 0 ? statistics.championships : null
   const hasNights = statistics.nights_count > 0
   if (!hasNights && !mainEvent) return <Empty>{t.statistics.noNights}</Empty>
 
@@ -174,6 +176,19 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
           {rebuys.time_chips && (
             <CountList title={t.statistics.timeChips} caption={t.statistics.timeChipsCaption} valueHeader={t.statistics.times} list={rebuys.time_chips} empty={t.statistics.noneRecorded} />
           )}
+        </div>
+      ),
+    })
+  }
+  if (championships) {
+    tabs.push({
+      id: 'championships',
+      title: t.statistics.championships,
+      content: (
+        <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-3">
+          <CountList title={t.statistics.championshipTitles} caption={t.statistics.championshipTitlesCaption} valueHeader={t.statistics.times} list={championships.titles} />
+          <CountList title={t.statistics.championshipPodiums} caption={t.statistics.championshipPodiumsCaption} valueHeader={t.statistics.times} list={championships.podiums} />
+          <CountList title={t.statistics.championshipAppearances} caption={t.statistics.championshipAppearancesCaption} valueHeader={t.statistics.times} list={championships.appearances} />
         </div>
       ),
     })

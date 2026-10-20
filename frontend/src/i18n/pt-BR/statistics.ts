@@ -36,6 +36,15 @@ export const statistics = {
   mainEventAppearances: 'Participações',
   mainEventAppearancesCaption: 'Jogadores por participações no Main Event',
 
+  // The final standings of the finished seasons
+  championships: 'Campeonatos',
+  championshipTitles: 'Títulos',
+  championshipTitlesCaption: 'Jogadores por temporadas terminadas em 1º lugar',
+  championshipPodiums: 'Pódios',
+  championshipPodiumsCaption: 'Jogadores por temporadas terminadas entre os três primeiros',
+  championshipAppearances: 'Participações',
+  championshipAppearancesCaption: 'Jogadores por temporadas em que pontuaram',
+
   // What the night dashboard recorded, on a site that has it
   rebuysTab: 'Rebuys',
   rebuys: 'Rebuys',

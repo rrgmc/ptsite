@@ -88,7 +88,7 @@ test('an admin adds the Main Event of a season in "Administração", and its nig
   await expect(page.getByText('Extra', { exact: true })).toBeVisible()
 })
 
-test('a player sees the Main Event of a finished season and its champion in "Temporadas"', async ({ page }) => {
+test('a player sees the two champions of a finished season, and the Main Event champion in "Temporadas"', async ({ page }) => {
   await login(page, 'dev-player')
 
   await page.goto('seasons')
@@ -103,6 +103,11 @@ test('a player sees the Main Event of a finished season and its champion in "Tem
   const seasonStandings = page.url()
   const podium = page.getByRole('list', { name: /^Classificação: Main Event/ })
   await expect(podium.getByRole('listitem')).toHaveText([/1º/, /2º/, /3º/])
+  // The season champion, by points, comes first: the first three of the final standings.
+  const championship = page.getByRole('region', { name: 'Campeonato' })
+  await expect(championship.getByRole('list', { name: 'Classificação final: Liga 2025' }).getByRole('listitem').first()).toContainText('1º')
+  const boxes = page.getByRole('region', { name: /^(Campeonato|Main Event)$/ }).getByRole('heading', { level: 2 })
+  await expect(boxes).toHaveText([/Campeonato$/, /Main Event$/])
   await expectAccessible(page)
 
   // "Resultados" of a finished season has no "Próximos eventos"

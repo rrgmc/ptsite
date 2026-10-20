@@ -70,6 +70,8 @@ class StatisticsResource extends JsonResource
             ], $this->positionTable),
             /** The lists of the finished Main Events of the same seasons. Null on a site with no Main Event. */
             'main_event' => $this->mainEvent === null ? null : new MainEventStatisticsResource($this->mainEvent),
+            /** The lists of the final standings of the finished seasons ("Campeonatos"). Null for one season. */
+            'championships' => $this->championships === null ? null : new ChampionshipStatisticsResource($this->championships),
             /** The rebuys and time chips the night dashboard recorded. Null on a site with no night dashboard. */
             'rebuys' => $this->rebuys === null ? null : new RebuyStatisticsResource($this->rebuys),
         ];
