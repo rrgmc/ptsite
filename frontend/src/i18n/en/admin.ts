@@ -204,6 +204,23 @@ export const admin: Messages['admin'] = {
     notOpenYet: 'Open the night to enter the result.',
   },
 
+  seasonTotals: {
+    title: ({ season }) => `Final standings · ${season}`,
+    linkLabel: ({ season }) => `Final standings: ${season}`,
+    intro: 'For a season known only by its final standings: the points of each player and how often they finished in each position. It has no nights.',
+    hasNights: 'This season has nights: its final standings come from them.',
+    empty: 'No player yet. Add the players of the final standings.',
+    points: 'Points',
+    times: ({ position }) => `Times ${position}`,
+    remove: ({ name }) => `Remove ${name}`,
+    add: 'Add a player',
+    sums: 'Total per position',
+    sumsHelp: ({ rounds }) => `Each position usually adds up to ${rounds}, once per round. A different total is saved as it is.`,
+    sumOff: ({ count, rounds }) => `${count} of ${rounds}`,
+    invalid: 'Check the points and the positions marked.',
+    saved: 'Final standings saved.',
+  },
+
   seasons: {
     newSeason: '+ New season',
     listTitle: 'Seasons',
@@ -213,6 +230,7 @@ export const admin: Messages['admin'] = {
     closed: 'Closed',
     planDates: 'Plan dates',
     mainEvent: 'Main Event',
+    totals: 'Final standings',
     back: '‹ Seasons',
     notFound: 'Season not found.',
     newTitle: 'New season',

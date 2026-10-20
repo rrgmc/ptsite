@@ -91,6 +91,16 @@ it('refuses a player listed twice, and an archived player', function () {
     $this->putJson($this->url, ['rows' => $rows])->assertUnprocessable()->assertJsonPath('rule', 'season.totals.unknown_player');
 });
 
+it('keeps a player archived after the final lines were saved, but refuses an archived player added to them', function () {
+    $rows = ($this->rows)();
+    $this->putJson($this->url, ['rows' => array_slice($rows, 1)])->assertOk();
+    $this->breno->forceFill(['archived_at' => now()])->save();
+
+    $this->putJson($this->url, ['rows' => array_slice($rows, 1)])->assertOk();
+    $this->ana->forceFill(['archived_at' => now()])->save();
+    $this->putJson($this->url, ['rows' => $rows])->assertUnprocessable()->assertJsonPath('rule', 'season.totals.unknown_player');
+});
+
 it('refuses final lines for a season with a finished night', function () {
     ($this->finishNewNight)();
 

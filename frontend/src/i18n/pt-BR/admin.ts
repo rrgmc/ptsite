@@ -215,6 +215,25 @@ export const admin = {
     notOpenYet: 'Abra o evento para lançar a classificação.',
   },
 
+  // The final standings of a season known only by them ("Só totais")
+  seasonTotals: {
+    title: ({ season }: { season: string }) => `Resultado final · ${season}`,
+    /** For screen readers: the link of one season among many. */
+    linkLabel: ({ season }: { season: string }) => `Resultado final: ${season}`,
+    intro: 'Para uma temporada da qual só se conhece o resultado final: os pontos de cada jogador e quantas vezes ele ficou em cada posição. Ela não tem eventos.',
+    hasNights: 'Esta temporada tem eventos: o resultado final vem deles.',
+    empty: 'Nenhum jogador ainda. Adicione os jogadores do resultado final.',
+    points: 'Pontos',
+    times: ({ position }: { position: string }) => `Vezes em ${position}`,
+    remove: ({ name }: { name: string }) => `Remover ${name}`,
+    add: 'Adicionar jogador',
+    sums: 'Total por posição',
+    sumsHelp: ({ rounds }: { rounds: number }) => `Cada posição costuma somar ${rounds} vezes, uma por rodada. Um total diferente é salvo como está.`,
+    sumOff: ({ count, rounds }: { count: number; rounds: number }) => `${count} de ${rounds}`,
+    invalid: 'Confira os pontos e as posições marcados.',
+    saved: 'Resultado final salvo.',
+  },
+
   // Seasons
   seasons: {
     newSeason: '+ Nova temporada',
@@ -226,6 +245,7 @@ export const admin = {
     closed: 'Fechada',
     planDates: 'Planejar datas',
     mainEvent: 'Main Event',
+    totals: 'Resultado final',
     back: '‹ Temporadas',
     notFound: 'Temporada não encontrada.',
     newTitle: 'Nova temporada',

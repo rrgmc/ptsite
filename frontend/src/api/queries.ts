@@ -634,6 +634,22 @@ export function useSaveSeason() {
   })
 }
 
+/** "Resultado final": replaces the final lines of a season known only by its final standings. */
+export function useSaveSeasonTotals(seasonId: number) {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async (rows: { player_id: number; points: string; positions: number[] }[]) =>
+      (await unwrap(api.PUT('/v1/seasons/{season}/totals', { params: { path: { season: seasonId } }, body: { rows } }))).data,
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: keys.standings(seasonId) })
+      client.invalidateQueries({ queryKey: ['statistics'] })
+      client.invalidateQueries({ queryKey: keys.seasons })
+      client.invalidateQueries({ queryKey: keys.season(seasonId) })
+      client.invalidateQueries({ queryKey: keys.seasonsTopStandings })
+    },
+  })
+}
+
 export function useSavePlace() {
   const client = useQueryClient()
   return useMutation({
