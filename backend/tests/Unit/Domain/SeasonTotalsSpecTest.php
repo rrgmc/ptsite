@@ -12,6 +12,7 @@ use PTSite\Domain\Shared\RuleViolation;
 use PTSite\Domain\Standings\ScoreLine;
 use PTSite\Domain\Standings\Standings;
 use PTSite\Domain\Standings\TotalsLine;
+use PTSite\Domain\Statistics\MainEventAsNight;
 use PTSite\Domain\Statistics\NightRecord;
 use PTSite\Domain\Statistics\PlayerStatistics;
 use PTSite\Domain\Statistics\RankedRow;
@@ -126,6 +127,16 @@ it('leaves a season known only by its final standings out of a progress night by
         ->and($summary->progress->steps)->toBe([])
         ->and($summary->biggestPots->rows)->toBe([])
         ->and($summary->positionTable[0])->playerId->toBe(1)->counts->toBe([1 => 2, 2 => 0, 3 => 0, 4 => 1, 5 => 0, 6 => 0]);
+});
+
+it('counts the Main Event of a season known only by its final standings, on its points over its rounds', function () {
+    // The old season paid 743,00 in 3 rounds: an average pot of 247,66. Breno wins its Main Event, 38% of it.
+    $records = [NightRecord::seasonTotals(1, 3, oldSeason())];
+    $mainEvent = (new MainEventAsNight)->record(20, 1, $records, [2, 3], PercentageTable::standard());
+
+    expect($mainEvent->lines[0]->points->toDecimal())->toBe('94.11')
+        // Breno's 180,00 + 94,11 passes Ana's 250,50, who did not play it.
+        ->and((new Statistics)->seasonRanks([...$records, $mainEvent], [1], [1, 2]))->toBe([1 => [2], 2 => [1]]);
 });
 
 it('lists a season known only by its final standings on a player\'s page, with no result of a night', function () {

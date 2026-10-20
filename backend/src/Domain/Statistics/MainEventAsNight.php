@@ -17,23 +17,33 @@ final class MainEventAsNight
     public function __construct(private readonly PointsCalculator $calculator = new PointsCalculator) {}
 
     /**
+     * A season known only by its final standings has no pot of its own: the points it paid, added up, are the pots
+     * of its nights, so its average pot is those points over its rounds.
+     *
      * @param  list<NightRecord>  $records  the finished nights; only the season's nights with a pot count
      * @param  list<int>  $order  the Main Event's players (by id), first place first
      * @return ?NightRecord null when the season has no night with a pot
      */
     public function record(int $nightId, int $seasonId, array $records, array $order, PercentageTable $table): ?NightRecord
     {
-        $pots = [];
+        $total = $nights = 0;
         foreach ($records as $record) {
-            if ($record->seasonId === $seasonId && ! $record->isSeasonTotals() && $record->pot->isPositive()) {
-                $pots[] = $record->pot->cents;
+            if ($record->seasonId !== $seasonId) {
+                continue;
+            }
+            if ($record->isSeasonTotals()) {
+                $total += array_sum(array_map(fn ($line) => $line->points->cents, $record->lines));
+                $nights += $record->rounds;
+            } elseif ($record->pot->isPositive()) {
+                $total += $record->pot->cents;
+                $nights++;
             }
         }
-        if ($pots === []) {
+        if ($nights === 0 || $total === 0) {
             return null;
         }
 
-        $points = $this->calculator->calculate(Money::cents(intdiv(array_sum($pots), count($pots))), $table);
+        $points = $this->calculator->calculate(Money::cents(intdiv($total, $nights)), $table);
         $lines = [];
         foreach (array_values($order) as $index => $playerId) {
             if (isset($points[$index + 1])) {
