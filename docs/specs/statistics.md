@@ -38,9 +38,13 @@ Everyone logged in: players, results keepers and admins.
 4. **Ties** work as in the standings ([points-and-standings.md](points-and-standings.md)): equal values share a
    position and the next one skips (1, 2, 2, 4). When the 10th line is tied with lines that do not fit, the list
    says how many: "e mais 2 empatados".
-5. **"Pontos acumulados"** is a line chart of the running total of the **eight players with most points**: one step
+5. **"Pontos acumulados"** is a line chart of the running total of the **ten players with most points**: one step
    per night in "Temporada", one step per season in "Geral". The box of a point lists the players by their total
    at that point, highest first.
+5a. **"Classificação por temporada"**, in "Geral" only, is a line chart of the same ten players' position in each
+   season, oldest first, with 1st at the top. It counts each season's Main Event as rule 12 says. A player has no
+   point in a season in which they did not score, and their line has a gap there. The box of a point lists the
+   players by position, best first. It is below the box with tabs, by itself.
 6. **"Vitórias"** is a bar chart of the ten players with most 1st places, with the first places of everyone
    else added up as "Outros".
 7. The view also shows how many nights it counts and their total pot. The Main Event pots and the time chips of
@@ -61,6 +65,13 @@ Everyone logged in: players, results keepers and admins.
 12. The player's **charts**: **"Pontos acumulados"**, a line of the player's running total, with one step per
     night in "Temporada" and one per season in "Geral"; and **"Posições"**, a bar for each scoring position. The
     line stays flat on a night or season in which the player did not score.
+    - In "Geral", a player who scored in two seasons or more also has **"Classificação por temporada"**: a line
+      of the player's position in each season of "Por temporada", oldest first, with 1st at the top. For fun, it
+      counts each season's Main Event ([main-event.md](main-event.md)) as one more night of that season: its
+      players get the points of their positions, on the average pot of the season's nights. A season known only
+      by its final standings has no pot of its own: its average pot is the points it paid, added up, over its
+      rounds. Only this chart and rule 5a count the Main Event. The standings and "Por temporada" do not. A
+      season with no Main Event keeps its position.
 
 13. **The Main Event lists**, in "Geral" only, on a site with the Main Event ([main-event.md](main-event.md)).
     They count the finished Main Events of the seasons that are not archived. Each shows the first 10, with
@@ -170,6 +181,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - **A player's results.** Ana: night 3, 1st, 114,00; night 2, 3rd, 60,00; night 1, 1st, 114,00.
 - **A player's points.** Ana in season A: 114,00 then 174,00. Ana in "Geral": 174,00 then 288,00. Breno in
   "Geral": 221,00 then 221,00, because he did not play in season B.
+- **A player's rank by season, with the Main Event.** Season A's Main Event ends Ana, Breno, Carla, Dudu. Season
+  A's average pot is R$ 350,00, so on the standard table it pays Ana 133,00, Breno 80,50, Carla 52,50 and Dudu
+  38,50. Ana has 307,00 and Breno 301,50: Ana's line shows 1st for season A, though she is 2nd in its standings.
 - **A player who never scored.** Dudu has no position, 0,00 points, 0 nights and 0 in every finishing position.
   "Por temporada" and "Resultados" are empty.
 
@@ -216,8 +230,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   "Próximos eventos", as of a finished season, shows the box with the full width and its amounts side by side. A season with no finished
   night has neither the chart nor the box.
 - **The player's page** has its own "Temporada" / "Geral" switch, each with its own address. Under it: the
-  numbers, "Por temporada" (in "Geral"), the two charts with "Ver dados em tabela", then "Resultados". A player
-  who did not score sees "Ainda não pontuou" in place of the charts and lists.
+  numbers, "Por temporada" (in "Geral"), "Classificação por temporada" (in "Geral", full width), the two charts
+  with "Ver dados em tabela", then "Resultados". A player who did not score sees "Ainda não pontuou" in place of
+  the charts and lists.
 
 ## Open questions
 

@@ -198,7 +198,7 @@ it('shows one player\'s statistics over every season', function () {
         ->assertJsonCount(6, 'data.positions')
         ->assertJsonPath('data.seasons.0', [
             'season_id' => $this->seasonB->id, 'season_name' => $this->seasonB->name,
-            'rank' => 1, 'points' => '114.00', 'nights_scored' => 1, 'wins' => 1,
+            'rank' => 1, 'points' => '114.00', 'nights_scored' => 1, 'wins' => 1, 'rank_with_main_event' => 1,
         ])
         ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
         ->assertJsonPath('data.seasons.1.rank', 2)
@@ -221,6 +221,41 @@ it('shows one player\'s statistics over every season', function () {
         ->assertJsonCount(1, 'data.seasons')
         ->assertJsonPath('data.seasons.0.season_id', $this->seasonA->id)
         ->assertJsonPath('data.points_progress.points', ['221.00', '221.00']);
+});
+
+it('ranks a player in each season with its Main Event counted as one more night, for fun', function () {
+    $mainEvent = Night::factory()->for($this->seasonA)->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'finished', 'starts_at' => '2026-04-03 13:00:00']);
+    $mainEvent->mainEventPositions()->createMany(array_map(
+        fn (Player $player, int $i) => ['position' => $i + 1, 'player_id' => $player->id],
+        [$this->ana, $this->breno, $this->carla],
+        [0, 1, 2],
+    ));
+
+    // Ana is 2nd in season A; its Main Event, on the average pot of 350,00, lifts her to 1st. The standings stay.
+    $this->getJson("/api/v1/players/{$this->ana->id}/statistics")->assertOk()
+        ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
+        ->assertJsonPath('data.seasons.1.rank', 2)
+        ->assertJsonPath('data.seasons.1.rank_with_main_event', 1)
+        ->assertJsonPath('data.seasons.0.rank_with_main_event', 1);
+    $this->getJson("/api/v1/players/{$this->breno->id}/statistics")->assertOk()
+        ->assertJsonPath('data.seasons.0.rank', 1)
+        ->assertJsonPath('data.seasons.0.rank_with_main_event', 2);
+});
+
+it('follows the leaders\' position season by season over every season, with the Main Event counted', function () {
+    $mainEvent = Night::factory()->for($this->seasonA)->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'finished', 'starts_at' => '2026-04-03 13:00:00']);
+    $mainEvent->mainEventPositions()->createMany([['position' => 1, 'player_id' => $this->ana->id], ['position' => 2, 'player_id' => $this->breno->id]]);
+
+    $response = $this->getJson('/api/v1/statistics')->assertOk()
+        ->assertJsonPath('data.points_progress.steps.0.season_id', $this->seasonA->id)
+        ->assertJsonPath('data.rank_progress.0.player.id', $this->ana->id)
+        // Ana is 2nd in season A's standings; its Main Event lifts her to 1st.
+        ->assertJsonPath('data.rank_progress.0.ranks', [1, 1]);
+    $breno = collect($response->json('data.rank_progress'))->firstWhere('player.id', $this->breno->id);
+    // Breno did not play in season B: no position there.
+    expect($breno['ranks'])->toBe([2, null]);
+
+    $this->getJson("/api/v1/statistics?season={$this->seasonA->id}")->assertOk()->assertJsonPath('data.rank_progress', null);
 });
 
 it('shows one player\'s statistics in one season, to any logged-in user', function () {

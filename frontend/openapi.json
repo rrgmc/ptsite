@@ -5707,7 +5707,7 @@
                     },
                     "seasons": {
                         "type": "array",
-                        "description": "The player's line in the standings of each season in which they scored, newest first.",
+                        "description": "The player's line in the standings of each season in which they scored, newest first.\n`rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the\naverage pot of the season's nights: a statistic for fun, which the standings never use.",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -5728,6 +5728,9 @@
                                 },
                                 "wins": {
                                     "type": "integer"
+                                },
+                                "rank_with_main_event": {
+                                    "type": "integer"
                                 }
                             },
                             "required": [
@@ -5736,7 +5739,8 @@
                                 "rank",
                                 "points",
                                 "nights_scored",
-                                "wins"
+                                "wins",
+                                "rank_with_main_event"
                             ]
                         }
                     },
@@ -7057,7 +7061,7 @@
                     },
                     "points_progress": {
                         "type": "object",
-                        "description": "The running total of the eight players with most points: per night in a season, per season otherwise.",
+                        "description": "The running total of the ten players with most points: per night in a season, per season otherwise.",
                         "properties": {
                             "steps": {
                                 "type": "array",
@@ -7127,6 +7131,34 @@
                             "series",
                             "pots"
                         ]
+                    },
+                    "rank_progress": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "description": "Over every season, the players of `points_progress.series`, in the same order, with their position in\neach season of `points_progress.steps`: null in a season in which they did not score. For fun, each\nseason's Main Event counts as one more night of it, on the average pot of its nights; the standings\nnever count it. Null for one season.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "player": {
+                                    "$ref": "#/components/schemas/PlayerResource"
+                                },
+                                "ranks": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "player",
+                                "ranks"
+                            ]
+                        }
                     },
                     "wins_not_shown": {
                         "type": "integer",
@@ -7216,6 +7248,7 @@
                     "biggest_pots",
                     "places",
                     "points_progress",
+                    "rank_progress",
                     "wins_not_shown",
                     "position_table",
                     "main_event",

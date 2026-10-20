@@ -47,7 +47,14 @@ final class LeagueStatistics
 
         $dashboard = $this->features->enabled(Feature::NightDashboard);
         $timeChip = $dashboard && $this->features->enabled(Feature::TimeChip);
-        $summary = $this->statistics->summarise($this->finishedNights->records($nights, withDashboard: $dashboard, totalsSeasons: $totalsSeasons), stepPerSeason: $season === null);
+        $records = $this->finishedNights->records($nights, withDashboard: $dashboard, totalsSeasons: $totalsSeasons);
+        $summary = $this->statistics->summarise($records, stepPerSeason: $season === null);
+        // Over every season, the leaders' position in each season, with its Main Event counted for fun.
+        $seasonRanks = $season === null ? $this->statistics->seasonRanks(
+            [...$records, ...$this->finishedNights->mainEventRecords(null, $records)],
+            $summary->progress->steps,
+            array_keys($summary->progress->totals),
+        ) : null;
         $mainEvent = $this->features->enabled(Feature::MainEvent) ? $this->mainEvent($season) : null;
         $championships = $season === null ? $this->championships($nights, $totalsSeasons) : null;
 
@@ -125,6 +132,11 @@ final class LeagueStatistics
                 $summary->progress->rebuys,
                 $timeChip ? $summary->progress->timeChips : null,
             ) : null,
+            $seasonRanks === null ? null : array_map(
+                fn (int $playerId, array $ranks) => ['player' => $players[$playerId], 'ranks' => $ranks],
+                array_keys($seasonRanks),
+                array_values($seasonRanks),
+            ),
         );
     }
 

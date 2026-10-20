@@ -51,7 +51,7 @@ test('a player can browse an earlier season and its results', async ({ page }) =
   await expect(titles.first()).toBeVisible()
   await expect(titles.first()).toHaveText(new RegExp(`^Liga ${await titles.count()} - `))
   await expect(titles.last()).toHaveText(/^Liga 1 - /)
-  await expect(page.getByRole('img', { name: /^Gráfico de linhas: pontos acumulados dos 8 jogadores com mais pontos, por evento/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Gráfico de linhas: pontos acumulados dos 10 jogadores com mais pontos, por evento/ })).toBeVisible()
   // The season's three amounts, added up, beside the chart.
   const totals = page.locator('section', { has: page.getByRole('heading', { name: 'Totais da temporada' }) })
   for (const label of ['Pote Total', 'Pote ME', 'Time chip']) await expect(totals.getByText(label)).toBeVisible()

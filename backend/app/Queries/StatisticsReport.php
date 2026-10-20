@@ -38,5 +38,12 @@ final readonly class StatisticsReport
         public ?ChampionshipStatisticsReport $championships,
         /** Null on a site with no night dashboard. */
         public ?RebuyStatisticsReport $rebuys,
+        /**
+         * The same players as $progressSeries, with their position in each season of $progressSteps, the Main
+         * Event counted. Null for one season.
+         *
+         * @var ?list<array{player: Player, ranks: list<?int>}>
+         */
+        public ?array $rankProgress = null,
     ) {}
 }

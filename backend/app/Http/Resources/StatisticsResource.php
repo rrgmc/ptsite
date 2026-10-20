@@ -31,7 +31,7 @@ class StatisticsResource extends JsonResource
             'biggest_pots' => new RankedListResource($this->biggestPots),
             /** Places by number of nights (`count`). */
             'places' => new RankedListResource($this->places),
-            /** The running total of the eight players with most points: per night in a season, per season otherwise. */
+            /** The running total of the ten players with most points: per night in a season, per season otherwise. */
             'points_progress' => [
                 /**
                  * Oldest first. `night_id` and `starts_at` are null when the step is a season.
@@ -55,6 +55,18 @@ class StatisticsResource extends JsonResource
                  */
                 'pots' => $this->progressPots,
             ],
+            /**
+             * Over every season, the players of `points_progress.series`, in the same order, with their position in
+             * each season of `points_progress.steps`: null in a season in which they did not score. For fun, each
+             * season's Main Event counts as one more night of it, on the average pot of its nights; the standings
+             * never count it. Null for one season.
+             *
+             * @var list<array{player: PlayerResource, ranks: list<int|null>}>|null
+             */
+            'rank_progress' => $this->rankProgress === null ? null : array_map(fn (array $series) => [
+                'player' => new PlayerResource($series['player']),
+                'ranks' => $series['ranks'],
+            ], $this->rankProgress),
             /** First places of the players who are not in the first "Posição" list ("Outros"). */
             'wins_not_shown' => $this->winsNotShown,
             /**

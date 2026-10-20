@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { playerStatistics, playerStatisticsAllTime, statistics, statisticsAllTime } from '@/mocks/data'
-import { placesData, playerProgressData, positionsData, potsData, progressData, rebuysData, SERIES_COLORS, winsData } from './chartData'
+import { placesData, playerProgressData, playerRankData, positionsData, potsData, progressData, rankProgressData, rankTicks, rebuysData, SERIES_COLORS, winsData } from './chartData'
 
 describe('progressData', () => {
   it('has one point per night in a season, labelled by date', () => {
@@ -77,6 +77,35 @@ describe('placesData', () => {
     expect(slices).toHaveLength(8)
     expect(slices[6]).toMatchObject({ key: 7, count: 4, fill: SERIES_COLORS[6] })
     expect(slices[7]).toEqual({ key: 'others', name: 'Outros', count: 6, fill: 'var(--color-muted)' })
+  })
+})
+
+describe('rankProgressData', () => {
+  it('has one point per season, with the ten leaders\' colors, and a gap where a player did not score', () => {
+    const { series, points } = rankProgressData(statisticsAllTime.points_progress.steps, statisticsAllTime.rank_progress!)
+    expect(series).toHaveLength(10)
+    expect(series[9]).toEqual({ key: 'p10', nickname: 'Joana', color: SERIES_COLORS[9] })
+    expect(points[0]).toMatchObject({ label: 'Liga 2024', p1: 1, p3: 2 })
+    expect(points[0]).not.toHaveProperty('p4')
+    expect(points[1]).not.toHaveProperty('p7')
+  })
+})
+
+describe('rankTicks', () => {
+  it('starts at 1st and takes about six steps down to the worst position', () => {
+    expect(rankTicks(1)).toEqual([1, 2])
+    expect(rankTicks(7)).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expect(rankTicks(12)).toEqual([1, 3, 5, 7, 9, 11])
+  })
+})
+
+describe('playerRankData', () => {
+  it('has one point per season, oldest first, with the Main Event counted', () => {
+    expect(playerRankData(playerStatisticsAllTime.seasons)).toEqual([
+      { label: 'Liga 2024', rank: 3 },
+      { label: 'Liga 2025', rank: 1 },
+      { label: 'Liga 2026', rank: 1 },
+    ])
   })
 })
 

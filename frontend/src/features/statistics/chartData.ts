@@ -11,7 +11,12 @@ export const SERIES_COLORS = [
   'var(--color-chart-6)',
   'var(--color-chart-7)',
   'var(--color-chart-8)',
+  'var(--color-chart-9)',
+  'var(--color-chart-10)',
 ]
+
+/** A pie keeps eight colors (docs/decisions/0023-ten-chart-colors.md). */
+const PIE_COLORS = SERIES_COLORS.slice(0, 8)
 
 export interface ProgressSeries {
   /** The key of this series in each point: "p12". */
@@ -43,6 +48,34 @@ export function progressData(progress: Pick<Statistics['points_progress'], 'step
   return { series, points }
 }
 
+/**
+ * The leaders' position in each season as chart points, with the same series, keys and colors as
+ * {@link progressData}. A season in which a player did not score has no value for them: their line has a gap.
+ */
+export function rankProgressData(steps: Statistics['points_progress']['steps'], rankProgress: NonNullable<Statistics['rank_progress']>): ProgressData {
+  const series = rankProgress.slice(0, SERIES_COLORS.length).map((s, i) => ({
+    key: `p${s.player.id}`,
+    nickname: s.player.nickname,
+    color: SERIES_COLORS[i],
+  }))
+  const points = steps.map((step, i) => {
+    const point: ProgressData['points'][number] = { label: step.season_name }
+    series.forEach((s, n) => {
+      const rank = rankProgress[n].ranks[i]
+      if (rank !== null && rank !== undefined) point[s.key] = rank
+    })
+    return point
+  })
+  return { series, points }
+}
+
+/** The ticks of an axis of positions: 1st always, then about six more down to the worst position shown. */
+export function rankTicks(worst: number): number[] {
+  const last = Math.max(2, worst)
+  const step = Math.ceil((last - 1) / 6)
+  return Array.from({ length: Math.floor((last - 1) / step) + 1 }, (_, i) => 1 + i * step)
+}
+
 export interface PlayerProgressPoint {
   label: string
   points: number
@@ -54,6 +87,18 @@ export function playerProgressData(progress: PlayerStatistics['points_progress']
     label: step.starts_at ? formatDate(step.starts_at) : step.season_name,
     points: Number(progress.points[i]),
   }))
+}
+
+export interface PlayerRankPoint {
+  /** The season's name */
+  label: string
+  /** The position with the season's Main Event counted as one more night */
+  rank: number
+}
+
+/** One player's position in each season, oldest first: the API lists the seasons newest first. */
+export function playerRankData(seasons: PlayerStatistics['seasons']): PlayerRankPoint[] {
+  return seasons.map((season) => ({ label: season.season_name, rank: season.rank_with_main_event })).reverse()
 }
 
 export interface PositionBar {
@@ -110,11 +155,11 @@ export interface PlaceSlice {
  */
 export function placesData(places: Statistics['places'], others: string): PlaceSlice[] {
   const rows = places.rows.map((row) => ({ key: row.place!.id, name: row.place!.name, count: row.count ?? 0 }))
-  if (rows.length <= SERIES_COLORS.length) return rows.map((row, i) => ({ ...row, fill: SERIES_COLORS[i] }))
+  if (rows.length <= PIE_COLORS.length) return rows.map((row, i) => ({ ...row, fill: PIE_COLORS[i] }))
 
-  const shown = rows.slice(0, SERIES_COLORS.length - 1)
+  const shown = rows.slice(0, PIE_COLORS.length - 1)
   const rest = rows.slice(shown.length).reduce((sum, row) => sum + row.count, 0)
-  return [...shown.map((row, i) => ({ ...row, fill: SERIES_COLORS[i] })), { key: 'others', name: others, count: rest, fill: 'var(--color-muted)' }]
+  return [...shown.map((row, i) => ({ ...row, fill: PIE_COLORS[i] })), { key: 'others', name: others, count: rest, fill: 'var(--color-muted)' }]
 }
 
 export interface WinsBar {

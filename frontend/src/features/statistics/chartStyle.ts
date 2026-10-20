@@ -7,6 +7,8 @@ export const tooltip = {
 }
 // The lines of a tooltip, highest value first: the order of the lines at that point.
 export const highestFirst = (item: { value?: unknown }) => -Number(item.value)
+// The same for positions, where the line at the top is the lowest number: 1st first.
+export const lowestFirst = (item: { value?: unknown }) => Number(item.value)
 
 
 // The cells of the tables under the charts.

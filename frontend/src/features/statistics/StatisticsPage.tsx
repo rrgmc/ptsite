@@ -18,7 +18,7 @@ import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { amountRows } from '../nights/amounts'
 import { PositionTable } from './PositionTable'
 import { titlePlaces } from './titlePlaces'
-import { PlacesChart, PointsProgressChart, PotsChart, RebuysChart, subtitle, WinsChart } from './StatisticsCharts'
+import { PlacesChart, PointsProgressChart, PotsChart, RankProgressChart, RebuysChart, subtitle, WinsChart } from './StatisticsCharts'
 
 /** "Estatísticas" of the selected season (docs/specs/statistics.md). */
 export function StatisticsPage() {
@@ -108,7 +108,10 @@ function CountList({ title, caption, valueHeader, list, empty }: { title: string
 
 const TAB_ORDER = ['positions', 'championships', 'main-event', 'players', 'nights', 'rebuys']
 
-/** The numbers of one view: the totals, the points chart, and the lists and other charts in a box with tabs. */
+/**
+ * The numbers of one view: the totals, the points chart, the lists and other charts in a box with tabs, and over
+ * every season the rank by season under them.
+ */
 export function StatisticsView({ statistics }: { statistics: Statistics }) {
   const allTime = statistics.season_id === null
   // One season has one Main Event, which makes no list: the Main Event lists are of every season.
@@ -260,6 +263,9 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
       {allTime && (championships || mainEvent) && <ChampionPodiums championships={championships} mainEvent={mainEvent} />}
       {hasNights && nightsKnown && <PointsProgressChart progress={statistics.points_progress} perSeason={allTime} />}
       <TabBox label={t.statistics.tabs} tabs={tabs} />
+      {statistics.rank_progress && statistics.rank_progress.length > 0 && statistics.points_progress.steps.length >= 2 && (
+        <RankProgressChart steps={statistics.points_progress.steps} rankProgress={statistics.rank_progress} />
+      )}
     </div>
   )
 }

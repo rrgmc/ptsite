@@ -104,4 +104,12 @@ export const statistics = {
   playerPositionsDescription: ({ nickname, best }: { nickname: string; best?: { label: string; count: number } }) =>
     `Gráfico de barras: vezes em que ${nickname} terminou em cada posição.${best ? ` A mais frequente é ${best.label}: ${best.count}.` : ''} Os números estão na tabela abaixo.`,
   playerPositionsCaption: ({ nickname }: { nickname: string }) => `Vezes em que ${nickname} terminou em cada posição`,
+  rankBySeason: 'Classificação por temporada',
+  rankBySeasonNote: 'Por diversão, o Main Event conta como mais um evento da temporada.',
+  rankBySeasonDescription: ({ nickname, best }: { nickname: string; best?: { label: string; rank: string } }) =>
+    `Gráfico de linha: classificação de ${nickname} em cada temporada, com o Main Event contado como mais um evento. O 1º lugar fica no alto.${best ? ` A melhor é ${best.rank}, em ${best.label}.` : ''} Os números estão na tabela abaixo.`,
+  rankProgressDescription: ({ count }: { count: number }) =>
+    `Gráfico de linhas: classificação dos ${count} jogadores com mais pontos em cada temporada, com o Main Event contado como mais um evento. O 1º lugar fica no alto. Os números estão na tabela abaixo.`,
+  rankProgressCaption: 'Classificação em cada temporada, com o Main Event',
+  rankBySeasonCaption:({ nickname }: { nickname: string }) => `Classificação de ${nickname} em cada temporada, com o Main Event`,
 }

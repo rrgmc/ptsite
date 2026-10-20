@@ -71,7 +71,7 @@ function PlayerScreen({ playerId, allTime, period, children }: { playerId: numbe
               <h2 id="player-statistics" className="font-display text-xl font-bold">{t.players.statistics}</h2>
               {period && <p className="text-muted wrap-anywhere">{period}</p>}
             </div>
-            <PeriodSwitch seasonTo={to(`/players/${playerId}`)} allTimeTo={`/players/${playerId}/all`} allTime={allTime} />
+            <PeriodSwitch seasonTo={to(`/players/${playerId}`)} allTimeTo={`/players/${playerId}/all`} allTime={allTime} allTimeFirst />
             {children}
           </section>
         </div>
