@@ -1561,7 +1561,11 @@ export interface components {
                 position: number;
                 count: number;
             }[];
-            /** @description The player's line in the standings of each season in which they scored, newest first. */
+            /**
+             * @description The player's line in the standings of each season in which they scored, newest first.
+             *     `rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the
+             *     average pot of the season's nights: a statistic for fun, which the standings never use.
+             */
             seasons: {
                 season_id: number;
                 season_name: string;
@@ -1569,6 +1573,7 @@ export interface components {
                 points: string;
                 nights_scored: number;
                 wins: number;
+                rank_with_main_event: number;
             }[];
             /** @description The nights on which the player scored, newest first. */
             results: {

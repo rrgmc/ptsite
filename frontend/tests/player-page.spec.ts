@@ -20,6 +20,7 @@ test('a nickname in the standings opens the player\'s page on every season, and 
   const seasons = page.getByRole('table', { name: /^Classificação de/ })
   await expect(seasons.getByRole('link', { name: 'Liga 2022' })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Gráfico de linha: pontos acumulados de .*, por temporada/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Gráfico de linha: classificação de .* em cada temporada/ })).toBeVisible()
   // Over every season, each night names its season.
   await expect(page.getByRole('table', { name: /^Eventos em que/ }).getByRole('row').nth(1)).toContainText('Liga')
   await expectAccessible(page)
@@ -33,6 +34,7 @@ test('a nickname in the standings opens the player\'s page on every season, and 
   await expect(page.getByRole('heading', { name: 'Por temporada' })).toHaveCount(0)
   await expect(page.getByRole('img', { name: new RegExp(`^Gráfico de linha: pontos acumulados de ${nickname}, por evento`) })).toBeVisible()
   await expect(page.getByRole('img', { name: /^Gráfico de barras: vezes em que/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /em cada temporada/ })).toHaveCount(0)
   // A night in "Resultados" opens the night.
   const results = page.getByRole('table', { name: /^Eventos em que/ })
   await expect(results.getByRole('link').first()).toHaveAttribute('href', /nights\/\d+$/)

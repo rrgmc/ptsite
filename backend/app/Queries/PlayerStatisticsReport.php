@@ -7,7 +7,7 @@ final readonly class PlayerStatisticsReport
 {
     /**
      * @param  list<array{position: int, count: int}>  $positions
-     * @param  list<array{season_id: int, season_name: string, rank: int, points: string, nights_scored: int, wins: int}>  $seasons
+     * @param  list<array{season_id: int, season_name: string, rank: int, points: string, nights_scored: int, wins: int, rank_with_main_event: int}>  $seasons
      * @param  list<array{night_id: int, starts_at: string, season_id: int, season_name: string, position: int, points: string}>  $results
      * @param  list<array{night_id: ?int, starts_at: ?string, season_id: int, season_name: string}>  $progressSteps
      * @param  list<string>  $progressPoints

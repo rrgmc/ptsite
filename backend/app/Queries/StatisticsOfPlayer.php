@@ -2,9 +2,13 @@
 
 namespace PTSite\App\Queries;
 
+use PTSite\App\Models\Night;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
+use PTSite\Domain\Scoring\PercentageTable;
 use PTSite\Domain\Shared\Money;
+use PTSite\Domain\Statistics\MainEventAsNight;
+use PTSite\Domain\Statistics\NightRecord;
 use PTSite\Domain\Statistics\PlayerResult;
 use PTSite\Domain\Statistics\PlayerSeasonRow;
 use PTSite\Domain\Statistics\PlayerStatistics;
@@ -18,6 +22,7 @@ final class StatisticsOfPlayer
     public function __construct(
         private readonly PlayerStatistics $statistics,
         private readonly FinishedNights $finishedNights,
+        private readonly MainEventAsNight $mainEventAsNight,
     ) {}
 
     public function __invoke(Player $player, ?Season $season): PlayerStatisticsReport
@@ -26,7 +31,9 @@ final class StatisticsOfPlayer
         $totalsSeasons = $this->finishedNights->totalsSeasons($season);
         $seasonNames = $nights->pluck('season.name', 'season_id')->union($totalsSeasons->pluck('name', 'id'));
 
-        $summary = $this->statistics->summarise($player->id, $this->finishedNights->records($nights, totalsSeasons: $totalsSeasons), stepPerSeason: $season === null);
+        $records = $this->finishedNights->records($nights, totalsSeasons: $totalsSeasons);
+        $summary = $this->statistics->summarise($player->id, $records, stepPerSeason: $season === null);
+        $ranksWithMainEvent = $this->ranksWithMainEvent($player, $season, $records);
 
         return new PlayerStatisticsReport(
             $season?->id,
@@ -42,6 +49,7 @@ final class StatisticsOfPlayer
                 'points' => $row->points->toDecimal(),
                 'nights_scored' => $row->nightsScored,
                 'wins' => $row->wins,
+                'rank_with_main_event' => $ranksWithMainEvent[$row->seasonId] ?? $row->rank,
             ], $summary->seasons),
             array_map(fn (PlayerResult $result) => [
                 'night_id' => $result->nightId,
@@ -54,5 +62,36 @@ final class StatisticsOfPlayer
             $this->finishedNights->steps($summary->progressSteps, $nights, $season === null, $totalsSeasons),
             array_map(fn (Money $total) => $total->toDecimal(), $summary->progress),
         );
+    }
+
+    /**
+     * The player's rank in each season with its Main Event counted as one more night, for fun.
+     *
+     * @param  list<NightRecord>  $records
+     * @return array<int, int> season id => rank
+     */
+    private function ranksWithMainEvent(Player $player, ?Season $season, array $records): array
+    {
+        $mainEvents = $this->finishedNights->mainEvents($season)->load('season.percentages')
+            ->map(fn (Night $night) => $this->mainEventAsNight->record(
+                $night->id,
+                $night->season_id,
+                $records,
+                $night->mainEventPositions->pluck('player_id')->all(),
+                PercentageTable::of($night->season->percentByPosition()),
+            ))
+            ->filter()
+            ->values()
+            ->all();
+        if ($mainEvents === []) {
+            return [];
+        }
+
+        $ranks = [];
+        foreach ($this->statistics->summarise($player->id, [...$records, ...$mainEvents])->seasons as $row) {
+            $ranks[$row->seasonId] = $row->rank;
+        }
+
+        return $ranks;
     }
 }

@@ -1,18 +1,82 @@
 import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { PlayerStatistics } from '@/api/client'
 import { t } from '@/i18n'
-import { formatPoints, formatWhole } from '@/lib/format'
-import { playerProgressData, positionsData, SERIES_COLORS } from './chartData'
+import { formatPoints, formatWhole, ordinal } from '@/lib/format'
+import { type PlayerRankPoint, playerProgressData, playerRankData, positionsData, SERIES_COLORS } from './chartData'
 import { cell, head, tick, tooltip } from './chartStyle'
 import { Figure } from './StatisticsCharts'
 
-/** The two charts of a player's page. They load apart from the page, with the chart library. */
+/**
+ * The charts of a player's page: "Classificação por temporada" over every season, for a player of two seasons or
+ * more, then the other two. They load apart from the page, with the chart library.
+ */
 export function PlayerCharts({ statistics, nickname }: { statistics: PlayerStatistics; nickname: string }) {
+  const allTime = statistics.season_id === null
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <PlayerPointsChart progress={statistics.points_progress} perSeason={statistics.season_id === null} nickname={nickname} />
+      {allTime && statistics.seasons.length >= 2 && <PlayerRankChart seasons={statistics.seasons} nickname={nickname} className="lg:col-span-2" />}
+      <PlayerPointsChart progress={statistics.points_progress} perSeason={allTime} nickname={nickname} />
       <PlayerPositionsChart positions={statistics.positions} nickname={nickname} />
     </div>
+  )
+}
+
+/** "Classificação por temporada": one player's position in each season, 1st at the top, with the Main Event counted. */
+export function PlayerRankChart({ seasons, nickname, className }: { seasons: PlayerStatistics['seasons']; nickname: string; className?: string }) {
+  const points = playerRankData(seasons)
+  const best = points.reduce<PlayerRankPoint | undefined>((top, point) => (point.rank < (top?.rank ?? Infinity) ? point : top), undefined)
+  // 1st always has a tick at the top, then about six more down to the worst position.
+  const worst = Math.max(2, ...points.map((point) => point.rank))
+  const step = Math.ceil((worst - 1) / 6)
+  const ticks = Array.from({ length: Math.floor((worst - 1) / step) + 1 }, (_, i) => 1 + i * step)
+  return (
+    <Figure
+      className={className}
+      title={t.statistics.rankBySeason}
+      description={t.statistics.rankBySeasonDescription({ nickname, best: best && { label: best.label, rank: ordinal(best.rank) } })}
+      legend={<p className="mb-2 text-sm text-muted">{t.statistics.rankBySeasonNote}</p>}
+      table={
+        <table className="w-full border-collapse">
+          <caption className="sr-only">{t.statistics.rankBySeasonCaption({ nickname })}</caption>
+          <thead>
+            <tr>
+              <th scope="col" className={`${head} text-left`}>{t.common.season}</th>
+              <th scope="col" className={head}>{t.common.position}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {points.map((point) => (
+              <tr key={point.label} className="even:bg-surface-stripe">
+                <th scope="row" className={`${cell} text-left font-semibold`}>{point.label}</th>
+                <td className={cell}>{ordinal(point.rank)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      }
+    >
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
+            <CartesianGrid stroke="var(--color-border)" vertical={false} />
+            <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: 'var(--color-border)' }} minTickGap={24} />
+            {/* Reversed, so 1st is at the top and a rising line means a better season. */}
+            <YAxis reversed domain={[1, worst]} ticks={ticks} interval={0} tick={tick} tickLine={false} axisLine={false} width={40} tickFormatter={(rank: number) => ordinal(rank)} />
+            <Tooltip {...tooltip} cursor={{ stroke: 'var(--color-muted)' }} formatter={(value) => [ordinal(Number(value)), t.common.position]} />
+            <Line
+              dataKey="rank"
+              name={t.common.position}
+              type="linear"
+              stroke={SERIES_COLORS[0]}
+              strokeWidth={2}
+              dot={{ r: 4, fill: SERIES_COLORS[0], stroke: 'var(--color-surface)', strokeWidth: 2 }}
+              activeDot={{ r: 5, stroke: 'var(--color-surface)', strokeWidth: 2 }}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Figure>
   )
 }
 

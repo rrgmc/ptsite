@@ -198,7 +198,7 @@ it('shows one player\'s statistics over every season', function () {
         ->assertJsonCount(6, 'data.positions')
         ->assertJsonPath('data.seasons.0', [
             'season_id' => $this->seasonB->id, 'season_name' => $this->seasonB->name,
-            'rank' => 1, 'points' => '114.00', 'nights_scored' => 1, 'wins' => 1,
+            'rank' => 1, 'points' => '114.00', 'nights_scored' => 1, 'wins' => 1, 'rank_with_main_event' => 1,
         ])
         ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
         ->assertJsonPath('data.seasons.1.rank', 2)
@@ -221,6 +221,25 @@ it('shows one player\'s statistics over every season', function () {
         ->assertJsonCount(1, 'data.seasons')
         ->assertJsonPath('data.seasons.0.season_id', $this->seasonA->id)
         ->assertJsonPath('data.points_progress.points', ['221.00', '221.00']);
+});
+
+it('ranks a player in each season with its Main Event counted as one more night, for fun', function () {
+    $mainEvent = Night::factory()->for($this->seasonA)->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'finished', 'starts_at' => '2026-04-03 13:00:00']);
+    $mainEvent->mainEventPositions()->createMany(array_map(
+        fn (Player $player, int $i) => ['position' => $i + 1, 'player_id' => $player->id],
+        [$this->ana, $this->breno, $this->carla],
+        [0, 1, 2],
+    ));
+
+    // Ana is 2nd in season A; its Main Event, on the average pot of 350,00, lifts her to 1st. The standings stay.
+    $this->getJson("/api/v1/players/{$this->ana->id}/statistics")->assertOk()
+        ->assertJsonPath('data.seasons.1.season_id', $this->seasonA->id)
+        ->assertJsonPath('data.seasons.1.rank', 2)
+        ->assertJsonPath('data.seasons.1.rank_with_main_event', 1)
+        ->assertJsonPath('data.seasons.0.rank_with_main_event', 1);
+    $this->getJson("/api/v1/players/{$this->breno->id}/statistics")->assertOk()
+        ->assertJsonPath('data.seasons.0.rank', 1)
+        ->assertJsonPath('data.seasons.0.rank_with_main_event', 2);
 });
 
 it('shows one player\'s statistics in one season, to any logged-in user', function () {

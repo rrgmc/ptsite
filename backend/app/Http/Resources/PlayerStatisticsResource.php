@@ -23,7 +23,11 @@ class PlayerStatisticsResource extends JsonResource
             'wins' => $this->wins,
             /** How often the player finished in each scoring position, first place first. Positions never reached have count 0. */
             'positions' => $this->positions,
-            /** The player's line in the standings of each season in which they scored, newest first. */
+            /**
+             * The player's line in the standings of each season in which they scored, newest first.
+             * `rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the
+             * average pot of the season's nights: a statistic for fun, which the standings never use.
+             */
             'seasons' => $this->seasons,
             /** The nights on which the player scored, newest first. */
             'results' => $this->results,

@@ -61,6 +61,11 @@ Everyone logged in: players, results keepers and admins.
 12. The player's **charts**: **"Pontos acumulados"**, a line of the player's running total, with one step per
     night in "Temporada" and one per season in "Geral"; and **"Posições"**, a bar for each scoring position. The
     line stays flat on a night or season in which the player did not score.
+    - In "Geral", a player who scored in two seasons or more also has **"Classificação por temporada"**: a line
+      of the player's position in each season of "Por temporada", oldest first, with 1st at the top. For fun, it
+      counts each season's Main Event ([main-event.md](main-event.md)) as one more night of that season: its
+      players get the points of their positions, on the average pot of the season's nights. Only this chart
+      counts it. The standings and "Por temporada" do not. A season with no Main Event keeps its position.
 
 13. **The Main Event lists**, in "Geral" only, on a site with the Main Event ([main-event.md](main-event.md)).
     They count the finished Main Events of the seasons that are not archived. Each shows the first 10, with
@@ -170,6 +175,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
 - **A player's results.** Ana: night 3, 1st, 114,00; night 2, 3rd, 60,00; night 1, 1st, 114,00.
 - **A player's points.** Ana in season A: 114,00 then 174,00. Ana in "Geral": 174,00 then 288,00. Breno in
   "Geral": 221,00 then 221,00, because he did not play in season B.
+- **A player's rank by season, with the Main Event.** Season A's Main Event ends Ana, Breno, Carla, Dudu. Season
+  A's average pot is R$ 350,00, so on the standard table it pays Ana 133,00, Breno 80,50, Carla 52,50 and Dudu
+  38,50. Ana has 307,00 and Breno 301,50: Ana's line shows 1st for season A, though she is 2nd in its standings.
 - **A player who never scored.** Dudu has no position, 0,00 points, 0 nights and 0 in every finishing position.
   "Por temporada" and "Resultados" are empty.
 
@@ -216,8 +224,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   "Próximos eventos", as of a finished season, shows the box with the full width and its amounts side by side. A season with no finished
   night has neither the chart nor the box.
 - **The player's page** has its own "Temporada" / "Geral" switch, each with its own address. Under it: the
-  numbers, "Por temporada" (in "Geral"), the two charts with "Ver dados em tabela", then "Resultados". A player
-  who did not score sees "Ainda não pontuou" in place of the charts and lists.
+  numbers, "Por temporada" (in "Geral"), "Classificação por temporada" (in "Geral", full width), the two charts
+  with "Ver dados em tabela", then "Resultados". A player who did not score sees "Ainda não pontuou" in place of
+  the charts and lists.
 
 ## Open questions
 

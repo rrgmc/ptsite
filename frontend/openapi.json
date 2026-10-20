@@ -5699,7 +5699,7 @@
                     },
                     "seasons": {
                         "type": "array",
-                        "description": "The player's line in the standings of each season in which they scored, newest first.",
+                        "description": "The player's line in the standings of each season in which they scored, newest first.\n`rank_with_main_event` is the rank with the season's Main Event counted as one more night, on the\naverage pot of the season's nights: a statistic for fun, which the standings never use.",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -5720,6 +5720,9 @@
                                 },
                                 "wins": {
                                     "type": "integer"
+                                },
+                                "rank_with_main_event": {
+                                    "type": "integer"
                                 }
                             },
                             "required": [
@@ -5728,7 +5731,8 @@
                                 "rank",
                                 "points",
                                 "nights_scored",
-                                "wins"
+                                "wins",
+                                "rank_with_main_event"
                             ]
                         }
                     },

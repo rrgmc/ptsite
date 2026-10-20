@@ -5,11 +5,13 @@
  * Players: Ana = 1, Breno = 2, Carla = 3, Dudu = 9. Places: Casa do Ana = 1, Bar do Zé = 2. Seasons: A = 1, B = 2.
  */
 
+use PTSite\Domain\Scoring\PercentageTable;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Standings\ScoreLine;
 use PTSite\Domain\Standings\StandingRow;
 use PTSite\Domain\Standings\Standings;
 use PTSite\Domain\Statistics\ChampionshipStatistics;
+use PTSite\Domain\Statistics\MainEventAsNight;
 use PTSite\Domain\Statistics\MainEventStatistics;
 use PTSite\Domain\Statistics\NightRecord;
 use PTSite\Domain\Statistics\PlayerStatistics;
@@ -192,6 +194,27 @@ it('follows one player night by night in a season, and season by season over eve
         ->and($totals(S_ANA, everySeason(), true))->toBe(['174.00', '288.00'])
         // Breno did not play in season B: his line stays flat.
         ->and($totals(S_BRENO, everySeason(), true))->toBe(['221.00', '221.00']);
+});
+
+it('counts each Main Event as one more night of its season, on the average pot, for the rank by season', function () {
+    $nights = everySeason();
+    $asNight = new MainEventAsNight;
+    $mainEventA = $asNight->record(10, 1, $nights, [S_ANA, S_BRENO, S_CARLA, S_DUDU], PercentageTable::standard());
+    $mainEventB = $asNight->record(11, 2, $nights, [S_BRENO, S_ANA, S_DUDU], PercentageTable::standard());
+
+    // Season A's pots are 300,00 and 400,00: the Main Event pays 38% of 350,00 to its winner.
+    expect(array_map(fn (ScoreLine $l) => [$l->playerId, $l->points->toDecimal()], $mainEventA->lines))
+        ->toBe([[S_ANA, '133.00'], [S_BRENO, '80.50'], [S_CARLA, '52.50'], [S_DUDU, '38.50']]);
+
+    $ranks = fn (int $player) => array_map(
+        fn ($row) => [$row->seasonId, $row->rank],
+        (new PlayerStatistics)->summarise($player, [...$nights, $mainEventA, $mainEventB], stepPerSeason: true)->seasons,
+    );
+    // Ana is 2nd in season A, but its Main Event lifts her to 1st: 307,00 against Breno's 301,50.
+    expect($ranks(S_ANA))->toBe([[2, 1], [1, 1]])
+        ->and($ranks(S_BRENO))->toBe([[2, 2], [1, 2]])
+        // A season with no night with a pot gives no Main Event night.
+        ->and($asNight->record(12, 3, $nights, [S_ANA], PercentageTable::standard()))->toBeNull();
 });
 
 it('shows zeros and no rank for a player who never scored', function () {

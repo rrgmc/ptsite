@@ -56,6 +56,18 @@ export function playerProgressData(progress: PlayerStatistics['points_progress']
   }))
 }
 
+export interface PlayerRankPoint {
+  /** The season's name */
+  label: string
+  /** The position with the season's Main Event counted as one more night */
+  rank: number
+}
+
+/** One player's position in each season, oldest first: the API lists the seasons newest first. */
+export function playerRankData(seasons: PlayerStatistics['seasons']): PlayerRankPoint[] {
+  return seasons.map((season) => ({ label: season.season_name, rank: season.rank_with_main_event })).reverse()
+}
+
 export interface PositionBar {
   /** "1º" */
   label: string
