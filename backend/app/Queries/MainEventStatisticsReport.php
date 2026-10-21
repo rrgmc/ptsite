@@ -10,6 +10,5 @@ final readonly class MainEventStatisticsReport
         public int $count,
         public RankedList $titles,
         public RankedList $podiums,
-        public RankedList $appearances,
     ) {}
 }

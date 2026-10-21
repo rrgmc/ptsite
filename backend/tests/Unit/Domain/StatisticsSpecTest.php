@@ -313,28 +313,26 @@ it('counts the rebuys and the late time chips of each night, and of each season'
         ->and($perSeason->timeChips)->toBe([3, 0]);
 });
 
-it('counts the titles, the podiums and the appearances of the Main Events', function () {
+it('counts the titles and the podiums of the Main Events', function () {
     // Season A's Main Event: Ana, Breno, Carla, Dudu. Season B's: Breno, Ana, Dudu.
     $summary = (new MainEventStatistics)->summarise([[S_ANA, S_BRENO, S_CARLA, S_DUDU], [S_BRENO, S_ANA, S_DUDU]]);
 
     expect($summary->count)->toBe(2)
         ->and(rows($summary->titles))->toBe([[1, S_ANA, 1], [1, S_BRENO, 1]])
-        ->and(rows($summary->podiums))->toBe([[1, S_ANA, 2], [1, S_BRENO, 2], [3, S_CARLA, 1], [3, S_DUDU, 1]])
-        ->and(rows($summary->appearances))->toBe([[1, S_ANA, 2], [1, S_BRENO, 2], [1, S_DUDU, 2], [4, S_CARLA, 1]]);
+        ->and(rows($summary->podiums))->toBe([[1, S_ANA, 2], [1, S_BRENO, 2], [3, S_CARLA, 1], [3, S_DUDU, 1]]);
 });
 
 it('counts a Main Event of which only the champion is known', function () {
     $summary = (new MainEventStatistics)->summarise([[S_CARLA]]);
 
     expect(rows($summary->titles))->toBe([[1, S_CARLA, 1]])
-        ->and(rows($summary->podiums))->toBe([[1, S_CARLA, 1]])
-        ->and(rows($summary->appearances))->toBe([[1, S_CARLA, 1]]);
+        ->and(rows($summary->podiums))->toBe([[1, S_CARLA, 1]]);
 });
 
 it('has empty Main Event lists when no Main Event is finished', function () {
     $summary = (new MainEventStatistics)->summarise([]);
 
-    expect($summary->count)->toBe(0)->and($summary->titles->rows)->toBe([])->and($summary->appearances->rows)->toBe([]);
+    expect($summary->count)->toBe(0)->and($summary->titles->rows)->toBe([])->and($summary->podiums->rows)->toBe([]);
 });
 
 /** @return list<StandingRow> the final standings of the season of the given nights */
@@ -379,7 +377,7 @@ it('lists every player with a Main Event title or a season title, past the first
 
     expect($mainEvents->titles->rows)->toHaveCount(12)
         ->and($mainEvents->titles->tiedNotShown)->toBe(0)
-        ->and($mainEvents->appearances->rows)->toHaveCount(10)
+        ->and($mainEvents->podiums->rows)->toHaveCount(10)
         ->and($seasons->titles->rows)->toHaveCount(12)
         ->and($seasons->podiums->rows)->toHaveCount(10);
 });

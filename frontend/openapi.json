@@ -4776,17 +4776,12 @@
                     "podiums": {
                         "description": "Players by times in the first three of a Main Event (`count`).",
                         "$ref": "#/components/schemas/RankedListResource"
-                    },
-                    "appearances": {
-                        "description": "Players by Main Events played (`count`).",
-                        "$ref": "#/components/schemas/RankedListResource"
                     }
                 },
                 "required": [
                     "count",
                     "titles",
-                    "podiums",
-                    "appearances"
+                    "podiums"
                 ],
                 "title": "MainEventStatisticsResource"
             },

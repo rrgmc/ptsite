@@ -60,7 +60,7 @@ final class LeagueStatistics
 
         $playerLists = [
             $summary->totalPoints, $summary->nightsScored, ...$summary->positions,
-            ...($mainEvent ? [$mainEvent->titles, $mainEvent->podiums, $mainEvent->appearances] : []),
+            ...($mainEvent ? [$mainEvent->titles, $mainEvent->podiums] : []),
             ...($championships ? [$championships->titles, $championships->podiums, $championships->appearances] : []),
             ...($dashboard ? [$summary->rebuys, $summary->moneyOnlyRebuys, $summary->timeChips] : []),
         ];
@@ -115,7 +115,6 @@ final class LeagueStatistics
                 $mainEvent->count,
                 $counted($mainEvent->titles),
                 $counted($mainEvent->podiums),
-                $counted($mainEvent->appearances),
             ) : null,
             $championships ? new ChampionshipStatisticsReport(
                 $championships->count,

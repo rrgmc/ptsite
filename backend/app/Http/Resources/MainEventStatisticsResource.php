@@ -18,8 +18,6 @@ class MainEventStatisticsResource extends JsonResource
             'titles' => new RankedListResource($this->titles),
             /** Players by times in the first three of a Main Event (`count`). */
             'podiums' => new RankedListResource($this->podiums),
-            /** Players by Main Events played (`count`). */
-            'appearances' => new RankedListResource($this->appearances),
         ];
     }
 }

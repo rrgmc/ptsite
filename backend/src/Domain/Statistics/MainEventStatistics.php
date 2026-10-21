@@ -18,10 +18,9 @@ final class MainEventStatistics
     /** @param  list<list<int>>  $orders  the player ids of each Main Event, first place first */
     public function summarise(array $orders): MainEventSummary
     {
-        $titles = $podiums = $appearances = [];
+        $titles = $podiums = [];
         foreach ($orders as $order) {
             foreach (array_values($order) as $index => $playerId) {
-                $appearances[$playerId] = ($appearances[$playerId] ?? 0) + 1;
                 if ($index < self::PODIUM) {
                     $podiums[$playerId] = ($podiums[$playerId] ?? 0) + 1;
                 }
@@ -36,7 +35,6 @@ final class MainEventStatistics
             // Every player with a title: there are few, and each is a champion.
             $this->ranking->top($titles, Ranking::ALL),
             $this->ranking->top($podiums),
-            $this->ranking->top($appearances),
         );
     }
 }

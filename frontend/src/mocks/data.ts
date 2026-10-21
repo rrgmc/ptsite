@@ -352,7 +352,6 @@ export const statistics: Statistics = {
     count: 1,
     titles: playerList([[2, 1, 1]], 'count'),
     podiums: playerList([[0, 1, 1], [2, 1, 1], [7, 1, 1]], 'count'),
-    appearances: playerList([[0, 1, 1], [1, 1, 1], [2, 1, 1], [3, 1, 1], [7, 1, 1]], 'count'),
   },
   // Only over every season.
   championships: null,
@@ -423,7 +422,6 @@ export const statisticsAllTime: Statistics = {
     count: 3,
     titles: playerList([[2, 1, 2], [0, 2, 1]], 'count'),
     podiums: playerList([[0, 1, 3], [2, 1, 3], [7, 3, 2], [1, 4, 1]], 'count'),
-    appearances: playerList([[0, 1, 3], [2, 1, 3], [7, 1, 3], [1, 4, 2], [3, 4, 2], [4, 4, 2], [5, 7, 1], [6, 7, 1], [8, 7, 1], [9, 7, 1]], 'count', { tied_not_shown: 1 }),
   },
   // The final standings of Liga 2024 and Liga 2025; Liga 2026 is still open. Two champions share the titles.
   championships: {

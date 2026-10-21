@@ -100,11 +100,12 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(page.getByRole('table', { name: 'Jogadores por temporadas terminadas em 1º lugar' }).getByRole('row').nth(1)).toContainText('1')
   await expectAccessible(page)
 
-  // The Main Events of every season: who won, who was in the first three and who played.
+  // The Main Events of every season: who won and who was in the first three.
   await tabs.filter({ hasText: 'Main Event' }).click()
-  for (const title of ['Títulos', 'Pódios', 'Participações']) {
+  for (const title of ['Títulos', 'Pódios']) {
     await expect(page.getByRole('heading', { name: title, level: 2 })).toBeVisible()
   }
+  await expect(page.getByRole('heading', { name: 'Participações', level: 2 })).toHaveCount(0)
   await expect(page.getByRole('table', { name: 'Jogadores por títulos do Main Event' }).getByRole('row').nth(1)).toContainText('1')
   await expectAccessible(page)
 })
