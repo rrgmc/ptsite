@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.35.1] - 2026-10-21
+
+### Removed
+
+- "Participações" from the Main Event lists of "Estatísticas"
+  ([docs/specs/statistics.md](docs/specs/statistics.md), rule 13). Some old Main Events have only some of their
+  players recorded, so the count was wrong. `main_event.appearances` is gone from `GET /api/v1/statistics`.
+
 ## [1.35.0] - 2026-10-20
 
 ### Added
@@ -299,7 +307,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.35.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.35.1...HEAD
+[1.35.1]: https://github.com/rrgmc/ptsite/compare/v1.35.0...v1.35.1
 [1.35.0]: https://github.com/rrgmc/ptsite/compare/v1.34.2...v1.35.0
 [1.34.2]: https://github.com/rrgmc/ptsite/compare/v1.34.1...v1.34.2
 [1.34.1]: https://github.com/rrgmc/ptsite/compare/v1.34.0...v1.34.1
