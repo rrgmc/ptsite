@@ -1304,8 +1304,6 @@ export interface components {
             titles: components["schemas"]["RankedListResource"];
             /** @description Players by times in the first three of a Main Event (`count`). */
             podiums: components["schemas"]["RankedListResource"];
-            /** @description Players by Main Events played (`count`). */
-            appearances: components["schemas"]["RankedListResource"];
         };
         /** MarkNightPlayerRequest */
         MarkNightPlayerRequest: {

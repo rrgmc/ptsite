@@ -33,8 +33,6 @@ export const statistics: Messages['statistics'] = {
   mainEventTitlesCaption: 'Players by Main Events won',
   mainEventPodiums: 'Podiums',
   mainEventPodiumsCaption: 'Players by times in the first three of a Main Event',
-  mainEventAppearances: 'Appearances',
-  mainEventAppearancesCaption: 'Players by Main Events played',
 
   // The final standings of the finished seasons
   championships: 'Championships',

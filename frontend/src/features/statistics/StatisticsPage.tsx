@@ -235,7 +235,6 @@ export function StatisticsView({ statistics }: { statistics: Statistics }) {
         <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-3">
           <CountList title={t.statistics.mainEventTitles} caption={t.statistics.mainEventTitlesCaption} valueHeader={t.statistics.times} list={mainEvent.titles} />
           <CountList title={t.statistics.mainEventPodiums} caption={t.statistics.mainEventPodiumsCaption} valueHeader={t.statistics.times} list={mainEvent.podiums} />
-          <CountList title={t.statistics.mainEventAppearances} caption={t.statistics.mainEventAppearancesCaption} valueHeader={t.statistics.times} list={mainEvent.appearances} />
         </div>
       ),
     })

@@ -84,8 +84,9 @@ Everyone logged in: players, results keepers and admins.
     ties as in rule 4, but "Títulos" shows every player with a title:
     - **"Títulos"**: players by Main Events won.
     - **"Pódios"**: players by times in the first three of a Main Event.
-    - **"Participações"**: players by Main Events played. A Main Event of which only some players
-      were recorded counts those players only.
+
+    There is no list of Main Events played: an old Main Event may have only some of its players recorded,
+    so the count would be wrong.
 
     "Temporada" has no such list: a season has one Main Event, and the "Main Event" screen shows it.
 
@@ -163,9 +164,8 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   up the other three.
 - **The Main Events.** Season A's Main Event ends Ana, Breno, Carla, Dudu, and season B's ends Breno, Ana,
   Dudu. Titles: Ana 1 and Breno 1 share 1st. Podiums: Ana 2 and Breno 2 share 1st; Carla 1 and Dudu 1 share
-  3rd. Appearances: Ana 2, Breno 2 and Dudu 2 share 1st; Carla, with 1, is 4th.
-- **Only the champion.** An old Main Event recorded with Carla alone gives her one title, one podium and one
-  appearance.
+  3rd.
+- **Only the champion.** An old Main Event recorded with Carla alone gives her one title and one podium.
 - **The championships.** Seasons A and B are finished. Season A ends Breno, Ana, Carla, and season B ends Ana,
   Carla. Titles: Ana 1 and Breno 1 share 1st. Podiums: Ana 2 and Carla 2 share 1st; Breno, with 1, is 3rd.
   Appearances: Ana 2 and Carla 2 share 1st; Breno, with 1, is 3rd.
@@ -227,7 +227,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   - **"Rebuys"**, on a site with the night dashboard: "Rebuys", "Rebuys além do limite" and "Time chips por
     atraso", side by side, one under the other on a phone. A list with nothing recorded says "Nenhum registrado
     no painel do evento.". The boxes at the top add "Rebuys", "Rebuys além do limite" and "Time chips por atraso".
-  - **"Main Event"**, in "Geral": "Títulos", "Pódios" and "Participações", side by side, two across on a phone.
+  - **"Main Event"**, in "Geral": "Títulos" and "Pódios", side by side.
   - **"Campeonatos"**, in "Geral", once a season is finished: the lists of rule 13a, laid out as in "Main
     Event".
 - "Maiores Potes" links to each night; in "Geral" it also names the season.

@@ -291,7 +291,7 @@ it('has no Main Event on a site that did not turn it on', function () {
     $this->postJson("/api/v1/seasons/{$this->season->id}/nights", ['starts_at' => '2026-12-12 13:00', 'type' => 'regular'])->assertCreated();
 });
 
-it('counts the titles, the podiums and the appearances of the finished Main Events in the statistics', function () {
+it('counts the titles and the podiums of the finished Main Events in the statistics', function () {
     Sanctum::actingAs(User::factory()->create());
     $record = function (Season $season, array $players, array $attributes = []): Night {
         $night = Night::factory()->for($season)->create(['type' => 'main_event', 'is_extra' => true, 'status' => 'finished', ...$attributes]);
@@ -322,13 +322,10 @@ it('counts the titles, the podiums and the appearances of the finished Main Even
         ->assertJsonPath('data.main_event.podiums.rows.2.player.id', $carla->id)
         ->assertJsonPath('data.main_event.podiums.rows.2.rank', 3)
         ->assertJsonCount(4, 'data.main_event.podiums.rows')
-        ->assertJsonPath('data.main_event.appearances.rows.2.player.id', $dudu->id)
-        ->assertJsonPath('data.main_event.appearances.rows.2.count', 2)
-        ->assertJsonPath('data.main_event.appearances.rows.3.player.id', $carla->id)
-        ->assertJsonPath('data.main_event.appearances.rows.3.rank', 4);
+        ->assertJsonMissingPath('data.main_event.appearances');
 
     $this->getJson("/api/v1/statistics?season={$other->id}")->assertOk()
         ->assertJsonPath('data.main_event.count', 1)
         ->assertJsonPath('data.main_event.titles.rows.0.player.id', $breno->id)
-        ->assertJsonCount(3, 'data.main_event.appearances.rows');
+        ->assertJsonCount(3, 'data.main_event.podiums.rows');
 });

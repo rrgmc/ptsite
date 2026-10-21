@@ -39,8 +39,6 @@ export const statistics = {
   mainEventTitlesCaption: 'Jogadores por títulos do Main Event',
   mainEventPodiums: 'Pódios',
   mainEventPodiumsCaption: 'Jogadores por vezes entre os três primeiros do Main Event',
-  mainEventAppearances: 'Participações',
-  mainEventAppearancesCaption: 'Jogadores por participações no Main Event',
 
   // The final standings of the finished seasons
   championships: 'Campeonatos',
