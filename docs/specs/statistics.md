@@ -203,9 +203,9 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   "Geral" is at `/statistics/all`, and "Estatísticas" in the menu leads there; the menu marks "Estatísticas"
   in both views.
 - At the top, a box for each total: "Eventos", "Pote Total", "Pote ME" and "Time chip". In "Geral", two bands
-  follow, as the box "Campeonato" of "Classificação" but shorter: **"Campeões das temporadas"**, the first three
-  of "Títulos" of rule 13a, and **"Campeões do Main Event"**, the first three of its "Títulos". They are side by
-  side, one over the other on a phone. Each band has a line per place: its medal, the place and the number of
+  follow, as the box "Campeonato" of "Classificação" but shorter: **"Campeões do Main Event"**, the first three
+  of its "Títulos", and **"Campeões das temporadas"**, the first three of "Títulos" of rule 13a. They are side by
+  side, "Campeões do Main Event" at the left, and one over the other on a phone. Each band has a line per place: its medal, the place and the number of
   titles, then every player with that many titles, with a small photo. Here the places go by the number of
   titles, so the next number after a tie is the next place: with 4, 2, 2, 2 and 1 titles, the bands show 1st,
   2nd (three players) and 3rd (the players with 1 title). The lists keep the places of rule 4. A band with no title is not shown. Then

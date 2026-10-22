@@ -70,6 +70,8 @@ test('a player sees the statistics of a season and of every season', async ({ pa
   await expect(page).toHaveURL(/\/statistics\/all$/)
   await expect(page.getByText('Todas as temporadas')).toBeVisible()
   await expect(seasonNotice(page)).toHaveCount(0)
+  // The champions' bands: the Main Event's first, at the left.
+  await expect(page.getByRole('heading', { level: 2, name: /^Campeões d/ })).toHaveText([/Campeões do Main Event/, /Campeões das temporadas/])
   await expect(page.getByRole('img', { name: /pontos acumulados.*por temporada/ })).toBeVisible()
   // Below the box with tabs, by itself: the same ten players' position in each season.
   const ranks = page.getByRole('figure').filter({ has: page.getByRole('img', { name: /^Gráficos de linhas, um por jogador: classificação dos 15 jogadores com mais pontos em cada temporada/ }) })
