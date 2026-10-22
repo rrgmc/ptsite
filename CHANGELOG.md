@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- "Estatísticas" in "Geral": "Campeões do Main Event" is at the left and "Campeões das temporadas" at the right
+  ([docs/specs/statistics.md](docs/specs/statistics.md)).
+
 ## [1.35.1] - 2026-10-21
 
 ### Removed

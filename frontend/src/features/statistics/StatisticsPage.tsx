@@ -63,7 +63,7 @@ function playerRows(list: RankedListData, value: (row: RankedListData['rows'][nu
 }
 
 /**
- * Over every season, the first three places by titles: of the seasons' final standings, then of the Main Event.
+ * Over every season, the first three places by titles: of the Main Event, then of the seasons' final standings.
  * Players with as many titles share a place, and the next number of titles is the next place ({@link titlePlaces}).
  */
 function ChampionPodiums({ championships, mainEvent }: { championships: Statistics['championships']; mainEvent: Statistics['main_event'] }) {
@@ -73,11 +73,11 @@ function ChampionPodiums({ championships, mainEvent }: { championships: Statisti
   return (
     // Side by side from a tablet's width up, one over the other on a phone.
     <div className={`grid grid-cols-1 items-start gap-3 ${championships && mainEvent ? 'md:grid-cols-2' : ''}`}>
-      {championships && (
-        <Podium compact title={t.statistics.seasonChampions} caption={t.statistics.championshipTitlesCaption} lines={lines(championships.titles)} />
-      )}
       {mainEvent && (
         <Podium compact title={t.statistics.mainEventChampions} caption={t.statistics.mainEventTitlesCaption} lines={lines(mainEvent.titles)} />
+      )}
+      {championships && (
+        <Podium compact title={t.statistics.seasonChampions} caption={t.statistics.championshipTitlesCaption} lines={lines(championships.titles)} />
       )}
     </div>
   )
