@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.35.3] - 2026-10-23
+
 ### Changed
 
 - The tabs of "Estatísticas" are in the order "Posições", "Main Event", "Campeonatos", "Jogadores", "Eventos"
@@ -319,7 +321,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.35.2...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.35.3...HEAD
+[1.35.3]: https://github.com/rrgmc/ptsite/compare/v1.35.2...v1.35.3
 [1.35.2]: https://github.com/rrgmc/ptsite/compare/v1.35.1...v1.35.2
 [1.35.1]: https://github.com/rrgmc/ptsite/compare/v1.35.0...v1.35.1
 [1.35.0]: https://github.com/rrgmc/ptsite/compare/v1.34.2...v1.35.0
