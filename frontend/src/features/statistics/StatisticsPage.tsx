@@ -106,7 +106,7 @@ function CountList({ title, caption, valueHeader, list, empty }: { title: string
   )
 }
 
-const TAB_ORDER = ['positions', 'championships', 'main-event', 'players', 'nights', 'rebuys']
+const TAB_ORDER = ['positions', 'main-event', 'championships', 'players', 'nights', 'rebuys']
 
 /**
  * The numbers of one view: the totals, the points chart, the lists and other charts in a box with tabs, and over
