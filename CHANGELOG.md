@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- The tabs of "Estatísticas" are in the order "Posições", "Main Event", "Campeonatos", "Jogadores", "Eventos"
+  and "Rebuys" ([docs/specs/statistics.md](docs/specs/statistics.md)).
+
 ## [1.35.2] - 2026-10-22
 
 ### Changed

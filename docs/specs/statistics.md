@@ -212,7 +212,7 @@ and a R$ 400,00 pot pays 152,00 / 92,00 / 60,00 to the first three.
   "Pontos acumulados", with the full width. Each chart of the screen has "Ver dados em tabela", which shows the
   same numbers as a table.
 - Under it, a box with **tabs**, drawn as the tabs of a folder: one tab shows at a time, and its title is filled
-  with the site's main color. The tabs are in this order: "Posições", "Campeonatos", "Main Event", "Jogadores",
+  with the site's main color. The tabs are in this order: "Posições", "Main Event", "Campeonatos", "Jogadores",
   "Eventos" and "Rebuys", each when it has something to show. "Posições" shows first. The tab on show is not in the address: opening the screen
   again shows "Posições". The lists in the tabs are compact: short lines, the player's small photo and no
   header line.
