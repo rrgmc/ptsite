@@ -115,6 +115,19 @@ export function amountsInUse(dashboard: NightDashboard): { pot: string; timeChip
 }
 
 /**
+ * The payout split among the first three places, 50%, 30% and 20%, each cut to whole money units, with what is
+ * left over going to 1st, so the shares add up to the payout. Empty when there is no payout. Provisional: a fixed
+ * split until the payout table is a feature of its own.
+ */
+export function payoutSplit(payout: string): { position: number; share: number; amount: string }[] {
+  const total = cents(payout)
+  if (total <= 0) return []
+  const shares = [50, 30, 20].map((share, i) => ({ position: i + 1, share, amount: Math.floor((total * share) / 100 / 100) * 100 }))
+  shares[0].amount += total - shares.reduce((sum, line) => sum + line.amount, 0)
+  return shares.map((line) => ({ ...line, amount: decimal(line.amount) }))
+}
+
+/**
  * How many of the night's payments were made, for the summary: the buy-ins, the rebuys and the late players' time
  * chips, each paid or not, and the participants who owe nothing more.
  */

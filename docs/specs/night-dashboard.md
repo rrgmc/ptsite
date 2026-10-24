@@ -102,6 +102,9 @@ A site has the dashboard only if it turns it on (`nightDashboard` in `features`,
     finished without the dashboard, it shows no payout, no Main Event pot and no house owner's discount.
     A season with no Main Event pot pays out all of that money. It changes neither the night's result nor its
     points.
+11c. **"Divisão da premiação"** (payout split), at the bottom of the summary, provisional: the payout split
+    among the first three places, 50%, 30% and 20%. Each share is cut to whole reais, and what is left goes to
+    the 1st. It is not shown when there is no payout. It changes neither the night's result nor its points.
 11a. **What was paid is split by how**, so that the money in hand can be checked:
     - **"Fora do dinheiro"** (not in cash): each buy-in paid not in cash, with the time chip that player paid;
       each rebuy paid not in cash, with the time chip it pays; and the adjustment of rule 13c, when there is one;
@@ -182,6 +185,8 @@ house owner's buy-in:
 - **The payout.** With a Main Event pot share of 20%, the Main Event pot is R$ 85,00 (rule 14). The payout is
   R$ 340,00: the total of R$ 450,00 less the time chip of R$ 25,00 and the Main Event pot of R$ 85,00. With a
   Main Event pot of R$ 90,00 set by hand, it is R$ 335,00.
+- **The payout split.** A payout of R$ 340,00 splits as R$ 170,00, R$ 102,00 and R$ 68,00. One of R$ 335,00
+  splits as R$ 168,00, R$ 100,00 and R$ 67,00: the 1st gets the R$ 1,00 left over.
 - **Not in cash.** On that night Ana paid her rebuy by bank transfer, and Breno his buy-in. Ana's rebuy is
   R$ 55,00, with the time chip it pays, and Breno's buy-in R$ 50,00: of the R$ 295,00 paid, R$ 105,00 are not in
   cash and R$ 190,00 are in cash. The pot and the time chip are the same.

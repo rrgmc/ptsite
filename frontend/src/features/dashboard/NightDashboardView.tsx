@@ -18,7 +18,7 @@ import { currencySymbol } from '@/lib/site'
 import { usePageTitle } from '@/lib/usePageTitle'
 import { amountRows } from '../nights/amounts'
 import { FinishingOrderFields } from '../nights/FinishingOrderFields'
-import { type Amounts, amountsInUse, type DashboardChange, paymentCounts } from './dashboardMoney'
+import { type Amounts, amountsInUse, type DashboardChange, paymentCounts, payoutSplit } from './dashboardMoney'
 import { DashboardPlayerRow } from './DashboardPlayerRow'
 
 type Percentages = { position: number; percent: number }[]
@@ -385,6 +385,8 @@ function AmountsForm({ dashboard, onChange }: { dashboard: NightDashboard; onCha
  *
  * "Pagamentos" counts the players, who owes nothing more, and how many buy-ins, rebuys and time chips were paid.
  * A finished night also shows the amounts it was finished with.
+ *
+ * Last, "Divisão da premiação" splits the payout among the first three places (payoutSplit), when there is one.
  */
 function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
   const { totals, manual, received } = dashboard
@@ -424,6 +426,7 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
     ...(isFinished && Number(inUse.payout) < 0 ? [] : [[t.dashboard.summary.payout, inUse.payout, true] as [string, string, boolean]]),
     ...(inUse.mainEventPot !== null ? [[t.dashboard.summary.mainEventPot, inUse.mainEventPot] as [string, string]] : []),
   ]
+  const split = hasPot ? payoutSplit(inUse.payout) : []
   const payments: [label: string, paid: number, total: number][] = [
     [t.dashboard.summary.settled, counts.settled, counts.players],
     [t.dashboard.summary.buyIns, counts.buyIns.paid, counts.buyIns.total],
@@ -528,6 +531,20 @@ function DashboardSummary({ dashboard }: { dashboard: NightDashboard }) {
           <h2 id="dashboard-recorded" className="font-display text-lg font-bold">{t.dashboard.recorded.title}</h2>
           <p className="mb-2 text-sm text-muted">{t.dashboard.recorded.help}</p>
           <AmountList amounts={{ pot: dashboard.recorded.pot, mainEventPot: dashboard.recorded.main_event_pot, timeChip: dashboard.recorded.time_chip }} />
+        </section>
+      )}
+
+      {split.length > 0 && (
+        <section aria-labelledby="dashboard-payout-split">
+          <h2 id="dashboard-payout-split" className="mb-2 font-display text-lg font-bold">{t.dashboard.payoutSplit.title}</h2>
+          <dl className="divide-y divide-border/60 text-sm">
+            {split.map(({ position, share, amount }) => (
+              <div key={position} className="flex items-baseline justify-between gap-2 py-1.5">
+                <dt className="font-semibold">{t.dashboard.payoutSplit.place({ position: ordinal(position), share })}</dt>
+                <dd className="tabular">{formatMoney(amount)}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
       )}
     </div>
