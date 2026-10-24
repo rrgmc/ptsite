@@ -77,10 +77,11 @@ Everyone who uses the site.
     assistant that writes the players' memos and the season recaps (see [season-recaps.md](season-recaps.md)).
     - A writer reads what any member reads. It changes only a player's memo, on its own, and the season recaps.
     - It has no player and no password, so it cannot log in on the site. Its only way in is an API token.
-    - The command `php artisan ptsite:writer-token [username]` prints a token. It makes the account the first
-      time, with the username `writer` unless another is given. `--replace` deletes the account's older tokens,
-      so a token that leaked stops working. A username that belongs to another role is refused: "Este usuário
-      já existe e não é um redator."
+    - An admin gets a token through the API (`POST /api/v1/writer-tokens`), or on the server with the command
+      `php artisan ptsite:writer-token [username]`. Either makes the account the first time, with the username
+      `writer` unless another is given. "Replace" deletes the account's older tokens, so a token that leaked
+      stops working. A username that belongs to another role is refused: "Este usuário já existe e não é um
+      redator."
     - The audit log records the account, each new token and every text it writes.
 
 ## Examples
@@ -119,8 +120,7 @@ Names are invented.
   "Este link expirou. Peça um novo link."
 - **A used link.** Maria opens the link again after saving the new password. The site answers "Este link não é
   válido ou já foi usado. Peça um novo link."
-- **A writer.** The admin runs `php artisan ptsite:writer-token cronista` on the host and gives the token to the
-  assistant. The assistant changes Guga's memo with the token: it works, and the audit log names "cronista".
+- **A writer.** The admin asks the API for a token of "cronista" and gives it to the assistant. The assistant changes Guga's memo with the token: it works, and the audit log names "cronista".
   When it tries to change Guga's nickname, the API refuses.
 - **Correction.** An admin corrects 2nd and 3rd place a day later. The standings change at once, and the audit
   log shows both the old and new order.

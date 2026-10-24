@@ -18,7 +18,7 @@ class CreateWriterTokenCommand extends Command
     public function handle(CreateWriterToken $create): int
     {
         try {
-            $token = $create((string) $this->argument('username'), (string) $this->option('name'), (bool) $this->option('replace'));
+            ['token' => $token] = $create(null, (string) $this->argument('username'), (string) $this->option('name'), (bool) $this->option('replace'));
         } catch (RuleViolation $violation) {
             $this->error(__('rules.'.$violation->rule));
 

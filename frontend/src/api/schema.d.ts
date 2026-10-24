@@ -127,6 +127,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/writer-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an API token for a writer account, the account of a program that writes the memos and the season
+         *     recaps (admins). The account is made the first time. The token is shown only in this answer
+         */
+        post: operations["auth.createWriterToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/password": {
         parameters: {
             query?: never;
@@ -1261,6 +1281,15 @@ export interface components {
             password: string;
             /** @description A name for the device or app, shown when managing tokens. */
             device_name: string;
+        };
+        /** CreateWriterTokenRequest */
+        CreateWriterTokenRequest: {
+            /** @description The writer account, made the first time. Default "writer". */
+            username?: string;
+            /** @description A name for the token. Default "api". */
+            name?: string;
+            /** @description Delete the account's other tokens first, so a token that leaked stops working. */
+            replace?: boolean;
         };
         /** FinishMainEventNightRequest */
         FinishMainEventNightRequest: {
@@ -2568,6 +2597,34 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "auth.createWriterToken": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CreateWriterTokenRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        token: string;
+                        user: components["schemas"]["UserResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "auth.changePassword": {
