@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.38.1] - 2026-10-24
+
+### Fixed
+
+- A unit test of the recaps used names that are not invented. It uses the demo's invented players now.
+
 ## [1.38.0] - 2026-10-24
 
 ### Added
@@ -361,7 +367,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.38.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.38.1...HEAD
+[1.38.1]: https://github.com/rrgmc/ptsite/compare/v1.38.0...v1.38.1
 [1.38.0]: https://github.com/rrgmc/ptsite/compare/v1.37.0...v1.38.0
 [1.37.0]: https://github.com/rrgmc/ptsite/compare/v1.36.0...v1.37.0
 [1.36.0]: https://github.com/rrgmc/ptsite/compare/v1.35.3...v1.36.0
