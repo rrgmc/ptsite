@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
+        Route::post('writer-tokens', [AuthController::class, 'createWriterToken']);
         // Limited like the login: each try checks a password.
         Route::put('me/password', [AuthController::class, 'changePassword'])->middleware('throttle:'.config('ptsite.auth.login_attempts_per_minute').',1');
 

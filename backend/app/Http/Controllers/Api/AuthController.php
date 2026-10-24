@@ -8,10 +8,12 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use PTSite\App\Actions\Auth\ChangeOwnPassword;
+use PTSite\App\Actions\Auth\CreateWriterToken;
 use PTSite\App\Actions\Auth\LogIn;
 use PTSite\App\Http\Controllers\Controller;
 use PTSite\App\Http\Requests\ChangeOwnPasswordRequest;
 use PTSite\App\Http\Requests\CreateTokenRequest;
+use PTSite\App\Http\Requests\CreateWriterTokenRequest;
 use PTSite\App\Http\Requests\LoginRequest;
 use PTSite\App\Http\Resources\UserResource;
 
@@ -71,6 +73,22 @@ class AuthController extends Controller
         );
 
         return response()->noContent();
+    }
+
+    /**
+     * Create an API token for a writer account, the account of a program that writes the memos and the season
+     * recaps (admins). The account is made the first time. The token is shown only in this answer.
+     */
+    public function createWriterToken(CreateWriterTokenRequest $request, CreateWriterToken $create): JsonResponse
+    {
+        ['token' => $token, 'writer' => $writer] = $create(
+            $request->user(),
+            $request->validated('username', 'writer'),
+            $request->validated('name', 'api'),
+            (bool) $request->validated('replace', false),
+        );
+
+        return response()->json(['token' => $token, 'user' => new UserResource($writer)], 201);
     }
 
     /** The logged-in user, their player and what they may do. */

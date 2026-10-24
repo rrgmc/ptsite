@@ -514,6 +514,54 @@
                 }
             }
         },
+        "/v1/writer-tokens": {
+            "post": {
+                "operationId": "auth.createWriterToken",
+                "summary": "Create an API token for a writer account, the account of a program that writes the memos and the season\nrecaps (admins). The account is made the first time. The token is shown only in this answer",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateWriterTokenRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "token",
+                                        "user"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/me/password": {
             "put": {
                 "operationId": "auth.changePassword",
@@ -4693,6 +4741,26 @@
                     "device_name"
                 ],
                 "title": "CreateTokenRequest"
+            },
+            "CreateWriterTokenRequest": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "description": "The writer account, made the first time. Default \"writer\".",
+                        "maxLength": 100
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "A name for the token. Default \"api\".",
+                        "maxLength": 100
+                    },
+                    "replace": {
+                        "type": "boolean",
+                        "description": "Delete the account's other tokens first, so a token that leaked stops working."
+                    }
+                },
+                "title": "CreateWriterTokenRequest"
             },
             "FinishMainEventNightRequest": {
                 "type": "object",

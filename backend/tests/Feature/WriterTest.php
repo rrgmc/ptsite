@@ -43,6 +43,44 @@ it('refuses a username that belongs to an account with another role', function (
     expect(User::query()->where('username', 'cronista')->sole()->tokens()->count())->toBe(0);
 });
 
+it('lets an admin make a writer token through the API, and the token works', function () {
+    $admin = User::factory()->admin()->create();
+    Sanctum::actingAs($admin);
+
+    $token = $this->postJson('/api/v1/writer-tokens', ['username' => 'cronista'])->assertCreated()
+        ->assertJsonPath('user.role', 'writer')
+        ->assertJsonPath('user.username', 'cronista')
+        ->json('token');
+    expect(AuditLog::query()->where('action', 'account.writer_token_created')->value('user_id'))->toBe($admin->id);
+
+    $this->app['auth']->forgetGuards();
+    $this->withToken($token)->getJson('/api/v1/me')->assertOk()->assertJsonPath('data.username', 'cronista');
+});
+
+it('replaces the older tokens through the API when asked', function () {
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $this->postJson('/api/v1/writer-tokens')->assertCreated();
+    $this->postJson('/api/v1/writer-tokens')->assertCreated();
+    $writer = User::query()->where('username', 'writer')->sole();
+    expect($writer->tokens()->count())->toBe(2);
+
+    $this->postJson('/api/v1/writer-tokens', ['replace' => true])->assertCreated();
+    expect($writer->tokens()->count())->toBe(1);
+});
+
+it('lets only admins make a writer token, and refuses a username of another role', function () {
+    User::factory()->resultsKeeper()->create(['username' => 'maria']);
+
+    foreach ([User::factory()->create(), User::factory()->resultsKeeper()->create(), User::factory()->writer()->create()] as $user) {
+        Sanctum::actingAs($user);
+        $this->postJson('/api/v1/writer-tokens')->assertForbidden();
+    }
+
+    Sanctum::actingAs(User::factory()->admin()->create());
+    $this->postJson('/api/v1/writer-tokens', ['username' => 'maria'])
+        ->assertJsonPath('errors.username.0', 'Este usuário já existe e não é um redator.');
+});
+
 it('cannot log in with a password', function () {
     User::factory()->writer()->create(['username' => 'cronista']);
 

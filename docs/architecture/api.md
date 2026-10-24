@@ -20,6 +20,7 @@
 | `POST /tokens` | anyone | Token login for other clients. Body adds `device_name`. Returns `token` |
 | `POST /logout` | logged in | Ends the session |
 | `GET /me` | logged in | The user, their player, role and `abilities` |
+| `POST /writer-tokens` | admin | A token for a writer account (the account of a program that writes the memos and the season recaps): `username` (default `writer`; made the first time), `name` (default `api`), `replace` (delete the account's older tokens). Returns `token`, shown only here, and `user`. 422 (`account.not_writer`) for a username of another role. Rules: [accounts-and-roles.md](../specs/accounts-and-roles.md), rule 13 |
 | `PUT /me/password` | logged in | Change the user's own password: `current_password`, `password` (8 characters or more). Answers 204. The user's other API tokens are deleted. Limited like the login |
 | `POST /password-resets` | anyone | A forgotten password: sends a link by email. Body: `login` (the username or the email). Returns `email`, the address with most of its name hidden. 422 with a rule when no account matches or the account has no address that may get a link |
 | `GET /password-resets/{token}` | anyone | The account behind a password link: `username`, `expires_at`. 422 when the link expired, was used or never existed |
@@ -155,8 +156,8 @@ The body always has a Brazilian Portuguese `message`, and `errors` by field when
   and the `X-XSRF-TOKEN` header. "Remember me" lasts 30 days. Requests from the site's own host always get
   session auth; `SANCTUM_STATEFUL_DOMAINS` adds others, such as the Vite dev server.
 - **Other clients:** `POST /api/v1/tokens`, then `Authorization: Bearer <token>`.
-- **Programs that write texts:** `php artisan ptsite:writer-token [username] [--replace]` prints a token of a
-  writer account, which has no password. Rules: [accounts-and-roles.md](../specs/accounts-and-roles.md), rule 13.
+- **Programs that write texts:** an admin's `POST /api/v1/writer-tokens`, or `php artisan ptsite:writer-token
+  [username] [--replace]` on the server, gives a token of a writer account, which has no password. Rules: [accounts-and-roles.md](../specs/accounts-and-roles.md), rule 13.
 - **Legacy passwords:** users imported from an older site log in with their old password once; it is then replaced by a
   modern hash.
 - **Forgotten passwords:** `POST /api/v1/password-resets` sends a link to
