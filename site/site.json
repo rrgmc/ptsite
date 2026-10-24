@@ -12,6 +12,7 @@
   "features": {
     "mainEvent": true,
     "houseOwnerBuyIn": true,
-    "nightDashboard": true
+    "nightDashboard": true,
+    "seasonRecaps": true
   }
 }
