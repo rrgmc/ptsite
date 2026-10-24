@@ -8,6 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.37.0] - 2026-10-24
+
+### Added
+
+- Season recaps ("Crônicas"): short texts about how the season is going, usually one after each night, shown in
+  "Crônica da temporada" below the standings, with the older ones behind "Crônicas anteriores". Published or
+  draft; writers and admins write them. Behind the feature flag `seasonRecaps`, off by default
+  ([docs/specs/season-recaps.md](docs/specs/season-recaps.md)).
+- `GET /api/v1/seasons/{id}/digest`: what a recap needs in one read, with the standings and how they moved on the
+  latest night. The recap endpoints are `GET` and `POST /api/v1/seasons/{id}/recaps`, `PATCH` and
+  `DELETE /api/v1/recaps/{id}`.
+- The writer role: an account with no player and no password, for a program that writes the players' memos and
+  the season recaps through the API. An admin makes its token with `POST /api/v1/writer-tokens`, or on the server
+  with `php artisan ptsite:writer-token` ([docs/specs/accounts-and-roles.md](docs/specs/accounts-and-roles.md),
+  rule 13).
+
 ## [1.36.0] - 2026-10-24
 
 ### Added
@@ -329,7 +345,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.36.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.37.0...HEAD
+[1.37.0]: https://github.com/rrgmc/ptsite/compare/v1.36.0...v1.37.0
 [1.36.0]: https://github.com/rrgmc/ptsite/compare/v1.35.3...v1.36.0
 [1.35.3]: https://github.com/rrgmc/ptsite/compare/v1.35.2...v1.35.3
 [1.35.2]: https://github.com/rrgmc/ptsite/compare/v1.35.1...v1.35.2
