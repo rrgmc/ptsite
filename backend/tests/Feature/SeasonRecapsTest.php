@@ -7,6 +7,8 @@
 use Laravel\Sanctum\Sanctum;
 use PTSite\App\Models\AuditLog;
 use PTSite\App\Models\Night;
+use PTSite\App\Models\NightPlayer;
+use PTSite\App\Models\NightRebuy;
 use PTSite\App\Models\Player;
 use PTSite\App\Models\Season;
 use PTSite\App\Models\SeasonRecap;
@@ -155,6 +157,37 @@ it('gives the digest: the standings and how they moved on the latest night', fun
         ->and($ana['points_on_latest_night'])->toBe('0.00')
         ->and($gabi['previous_rank'])->toBeNull()
         ->and($gabi['form'])->toBe([null, 2]);
+});
+
+it('gives each player\'s rebuys and time chips in the digest, on a site with the night dashboard', function () {
+    config(['ptsite.features' => ['seasonRecaps' => true, 'nightDashboard' => true]]);
+    $this->season->update(['rebuys_allowed' => 1, 'rebuy_charges_time_chip' => true]);
+    $first = ($this->finish)([0, 1, 2, 3, 4, 5], '2026-03-06 21:30:00', '600.00');
+    $latest = ($this->finish)([1, 6, 2, 3, 4, 5], '2026-03-13 21:30:00', '600.00');
+    [$ana, $breno] = $this->players;
+    // Ana: two rebuys on the first night, one past the limit. Breno: late and one rebuy on the latest night.
+    NightRebuy::query()->create(['night_id' => $first->id, 'player_id' => $ana->id]);
+    NightRebuy::query()->create(['night_id' => $first->id, 'player_id' => $ana->id]);
+    NightRebuy::query()->create(['night_id' => $latest->id, 'player_id' => $breno->id]);
+    NightPlayer::query()->create(['night_id' => $latest->id, 'player_id' => $breno->id, 'time_chip_at' => now()]);
+    $latest->update(['time_chip' => '30.00']);
+    Sanctum::actingAs($this->writer);
+
+    $money = $this->getJson("/api/v1/seasons/{$this->season->id}/digest")->assertOk()
+        ->assertJsonPath('data.season.time_chip_total', '30.00')
+        ->json('data.money');
+
+    expect($money)->toHaveCount(2)
+        ->and($money[0]['player']['id'])->toBe($ana->id)
+        ->and($money[0]['season'])->toBe(['rebuys' => 2, 'money_only_rebuys' => 1, 'late_arrivals' => 0, 'time_chips' => 2])
+        ->and($money[0]['latest_night'])->toBe(['rebuys' => 0, 'money_only_rebuys' => 0, 'late_arrivals' => 0, 'time_chips' => 0])
+        ->and($money[1]['latest_night'])->toBe(['rebuys' => 1, 'money_only_rebuys' => 0, 'late_arrivals' => 1, 'time_chips' => 2]);
+});
+
+it('has no rebuys in the digest on a site with no night dashboard', function () {
+    Sanctum::actingAs($this->writer);
+
+    $this->getJson("/api/v1/seasons/{$this->season->id}/digest")->assertOk()->assertJsonPath('data.money', null);
 });
 
 it('gives an empty digest before the first night', function () {
