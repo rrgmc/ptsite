@@ -12,5 +12,7 @@ export const recaps = {
   listTitle: 'Crônicas',
   /** The box on "Resultados": the newest recap in full. */
   latest: 'Última crônica',
+  /** The box on a night's page: the recap about that night. */
+  ofNight: 'Crônica',
   seeAll: 'Ver todas as crônicas',
 }

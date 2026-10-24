@@ -220,6 +220,13 @@ export const FinishedNightWithDashboard: StoryObj = {
   render: () => <RouterStory path="/nights/:nightId" url="/nights/10" element={<NightPage />} />,
 }
 
+/** A finished night with a recap about it: the recap in full, before the attendance, with nicknames in bold. */
+export const FinishedNightWithRecap: StoryObj = {
+  decorators: [withFeatures({ nightDashboard: true, seasonRecaps: true })],
+  parameters: { msw: [withFinishedDashboard, ...handlers] },
+  render: () => <RouterStory path="/nights/:nightId" url="/nights/10" element={<NightPage />} />,
+}
+
 /** The same night as an admin sees it: "Abrir o painel" in "Ações" leads to the dashboard, which only an admin changes. */
 export const FinishedNightWithDashboardAsAdmin: StoryObj = {
   decorators: [withFeatures({ nightDashboard: true })],

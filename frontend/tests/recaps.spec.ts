@@ -39,6 +39,14 @@ test('a recap shows on "Crônicas", with its title on "Classificação" and in f
     await expect(latest).toContainText('saiu sorrindo')
     await latest.getByRole('link', { name: 'Ver todas as crônicas' }).click()
     await expect(page).toHaveURL(/\/recaps$/)
+
+    // The night's own page has the recap before "Presença".
+    await page.goto(`nights/${digest.latest_night.id}`)
+    const ofNight = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Crônica', exact: true }) })
+    await expect(ofNight.getByRole('heading', { name: '🎯 Noite de festa' })).toBeVisible()
+    await expect(ofNight.locator('strong', { hasText: winner })).toBeVisible()
+    await ofNight.getByRole('link', { name: 'Ver todas as crônicas' }).click()
+    await expect(page).toHaveURL(new RegExp(`/recaps#recap-${recap.id}$`))
   } finally {
     await request.delete(`../api/v1/recaps/${recap.id}`, { headers: auth })
   }

@@ -8,5 +8,6 @@ export const recaps: Messages['recaps'] = {
   draft: 'Draft',
   listTitle: 'Recaps',
   latest: 'Latest recap',
+  ofNight: 'Recap',
   seeAll: 'See all recaps',
 }

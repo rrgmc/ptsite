@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import { Card } from '@/components/Card'
 import { t } from '@/i18n'
-import { useSeasonPath } from '@/lib/seasonPath'
+import { seasonPath, useSeasonPath } from '@/lib/seasonPath'
 import { RecapBody } from './RecapBody'
 import { recapAnchor, useRecaps } from './useRecaps'
 
@@ -22,6 +22,20 @@ export function RecapTitlesBox({ seasonId }: { seasonId: number }) {
           </li>
         ))}
       </ul>
+    </Card>
+  )
+}
+
+/** On a night's page: the recap about that night in full, with a link to it on "Crônicas". Nothing without one. */
+export function NightRecapBox({ seasonId, nightId }: { seasonId: number; nightId: number }) {
+  const { views, nicknames } = useRecaps(seasonId)
+  const view = views.find((v) => v.recap.night?.id === nightId)
+  if (!view) return null
+
+  return (
+    <Card title={t.recaps.ofNight} action={<Link to={`${seasonPath(seasonId, '/recaps')}#${recapAnchor(view.recap)}`} className="text-sm font-semibold text-primary">{t.recaps.seeAll}</Link>}>
+      <h3 className="mb-2 font-display font-bold wrap-anywhere">{view.title}</h3>
+      <RecapBody text={view.text} nicknames={nicknames} />
     </Card>
   )
 }
