@@ -16,6 +16,9 @@ export const Finished: StoryObj<typeof meta> = {}
 /** On "Resultados" the title has the night's number in the season. */
 export const Numbered: StoryObj<typeof meta> = { args: { number: 3 } }
 
+/** The small card beside a recap on "Crônicas", the same size on every screen. */
+export const Compact: StoryObj<typeof meta> = { args: { number: 3, compact: true } }
+
 /** An extra night, such as a parallel table: it has no number and is marked. */
 export const Extra: StoryObj<typeof meta> = { args: { night: extraNight } }
 

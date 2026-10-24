@@ -23,13 +23,6 @@ export const standings = {
   lastResultLine: ({ date, pot }: { date: string; pot: string }) => `${date} · Pote ${pot}`,
   simulate: '🔮 E se…? Simular o próximo evento',
 
-  // The season recap, above the table (docs/specs/season-recaps.md)
-  recap: 'Crônica da temporada',
-  recapAfter: ({ date }: { date: string }) => `Depois do evento de ${date}`,
-  recapDraft: 'Rascunho',
-  olderRecaps: ({ count }: { count: number }) => `Crônicas anteriores (${count})`,
-  hideOlderRecaps: 'Esconder crônicas anteriores',
-
   // Attendance under the next night
   coming: ({ count }: { count: number }) => `${count} ${count === 1 ? 'vai jogar' : 'vão jogar'} ·`,
   myAnswer: ({ answer }: { answer: string }) => `Você: ${answer}`,

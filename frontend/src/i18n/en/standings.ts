@@ -22,13 +22,6 @@ export const standings: Messages['standings'] = {
   lastResultLine: ({ date, pot }) => `${date} · Pot ${pot}`,
   simulate: '🔮 What if…? Simulate the next night',
 
-  // The season recap, above the table
-  recap: 'Season recap',
-  recapAfter: ({ date }) => `After the night of ${date}`,
-  recapDraft: 'Draft',
-  olderRecaps: ({ count }) => `Earlier recaps (${count})`,
-  hideOlderRecaps: 'Hide earlier recaps',
-
   // Attendance under the next night
   coming: ({ count }) => `${count} ${count === 1 ? 'is playing' : 'are playing'} ·`,
   myAnswer: ({ answer }) => `You: ${answer}`,

@@ -16,6 +16,7 @@ import { ResultFormPage } from './features/nights/ResultFormPage'
 import { AllTimePlayerPage, PlayerPage } from './features/players/PlayerPage'
 import { PlayersPage } from './features/players/PlayersPage'
 import { ProfilePage } from './features/profile/ProfilePage'
+import { RecapsPage } from './features/recaps/RecapsPage'
 import { ResultsPage } from './features/results/ResultsPage'
 import { SeasonPickerPage } from './features/seasons/SeasonPickerPage'
 import { SeasonsPage } from './features/seasons/SeasonsPage'
@@ -34,6 +35,7 @@ const statistics = (page: 'StatisticsPage' | 'AllTimeStatisticsPage') => () =>
 const seasonScreens = (): RouteObject[] => [
   { index: true, element: <StandingsPage /> },
   { path: 'results', element: <ResultsPage /> },
+  ...(hasFeature('seasonRecaps') ? [{ path: 'recaps', element: <RecapsPage /> }] : []),
   { path: 'calendar', element: <CalendarPage /> },
   { path: 'simulator', element: <SimulatorPage /> },
   { path: 'statistics', lazy: statistics('StatisticsPage') },

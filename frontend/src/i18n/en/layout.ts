@@ -4,6 +4,7 @@ export const layout: Messages['layout'] = {
   nav: {
     standings: 'Standings',
     results: 'Results',
+    recaps: 'Recaps',
     calendar: 'Calendar',
     simulator: 'Simulator',
     players: 'Players',

@@ -4,6 +4,7 @@ export const layout = {
   nav: {
     standings: 'Classificação',
     results: 'Resultados',
+    recaps: 'Crônicas',
     calendar: 'Calendário',
     simulator: 'Simulação',
     players: 'Jogadores',
