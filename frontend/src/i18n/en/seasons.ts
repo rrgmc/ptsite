@@ -8,6 +8,10 @@ export const seasons: Messages['seasons'] = {
   noResults: 'No finished night yet.',
   topTenCaption: ({ season }) => `The first ten of ${season}`,
 
+  mainEventPending: 'Main Event not played yet',
+  mainEventNone: 'No Main Event',
+  jumpLabel: 'Go to season',
+  leader: '1st:',
   mainEventChampion: 'Main Event champion:',
 
   pickTitle: 'Choose a season',

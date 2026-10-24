@@ -93,6 +93,8 @@ test('a player sees the two champions of a finished season, and the Main Event c
 
   await page.goto('seasons')
   await expect(page.getByText('Campeão do Main Event:').first()).toBeVisible()
+  // The current season has not played its Main Event: a box holds the champion's place.
+  await expect(page.locator('section').filter({ hasText: 'Atual' })).toContainText('Main Event ainda não disputado')
   await expectAccessible(page)
 
   // "Classificação" of a season with a finished Main Event: its first three, above the table

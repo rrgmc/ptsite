@@ -56,6 +56,10 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
    empatados").
    A season with no finished night says so. **"Ver esta temporada"** opens a season's standings, at that season's
    address; the selected season shows "✓ Selecionada" instead. Everyone logged in can open it.
+   A list at the top names every season with its winner: the Main Event champion when there is one, else the
+   1st of its standings ("1º:"). A click on a season scrolls to its card. On a site with the Main Event, a
+   season with no champion shows a grey box in the champion's place ("Main Event ainda não disputado", or "Sem
+   Main Event" once the season is finished), so the lists of two seasons side by side start at the same height.
 4. A night belongs to a season explicitly. A night's season cannot be worked out from its date, because
    seasons no longer follow the calendar year.
 5. A season has a **regular night**: a weekday, a start time and a frequency (for example Friday at 21:30, every
@@ -239,7 +243,7 @@ The selected season, in the demo league (the current season, and Liga 2022, whic
   header of "Jogadores" names it.
 - **The first ten.** The player opens "Temporadas" from the menu. Liga 2022 is "Finalizada" and lists ten players,
   its champion first. The current season shows "✓ Selecionada" and no button. "Ver esta temporada" on Liga 2022
-  opens the standings of 2022, with the notice.
+  opens the standings of 2022, with the notice. In the list at the top, a click on Liga 2022 scrolls to its card.
 - **A shared tenth place.** Eleven players scored, and the tenth and the eleventh both have 15,00. The list shows
   ten players and "e mais 1 empatado".
 - **A link.** Opening `/seasons/10/results` shows the results of Liga 2022 and stays at that address.

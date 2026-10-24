@@ -12,6 +12,14 @@ export const seasons = {
 
   /** Before the nickname of the 1st place of a season's Main Event. */
   mainEventChampion: 'Campeão do Main Event:',
+  /** In the champion's place, on a season with no champion. */
+  mainEventPending: 'Main Event ainda não disputado',
+  mainEventNone: 'Sem Main Event',
+
+  /** For screen readers: the list of seasons at the top, which scrolls to a season. */
+  jumpLabel: 'Ir para a temporada',
+  /** In that list, before the nickname of the 1st of a season with no Main Event champion. */
+  leader: '1º:',
 
   pickTitle: 'Escolher temporada',
   subtitle: 'Escolha a temporada que o site mostra.',

@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- "Temporadas" starts with a list of every season and its winner (the Main Event champion, else the 1st). A
+  click scrolls to the season's card. A season with no Main Event champion holds the champion's place with a
+  grey box, so two cards side by side line up
+  ([docs/specs/seasons-and-nights.md](docs/specs/seasons-and-nights.md), rule 3f).
+
 ## [1.39.0] - 2026-10-24
 
 ### Added

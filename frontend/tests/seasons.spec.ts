@@ -115,6 +115,16 @@ test('"Temporadas" shows the first ten of every season, and makes one the select
   await expect(rows.first()).toContainText(/^1/)
   await expect(rows.first().getByRole('link')).toHaveAttribute('href', /\/players\/\d+\/all$/)
 
+  // The list at the top names every season with its winner, its Main Event champion here, and scrolls to the
+  // season's card.
+  const jumpToSeason = page.getByRole('navigation', { name: 'Ir para a temporada' }).getByRole('button', { name: /^Liga 2022/ })
+  const mainEventChampion = await season.locator('p').filter({ hasText: 'Campeão do Main Event:' }).getByRole('link').textContent()
+  await expect(jumpToSeason).toContainText(mainEventChampion!)
+  await jumpToSeason.click()
+  // The focus moves to the card, so the keyboard follows.
+  await expect(page.locator(':focus').getByRole('heading', { name: 'Liga 2022', exact: true })).toBeVisible()
+  await expect(season.getByRole('heading', { name: 'Liga 2022', exact: true })).toBeInViewport()
+
   // The current season is the selected one, so it has no button.
   const current = page.locator('section').filter({ hasText: 'Atual' })
   await expect(current).toContainText('✓ Selecionada')
