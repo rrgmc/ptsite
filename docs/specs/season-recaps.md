@@ -39,6 +39,8 @@ Recaps are the feature `seasonRecaps`, **off** unless the site turns it on in it
      first. Each title leads to its recap on "Crônicas".
    - **"Resultados"**: a box "Última crônica" above "Pontos acumulados", with the newest recap in full and a
      link "Ver todas as crônicas".
+   - **A finished night's page**: a box "Crônica" with the recap about that night in full, before "Presença",
+     and a link to it on "Crônicas". A night with no recap has no box.
 4b. **Players' nicknames are in bold** in a recap's text: every nickname of a player who is not archived, as a
    whole word, with its capitals as written.
 5. **Writers and admins change and delete recaps.** The audit log records every change, and keeps a deleted

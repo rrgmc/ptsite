@@ -19,6 +19,7 @@ import { FinishedNightDashboard } from '../dashboard/FinishedNightDashboard'
 import { NightDashboardCard } from '../dashboard/NightDashboardCard'
 import { usePathOfSeason } from '../layout/useSelectedSeason'
 import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
+import { NightRecapBox } from '../recaps/RecapBoxes'
 import { NightResultCard } from '../results/NightResultCard'
 import { NightMark } from './NightMark'
 import { NightPartialResult } from './PartialResultCard'
@@ -120,9 +121,15 @@ export function NightPage() {
       )}
 
       {isFinished && (
-        <div className="mt-4">
-          <NightAttendance night={n} compact />
-        </div>
+        <>
+          {/* The recap about this night, on a site with recaps; nothing when it has none. */}
+          <div className="mt-4 max-w-3xl empty:hidden">
+            <NightRecapBox seasonId={n.season_id} nightId={n.id} />
+          </div>
+          <div className="mt-4">
+            <NightAttendance night={n} compact />
+          </div>
+        </>
       )}
 
       <ConfirmDialog
