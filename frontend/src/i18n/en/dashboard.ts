@@ -32,6 +32,12 @@ export const dashboard = {
     missing: ({ count }: { count: number }) => `${count} missing`,
   },
 
+  // Under the summary: the payout split among the first three places (provisional)
+  payoutSplit: {
+    title: 'Payout split',
+    place: ({ position, share }: { position: string; share: number }) => `${position} (${share}%)`,
+  },
+
   // Participants
   players: {
     heading: ({ count }: { count: number }) => `Players (${count})`,

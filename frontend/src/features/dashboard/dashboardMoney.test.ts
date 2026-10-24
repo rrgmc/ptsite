@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { NightDashboard } from '@/api/client'
 import { finishedNightDashboard, nightDashboard, players } from '@/mocks/data'
-import { amountsInUse, applyChange, hasPayments, nextPayment, paymentCounts, recalculated } from './dashboardMoney'
+import { amountsInUse, applyChange, hasPayments, nextPayment, paymentCounts, payoutSplit, recalculated } from './dashboardMoney'
 
 // The same rules as the API, so that a tap shows at once what the API will answer
 // (docs/specs/night-dashboard.md, the example "A night": Ana, Breno, Carlão, Dudu and Estela, at Estela's house).
@@ -250,5 +250,16 @@ describe('amountsInUse', () => {
 
     expect(typed.manual).toEqual({ pot: '600.00', time_chip: null })
     expect(amountsInUse(typed)).toMatchObject({ pot: '600.00', timeChip: null, total: '575.00' })
+  })
+})
+
+describe('payoutSplit', () => {
+  it('cuts each share to whole units and gives the rest to 1st', () => {
+    expect(payoutSplit('340.00').map((line) => line.amount)).toEqual(['170.00', '102.00', '68.00'])
+    expect(payoutSplit('335.00').map((line) => line.amount)).toEqual(['168.00', '100.00', '67.00'])
+  })
+
+  it('splits nothing without a payout', () => {
+    expect(payoutSplit('0.00')).toEqual([])
   })
 })

@@ -88,6 +88,14 @@ describe('NightDashboardView', () => {
     expect(payout.getByText('Pote ME').closest('div')).toHaveTextContent('Pote MER$ 85,00')
   })
 
+  it('splits the payout among the first three places, 50%, 30% and 20%', () => {
+    view()
+    const split = screen.getByRole('heading', { name: 'Divisão da premiação' }).closest('section')!
+    expect(split).toHaveTextContent('1º (50%)R$ 170,00')
+    expect(split).toHaveTextContent('2º (30%)R$ 102,00')
+    expect(split).toHaveTextContent('3º (20%)R$ 68,00')
+  })
+
   it('opens on the summary, with the players and the amounts in tabs of their own', async () => {
     view()
 
