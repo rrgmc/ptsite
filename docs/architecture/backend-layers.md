@@ -17,7 +17,9 @@ backend/
     Calendar/               Easter, HolidayRule, HolidayException, HolidayCalendar, HolidayPreset, HolidayPresets and
                             SaoPauloHolidays (the starting table), SeasonPlanner (a season's dates around holidays)
     Attendance/             AttendanceAnswer, AttendanceRules
-    Standings/              Standings, RankingSimulator, ScoreLine, StandingRow, SimulatedRow
+    Standings/              Standings, RankingSimulator, ScoreLine, StandingRow, SimulatedRow, StandingsDigest and
+                            DigestLine (how the standings moved on the latest night)
+    Recaps/                 SeasonRecapRules
     Statistics/             Statistics (top ten lists and the leaders' running totals), MainEventStatistics,
                             PlayerStatistics (one player's), Ranking, NightRecord
   app/Actions/            one class per change; check policy, call domain, save, audit
@@ -35,12 +37,13 @@ backend/
     Players/                QuickAddPlayer, SavePlayer, NicknameCheck
     Seasons/                SaveSeason
     Places/                 SavePlace
+    Recaps/                 SaveSeasonRecap, DeleteSeasonRecap
     Auth/                   LogIn (with the upgrade of old MD5 hashes), ChangeOwnPassword, RequestPasswordReset (sends the
-                            link by email), ResetPassword
+                            link by email), ResetPassword, CreateWriterToken (the `ptsite:writer-token` command)
     Import/                 VerifyLeagueData (the `ptsite:verify` check)
   app/Queries/            reads that need the domain: SeasonStandings, SimulateRanking, SuggestNightDates,
                             PlanSeasonNights, SeasonCalendar, HolidayCalendarForYear, LeagueStatistics,
-                            StatisticsOfPlayer, FinishedNights, PendingPasswordReset, NightDashboard
+                            StatisticsOfPlayer, FinishedNights, PendingPasswordReset, NightDashboard, SeasonDigest
   app/Mail/               messages the site sends, sent inside the request: PasswordResetMail
   resources/views/mail/   their text, as an HTML view and a plain text view
   app/Http/Controllers/Api  thin: validate (Form Request), call one action or query, return a resource
@@ -52,7 +55,7 @@ backend/
                             rows → its domain prices and participants), PlayerPhotoMaker, DatabaseCreator, TablePrefix
   app/Providers/          PTSiteServiceProvider: loads everything on this list into the host app
   app/Bootstrap.php       the middleware and error rendering a host app's bootstrap/app.php asks for
-  app/Console/Commands/   ptsite:prepare-database, ptsite:verify
+  app/Console/Commands/   ptsite:prepare-database, ptsite:verify, ptsite:writer-token
   config/ptsite.php       the site's settings
   lang/pt_BR/             validation, auth and rule messages
   tests/Unit/Domain/      domain tests, no database; mirror the examples in docs/specs

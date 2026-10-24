@@ -39,6 +39,7 @@ Ask these before creating anything. Offer the default where there is one.
 | Does the league end each season with a Main Event, a final game with no points? | `features`: `mainEvent` | no |
 | Does the owner of the house where a night is played pay a smaller buy-in? | `features`: `houseOwnerBuyIn` | no |
 | Should the players record each night's buy-ins, rebuys and time chips on their phones ("Painel do evento")? | `features`: `nightDashboard` | no |
+| Should the season's screen show short texts about how the season is going ("Crônicas"), written by an assistant or an admin? | `features`: `seasonRecaps` | no |
 | The holidays a new database starts with | `PTSITE_HOLIDAY_PRESET` in `.env` | `sao-paulo`; empty for none |
 | A table prefix, when the database is shared with another site | `DB_TABLE_PREFIX` in `.env` | none |
 | A short name for the deploy package, in lowercase | `packageName` | `ptsite` |
@@ -79,8 +80,8 @@ it (`task setup`, `task serve`).
 Write `site/site.json` from the answers. Every setting is explained in the core's
 [`site/README.md`](../site/README.md).
 
-Write the six features in `features` with the owner's answers, `true` or `false`, so the choice can be read in
-the file: `"features": { "mainEventPot": true, "timeChip": false, "seasonPlanner": true, "mainEvent": false, "houseOwnerBuyIn": false, "nightDashboard": false }`. The same README lists
+Write the seven features in `features` with the owner's answers, `true` or `false`, so the choice can be read in
+the file: `"features": { "mainEventPot": true, "timeChip": false, "seasonPlanner": true, "mainEvent": false, "houseOwnerBuyIn": false, "nightDashboard": false, "seasonRecaps": false }`. The same README lists
 what each one turns off.
 
 Delete `site/theme.css` unless the owner wants to change a design token

@@ -67,6 +67,12 @@ class Season extends Model
         return $this->hasMany(Night::class);
     }
 
+    /** @return HasMany<SeasonRecap, $this> */
+    public function recaps(): HasMany
+    {
+        return $this->hasMany(SeasonRecap::class);
+    }
+
     /** @return HasMany<SeasonTotal, $this> the final lines of a season known only by its final standings */
     public function totals(): HasMany
     {

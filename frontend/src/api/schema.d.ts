@@ -1074,6 +1074,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/seasons/{season}/digest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Everything a recap of the season needs, in one read: the standings and how they moved on the latest night,
+         *     that night's results, the next night, the rounds left and the latest published recaps
+         */
+        get: operations["seasonRecap.digest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/seasons/{season}/recaps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The season's published recaps, newest first. Writers and admins also get the drafts */
+        get: operations["seasonRecap.index"];
+        put?: never;
+        /** Write a recap of the season. Only on a site that shows recaps */
+        post: operations["seasonRecap.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/recaps/{recap}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["seasonRecap.destroy"];
+        options?: never;
+        head?: never;
+        /** Change a recap's text or night, or publish it or make it a draft again. Publishing needs a site that shows recaps */
+        patch: operations["seasonRecap.update"];
+        trace?: never;
+    };
     "/v1/statistics": {
         parameters: {
             query?: never;
@@ -1759,6 +1814,15 @@ export interface components {
             status?: "active" | "inactive";
             archived?: boolean;
         };
+        /** SaveSeasonRecapRequest */
+        SaveSeasonRecapRequest: {
+            /** @description Plain text: line breaks are kept, nothing else is formatted. */
+            body: string;
+            /** @description The finished night of this season the recap comes after, if it is about one. */
+            night_id?: number | null;
+            /** @description Published recaps are shown on the season page; a draft only to writers and admins. A new recap is published unless false is sent. */
+            published?: boolean;
+        };
         /** SaveSeasonRequest */
         SaveSeasonRequest: {
             name: string;
@@ -1827,6 +1891,56 @@ export interface components {
         ScheduleNightsRequest: {
             /** @description Date and time of each night to schedule, at the season's default place. */
             starts_at: string[];
+        };
+        /** SeasonDigestResource */
+        SeasonDigestResource: {
+            season: {
+                id: number;
+                name: string;
+                starts_on: string;
+                is_finished: boolean;
+                /** @description The regular nights the season plans. */
+                rounds: number;
+                /** @description Finished regular nights. */
+                rounds_played: number;
+                rounds_left: unknown;
+                extra_nights_played: number;
+            };
+            latest_night: components["schemas"]["NightResource"] | null;
+            next_night: components["schemas"]["NightResource"] | null;
+            /** @description The standings, with how they moved on the latest night. */
+            standings: {
+                rank: number;
+                previous_rank: number | null;
+                player: components["schemas"]["PlayerResource"];
+                points: string;
+                points_on_latest_night: string;
+                gap_to_leader: string;
+                gap_to_above: string;
+                nights_scored: number;
+                wins: number;
+                form: (number | null)[];
+            }[];
+            /** @description The latest published recaps, newest first. */
+            recaps: components["schemas"]["SeasonRecapResource"][];
+        };
+        /** SeasonRecapResource */
+        SeasonRecapResource: {
+            id: string;
+            season_id: string;
+            /** @description The night the recap comes after, or null when it is about no single night. */
+            night: {
+                id: number;
+                starts_at: string;
+            } | null;
+            /** @description Plain text, with line breaks. */
+            body: string;
+            published: boolean;
+            published_at: string | null;
+            /** @description The name of the account that wrote it. */
+            author: string;
+            created_at: string | null;
+            updated_at: string | null;
         };
         /** SeasonResource */
         SeasonResource: {
@@ -2083,6 +2197,18 @@ export interface components {
             archived?: boolean;
         };
         /**
+         * UpdateSeasonRecapRequest
+         * @description Same fields as creating, all optional: only the fields sent are changed.
+         */
+        UpdateSeasonRecapRequest: {
+            /** @description Plain text: line breaks are kept, nothing else is formatted. */
+            body?: string;
+            /** @description The finished night of this season the recap comes after, if it is about one. */
+            night_id?: number | null;
+            /** @description Published recaps are shown on the season page; a draft only to writers and admins. A new recap is published unless false is sent. */
+            published?: boolean;
+        };
+        /**
          * UpdateSeasonRequest
          * @description Same fields as creating, all optional: only the fields sent are changed.
          */
@@ -2129,7 +2255,7 @@ export interface components {
             username: string;
             name: string;
             /** @enum {string} */
-            role: "player" | "results_keeper" | "admin";
+            role: "player" | "results_keeper" | "admin" | "writer";
             player?: components["schemas"]["PlayerResource"] | null;
             /** @description What this user may do, so clients can show or hide actions. The API still checks every request. */
             abilities: {
@@ -2143,6 +2269,8 @@ export interface components {
                 manage_seasons: boolean;
                 manage_places: boolean;
                 view_audit_log: boolean;
+                /** @description Whether the user writes the players' memos and the season recaps. */
+                write_texts: boolean;
             };
         };
     };
@@ -4285,6 +4413,147 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "seasonRecap.digest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The season ID */
+                season: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `SeasonDigestResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SeasonDigestResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "seasonRecap.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The season ID */
+                season: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `SeasonRecapResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SeasonRecapResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "seasonRecap.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The season ID */
+                season: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveSeasonRecapRequest"];
+            };
+        };
+        responses: {
+            /** @description `SeasonRecapResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SeasonRecapResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "seasonRecap.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The recap ID */
+                recap: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "seasonRecap.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The recap ID */
+                recap: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateSeasonRecapRequest"];
+            };
+        };
+        responses: {
+            /** @description `SeasonRecapResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SeasonRecapResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "statistics.show": {

@@ -204,6 +204,7 @@ export const keeper: User = {
     manage_seasons: false,
     manage_places: false,
     view_audit_log: false,
+    write_texts: false,
   },
 }
 
