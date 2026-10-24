@@ -1903,7 +1903,7 @@ export interface components {
                 rounds: number;
                 /** @description Finished regular nights. */
                 rounds_played: number;
-                rounds_left: unknown;
+                rounds_left: number;
                 extra_nights_played: number;
             };
             latest_night: components["schemas"]["NightResource"] | null;
@@ -1926,8 +1926,8 @@ export interface components {
         };
         /** SeasonRecapResource */
         SeasonRecapResource: {
-            id: string;
-            season_id: string;
+            id: number;
+            season_id: number;
             /** @description The night the recap comes after, or null when it is about no single night. */
             night: {
                 id: number;
@@ -1938,7 +1938,7 @@ export interface components {
             published: boolean;
             published_at: string | null;
             /** @description The name of the account that wrote it. */
-            author: string;
+            author: string | null;
             created_at: string | null;
             updated_at: string | null;
         };

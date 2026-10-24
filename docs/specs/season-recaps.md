@@ -29,8 +29,9 @@ Recaps are the feature `seasonRecaps`, **off** unless the site turns it on in it
 3. **A recap is published or a draft.** A new recap is published unless the writer asks for a draft. A draft
    is seen only by writers and admins. Publishing a draft dates it; making a published recap a draft again
    hides it.
-4. **The season's screen shows the newest published recap** in a card "Crônica da temporada", with its night's
-   date. "Crônicas anteriores" opens the older ones, newest first.
+4. **The season's standings screen shows the newest recap** in a card "Crônica da temporada", below the table,
+   with its night's date. "Crônicas anteriores" opens the older ones, newest first. Writers and admins also see
+   the drafts there, marked "Rascunho".
 5. **Writers and admins change and delete recaps.** The audit log records every change, and keeps a deleted
    recap's text.
 

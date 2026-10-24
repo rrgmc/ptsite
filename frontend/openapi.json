@@ -6928,7 +6928,9 @@
                                 "type": "integer",
                                 "description": "Finished regular nights."
                             },
-                            "rounds_left": {},
+                            "rounds_left": {
+                                "type": "integer"
+                            },
                             "extra_nights_played": {
                                 "type": "integer"
                             }
@@ -7047,10 +7049,10 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "type": "string"
+                        "type": "integer"
                     },
                     "season_id": {
-                        "type": "string"
+                        "type": "integer"
                     },
                     "night": {
                         "type": [
@@ -7085,7 +7087,10 @@
                         ]
                     },
                     "author": {
-                        "type": "string",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
                         "description": "The name of the account that wrote it."
                     },
                     "created_at": {

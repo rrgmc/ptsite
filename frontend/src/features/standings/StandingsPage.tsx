@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { useAttendance, useMe, useSeasonNights, useStandings } from '@/api/queries'
+import { useAttendance, useMe, useSeasonNights, useSeasonRecaps, useStandings } from '@/api/queries'
 import { Card, PageHeader } from '@/components/Card'
 import { Empty, ErrorBox, Loading } from '@/components/Feedback'
 import { Podium } from '@/components/Podium'
@@ -12,12 +12,14 @@ import { MainEventPodium } from '../mainEvent/MainEventPodium'
 import { NightMark } from '../nights/NightMark'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
 import { nextNight } from './nextNight'
+import { SeasonRecapCard } from './SeasonRecapCard'
 import { StandingsTable } from './StandingsTable'
 
 export function StandingsPage() {
   const { season, isPending, error } = useSelectedSeason()
   const standings = useStandings(season?.id)
   const nights = useSeasonNights(season?.id)
+  const recaps = useSeasonRecaps(hasFeature('seasonRecaps') ? season?.id : undefined)
   const to = useSeasonPath()
 
   if (isPending) return <Loading />
@@ -61,6 +63,8 @@ export function StandingsPage() {
               <StandingsTable rows={standings.data!} caption={t.standings.tableCaption({ season: season.name })} />
             )}
           </Card>
+          {/* Below the table, so a phone shows the standings first. */}
+          {recaps.data && <SeasonRecapCard recaps={recaps.data} />}
         </div>
 
         <div className="flex flex-col gap-4">

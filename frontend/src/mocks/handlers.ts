@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { archivedWithMemo, attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightDashboard, nightPlan, openMainEventNight, openNight, places, players, playerResults, playerResultsAllTime, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
+import { archivedWithMemo, attendances, emptyPartialResult, seasonCalendar, finishedNight, holidayCalendar2027, holidays, keeper, mainEventNight, memo, memos, nightDashboard, nightPlan, openMainEventNight, openNight, places, players, playerResults, playerResultsAllTime, playerStatistics, playerStatisticsAllTime, playerStatisticsEmpty, recaps, season, seasons, seasonsTopStandings, standings, statistics, statisticsAllTime } from './data'
 
 const withArchived = (request: Request) => new URL(request.url).searchParams.get('archived') === '1'
 
@@ -19,6 +19,7 @@ export const handlers = [
     return found ? HttpResponse.json({ data: found }) : HttpResponse.json({ message: 'Temporada não encontrada.' }, { status: 404 })
   }),
   http.get('/api/v1/seasons/:id/standings', () => HttpResponse.json({ data: standings })),
+  http.get('/api/v1/seasons/:id/recaps', () => HttpResponse.json({ data: recaps })),
   http.get('/api/v1/statistics', ({ request }) =>
     HttpResponse.json({ data: new URL(request.url).searchParams.has('season') ? statistics : statisticsAllTime }),
   ),

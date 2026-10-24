@@ -1,4 +1,4 @@
-import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, NightDashboard, PartialResult, Player, PlayerNightResult, PlayerStatistics, PlannedDate, RankedList, Season, SeasonTopStandings, Standing, Statistics, User } from '@/api/client'
+import type { Attendance, CalendarEntry, CalendarHoliday, Holiday, Night, NightDashboard, PartialResult, Player, PlayerNightResult, PlayerStatistics, PlannedDate, RankedList, Season, SeasonRecap, SeasonTopStandings, Standing, Statistics, User } from '@/api/client'
 import { recalculated } from '@/features/dashboard/dashboardMoney'
 
 // Invented data for Storybook and component tests. The development database has the demo league (backend/database/seeders/DemoLeagueSeeder.php).
@@ -186,6 +186,32 @@ export const standings: Standing[] = [
   { rank: 3, player: players[3], points: '90.00', nights_scored: 2, wins: 0, positions: timesIn(0, 0, 1, 1, 0, 0) },
   { rank: 5, player: players[4], points: '48.00', nights_scored: 1, wins: 0, positions: timesIn(0, 0, 0, 1, 0, 0) },
   { rank: 6, player: players[5], points: '15.00', nights_scored: 1, wins: 0, positions: timesIn(0, 0, 0, 0, 0, 1) },
+]
+
+/** The season's recaps, newest first: one after the finished night and an older one about no single night. */
+export const recaps: SeasonRecap[] = [
+  {
+    id: 2,
+    season_id: 1,
+    night: { id: 10, starts_at: '2026-04-11T21:00:00-03:00' },
+    body: 'Ana não deu chance: terceira vitória e a liderança cada vez mais folgada.\nBreno segue na cola, R$ 30 atrás. Carlão e Dudu empatados em 3º, e ninguém sabe quem cede primeiro.',
+    published: true,
+    published_at: '2026-04-12T09:00:00-03:00',
+    author: 'writer',
+    created_at: '2026-04-12T09:00:00-03:00',
+    updated_at: '2026-04-12T09:00:00-03:00',
+  },
+  {
+    id: 1,
+    season_id: 1,
+    night: null,
+    body: 'Começa a temporada! Vinte e seis rodadas pela frente e todo mundo zerado.',
+    published: true,
+    published_at: '2026-03-01T09:00:00-03:00',
+    author: 'writer',
+    created_at: '2026-03-01T09:00:00-03:00',
+    updated_at: '2026-03-01T09:00:00-03:00',
+  },
 ]
 
 export const keeper: User = {

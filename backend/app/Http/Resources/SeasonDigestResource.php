@@ -22,6 +22,7 @@ class SeasonDigestResource extends JsonResource
                 'rounds' => $this->season->rounds,
                 /** Finished regular nights. */
                 'rounds_played' => $this->roundsPlayed,
+                /** @var int */
                 'rounds_left' => max(0, $this->season->rounds - $this->roundsPlayed),
                 'extra_nights_played' => $this->extraNightsPlayed,
             ],
