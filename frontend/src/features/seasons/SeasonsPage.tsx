@@ -118,17 +118,18 @@ function SeasonJumpList({ seasons }: { seasons: SeasonTopStandings[] }) {
           const leaders = rows.filter((row) => row.rank === 1)
           return (
             <li key={season.id}>
-              <Button variant="ghost" fullWidth className="justify-between! px-2 text-left text-text" onPress={() => jump(season.id)}>
+              {/* With large text the winner goes to a line of its own, at the right. */}
+              <Button variant="ghost" fullWidth className="flex-wrap justify-between! gap-x-3 gap-y-0 px-2 py-1 text-left text-text" onPress={() => jump(season.id)}>
                 <span className="min-w-0 wrap-anywhere">{season.name}</span>
                 {showChampion ? (
-                  <span className="flex min-w-0 items-center gap-1.5 font-normal">
-                    <span aria-hidden>🏅</span>
-                    <span className="sr-only">{t.seasons.mainEventChampion}</span>
+                  <span className="ml-auto min-w-0 text-right font-normal wrap-anywhere">
+                    <span aria-hidden>🏅 </span>
+                    <span className="sr-only">{t.seasons.mainEventChampion} </span>
                     {champion.nickname}
                   </span>
                 ) : (
                   leaders.length > 0 && (
-                    <span className="min-w-0 text-right font-normal wrap-anywhere">
+                    <span className="ml-auto min-w-0 text-right font-normal wrap-anywhere">
                       <span className="text-muted">{t.seasons.leader}</span> {leaders.map((row) => row.player.nickname).join(', ')}
                     </span>
                   )
