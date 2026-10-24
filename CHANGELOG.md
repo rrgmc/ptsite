@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.39.0] - 2026-10-24
+
+### Added
+
+- A finished night's page shows the recap about that night in full, in a box "Crônica" before "Presença", with a
+  link to it on "Crônicas" ([docs/specs/season-recaps.md](docs/specs/season-recaps.md), rule 4).
+
 ## [1.38.1] - 2026-10-24
 
 ### Fixed
@@ -367,7 +374,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.38.1...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.39.0...HEAD
+[1.39.0]: https://github.com/rrgmc/ptsite/compare/v1.38.1...v1.39.0
 [1.38.1]: https://github.com/rrgmc/ptsite/compare/v1.38.0...v1.38.1
 [1.38.0]: https://github.com/rrgmc/ptsite/compare/v1.37.0...v1.38.0
 [1.37.0]: https://github.com/rrgmc/ptsite/compare/v1.36.0...v1.37.0
