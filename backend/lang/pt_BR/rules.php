@@ -71,6 +71,7 @@ return [
     'account.username_required' => 'Informe o usuário para criar o acesso.',
     'account.password_required' => 'Informe a senha para criar o acesso.',
     'account.own_role' => 'Você não pode mudar o seu próprio papel.',
+    'account.not_writer' => 'Este usuário já existe e não é um redator.',
     'account.wrong_current_password' => 'A senha atual está incorreta.',
     'password_reset.unknown_account' => 'Não encontramos nenhum acesso com este usuário ou e-mail.',
     'password_reset.no_usable_email' => 'Este acesso não tem um e-mail válido cadastrado. Peça a um administrador para definir uma nova senha.',

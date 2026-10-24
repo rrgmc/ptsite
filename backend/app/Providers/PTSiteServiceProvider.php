@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
+use PTSite\App\Console\Commands\CreateWriterTokenCommand;
 use PTSite\App\Console\Commands\PrepareDatabase;
 use PTSite\App\Console\Commands\VerifyLeague;
 use PTSite\App\Models\User;
@@ -46,7 +47,7 @@ class PTSiteServiceProvider extends ServiceProvider
         $this->loadViewsFrom(self::ROOT.'/resources/views', 'ptsite');
         $this->loadMessages();
         $this->loadRoutes();
-        $this->commands([PrepareDatabase::class, VerifyLeague::class]);
+        $this->commands([PrepareDatabase::class, VerifyLeague::class, CreateWriterTokenCommand::class]);
 
         /*
          * The name stored with a login token, in place of the model's class name. "App\Models\User" is the name

@@ -71,6 +71,7 @@ return [
     'account.username_required' => 'Enter the username to create the login.',
     'account.password_required' => 'Enter the password to create the login.',
     'account.own_role' => 'You cannot change your own role.',
+    'account.not_writer' => 'This username already exists and is not a writer.',
     'account.wrong_current_password' => 'The current password is wrong.',
     'password_reset.unknown_account' => 'We found no login with this username or email.',
     'password_reset.no_usable_email' => 'This login has no valid email. Ask an admin to set a new password.',

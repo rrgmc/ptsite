@@ -19,7 +19,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'username' => $this->username,
             'name' => $this->name,
-            /** @var 'player'|'results_keeper'|'admin' */
+            /** @var 'player'|'results_keeper'|'admin'|'writer' */
             'role' => $this->role->value,
             'player' => new PlayerResource($this->whenLoaded('player')),
             /** What this user may do, so clients can show or hide actions. The API still checks every request. */
@@ -34,6 +34,8 @@ class UserResource extends JsonResource
                 'manage_seasons' => $this->can('create', Season::class),
                 'manage_places' => $this->can('create', Place::class),
                 'view_audit_log' => $this->isAdmin(),
+                /** Whether the user writes the players' memos and the season recaps. */
+                'write_texts' => $this->canWriteTexts(),
             ],
         ];
     }

@@ -20,11 +20,15 @@ final class SavePlayer
     /** @param array{nickname?: string, name?: ?string, email?: ?string, birth_date?: ?string, memo?: ?string, status?: string, archived?: bool} $data */
     public function __invoke(User $user, ?Player $player, array $data): Player
     {
-        // A player changes their own profile, but not their memo or status, and cannot archive themself.
-        $adminOnly = array_intersect_key($data, array_flip(['memo', 'status', 'archived'])) !== [];
+        // A player changes their own profile, but not their memo or status, and cannot archive themself. A writer
+        // changes only the memo.
+        $adminOnly = array_intersect_key($data, array_flip(['status', 'archived'])) !== [];
+        $memoOnly = array_keys($data) === ['memo'];
         match (true) {
             $player === null => Gate::forUser($user)->authorize('create', Player::class),
             $adminOnly => Gate::forUser($user)->authorize('update', $player),
+            $memoOnly => Gate::forUser($user)->authorize('updateMemo', $player),
+            array_key_exists('memo', $data) => Gate::forUser($user)->authorize('update', $player),
             default => Gate::forUser($user)->authorize('updateProfile', $player),
         };
 
