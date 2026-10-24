@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.40.0] - 2026-10-24
+
 ### Added
 
 - "Temporadas" starts with a list of every season and its winner (the Main Event champion, else the 1st). A
@@ -381,7 +383,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.39.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.40.0...HEAD
+[1.40.0]: https://github.com/rrgmc/ptsite/compare/v1.39.0...v1.40.0
 [1.39.0]: https://github.com/rrgmc/ptsite/compare/v1.38.1...v1.39.0
 [1.38.1]: https://github.com/rrgmc/ptsite/compare/v1.38.0...v1.38.1
 [1.38.0]: https://github.com/rrgmc/ptsite/compare/v1.37.0...v1.38.0
