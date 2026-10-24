@@ -43,6 +43,9 @@ return [
     'attributes' => [
         'address' => 'endereço',
         'birth_date' => 'data de nascimento',
+        'body' => 'texto',
+        'night_id' => 'evento',
+        'published' => 'publicada',
         'current_password' => 'senha atual',
         'buy_in' => 'buy-in',
         'rebuy_value' => 'valor do rebuy',

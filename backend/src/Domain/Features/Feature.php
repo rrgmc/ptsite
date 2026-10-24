@@ -28,11 +28,14 @@ enum Feature: string
     /** "Painel do evento": who paid what on a night, and the pot and time chip worked out from it. */
     case NightDashboard = 'nightDashboard';
 
+    /** "Crônicas": texts about how the season is going, written after the nights and shown on the season page. */
+    case SeasonRecaps = 'seasonRecaps';
+
     /** Whether a site that does not name the feature has it. */
     public function default(): bool
     {
         return match ($this) {
-            self::MainEvent, self::HouseOwnerBuyIn, self::NightDashboard => false,
+            self::MainEvent, self::HouseOwnerBuyIn, self::NightDashboard, self::SeasonRecaps => false,
             default => true,
         };
     }

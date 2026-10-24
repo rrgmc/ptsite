@@ -24,6 +24,12 @@ class PlayerPolicy
         return $user->isAdmin();
     }
 
+    /** The memo alone: admins, and writers, the accounts of a program that writes texts. */
+    public function updateMemo(User $user, Player $player): bool
+    {
+        return $user->canWriteTexts();
+    }
+
     /** The profile: nickname, name, email, birthday, thumbnail and photo. Admins, and the player themself. */
     public function updateProfile(User $user, Player $player): bool
     {

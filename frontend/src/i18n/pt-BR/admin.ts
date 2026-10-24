@@ -143,6 +143,10 @@ export const admin = {
         name: 'Painel do evento',
         description: 'A tela para o celular que registra quem pagou o buy-in, os rebuys e os time chips de um evento, e calcula o pote.',
       },
+      seasonRecaps: {
+        name: 'Crônicas',
+        description: 'Textos curtos sobre como vai a temporada, escritos depois dos eventos e mostrados na classificação.',
+      },
     } satisfies Record<FeatureName, { name: string; description: string }>,
     versionTitle: 'Versão',
     /** The only version of a build of the core itself. */

@@ -208,6 +208,8 @@ return [
         'main_event_pot_percent' => 'Main Event pot share',
         'default_place_id' => 'default place',
         'login' => 'username or email',
+        'body' => 'text',
+        'night_id' => 'night',
         'percentages' => 'percentage table',
         'place_id' => 'place',
         'schedule_time' => 'time',

@@ -13,6 +13,7 @@ export const keys = {
   currentSeason: ['seasons', 'current'] as const,
   season: (id: number) => ['seasons', id] as const,
   standings: (id: number) => ['seasons', id, 'standings'] as const,
+  recaps: (id: number) => ['seasons', id, 'recaps'] as const,
   /** Starts with "seasons", so a changed result refreshes it with the standings. */
   seasonsTopStandings: ['seasons', 'top-standings'] as const,
   /** `null` is every season. */
@@ -144,6 +145,16 @@ export function useStandings(seasonId: number | undefined) {
     enabled: seasonId !== undefined,
     queryFn: async () =>
       (await unwrap(api.GET('/v1/seasons/{season}/standings', { params: { path: { season: seasonId! } } }))).data,
+  })
+}
+
+/** The season's recaps, newest first: the published ones, and the drafts too for writers and admins. */
+export function useSeasonRecaps(seasonId: number | undefined) {
+  return useQuery({
+    queryKey: keys.recaps(seasonId ?? 0),
+    enabled: seasonId !== undefined,
+    queryFn: async () =>
+      (await unwrap(api.GET('/v1/seasons/{season}/recaps', { params: { path: { season: seasonId! } } }))).data,
   })
 }
 

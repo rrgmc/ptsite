@@ -38,6 +38,12 @@ export const StandingsWithMainEvent: StoryObj = {
   render: () => <RouterStory path="/" url="/" element={<StandingsPage />} />,
 }
 
+/** "Classificação" on a site with recaps: the newest one below the table, the older one behind "Crônicas anteriores". */
+export const StandingsWithRecaps: StoryObj = {
+  decorators: [withFeatures({ seasonRecaps: true })],
+  render: () => <RouterStory path="/" url="/" element={<StandingsPage />} />,
+}
+
 /** "Classificação" of a finished season: no "Evento aberto" and no "Próximo evento", even with a night left open. */
 export const StandingsFinishedSeason: StoryObj = {
   parameters: {

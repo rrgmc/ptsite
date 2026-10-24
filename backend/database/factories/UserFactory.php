@@ -40,6 +40,12 @@ class UserFactory extends Factory
         return $this->state(['role' => Role::ResultsKeeper]);
     }
 
+    /** The account of a program that writes texts: no player and no password. */
+    public function writer(): static
+    {
+        return $this->state(['role' => Role::Writer, 'password' => null, 'email' => null]);
+    }
+
     /** A user imported from an older site, with an unsalted MD5 hash and no modern password yet. */
     public function legacy(string $password): static
     {

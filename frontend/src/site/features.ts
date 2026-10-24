@@ -18,6 +18,8 @@ export const FEATURE_DEFAULTS = {
   houseOwnerBuyIn: false,
   /** "Painel do evento": who paid what on a night, and the pot and time chip worked out from it. Off unless a site turns it on. */
   nightDashboard: false,
+  /** "Crônicas": texts about how the season is going, written after the nights and shown on the season page. Off unless a site turns it on. */
+  seasonRecaps: false,
 }
 
 export type FeatureName = keyof typeof FEATURE_DEFAULTS

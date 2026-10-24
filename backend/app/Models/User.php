@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->role->canRunNights();
     }
+
+    public function canWriteTexts(): bool
+    {
+        return $this->role->canWriteTexts();
+    }
 }

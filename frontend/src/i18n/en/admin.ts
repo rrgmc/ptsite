@@ -134,6 +134,10 @@ export const admin: Messages['admin'] = {
         name: 'Night dashboard',
         description: "The screen for a phone that records who paid the buy-in, the rebuys and the time chips of a night, and works out its pot.",
       },
+      seasonRecaps: {
+        name: 'Recaps',
+        description: 'Short texts about how the season is going, written after the nights and shown with the standings.',
+      },
     },
     versionTitle: 'Version',
     version: 'Version',

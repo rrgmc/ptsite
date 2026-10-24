@@ -15,6 +15,7 @@ use PTSite\App\Http\Controllers\Api\PlayerController;
 use PTSite\App\Http\Controllers\Api\PlayerLoginController;
 use PTSite\App\Http\Controllers\Api\PlayerStatisticsController;
 use PTSite\App\Http\Controllers\Api\SeasonController;
+use PTSite\App\Http\Controllers\Api\SeasonRecapController;
 use PTSite\App\Http\Controllers\Api\StatisticsController;
 use PTSite\App\Http\Middleware\RequireFeature;
 use PTSite\Domain\Features\Feature;
@@ -52,6 +53,11 @@ Route::prefix('v1')->group(function () {
         Route::get('seasons/{season}/night-plan', [SeasonController::class, 'nightPlan'])->middleware(RequireFeature::for(Feature::SeasonPlanner));
         Route::get('seasons/{season}/calendar', [SeasonController::class, 'calendar']);
         Route::post('seasons/{season}/nights/batch', [NightController::class, 'storeMany'])->middleware(RequireFeature::for(Feature::SeasonPlanner));
+        Route::get('seasons/{season}/digest', [SeasonRecapController::class, 'digest']);
+        Route::get('seasons/{season}/recaps', [SeasonRecapController::class, 'index']);
+        Route::post('seasons/{season}/recaps', [SeasonRecapController::class, 'store'])->middleware(RequireFeature::for(Feature::SeasonRecaps));
+        Route::patch('recaps/{recap}', [SeasonRecapController::class, 'update']);
+        Route::delete('recaps/{recap}', [SeasonRecapController::class, 'destroy']);
 
         Route::get('nights/{night}', [NightController::class, 'show']);
         Route::patch('nights/{night}', [NightController::class, 'update']);
