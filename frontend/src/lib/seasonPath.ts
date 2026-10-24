@@ -22,7 +22,7 @@ export function seasonPath(seasonId: number | null, screen: string): string {
 }
 
 /** The screens that show one season. A player's page does too: /players/12, but not /players/12/all. */
-const seasonScreens = ['/', '/results', '/calendar', '/simulator', '/statistics', '/main-event']
+const seasonScreens = ['/', '/results', '/recaps', '/calendar', '/simulator', '/statistics', '/main-event']
 const playerPage = /^\/players\/\d+$/
 
 /** Whether a path, with or without a season in it, is a season screen. */

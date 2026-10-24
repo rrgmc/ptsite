@@ -16,6 +16,7 @@ import { MainEventResultCard } from '../mainEvent/MainEventResultCard'
 import { amountRows } from '../nights/amounts'
 import { NightMark } from '../nights/NightMark'
 import { useSelectedSeason } from '../layout/useSelectedSeason'
+import { LatestRecapBox } from '../recaps/RecapBoxes'
 import { NightResultCard } from './NightResultCard'
 import { NightSuggestions } from './NightSuggestions'
 import { numberRounds } from './rounds'
@@ -106,6 +107,10 @@ export function ResultsPage() {
           )}
         </div>
       )}
+
+      <div className="mb-4 empty:hidden">
+        <LatestRecapBox seasonId={season.id} />
+      </div>
 
       {totals && (
         // min-w-0 lets the chart shrink with the page.

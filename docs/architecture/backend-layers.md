@@ -19,7 +19,7 @@ backend/
     Attendance/             AttendanceAnswer, AttendanceRules
     Standings/              Standings, RankingSimulator, ScoreLine, StandingRow, SimulatedRow, StandingsDigest and
                             DigestLine (how the standings moved on the latest night)
-    Recaps/                 SeasonRecapRules
+    Recaps/                 SeasonRecapRules, MoneyTally and PlayerMoneyLine (rebuys and time chips for the digest)
     Statistics/             Statistics (top ten lists and the leaders' running totals), MainEventStatistics,
                             PlayerStatistics (one player's), Ranking, NightRecord
   app/Actions/            one class per change; check policy, call domain, save, audit

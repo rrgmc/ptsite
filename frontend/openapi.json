@@ -7001,6 +7001,13 @@
                             },
                             "extra_nights_played": {
                                 "type": "integer"
+                            },
+                            "time_chip_total": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "The time chips of the season's finished nights: the money for the year party. Null on a site with no time chip."
                             }
                         },
                         "required": [
@@ -7011,7 +7018,8 @@
                             "rounds",
                             "rounds_played",
                             "rounds_left",
-                            "extra_nights_played"
+                            "extra_nights_played",
+                            "time_chip_total"
                         ]
                     },
                     "latest_night": {
@@ -7096,6 +7104,72 @@
                             ]
                         }
                     },
+                    "money": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "description": "What the night dashboard recorded, for every player who rebought or arrived late: over the season's\nfinished nights, and on the latest one. The most time chips first. Rebuys past the limit\n(money_only_rebuys) put money in the pot, but the player plays only for money. Null on a site with\nno night dashboard.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "player": {
+                                    "$ref": "#/components/schemas/PlayerResource"
+                                },
+                                "season": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rebuys": {
+                                            "type": "integer"
+                                        },
+                                        "money_only_rebuys": {
+                                            "type": "integer"
+                                        },
+                                        "late_arrivals": {
+                                            "type": "integer"
+                                        },
+                                        "time_chips": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "rebuys",
+                                        "money_only_rebuys",
+                                        "late_arrivals",
+                                        "time_chips"
+                                    ]
+                                },
+                                "latest_night": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rebuys": {
+                                            "type": "integer"
+                                        },
+                                        "money_only_rebuys": {
+                                            "type": "integer"
+                                        },
+                                        "late_arrivals": {
+                                            "type": "integer"
+                                        },
+                                        "time_chips": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "rebuys",
+                                        "money_only_rebuys",
+                                        "late_arrivals",
+                                        "time_chips"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "player",
+                                "season",
+                                "latest_night"
+                            ]
+                        }
+                    },
                     "recaps": {
                         "type": "array",
                         "description": "The latest published recaps, newest first.",
@@ -7109,6 +7183,7 @@
                     "latest_night",
                     "next_night",
                     "standings",
+                    "money",
                     "recaps"
                 ],
                 "title": "SeasonDigestResource"

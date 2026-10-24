@@ -1934,6 +1934,8 @@ export interface components {
                 rounds_played: number;
                 rounds_left: number;
                 extra_nights_played: number;
+                /** @description The time chips of the season's finished nights: the money for the year party. Null on a site with no time chip. */
+                time_chip_total: string | null;
             };
             latest_night: components["schemas"]["NightResource"] | null;
             next_night: components["schemas"]["NightResource"] | null;
@@ -1950,6 +1952,27 @@ export interface components {
                 wins: number;
                 form: (number | null)[];
             }[];
+            /**
+             * @description What the night dashboard recorded, for every player who rebought or arrived late: over the season's
+             *     finished nights, and on the latest one. The most time chips first. Rebuys past the limit
+             *     (money_only_rebuys) put money in the pot, but the player plays only for money. Null on a site with
+             *     no night dashboard.
+             */
+            money: {
+                player: components["schemas"]["PlayerResource"];
+                season: {
+                    rebuys: number;
+                    money_only_rebuys: number;
+                    late_arrivals: number;
+                    time_chips: number;
+                };
+                latest_night: {
+                    rebuys: number;
+                    money_only_rebuys: number;
+                    late_arrivals: number;
+                    time_chips: number;
+                };
+            }[] | null;
             /** @description The latest published recaps, newest first. */
             recaps: components["schemas"]["SeasonRecapResource"][];
         };

@@ -21,6 +21,7 @@ import { NightEditPage } from './nights/NightEditPage'
 import { NightPage, RescheduleForm } from './nights/NightPage'
 import { PartialResultFormPage } from './nights/PartialResultFormPage'
 import { ResultFormPage } from './nights/ResultFormPage'
+import { RecapsPage } from './recaps/RecapsPage'
 import { ResultsPage } from './results/ResultsPage'
 import { SimulatorPage } from './simulator/SimulatorPage'
 import { StandingsPage } from './standings/StandingsPage'
@@ -38,10 +39,29 @@ export const StandingsWithMainEvent: StoryObj = {
   render: () => <RouterStory path="/" url="/" element={<StandingsPage />} />,
 }
 
-/** "Classificação" on a site with recaps: the newest one below the table, the older one behind "Crônicas anteriores". */
+/** "Classificação" on a site with recaps: their titles in a box at the right, each a link to it on "Crônicas". */
 export const StandingsWithRecaps: StoryObj = {
   decorators: [withFeatures({ seasonRecaps: true })],
   render: () => <RouterStory path="/" url="/" element={<StandingsPage />} />,
+}
+
+/** "Resultados" on a site with recaps: the newest one in full, above the chart. */
+export const ResultsWithRecap: StoryObj = {
+  decorators: [withFeatures({ seasonRecaps: true })],
+  render: () => <RouterStory path="/results" url="/results" element={<ResultsPage />} />,
+}
+
+/** "Crônicas": quick links to each recap; a recap about a night has its positions at the left. Names are in bold. */
+export const Recaps: StoryObj = {
+  decorators: [withFeatures({ seasonRecaps: true })],
+  render: () => <RouterStory path="/recaps" url="/recaps" element={<RecapsPage />} />,
+}
+
+/** "Crônicas" of a season with none yet. */
+export const RecapsNone: StoryObj = {
+  decorators: [withFeatures({ seasonRecaps: true })],
+  parameters: { msw: [http.get('/api/v1/seasons/:id/recaps', () => HttpResponse.json({ data: [] })), ...handlers] },
+  render: () => <RouterStory path="/recaps" url="/recaps" element={<RecapsPage />} />,
 }
 
 /** "Classificação" of a finished season: no "Evento aberto" and no "Próximo evento", even with a night left open. */

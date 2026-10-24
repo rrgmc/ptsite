@@ -26,6 +26,7 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { to: '/', label: t.layout.nav.standings, icon: '🏆', end: true, tab: true, top: true },
   { to: '/results', label: t.layout.nav.results, icon: '🃏', tab: true, top: true },
+  { to: '/recaps', label: t.layout.nav.recaps, icon: '📰', top: true, feature: 'seasonRecaps' },
   { to: '/calendar', label: t.layout.nav.calendar, icon: '📅', tab: true, top: true },
   { to: '/simulator', label: t.layout.nav.simulator, icon: '🔮' },
   { to: '/main-event', label: t.layout.nav.mainEvent, icon: '🏅', feature: 'mainEvent' },

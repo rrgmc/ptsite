@@ -4,6 +4,8 @@
  * Mirrors the examples in docs/specs/season-recaps.md. Players: Ana = 1, Breno = 2, Carla = 3.
  */
 
+use PTSite\Domain\Recaps\MoneyTally;
+use PTSite\Domain\Recaps\PlayerMoneyLine;
 use PTSite\Domain\Recaps\SeasonRecapRules;
 use PTSite\Domain\Shared\Money;
 use PTSite\Domain\Shared\RuleViolation;
@@ -63,4 +65,30 @@ it('publishes only on a site with recaps ("Without the feature")', function () {
 
     $rules->assertCanPublish(true);
     expect(fn () => $rules->assertCanPublish(false))->toThrow(RuleViolation::class, 'recap.disabled');
+});
+
+it('counts each player\'s rebuys, the ones past the limit and the time chips of a night ("Rebuys and the time chip")', function () {
+    // Ana: three rebuys with two allowed; Breno: late, one rebuy; Carla: late only. A rebuy charges a time chip.
+    $night = (new MoneyTally)->night([1 => 3, 2 => 1], [2, 3], rebuysAllowed: 2, rebuyChargesTimeChip: true, timeChip: true);
+
+    expect(array_map(fn ($l) => [$l->rebuys, $l->moneyOnlyRebuys, $l->lateArrivals, $l->timeChips], $night))->toBe([
+        1 => [3, 1, 0, 3],
+        2 => [1, 0, 1, 2],
+        3 => [0, 0, 1, 1],
+    ]);
+});
+
+it('charges no time chip for a rebuy when the season says so, and none at all on a site with no time chip', function () {
+    $tally = new MoneyTally;
+
+    expect($tally->night([1 => 2], [1], 5, rebuyChargesTimeChip: false, timeChip: true)[1]->timeChips)->toBe(1)
+        ->and($tally->night([1 => 2], [1], 5, rebuyChargesTimeChip: true, timeChip: false)[1])->toEqual(new PlayerMoneyLine(1, 2, 0, 0, 0));
+});
+
+it('adds the nights of a season up by player', function () {
+    $tally = new MoneyTally;
+    $total = $tally->add([$tally->night([1 => 3], [], 2, true, true), $tally->night([1 => 1, 2 => 1], [1], 2, true, true)]);
+
+    expect($total[1])->toEqual(new PlayerMoneyLine(1, 4, 1, 1, 5))
+        ->and($total[2])->toEqual(new PlayerMoneyLine(2, 1, 0, 0, 1));
 });
