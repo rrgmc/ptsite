@@ -8,6 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.38.0] - 2026-10-24
+
+### Added
+
+- "Crônicas", a screen of the season of its own, in the menu after "Resultados": every recap, newest first,
+  under quick links to each one, with the night's positions in a small box at the left. "Resultados" shows the
+  newest recap in full above "Pontos acumulados". A recap's first line is its title, and players' nicknames are
+  in bold ([docs/specs/season-recaps.md](docs/specs/season-recaps.md), rules 1, 4 and 4b).
+- The season digest has each player's rebuys, rebuys past the limit, late arrivals and time chips, over the season
+  and on the latest night (`money`), and the season's time chip total (`season.time_chip_total`).
+
+### Changed
+
+- "Classificação" lists the recaps' titles in a box at the right, below "E se…?", instead of showing the newest
+  recap below the table.
+
 ## [1.37.0] - 2026-10-24
 
 ### Added
@@ -345,7 +361,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.37.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.38.0...HEAD
+[1.38.0]: https://github.com/rrgmc/ptsite/compare/v1.37.0...v1.38.0
 [1.37.0]: https://github.com/rrgmc/ptsite/compare/v1.36.0...v1.37.0
 [1.36.0]: https://github.com/rrgmc/ptsite/compare/v1.35.3...v1.36.0
 [1.35.3]: https://github.com/rrgmc/ptsite/compare/v1.35.2...v1.35.3
