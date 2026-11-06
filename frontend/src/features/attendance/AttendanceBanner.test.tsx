@@ -28,6 +28,16 @@ describe('AttendanceBanner', () => {
     expect(screen.getByRole('link', { name: 'Evento aberto: Sábado, 18/04' })).toHaveAttribute('href', '/nights/11')
   })
 
+  it("shows the place's address when the place has one", () => {
+    banner(null)
+    expect(screen.getByRole('complementary')).toHaveTextContent('Rua das Flores, 123')
+  })
+
+  it('shows no address when the place has none', () => {
+    banner(null, undefined, { ...openNight, place: { ...openNight.place!, address: null } })
+    expect(screen.getByRole('complementary')).not.toHaveTextContent('Rua das Flores')
+  })
+
   it('shows how many players answered ALL IN, also when nobody has', () => {
     banner(null, undefined, openNight, 0)
     expect(screen.getByRole('complementary')).toHaveTextContent('Casa do Breno · 0 ALL IN')

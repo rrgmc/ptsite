@@ -48,4 +48,6 @@ test('the banner on "Classificação" and "Resultados" takes the player\'s answe
   await banner.getByRole('link', { name: 'Alterar' }).click()
   await expect(page).toHaveURL(/\/nights\/\d+$/)
   await expect(page.getByRole('heading', { name: 'Confirme sua presença' })).toBeVisible()
+  // The open night's page shows its place in a box of its own
+  await expect(page.getByRole('region', { name: 'Local' })).toBeVisible()
 })

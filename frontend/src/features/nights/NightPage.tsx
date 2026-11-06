@@ -55,6 +55,7 @@ export function NightPage() {
   // On a site with the night dashboard, a regular night that was opened has one; it holds the partial result.
   const hasDashboard = hasFeature('nightDashboard') && !isMainEvent && !n.archived && n.status !== 'scheduled'
   const isFinished = n.status === 'finished'
+  const isOpen = n.status === 'open' && !n.archived
   // Only an admin changes a finished night's dashboard; everyone else sees its players beside the result.
   const canEditFinishedDashboard = isFinished && hasDashboard && me.data?.abilities.edit_played_nights
 
@@ -62,7 +63,17 @@ export function NightPage() {
     <>
       <PageHeader
         title={titleOfNight(n)}
-        subtitle={<span>{formatWeekday(n.starts_at)} · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>}
+        subtitle={
+          // An open night shows its place in a box of its own below, where the players look for it.
+          isOpen ? (
+            <span>{formatWeekday(n.starts_at)} · {formatTime(n.starts_at)}</span>
+          ) : (
+            <>
+              <span>{formatWeekday(n.starts_at)} · {formatTime(n.starts_at)} · {n.place?.name ?? t.nights.noPlace}</span>
+              {n.place?.address && <span className="block whitespace-pre-line text-sm">{n.place.address}</span>}
+            </>
+          )
+        }
         action={
           <span className="flex flex-wrap items-center gap-2">
             <NightMark night={n} />
@@ -70,6 +81,13 @@ export function NightPage() {
           </span>
         }
       />
+
+      {isOpen && (
+        <section aria-label={t.nights.page.place} className="mb-4 max-w-xl rounded-md bg-primary-soft p-3 wrap-anywhere">
+          <p className="text-lg font-semibold">{n.place?.name ?? t.nights.noPlace}</p>
+          {n.place?.address && <p className="whitespace-pre-line">{n.place.address}</p>}
+        </section>
+      )}
 
       {description && <p className="mb-4 max-w-xl whitespace-pre-line">{description}</p>}
 

@@ -10,8 +10,8 @@ import type { Answer } from './AttendancePanel'
 const labels: Record<Answer, string> = { all_in: t.attendance.allIn, fold: t.attendance.fold }
 
 /**
- * The open night, above a season screen: a player who has not answered taps ALL IN or FOLD; one who has sees the
- * answer, with the way to the night's page to change it (docs/specs/attendance.md, rule 8).
+ * The open night, above a season screen, with its place's address when the place has one: a player who has not
+ * answered taps ALL IN or FOLD; one who has sees the answer, with the way to the night's page to change it (docs/specs/attendance.md, rule 8).
  */
 export function AttendanceBanner({
   night,
@@ -34,6 +34,7 @@ export function AttendanceBanner({
       <p className="min-w-0 wrap-anywhere">
         <Link to={nightPath} className="font-semibold underline">{t.attendance.banner.title({ weekday: formatWeekday(night.starts_at) })}</Link>
         <span className="text-muted"> · {night.place?.name ?? t.nights.noPlace} · {t.attendance.banner.allInCount({ count: allInCount })}</span> <NightMark night={night} />
+        {night.place?.address && <span className="block whitespace-pre-line text-sm text-muted">{night.place.address}</span>}
         <span className="block">
           {answer ? rich(t.attendance.banner.you, { answer: <strong>{labels[answer]}</strong> }) : t.attendance.banner.confirmPresence}
         </span>
