@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.41.0] - 2026-11-06
+
+### Added
+
+- The open night's banner and the night's page show the place's address, when the place has one. While a night
+  is open, its page shows the place and its address in a box of their own ("Local") near the top
+  ([docs/specs/attendance.md](docs/specs/attendance.md), rule 8;
+  [docs/specs/seasons-and-nights.md](docs/specs/seasons-and-nights.md), rule 6).
+
 ## [1.40.0] - 2026-10-24
 
 ### Added
@@ -383,7 +392,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The night dashboard link on the open night's banner.
 
-[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.40.0...HEAD
+[Unreleased]: https://github.com/rrgmc/ptsite/compare/v1.41.0...HEAD
+[1.41.0]: https://github.com/rrgmc/ptsite/compare/v1.40.0...v1.41.0
 [1.40.0]: https://github.com/rrgmc/ptsite/compare/v1.39.0...v1.40.0
 [1.39.0]: https://github.com/rrgmc/ptsite/compare/v1.38.1...v1.39.0
 [1.38.1]: https://github.com/rrgmc/ptsite/compare/v1.38.0...v1.38.1
