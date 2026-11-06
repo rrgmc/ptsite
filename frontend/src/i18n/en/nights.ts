@@ -49,6 +49,7 @@ export const nights: Messages['nights'] = {
   // The night's page
   page: {
     actions: 'Actions',
+    place: 'Place',
     openNight: 'Open night',
     reschedule: 'Reschedule',
     cancelNight: 'Cancel night',

@@ -104,6 +104,8 @@ Run a season of game nights: schedule a night, open it, play, enter the results.
 ### Game nights ("Evento")
 
 6. A night has a date and time, a place (the season's default place unless changed) and a description.
+   The night's page shows the place under its date, with the place's address when the place has one. While the
+   night is open, the place and its address stand out in a box of their own ("Local") at the top of the page.
 6a. A night's title is a word set by the site and the night's date: "Liga - 14/03/2026". The first word is the
    site's setting (`nightTitlePrefix` in its `site.json`); the demo league uses "Liga", and so do the
    examples in these specs. On "Resultados" the title also has the night's number in the season, counting the

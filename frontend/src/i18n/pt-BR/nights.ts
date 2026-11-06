@@ -56,6 +56,7 @@ export const nights = {
   // The night's page
   page: {
     actions: 'Ações',
+    place: 'Local',
     openNight: 'Abrir evento',
     reschedule: 'Remarcar',
     cancelNight: 'Cancelar evento',

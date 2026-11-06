@@ -41,7 +41,8 @@ Know who is coming to the night that is open, so the host can plan, and make ent
 7. When finishing a night, the player picker lists the players who answered **ALL IN first**, under
    "Confirmados", then the other active and inactive players as usual.
 8. While a night of the **current season** is open, a banner at the top of "Classificação" and "Resultados"
-   names it and says how many players answered ALL IN ("3 ALL IN"), as the calendar does. A player who has
+   names it, its place and the place's address when the place has one, and says how many players answered ALL IN
+   ("3 ALL IN"), as the calendar does. A player who has
    not answered gets the buttons **"ALL IN"** and **"FOLD"** there. A player who has answered sees the answer ("Você: ALL IN") and "Alterar", which leads to the night's page; the answer is
    changed or removed there. The banner is about the current season's night also while another season is on
    screen. An account with no player sees no banner.
